@@ -1,0 +1,452 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "",
+    "version": "1.0.0",
+    "title": "EnergyCoin Dashboard Partner API"
+  },
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/transaction/insertBatch": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "Insert an array of transactions into the EnergyCoin Dashboard application",
+        "description": "",
+        "operationId": "insertTransactionBatch",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "In order to create an array of transaction records, It is required to pass Transaction Batch Request that will contain a list of transactions that have to be inserted.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/InsertTransactionBatchRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful insert.",
+            "schema": {
+              "$ref": "#/definitions/InsertTransactionBatchResponse"
+            }
+          },
+          "406": {
+            "description": "EnergyCoin amount has to be above 0.1 ENRG"
+          },
+          "409": {
+            "description": "Email provided in transaction does not exist."
+          }
+        },
+        "security": [
+          {
+            "partner_auth": [
+              "write_transactions"
+            ]
+          }
+        ]
+      }
+    },
+    "/transaction/cancelBatch": {
+      "post": {
+        "tags": [
+          "Transaction"
+        ],
+        "summary": "Cancels an array of transactions within the EnergyCoin Dashboard application",
+        "description": "",
+        "operationId": "cancelTransactionBatch",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "In order to cancel an array of transaction records, It is required to pass Cancel Transaction Batch Request that will contain a list of Transaction IDs that needs to be canceled.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CancelTransactionBatchRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancel successful."
+          },
+          "406": {
+            "description": "Transaction does not exist or is already persisted on Blockchain"
+          }
+        },
+        "security": [
+          {
+            "partner_auth": [
+              "write_transactions"
+            ]
+          }
+        ]
+      }
+    },
+    "/user/connectExternal": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Connect and integrate User with the EnergyCoin Dashboard application by passing User's Email",
+        "description": "",
+        "operationId": "connectExternal",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "In order to connect and integrate external User into application, It is required to store Partner User Connection Request into request body that will include Email of that particular User.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PartnerUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful insert.",
+            "schema": {
+              "$ref": "#/definitions/PartnerUserConnectionResponse"
+            }
+          },
+          "400": {
+            "description": "Bad email format."
+          }
+        },
+        "security": [
+          {
+            "partner_auth": [
+              "connect_users"
+            ]
+          }
+        ]
+      }
+    },
+    "/user/retrieveBalance": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Retrieve the total amount of EnergyCoin accumulated for specific user, using specific partner application.",
+        "description": "",
+        "operationId": "retrieveBalance",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "In order to get current EnergyCoin balance for a specific user, email has to be provided.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PartnerUserRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fetching successful.",
+            "schema": {
+              "$ref": "#/definitions/PartnerUserBalanceResponse"
+            }
+          },
+          "400": {
+            "description": "Bad email format."
+          },
+          "409": {
+            "description": "User with given email does not exist."
+          }
+        },
+        "security": [
+          {
+            "partner_auth": [
+              "access_user_transactions"
+            ]
+          }
+        ]
+      }
+    },
+    "/user/retrieveTransactionsByStatus": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Retrieve all user's transactions based on status provided in request.",
+        "description": "",
+        "operationId": "retrieveUsersTransactions",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "In order to retrieve transaction list, it is necessary to pass relevant information including email of user and status by which transactions are retrieved.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserTransactionStatusRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fetching successful",
+            "schema": {
+              "$ref": "#/definitions/UserTransactionStatusBatchResponse"
+            }
+          },
+          "409": {
+            "description": "User with given email does not exist."
+          }
+        },
+        "security": [
+          {
+            "partner_auth": [
+              "access_user_transactions"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "partner_auth": {
+      "type": "oauth2",
+      "tokenUrl": "https://api.dashboard.energycoin.eu/api/oauth/token",
+      "flow": "application",
+      "scopes": {
+        "write_transactions": "Write transactions based on 'Green' activity",
+        "connect_users": "Connect and integrate users with the EnergyCoin Dashboard application",
+        "access_user_transactions": "Access all transaction based information for partner's users"
+      }
+    }
+  },
+  "definitions": {
+    "InsertTransactionBatchRequest": {
+      "type": "object",
+      "properties": {
+        "transactionRequests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InsertTransactionRequest"
+          }
+        }
+      }
+    },
+    "InsertTransactionRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Email to whom this transaction is related.",
+          "example": "johndoe@noreply.com"
+        },
+        "location": {
+          "type": "string",
+          "description": "Location of transaction - represents a region where the 'Green' event occured.",
+          "example": "Netherlands"
+        },
+        "envAmount": {
+          "type": "number",
+          "description": "Environmental amount - represents the amount of 'Green' metric from which this transaction is based upon.",
+          "example": "10.6"
+        },
+        "virtualCurrencyCode": {
+          "type": "string",
+          "description": "Virtual currency denomination code.",
+          "example": "BB"
+        },
+        "virtualCurrencyAmount": {
+          "type": "number",
+          "description": "Virtual currency amount that is being inserted for this Transaction.",
+          "example": "5.3"
+        },
+        "enrgAmount": {
+          "type": "number",
+          "description": "EnergyCoin amount",
+          "example": "1.06"
+        }
+      }
+    },
+    "InsertTransactionBatchResponse": {
+      "type": "object",
+      "properties": {
+        "transactionResponses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InsertTransactionResponse"
+          }
+        }
+      }
+    },
+    "InsertTransactionResponse": {
+      "type": "object",
+      "properties": {
+        "transactionId": {
+          "type": "integer",
+          "description": "Unique transaction ID inserted, this ID can be further used to cancel it.",
+          "example": "1221"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email of a user to that is related to this transaction ID.",
+          "example": "johndoe@noreply.com"
+        },
+        "enrgAmount": {
+          "type": "number",
+          "description": "Amount of EnergyCoin given to user.",
+          "example": "123.48"
+        }
+      }
+    },
+    "CancelTransactionBatchRequest": {
+      "type": "object",
+      "properties": {
+        "cancelTransactionRequests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CancelTransactionRequest"
+          }
+        }
+      }
+    },
+    "CancelTransactionRequest": {
+      "type": "object",
+      "properties": {
+        "transactionId": {
+          "type": "integer",
+          "description": "Unique transaction ID related to transaction that needs to be canceled.",
+          "example": "12"
+        }
+      }
+    },
+    "PartnerUserRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Unique Email of the particular user that wants to integrate with the EnergyCoin Dashboard application, or is already integrated.",
+          "example": "johndoe@noreply.com"
+        }
+      }
+    },
+    "PartnerUserConnectionResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string",
+          "description": "Oauth2 Access token that is used to authorize User within EnergyCoin Dashboard Application",
+          "example": "6f82b269-7adb-4fe4-8b04-ae1ad568b794"
+        }
+      }
+    },
+    "PartnerUserBalanceResponse": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Email of a particular user to whom balance is related.",
+          "example": "johndoe@noreply.com"
+        },
+        "virtualBalance": {
+          "type": "number",
+          "description": "Specific number that represents the balance of partner's virtual denomination for a particular user.",
+          "example": "7438.16"
+        },
+        "enrgBalance": {
+          "type": "number",
+          "description": "Specific number that represents the EnergyCoin balance for a particular user.",
+          "example": "7438.16"
+        }
+      }
+    },
+    "UserTransactionStatusRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Unique Email of the particular user from whom a list of transactions is retrieved",
+          "example": "johndoe@noreply.com"
+        },
+        "status": {
+          "type": "string",
+          "description": "This field describes current transaction status",
+          "enum": [
+            "CREATED",
+            "CANCELED",
+            "PENDING",
+            "DISPUTED",
+            "CONFIRMED"
+          ],
+          "example": "DISPUTED"
+        }
+      }
+    },
+    "UserTransactionStatusBatchResponse": {
+      "type": "object",
+      "properties": {
+        "userTransactionStatusResponses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserTransactionStatusResponse"
+          }
+        }
+      }
+    },
+    "UserTransactionStatusResponse": {
+      "type": "object",
+      "properties": {
+        "transactionId": {
+          "type": "integer",
+          "description": "Unique transaction ID related to this transaction.",
+          "example": "1"
+        },
+        "transactionStatus": {
+          "type": "string",
+          "description": "Describes the current status of transaction",
+          "enum": [
+            "CREATED",
+            "CANCELED",
+            "PENDING",
+            "DISPUTED",
+            "CONFIRMED"
+          ],
+          "example": "DISPUTED"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email related to user to whom this transaction is sent",
+          "example": "johndoe@noreply.com"
+        },
+        "enrgAmount": {
+          "type": "number",
+          "description": "EnergyCoin amount",
+          "example": "123.48"
+        }
+      }
+    }
+  }
+}

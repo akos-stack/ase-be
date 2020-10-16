@@ -1,0 +1,18 @@
+version: '3.5'
+
+services:
+  postgres:
+    image: postgres
+    container_name: userservicepostgres
+    volumes:
+      - ./src/main/resources/db/createdb:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - userservice
+networks:
+  userservice:
+    name: userservice
+    driver: bridge
