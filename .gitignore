@@ -1,0 +1,7 @@
+.gradle/
+.idea/
+out/
+build/
+logs
+sample-service.iml
+user-api.iml
