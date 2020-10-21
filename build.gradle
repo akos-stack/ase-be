@@ -84,6 +84,9 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok:1.18.14")
     annotationProcessor 'org.projectlombok:lombok:1.18.14'
+    testCompileOnly("org.projectlombok:lombok:1.18.14")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.14")
+
     compile group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation('javax.xml.bind:jaxb-api:2.3.0')
