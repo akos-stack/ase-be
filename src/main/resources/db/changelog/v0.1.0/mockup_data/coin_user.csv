@@ -1,2 +1,2 @@
-email,password,locked,enabled,deleted,created
-mockupuser@noreply.com,$2a$10$BofVQ7tFpcUA.H0Lxp90Wew0n6VYGcc2R4tyyeHeOgRR0pgpB845G,false,true,false,2018-10-01T13:35:51+00:00
+email,password,locked,enabled,deleted
+mockupuser@noreply.com,$2a$10$BofVQ7tFpcUA.H0Lxp90Wew0n6VYGcc2R4tyyeHeOgRR0pgpB845G,false,true,false
