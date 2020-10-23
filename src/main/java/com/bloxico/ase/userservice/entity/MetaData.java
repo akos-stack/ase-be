@@ -23,14 +23,14 @@ public abstract class MetaData implements Serializable {
 
     @PrePersist
     void prePersist() {
-        created = LocalDateTime.now();
+        setCreated(LocalDateTime.now());
     }
 
     @PreUpdate
     void preUpdate() {
-        if (updater == null)
+        if (getUpdater() == null)
             throw new IllegalStateException("updater is null");
-        updated = LocalDateTime.now();
+        setUpdated(LocalDateTime.now());
     }
 
 }

@@ -1,0 +1,43 @@
+package com.bloxico.ase.userservice.repository;
+
+import com.bloxico.ase.testutil.AbstractSpringTest;
+import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.entity.user.UserProfile;
+import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.UUID;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+public class UserProfileRepositoryTest extends AbstractSpringTest {
+
+    @Autowired
+    private MockUtil mockUtil;
+
+    @Autowired
+    private UserProfileRepository repository;
+
+    @Test
+    public void save() {
+        assertNotNull(mockUtil.savedUser().getId());
+    }
+
+    @Test
+    public void findById() {
+        assertFalse(repository.findById(-1L).isPresent());
+        UserProfile user = mockUtil.savedUser();
+        assertTrue(repository.findById(user.getId()).isPresent());
+    }
+
+    @Test
+    public void findByEmail() {
+        assertFalse(repository.findByEmailIgnoreCase(UUID.randomUUID().toString()).isPresent());
+        UserProfile user = mockUtil.savedUser();
+        assertTrue(repository.findByEmailIgnoreCase(user.getEmail()).isPresent());
+    }
+
+}
