@@ -4,7 +4,6 @@ import com.bloxico.ase.userservice.entity.MetaData;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,7 +30,6 @@ public class UserProfile extends MetaData {
 
     private String password;
 
-    @NaturalId
     private String email;
 
     private String phone;
