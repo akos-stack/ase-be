@@ -8,7 +8,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 
-@Entity
+@Entity(name = "userProfileOld")
 @Data
 @EqualsAndHashCode(of = {"name", "city", "region"}, callSuper = false)
 @ToString(exclude = "coinUser")

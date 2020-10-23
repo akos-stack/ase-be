@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository("userProfileRepositoryOld")
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
 
-    @Query("select up FROM UserProfile up WHERE up.coinUser.email = ?1")
+    @Query("select up FROM userProfileOld up WHERE up.coinUser.email = ?1")
     Optional<UserProfile> findByEmail(String email);
 }

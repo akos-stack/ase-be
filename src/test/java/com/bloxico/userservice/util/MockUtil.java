@@ -29,7 +29,7 @@ import static io.restassured.RestAssured.given;
 /**
  * This class will contain utility methods that will be used when initiating tests in order to have valid testing environment
  */
-@Component
+@Component("mockUtilOld")
 public class MockUtil {
 
     @Autowired
