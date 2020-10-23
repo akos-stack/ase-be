@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
+@Repository("userProfileRepositoryOld")
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
 
     @Query("select up FROM UserProfile up WHERE up.coinUser.email = ?1")
