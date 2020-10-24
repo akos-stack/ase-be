@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Data
 @MappedSuperclass
-public abstract class MetaData implements Serializable {
+public abstract class Metadata implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

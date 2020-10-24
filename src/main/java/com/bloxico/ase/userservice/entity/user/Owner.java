@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.entity.user;
 
-import com.bloxico.ase.userservice.entity.MetaData;
+import com.bloxico.ase.userservice.entity.Metadata;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -18,7 +18,7 @@ import static javax.persistence.FetchType.LAZY;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = "userProfile")
 @Entity
-public class Owner extends MetaData {
+public class Owner extends Metadata {
 
     @Id
     private Long id;

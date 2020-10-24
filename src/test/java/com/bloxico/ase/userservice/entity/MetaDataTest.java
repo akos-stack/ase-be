@@ -11,7 +11,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class MetaDataTest extends AbstractSpringTest {
+public class MetadataTest extends AbstractSpringTest {
 
     @Autowired
     private MockUtil mockUtil;
@@ -36,7 +36,7 @@ public class MetaDataTest extends AbstractSpringTest {
         Permission newPermission = new Permission();
         newPermission.setId(oldPermission.getId());
         newPermission.setName("BAR"); // update
-        MockUtil.copyMetaData(oldPermission, newPermission);
+        MockUtil.copyMetadata(oldPermission, newPermission);
         permissionRepository.saveAndFlush(newPermission);
     }
 
@@ -48,7 +48,7 @@ public class MetaDataTest extends AbstractSpringTest {
         Permission newPermission = new Permission();
         newPermission.setId(oldPermission.getId());
         newPermission.setName("BAR"); // update
-        MockUtil.copyMetaData(oldPermission, newPermission);
+        MockUtil.copyMetadata(oldPermission, newPermission);
         newPermission.setUpdater(mockUtil.savedUser().getId()); // !null
         assertNull(newPermission.getUpdated());
         newPermission = permissionRepository.saveAndFlush(newPermission);

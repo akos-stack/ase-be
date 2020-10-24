@@ -1,6 +1,6 @@
 package com.bloxico.ase.testutil;
 
-import com.bloxico.ase.userservice.entity.MetaData;
+import com.bloxico.ase.userservice.entity.Metadata;
 import com.bloxico.ase.userservice.entity.user.Permission;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
@@ -27,12 +27,12 @@ public class MockUtil {
     public UserProfile savedUser() {
         Role role = new Role();
         {
-            role.setName("ROLE_X");
+            role.setName("role_x");
             Permission p1 = new Permission();
-            p1.setName("PERMISSION_1");
+            p1.setName("permission_1");
             p1 = permissionRepository.saveAndFlush(p1);
             Permission p2 = new Permission();
-            p2.setName("PERMISSION_2");
+            p2.setName("permission_2");
             p2 = permissionRepository.saveAndFlush(p2);
             role.setPermissions(Set.of(p1, p2));
             roleRepository.save(role);
@@ -45,7 +45,7 @@ public class MockUtil {
         return userProfileRepository.saveAndFlush(admin);
     }
 
-    public static void copyMetaData(MetaData from, MetaData to) {
+    public static void copyMetadata(Metadata from, Metadata to) {
         to.setCreator(from.getCreator());
         to.setUpdater(from.getUpdater());
         to.setCreated(from.getCreated());

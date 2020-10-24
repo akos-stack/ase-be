@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.entity.user;
 
-import com.bloxico.ase.userservice.entity.MetaData;
+import com.bloxico.ase.userservice.entity.Metadata;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -19,7 +19,7 @@ import static javax.persistence.FetchType.LAZY;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"userProfile", "verifier"})
 @Entity
-public class Evaluator extends MetaData {
+public class Evaluator extends Metadata {
 
     @Id
     private Long id;

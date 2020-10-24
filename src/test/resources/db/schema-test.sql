@@ -6,7 +6,7 @@ CREATE TABLE ase.role
  (id   SMALLSERIAL NOT NULL,
   name VARCHAR     NOT NULL UNIQUE,
   PRIMARY KEY (id),
-  -- meta_data
+  -- metadata
   creator BIGINT    DEFAULT NULL,
   updater BIGINT    DEFAULT NULL,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -17,7 +17,7 @@ CREATE TABLE ase.permission
  (id   SMALLSERIAL NOT NULL,
   name VARCHAR     NOT NULL UNIQUE,
   PRIMARY KEY (id),
-  -- meta_data
+  -- metadata
   creator BIGINT    DEFAULT NULL,
   updater BIGINT    DEFAULT NULL,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -43,7 +43,7 @@ CREATE TABLE ase.user_profile
   PRIMARY KEY (id),
   FOREIGN KEY (role_id)
    REFERENCES ase.role(id),
-  -- meta_data
+  -- metadata
   creator BIGINT    DEFAULT NULL,
   updater BIGINT    DEFAULT NULL,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -63,7 +63,7 @@ CREATE TABLE ase.evaluator
    REFERENCES ase.user_profile(id),
   FOREIGN KEY (verifier)
    REFERENCES ase.user_profile(id),
-  -- meta_data
+  -- metadata
   creator BIGINT    DEFAULT NULL,
   updater BIGINT    DEFAULT NULL,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -80,7 +80,7 @@ CREATE TABLE ase.owner
   PRIMARY KEY (id),
   FOREIGN KEY (id)
    REFERENCES ase.user_profile(id),
-  -- meta_data
+  -- metadata
   creator BIGINT    DEFAULT NULL,
   updater BIGINT    DEFAULT NULL,
   created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
