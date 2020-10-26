@@ -9,6 +9,8 @@ import javax.persistence.Version;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import static java.util.Objects.requireNonNull;
+
 @Data
 @MappedSuperclass
 public abstract class Metadata implements Serializable {
@@ -28,8 +30,7 @@ public abstract class Metadata implements Serializable {
 
     @PreUpdate
     void preUpdate() {
-        if (getUpdater() == null)
-            throw new IllegalStateException("updater is null");
+        requireNonNull(getUpdater());
         setUpdated(LocalDateTime.now());
     }
 

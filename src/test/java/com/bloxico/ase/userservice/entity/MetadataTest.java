@@ -6,7 +6,6 @@ import com.bloxico.ase.userservice.entity.user.Permission;
 import com.bloxico.ase.userservice.repository.user.PermissionRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -28,7 +27,7 @@ public class MetadataTest extends AbstractSpringTest {
         assertNotNull(permission.getCreated());
     }
 
-    @Test(expected = InvalidDataAccessApiUsageException.class)
+    @Test(expected = NullPointerException.class)
     public void preUpdate_updater_isNull() {
         Permission oldPermission = new Permission();
         oldPermission.setName("FOO");
