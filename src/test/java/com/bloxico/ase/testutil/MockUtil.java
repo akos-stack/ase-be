@@ -24,25 +24,34 @@ public class MockUtil {
     @Autowired
     private UserProfileRepository userProfileRepository;
 
+    public UserProfile superUser() {
+        return userProfileRepository
+                .findById(1L)
+                .orElseThrow(AssertionError::new);
+    }
+
     public UserProfile savedUser() {
         Role role = new Role();
         {
-            role.setName("role_x");
             Permission p1 = new Permission();
             p1.setName("permission_1");
+            p1.setCreator(1L);
             p1 = permissionRepository.saveAndFlush(p1);
             Permission p2 = new Permission();
             p2.setName("permission_2");
+            p2.setCreator(1L);
             p2 = permissionRepository.saveAndFlush(p2);
+            role.setName("role_x");
             role.setPermissions(Set.of(p1, p2));
+            role.setCreator(1L);
             roleRepository.save(role);
         }
-        UserProfile admin = new UserProfile();
-        admin.setName("foobar");
-        admin.setPassword("foobar");
-        admin.setEmail("foobar@mail.com");
-        admin.setRole(role);
-        return userProfileRepository.saveAndFlush(admin);
+        UserProfile user = new UserProfile();
+        user.setName("foobar");
+        user.setPassword("foobar");
+        user.setEmail("foobar@mail.com");
+        user.setRole(role);
+        return userProfileRepository.saveAndFlush(user);
     }
 
     public static void copyMetadata(Metadata from, Metadata to) {

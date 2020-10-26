@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.entity;
 
+import com.bloxico.ase.userservice.entity.user.UserProfile;
 import lombok.Data;
 
 import javax.persistence.MappedSuperclass;
@@ -25,6 +26,8 @@ public abstract class Metadata implements Serializable {
 
     @PrePersist
     void prePersist() {
+        if (!(this instanceof UserProfile))
+            requireNonNull(getCreator());
         setCreated(LocalDateTime.now());
     }
 

@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.repository;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.entity.user.Evaluator;
+import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,9 @@ public class EvaluatorRepositoryTest extends AbstractSpringTest {
     @Test
     public void save() {
         Evaluator user = new Evaluator();
-        user.setUserProfile(mockUtil.savedUser());
+        UserProfile creator = mockUtil.savedUser();
+        user.setUserProfile(creator);
+        user.setCreator(creator.getId());
         user = repository.saveAndFlush(user);
         assertNotNull(user.getId());
     }
@@ -31,7 +34,9 @@ public class EvaluatorRepositoryTest extends AbstractSpringTest {
     public void findById() {
         assertFalse(repository.findById(-1L).isPresent());
         Evaluator user = new Evaluator();
-        user.setUserProfile(mockUtil.savedUser());
+        UserProfile creator = mockUtil.savedUser();
+        user.setUserProfile(creator);
+        user.setCreator(creator.getId());
         user = repository.saveAndFlush(user);
         assertTrue(repository.findById(user.getId()).isPresent());
     }

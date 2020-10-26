@@ -18,10 +18,18 @@ public class MetadataTest extends AbstractSpringTest {
     @Autowired
     private PermissionRepository permissionRepository;
 
-    @Test
-    public void prePersist() {
+    @Test(expected = NullPointerException.class)
+    public void prePersist_creator_isNull() {
         Permission permission = new Permission();
         permission.setName("FOO");
+        permissionRepository.saveAndFlush(permission);
+    }
+
+    @Test
+    public void prePersist_creator_isNotNull() {
+        Permission permission = new Permission();
+        permission.setName("FOO");
+        permission.setCreator(1L);
         assertNull(permission.getCreated());
         permission = permissionRepository.saveAndFlush(permission);
         assertNotNull(permission.getCreated());
@@ -31,6 +39,7 @@ public class MetadataTest extends AbstractSpringTest {
     public void preUpdate_updater_isNull() {
         Permission oldPermission = new Permission();
         oldPermission.setName("FOO");
+        oldPermission.setCreator(1L);
         oldPermission = permissionRepository.saveAndFlush(oldPermission);
         Permission newPermission = new Permission();
         newPermission.setId(oldPermission.getId());
@@ -43,6 +52,7 @@ public class MetadataTest extends AbstractSpringTest {
     public void preUpdate_updater_isNotNull() {
         Permission oldPermission = new Permission();
         oldPermission.setName("FOO");
+        oldPermission.setCreator(1L);
         oldPermission = permissionRepository.saveAndFlush(oldPermission);
         Permission newPermission = new Permission();
         newPermission.setId(oldPermission.getId());
