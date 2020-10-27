@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.entity.user;
 
-import com.bloxico.ase.userservice.entity.Metadata;
+import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,7 +13,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Data
 @EqualsAndHashCode(of = "name", callSuper = false)
 @Entity
-public class Permission extends Metadata {
+public class Permission extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

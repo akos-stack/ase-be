@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.entity.user;
 
-import com.bloxico.ase.userservice.entity.Metadata;
+import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -20,7 +20,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @ToString(exclude = "role")
 @Entity
 @Table(name = "user_profile")
-public class UserProfile extends Metadata {
+public class UserProfile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

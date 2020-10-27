@@ -14,7 +14,7 @@ import static java.util.Objects.requireNonNull;
 
 @Data
 @MappedSuperclass
-public abstract class Metadata implements Serializable {
+public abstract class BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

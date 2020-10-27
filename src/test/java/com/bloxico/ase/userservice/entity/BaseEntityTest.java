@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-public class MetadataTest extends AbstractSpringTest {
+public class BaseEntityTest extends AbstractSpringTest {
 
     @Autowired
     private MockUtil mockUtil;
@@ -44,7 +44,7 @@ public class MetadataTest extends AbstractSpringTest {
         Permission newPermission = new Permission();
         newPermission.setId(oldPermission.getId());
         newPermission.setName("BAR"); // update
-        MockUtil.copyMetadata(oldPermission, newPermission);
+        MockUtil.copyBaseEntityData(oldPermission, newPermission);
         permissionRepository.saveAndFlush(newPermission);
     }
 
@@ -57,7 +57,7 @@ public class MetadataTest extends AbstractSpringTest {
         Permission newPermission = new Permission();
         newPermission.setId(oldPermission.getId());
         newPermission.setName("BAR"); // update
-        MockUtil.copyMetadata(oldPermission, newPermission);
+        MockUtil.copyBaseEntityData(oldPermission, newPermission);
         newPermission.setUpdater(mockUtil.savedUser().getId()); // !null
         assertNull(newPermission.getUpdated());
         newPermission = permissionRepository.saveAndFlush(newPermission);

@@ -1,6 +1,6 @@
 package com.bloxico.ase.testutil;
 
-import com.bloxico.ase.userservice.entity.Metadata;
+import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.user.Permission;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
@@ -54,7 +54,7 @@ public class MockUtil {
         return userProfileRepository.saveAndFlush(user);
     }
 
-    public static void copyMetadata(Metadata from, Metadata to) {
+    public static void copyBaseEntityData(BaseEntity from, BaseEntity to) {
         to.setCreator(from.getCreator());
         to.setUpdater(from.getUpdater());
         to.setCreated(from.getCreated());
