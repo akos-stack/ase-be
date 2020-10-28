@@ -91,6 +91,18 @@ CREATE TABLE ase.owner
   FOREIGN KEY (updater)
    REFERENCES ase.user_profile(id));
 
+CREATE TABLE ase.blacklisted_jwt
+ (token VARCHAR NOT NULL,
+  PRIMARY KEY (token),
+  -- metadata
+  creator BIGINT    NOT NULL,
+  updater BIGINT    DEFAULT NULL,
+  created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated TIMESTAMP DEFAULT NULL,
+  version BIGINT    NOT NULL DEFAULT 0,
+  FOREIGN KEY (creator)
+   REFERENCES ase.user_profile(id));
+
 -- Add super admin
 
 INSERT INTO ase.role (name, creator)
