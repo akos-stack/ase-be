@@ -23,20 +23,20 @@ public class UserProfileRepositoryTest extends AbstractSpringTest {
 
     @Test
     public void save() {
-        assertNotNull(mockUtil.savedUser().getId());
+        assertNotNull(mockUtil.savedUserProfile().getId());
     }
 
     @Test
     public void findById() {
         assertFalse(repository.findById(-1L).isPresent());
-        UserProfile user = mockUtil.savedUser();
+        UserProfile user = mockUtil.savedUserProfile();
         assertTrue(repository.findById(user.getId()).isPresent());
     }
 
     @Test
     public void findByEmail() {
         assertFalse(repository.findByEmailIgnoreCase(UUID.randomUUID().toString()).isPresent());
-        UserProfile user = mockUtil.savedUser();
+        UserProfile user = mockUtil.savedUserProfile();
         assertTrue(repository.findByEmailIgnoreCase(user.getEmail()).isPresent());
     }
 

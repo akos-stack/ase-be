@@ -1,5 +1,6 @@
 package com.bloxico.ase.testutil;
 
+import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.user.Permission;
 import com.bloxico.ase.userservice.entity.user.Role;
@@ -7,13 +8,18 @@ import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.repository.user.PermissionRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
+import com.bloxico.ase.userservice.util.mapper.EntityToDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
 @Component
 public class MockUtil {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private PermissionRepository permissionRepository;
@@ -24,13 +30,7 @@ public class MockUtil {
     @Autowired
     private UserProfileRepository userProfileRepository;
 
-    public UserProfile superUser() {
-        return userProfileRepository
-                .findById(1L)
-                .orElseThrow(AssertionError::new);
-    }
-
-    public UserProfile savedUser() {
+    public UserProfile savedUserProfile() {
         Role role = new Role();
         {
             Permission p1 = new Permission();
@@ -48,10 +48,14 @@ public class MockUtil {
         }
         UserProfile user = new UserProfile();
         user.setName("foobar");
-        user.setPassword("foobar");
+        user.setPassword(passwordEncoder.encode("foobar"));
         user.setEmail("foobar@mail.com");
         user.setRole(role);
         return userProfileRepository.saveAndFlush(user);
+    }
+
+    public UserProfileDto savedUserProfileDto() {
+        return EntityToDtoMapper.INSTANCE.userProfile(savedUserProfile());
     }
 
     public static void copyBaseEntityData(BaseEntity from, BaseEntity to) {

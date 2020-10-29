@@ -18,7 +18,7 @@ import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Slf4j
-@Service
+@Service("userProfileServiceImplOld")
 public class UserProfileServiceImpl implements IUserProfileService {
 
     private UserProfileRepository userProfileRepository;

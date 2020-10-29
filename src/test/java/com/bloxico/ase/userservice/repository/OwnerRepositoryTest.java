@@ -25,7 +25,7 @@ public class OwnerRepositoryTest extends AbstractSpringTest {
     @Test
     public void save() {
         Owner user = new Owner();
-        UserProfile creator = mockUtil.savedUser();
+        UserProfile creator = mockUtil.savedUserProfile();
         user.setUserProfile(creator);
         user.setBirthday(LocalDate.now());
         user.setCreator(creator.getId());
@@ -37,7 +37,7 @@ public class OwnerRepositoryTest extends AbstractSpringTest {
     public void findById() {
         assertFalse(repository.findById(-1L).isPresent());
         Owner user = new Owner();
-        UserProfile creator = mockUtil.savedUser();
+        UserProfile creator = mockUtil.savedUserProfile();
         user.setUserProfile(creator);
         user.setBirthday(LocalDate.now());
         user.setCreator(creator.getId());

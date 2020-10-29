@@ -58,7 +58,7 @@ public class BaseEntityTest extends AbstractSpringTest {
         newPermission.setId(oldPermission.getId());
         newPermission.setName("BAR"); // update
         MockUtil.copyBaseEntityData(oldPermission, newPermission);
-        newPermission.setUpdater(mockUtil.savedUser().getId()); // !null
+        newPermission.setUpdater(mockUtil.savedUserProfile().getId()); // !null
         assertNull(newPermission.getUpdated());
         newPermission = permissionRepository.saveAndFlush(newPermission);
         assertNotNull(newPermission.getUpdated());

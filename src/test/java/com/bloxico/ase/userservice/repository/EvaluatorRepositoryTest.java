@@ -23,7 +23,7 @@ public class EvaluatorRepositoryTest extends AbstractSpringTest {
     @Test
     public void save() {
         Evaluator user = new Evaluator();
-        UserProfile creator = mockUtil.savedUser();
+        UserProfile creator = mockUtil.savedUserProfile();
         user.setUserProfile(creator);
         user.setCreator(creator.getId());
         user = repository.saveAndFlush(user);
@@ -34,7 +34,7 @@ public class EvaluatorRepositoryTest extends AbstractSpringTest {
     public void findById() {
         assertFalse(repository.findById(-1L).isPresent());
         Evaluator user = new Evaluator();
-        UserProfile creator = mockUtil.savedUser();
+        UserProfile creator = mockUtil.savedUserProfile();
         user.setUserProfile(creator);
         user.setCreator(creator.getId());
         user = repository.saveAndFlush(user);
