@@ -112,6 +112,14 @@ INSERT INTO ase.role (name, creator)
 INSERT INTO ase.user_profile (name, password, email, role_id)
      VALUES ('bloxico', 'bloxico!', 'bloxico@mailinator.com', 1);
 
+-- Add for StartupConfigTest
+
+INSERT INTO ase.blacklisted_jwt (token, creator)
+     VALUES ('7WK5T79u5mIzjIXXi2oI9Fglmgivv7RAJ7izyj9tUyQ', 1);
+
+INSERT INTO ase.blacklisted_jwt (token, creator)
+     VALUES ('8WK5T79u5mIzjIXXi2oI9Fglmgivv7RAJ7izyj9tUyQ', 1);
+
 -- Add constraints for forward references
 
    ALTER TABLE ase.role
