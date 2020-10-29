@@ -112,7 +112,7 @@ INSERT INTO ase.role (name, creator)
 INSERT INTO ase.user_profile (name, password, email, role_id)
      VALUES ('bloxico', 'bloxico!', 'bloxico@mailinator.com', 1);
 
--- Add for StartupConfigTest
+-- Add for StartupConfigTest, used also in BlacklistedJwtRepositoryTest
 
 INSERT INTO ase.blacklisted_jwt (token, creator)
      VALUES ('7WK5T79u5mIzjIXXi2oI9Fglmgivv7RAJ7izyj9tUyQ', 1);
