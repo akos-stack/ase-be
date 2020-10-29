@@ -92,8 +92,9 @@ CREATE TABLE ase.owner
    REFERENCES ase.user_profile(id));
 
 CREATE TABLE ase.blacklisted_jwt
- (token VARCHAR NOT NULL,
-  PRIMARY KEY (token),
+ (id    BIGSERIAL NOT NULL,
+  token VARCHAR   NOT NULL,
+  PRIMARY KEY (id),
   -- metadata
   creator BIGINT    NOT NULL,
   updater BIGINT    DEFAULT NULL,
