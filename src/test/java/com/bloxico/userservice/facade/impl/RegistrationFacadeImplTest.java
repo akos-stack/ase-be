@@ -2,8 +2,8 @@ package com.bloxico.userservice.facade.impl;
 
 import com.bloxico.userservice.dto.entities.TokenDto;
 import com.bloxico.userservice.entities.user.CoinUser;
-import com.bloxico.userservice.entities.user.Role;
-import com.bloxico.userservice.entities.user.UserRole;
+import com.bloxico.userservice.entities.user.CoinRole;
+import com.bloxico.userservice.entities.user.CoinUserRole;
 import com.bloxico.userservice.entities.token.VerificationToken;
 import com.bloxico.userservice.exceptions.CoinUserException;
 import com.bloxico.userservice.exceptions.TokenException;
@@ -56,7 +56,7 @@ public class RegistrationFacadeImplTest extends AbstractUnitTest {
         TokenDto token = verificationTokenService.getTokenByUserId(newUser.getId());
         Assert.assertNotNull(token);
 
-        Assert.assertTrue(newUser.getUserRoles().contains(new UserRole(newUser, new Role(Role.RoleName.USER))));
+        Assert.assertTrue(newUser.getCoinUserRoles().contains(new CoinUserRole(newUser, new CoinRole(CoinRole.RoleName.USER))));
     }
 
     @DirtiesContext

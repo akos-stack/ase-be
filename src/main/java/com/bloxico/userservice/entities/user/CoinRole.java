@@ -1,7 +1,6 @@
 package com.bloxico.userservice.entities.user;
 
 import com.bloxico.userservice.entities.BaseEntity;
-import com.bloxico.userservice.entities.user.UserRole;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,18 +10,18 @@ import java.util.List;
 @Entity
 @Data
 @EqualsAndHashCode(of = {"roleName"}, callSuper = false)
-@Table(name = "roles")
-public class Role extends BaseEntity {
+@Table(name = "roles_old")
+public class CoinRole extends BaseEntity {
 
     public enum RoleName {
         USER, ADMIN
     }
 
-    public Role() {
+    public CoinRole() {
         super();
     }
 
-    public Role(RoleName roleName) {
+    public CoinRole(RoleName roleName) {
         this.roleName = roleName;
     }
 
@@ -32,5 +31,5 @@ public class Role extends BaseEntity {
 
     @OneToMany
     @JoinColumn(name = "role_id")
-    private List<UserRole> userRoles;
+    private List<CoinUserRole> coinUserRoles;
 }

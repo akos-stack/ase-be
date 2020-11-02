@@ -5,12 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 import static javax.persistence.FetchType.LAZY;
@@ -18,6 +13,7 @@ import static javax.persistence.FetchType.LAZY;
 @Data
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = {"userProfile", "verifier"})
+@Table(name = "evaluators")
 @Entity
 public class Evaluator extends BaseEntity {
 
@@ -30,9 +26,7 @@ public class Evaluator extends BaseEntity {
     private UserProfile userProfile;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "verifier")
+    @JoinColumn(name = "verifier_id")
     private UserProfile verifier;
-
-    private LocalDateTime verified;
 
 }

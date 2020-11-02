@@ -46,7 +46,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     @Override
-    public void updateProfile(String email, UpdateProfileDto updateProfileDto) {
+    public UserProfileDto updateProfile(String email, UpdateProfileDto updateProfileDto) {
         log.debug("Update profile - start , email: {} - UpdateProfile data", updateProfileDto);
 
         Optional<UserProfile> userProfileOptional = userProfileRepository.findByEmail(email);
@@ -60,6 +60,10 @@ public class UserProfileServiceImpl implements IUserProfileService {
 
         userProfileRepository.save(userProfile);
 
+        UserProfileDto userProfileDto = entityDataMapper.userProfileToDto(userProfile);
+
+
         log.debug("Update profile - end , email: {}", email);
+        return userProfileDto;
     }
 }

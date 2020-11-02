@@ -23,9 +23,9 @@ public class CoinUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        return coinUser.getUserRoles()
+        return coinUser.getCoinUserRoles()
                 .stream()
-                .map(x -> new SimpleGrantedAuthority(ROLE_PREFIX + x.getRole().getRoleName()))
+                .map(x -> new SimpleGrantedAuthority(ROLE_PREFIX + x.getCoinRole().getRoleName()))
                 .collect(Collectors.toList());
     }
 

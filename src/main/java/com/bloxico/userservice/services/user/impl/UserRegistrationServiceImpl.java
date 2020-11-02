@@ -13,6 +13,7 @@ import com.bloxico.userservice.util.mappers.RegistrationRequestMapper;
 import com.bloxico.userservice.web.error.ErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
     @Autowired
     public UserRegistrationServiceImpl(CoinUserRepository coinUserRepository,
                                        RegionRepository regionRepository,
-                                       RoleRepository roleRepository,
+                                       @Qualifier("roleRepositoryOld") RoleRepository roleRepository,
                                        PasswordEncoder passwordEncoder) {
 
         this.coinUserRepository = coinUserRepository;
@@ -70,13 +71,13 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 
         coinUser.setPassword(passwordEncoder.encode(registrationRequestDto.getPassword()));
 
-        Optional<Role> role = roleRepository.findRoleByRoleName(Role.RoleName.USER);
+        Optional<CoinRole> role = roleRepository.findRoleByRoleName(CoinRole.RoleName.USER);
 
-        UserRole userRole = new UserRole();
-        userRole.setRole(role.orElseThrow(() -> new EntityNotFoundException(ErrorCodes.ROLE_NOT_FOUND.getCode())));
-        userRole.setCoinUser(coinUser);
+        CoinUserRole coinUserRole = new CoinUserRole();
+        coinUserRole.setCoinRole(role.orElseThrow(() -> new EntityNotFoundException(ErrorCodes.ROLE_NOT_FOUND.getCode())));
+        coinUserRole.setCoinUser(coinUser);
 
-        coinUser.setUserRoles(Collections.singletonList(userRole));
+        coinUser.setCoinUserRoles(Collections.singletonList(coinUserRole));
 
         String regionName = registrationRequestDto.getRegionName();
         Optional<Region> region = regionRepository.findByRegionName(regionName);
@@ -156,13 +157,13 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 
         coinUser.setUserProfile(userProfile);
 
-        Optional<Role> role = roleRepository.findRoleByRoleName(Role.RoleName.USER);
+        Optional<CoinRole> role = roleRepository.findRoleByRoleName(CoinRole.RoleName.USER);
 
-        UserRole userRole = new UserRole();
-        userRole.setRole(role.orElseThrow(() -> new EntityNotFoundException(ErrorCodes.ROLE_NOT_FOUND.getCode())));
-        userRole.setCoinUser(coinUser);
+        CoinUserRole coinUserRole = new CoinUserRole();
+        coinUserRole.setCoinRole(role.orElseThrow(() -> new EntityNotFoundException(ErrorCodes.ROLE_NOT_FOUND.getCode())));
+        coinUserRole.setCoinUser(coinUser);
 
-        coinUser.setUserRoles(Collections.singletonList(userRole));
+        coinUser.setCoinUserRoles(Collections.singletonList(coinUserRole));
 
         coinUserRepository.save(coinUser);
     }

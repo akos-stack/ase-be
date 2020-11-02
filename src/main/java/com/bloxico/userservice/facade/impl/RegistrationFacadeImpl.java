@@ -14,6 +14,7 @@ import com.bloxico.userservice.util.MailUtil;
 import com.bloxico.userservice.util.mappers.RegistrationRequestMapper;
 import com.bloxico.userservice.web.model.registration.RegistrationDataResponse;
 import com.bloxico.userservice.web.model.registration.RegistrationRequest;
+import com.bloxico.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.userservice.web.model.token.TokenValidityRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class RegistrationFacadeImpl implements IRegistrationFacade {
 
     @Override
     @Transactional
-    public CoinUserDto registerUserWithVerificationToken(RegistrationRequest registrationRequest) {
+    public RegistrationResponse registerUserWithVerificationToken(RegistrationRequest registrationRequest) {
         log.info("Direct user registration - start , request: {}", registrationRequest);
 
         RegistrationRequestDto registrationRequestDto = RegistrationRequestMapper.INSTANCE.requestToDto(registrationRequest);
@@ -57,7 +58,7 @@ public class RegistrationFacadeImpl implements IRegistrationFacade {
         mailUtil.sendVerificationTokenEmail(coinUserDto.getEmail(), tokenDto.getTokenValue());
 
         log.info("Direct user registration - end , email sent to user.");
-        return coinUserDto;
+        return new RegistrationResponse(tokenDto.getTokenValue());
     }
 
 

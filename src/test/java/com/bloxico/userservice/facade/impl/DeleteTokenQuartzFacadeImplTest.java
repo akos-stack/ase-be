@@ -1,7 +1,7 @@
 package com.bloxico.userservice.facade.impl;
 
 import com.bloxico.userservice.entities.user.CoinUser;
-import com.bloxico.userservice.entities.user.UserRole;
+import com.bloxico.userservice.entities.user.CoinUserRole;
 import com.bloxico.userservice.exceptions.CoinUserException;
 import com.bloxico.userservice.facade.IDeleteTokenQuartzFacade;
 import com.bloxico.userservice.repository.user.UserRoleRepository;
@@ -53,7 +53,7 @@ public class DeleteTokenQuartzFacadeImplTest extends AbstractUnitTest {
             //then
             Assert.assertEquals(ErrorCodes.USER_DOES_NOT_EXIST.getCode(), e.getMessage());
 
-            Optional<UserRole> userRole = userRoleRepository.findByCoinUserId(mockUser.getId());
+            Optional<CoinUserRole> userRole = userRoleRepository.findByCoinUserId(mockUser.getId());
 
             Assert.assertFalse(userRole.isPresent());
         }
@@ -98,7 +98,7 @@ public class DeleteTokenQuartzFacadeImplTest extends AbstractUnitTest {
             //then
             Assert.assertEquals(ErrorCodes.USER_DOES_NOT_EXIST.getCode(), e.getMessage());
 
-            Optional<UserRole> userRole = userRoleRepository.findByCoinUserId(mockUser.getId());
+            Optional<CoinUserRole> userRole = userRoleRepository.findByCoinUserId(mockUser.getId());
 
             Assert.assertFalse(userRole.isPresent());
         }

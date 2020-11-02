@@ -6,18 +6,12 @@ databaseChangeLog:
     - loadData:
         encoding: UTF-8
         file: db/changelog/v0.1.0/initial_data/region.csv
-        tableName: regions
+        tableName: regions_old
 
     - loadData:
         encoding: UTF-8
-        file: db/changelog/v0.1.0/initial_data/role.csv
-        tableName: roles
-
-    - loadData:
-        encoding: UTF-8
-        file: db/changelog/v0.1.0/initial_data/service_client_details.csv
-        tableName: oauth_client_details
-        quotchar: '"'
+        file: db/changelog/v0.1.0/initial_data/role_old.csv
+        tableName: roles_old
 
 
 

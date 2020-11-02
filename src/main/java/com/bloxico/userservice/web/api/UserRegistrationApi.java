@@ -2,6 +2,7 @@ package com.bloxico.userservice.web.api;
 
 import com.bloxico.userservice.web.model.registration.RegistrationDataResponse;
 import com.bloxico.userservice.web.model.registration.RegistrationRequest;
+import com.bloxico.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.userservice.web.model.token.ResendTokenRequest;
 import com.bloxico.userservice.web.model.token.TokenValidityRequest;
 import io.swagger.annotations.*;
@@ -33,7 +34,7 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 409, message = "User already exists."),
             @ApiResponse(code = 500, message = "Entity not found - either region or role, details are provided in response object.")
     })
-    ResponseEntity<Void> registerCoinUser(@Valid @RequestBody RegistrationRequest registrationRequest, HttpServletRequest request);
+    ResponseEntity<RegistrationResponse> registerCoinUser(@Valid @RequestBody RegistrationRequest registrationRequest, HttpServletRequest request);
 
     @PostMapping(value = REGISTRATION_CONFIRMATION_ENDPOINT,
             produces = {"application/json"},

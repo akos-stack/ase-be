@@ -12,7 +12,7 @@ import javax.persistence.Table;
 @Entity
 @Data
 @EqualsAndHashCode(of = {"regionName"}, callSuper = false)
-@Table(name = "regions")
+@Table(name = "regions_old")
 public class Region extends BaseEntity {
 
     @Column(name = "region_name", nullable = false)

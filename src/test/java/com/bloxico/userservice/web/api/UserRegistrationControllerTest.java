@@ -2,14 +2,13 @@ package com.bloxico.userservice.web.api;
 
 import com.bloxico.userservice.dto.entities.TokenDto;
 import com.bloxico.userservice.entities.user.CoinUser;
-import com.bloxico.userservice.entities.user.Role;
-import com.bloxico.userservice.entities.user.UserRole;
+import com.bloxico.userservice.entities.user.CoinRole;
+import com.bloxico.userservice.entities.user.CoinUserRole;
 import com.bloxico.userservice.entities.token.VerificationToken;
 import com.bloxico.userservice.repository.user.RegionRepository;
 import com.bloxico.userservice.services.token.impl.VerificationTokenServiceImpl;
 import com.bloxico.userservice.test.base.AbstractUnitTest;
 import com.bloxico.userservice.util.MockUtil;
-import com.bloxico.userservice.web.api.UserRegistrationApi;
 import com.bloxico.userservice.web.error.ErrorCodes;
 import com.bloxico.userservice.web.model.ApiError;
 import com.bloxico.userservice.web.model.registration.RegistrationDataResponse;
@@ -69,7 +68,7 @@ public class UserRegistrationControllerTest extends AbstractUnitTest {
         TokenDto token = verificationTokenService.getTokenByUserId(newUser.getId());
         Assert.assertNotNull(token);
 
-        Assert.assertTrue(newUser.getUserRoles().contains(new UserRole(newUser, new Role(Role.RoleName.USER))));
+        Assert.assertTrue(newUser.getCoinUserRoles().contains(new CoinUserRole(newUser, new CoinRole(CoinRole.RoleName.USER))));
     }
 
 

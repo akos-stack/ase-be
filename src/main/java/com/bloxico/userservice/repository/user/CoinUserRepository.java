@@ -18,7 +18,7 @@ public interface CoinUserRepository extends JpaRepository<CoinUser, Long> {
 
     Optional<CoinUser> findById(long id);
 
-    @EntityGraph(attributePaths = {"userRoles.role"})
+    @EntityGraph(attributePaths = {"coinUserRoles.coinRole"})
     @Transactional
     Optional<CoinUser> findUserWithRolesByEmailIgnoreCase(String email);
 

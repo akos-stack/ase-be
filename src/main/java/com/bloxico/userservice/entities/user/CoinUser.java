@@ -11,8 +11,8 @@ import java.util.List;
 @Entity
 @Data
 @EqualsAndHashCode(of = {"email", "password", "locked", "enabled", "deleted"}, callSuper = false)
-@ToString(exclude = {"userRoles", "password"})
-@Table(name = "coin_users")
+@ToString(exclude = {"coinUserRoles", "password"})
+@Table(name = "coin_users_old")
 
 public class CoinUser extends BaseEntity {
 
@@ -23,11 +23,10 @@ public class CoinUser extends BaseEntity {
     private String password;
 
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true, mappedBy = "coinUser")
-    private List<UserRole> userRoles;
+    private List<CoinUserRole> coinUserRoles;
 
     @OneToOne(mappedBy = "coinUser", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true, fetch = FetchType.EAGER)
     private UserProfile userProfile;
-
 
     @Column(name = "locked")
     private boolean locked;

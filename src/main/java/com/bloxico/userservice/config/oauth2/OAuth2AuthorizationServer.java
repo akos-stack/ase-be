@@ -69,7 +69,6 @@ public class OAuth2AuthorizationServer extends AuthorizationServerConfigurerAdap
                 .authenticationManager(authenticationManager)
                 .userDetailsService(userDetailsService)
                 .tokenServices(customTokenService);
-
     }
 
     @Override

@@ -4,9 +4,9 @@ import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.user.Permission;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
+import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.repository.user.PermissionRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
-import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +43,6 @@ public class MockUtil {
             p2 = permissionRepository.saveAndFlush(p2);
             role.setName("role_x");
             role.setPermissions(Set.of(p1, p2));
-            role.setCreator(1L);
             roleRepository.save(role);
         }
         UserProfile user = new UserProfile();

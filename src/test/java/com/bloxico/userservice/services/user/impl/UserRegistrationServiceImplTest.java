@@ -1,9 +1,9 @@
 package com.bloxico.userservice.services.user.impl;
 
 import com.bloxico.userservice.dto.RegistrationRequestDto;
+import com.bloxico.userservice.entities.user.CoinRole;
 import com.bloxico.userservice.entities.user.CoinUser;
-import com.bloxico.userservice.entities.user.Role;
-import com.bloxico.userservice.entities.user.UserRole;
+import com.bloxico.userservice.entities.user.CoinUserRole;
 import com.bloxico.userservice.entities.token.VerificationToken;
 import com.bloxico.userservice.exceptions.CoinUserException;
 import com.bloxico.userservice.repository.user.UserRoleRepository;
@@ -62,7 +62,7 @@ public class UserRegistrationServiceImplTest extends AbstractUnitTest {
 
         Assert.assertFalse(newUser.isEnabled());
 
-        Assert.assertTrue(newUser.getUserRoles().contains(new UserRole(newUser, new Role(Role.RoleName.USER))));
+        Assert.assertTrue(newUser.getCoinUserRoles().contains(new CoinUserRole(newUser, new CoinRole(CoinRole.RoleName.USER))));
     }
 
     @Test
@@ -144,7 +144,7 @@ public class UserRegistrationServiceImplTest extends AbstractUnitTest {
         CoinUser enabledUser = mockUtil.findUserByEmail(MockUtil.Constants.MOCK_USER_EMAIL);
         Assert.assertTrue(enabledUser.isEnabled());
 
-        Optional<UserRole> userRole = userRoleRepository.findByCoinUserId(coinUser.getId());
+        Optional<CoinUserRole> userRole = userRoleRepository.findByCoinUserId(coinUser.getId());
 
         Assert.assertTrue(userRole.isPresent());
 
@@ -171,7 +171,7 @@ public class UserRegistrationServiceImplTest extends AbstractUnitTest {
             //then
             Assert.assertEquals(ErrorCodes.USER_DOES_NOT_EXIST.getCode(), e.getMessage());
 
-            Optional<UserRole> userRole = userRoleRepository.findByCoinUserId(mockUser.getId());
+            Optional<CoinUserRole> userRole = userRoleRepository.findByCoinUserId(mockUser.getId());
 
             Assert.assertFalse(userRole.isPresent());
         }

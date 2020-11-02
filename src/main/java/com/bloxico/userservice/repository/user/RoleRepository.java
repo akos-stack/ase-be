@@ -1,14 +1,14 @@
 package com.bloxico.userservice.repository.user;
 
-import com.bloxico.userservice.entities.user.Role;
+import com.bloxico.userservice.entities.user.CoinRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository("roleRepositoryOld")
-public interface RoleRepository extends JpaRepository<Role, Long> {
+public interface RoleRepository extends JpaRepository<CoinRole, Long> {
 
-    Optional<Role> findRoleByRoleName(Role.RoleName roleName);
+    Optional<CoinRole> findRoleByRoleName(CoinRole.RoleName roleName);
 
 }

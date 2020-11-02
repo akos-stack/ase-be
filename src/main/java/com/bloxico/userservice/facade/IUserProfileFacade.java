@@ -7,5 +7,5 @@ public interface IUserProfileFacade {
 
     UserProfileDataResponse returnMyProfileData(String email);
 
-    void updateMyProfile(String email, UpdateProfileRequest updateProfileRequest);
+    UserProfileDataResponse updateMyProfile(String email, UpdateProfileRequest updateProfileRequest);
 }
