@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9a0fc170-1000-4c53-bf26-76f9e5739a7a",
+		"_postman_id": "97630208-1ef4-4b6c-bfcb-947d8a5c5df1",
 		"name": "Art Stock Exchange",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -45,12 +45,12 @@
 								},
 								{
 									"key": "username",
-									"value": "sekuloskimilos@gmail.com",
+									"value": "nikola.vojicic@gmail.com",
 									"type": "text"
 								},
 								{
 									"key": "password",
-									"value": "Sekula123!",
+									"value": "Nikola123!",
 									"type": "text"
 								},
 								{
@@ -61,15 +61,14 @@
 							]
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/oauth/token/",
+							"raw": "{{endpoint}}/api/oauth/token",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"oauth",
-								"token",
-								""
+								"token"
 							]
 						}
 					},
@@ -230,7 +229,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"sekuloskimilos@gmail.com\",\n    \"tokenValue\": 4192\n}"
+							"raw": "{\n    \"email\": \"sekuloskimilos@gmail.com\",\n    \"tokenValue\": {{verification_token}}\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/user/registrationConfirm",
@@ -250,10 +249,28 @@
 				{
 					"name": "Get my profile data",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": ""
+							"raw": "{{endpoint}}/api/user/myProfile",
+							"host": [
+								"{{endpoint}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"myProfile"
+							]
 						}
 					},
 					"response": []
@@ -281,7 +298,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Milos\",\n    \"region\": \"Afghanistan\",\n    \"City\": \"Kabul\"\n}"
+							"raw": "{\n    \"name\": \"Nikola\",\n    \"region\": \"Afghanistan\",\n    \"city\": \"Kabul\"\n}"
 						},
 						"url": {
 							"raw": "{{endpoint}}/api/user/updateMyProfile",
