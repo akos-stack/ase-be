@@ -2,7 +2,7 @@ DROP SCHEMA IF EXISTS ase CASCADE;
 
 CREATE SCHEMA ase;
 
-CREATE TABLE ase.coinRole
+CREATE TABLE ase.role
  (id   SMALLSERIAL NOT NULL,
   name VARCHAR     NOT NULL UNIQUE,
   PRIMARY KEY (id),
@@ -29,7 +29,7 @@ CREATE TABLE ase.role_permission
   permission_id SMALLINT NOT NULL,
   PRIMARY KEY (role_id, permission_id),
   FOREIGN KEY (role_id)
-   REFERENCES ase.coinRole(id),
+   REFERENCES ase.role(id),
   FOREIGN KEY (permission_id)
    REFERENCES ase.permission(id));
 
@@ -42,7 +42,7 @@ CREATE TABLE ase.user_profile
   role_id  SMALLINT  NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (role_id)
-   REFERENCES ase.coinRole(id),
+   REFERENCES ase.role(id),
   -- metadata
   creator BIGINT    DEFAULT NULL,
   updater BIGINT    DEFAULT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE ase.owner
 
 -- Add super admin
 
-INSERT INTO ase.coinRole (name, creator)
+INSERT INTO ase.role (name, creator)
      VALUES ('super_admin', 1);
 
 INSERT INTO ase.user_profile (name, password, email, role_id)
@@ -101,12 +101,12 @@ INSERT INTO ase.user_profile (name, password, email, role_id)
 
 -- Add constraints for forward references
 
-   ALTER TABLE ase.coinRole
+   ALTER TABLE ase.role
 ADD CONSTRAINT role_creator_fkey
    FOREIGN KEY (creator)
     REFERENCES ase.user_profile(id);
 
-   ALTER TABLE ase.coinRole
+   ALTER TABLE ase.role
 ADD CONSTRAINT role_updater_fkey
    FOREIGN KEY (updater)
     REFERENCES ase.user_profile(id);
