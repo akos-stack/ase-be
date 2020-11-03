@@ -19,7 +19,6 @@ public class PermissionRepositoryTest extends AbstractSpringTest {
     public void save() {
         Permission permission = new Permission();
         permission.setName("foo");
-        permission.setCreator(1L);
         permission = repository.saveAndFlush(permission);
         assertNotNull(permission.getId());
     }
@@ -29,7 +28,6 @@ public class PermissionRepositoryTest extends AbstractSpringTest {
         assertFalse(repository.findById((short) -1).isPresent());
         Permission permission = new Permission();
         permission.setName("foo");
-        permission.setCreator(1L);
         permission = repository.saveAndFlush(permission);
         assertTrue(repository.findById(permission.getId()).isPresent());
     }

@@ -1,6 +1,5 @@
 package com.bloxico.ase.userservice.entity.user;
 
-import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

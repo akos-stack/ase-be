@@ -3,10 +3,7 @@ package com.bloxico.ase.userservice.entity;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import lombok.Data;
 
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -18,8 +15,17 @@ public abstract class BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long creator, updater;
-    private LocalDateTime created, updated;
+    @Column(name = "creator_id")
+    private Long creator;
+
+    @Column(name = "updater_id")
+    private Long updater;
+
+    @Column(name = "created")
+    private LocalDateTime created;
+
+    @Column(name = "updated")
+    private LocalDateTime updated;
 
     @Version
     private long version;
