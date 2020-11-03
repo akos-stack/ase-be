@@ -9,6 +9,6 @@ public interface IJwtService {
 
     DecodedJwtDto verifyToken(String token);
 
-    void blacklistToken(long creator, String token);
+    void blacklistToken(long principalId, String token);
 
 }
