@@ -4,25 +4,100 @@ databaseChangeLog:
       author: milos.sekuloski@bloxico.com
       changes:
         - createTable:
-            tableName: evaluators
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: smallint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+                    unique: true
+        - createTable:
+            tableName: permissions
+            columns:
+              - column:
+                  name: id
+                  type: smallint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+                    unique: true
+        - createTable:
+            tableName: roles_permissions
+            columns:
+              - column:
+                  name: role_id
+                  type: smallint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_role_permission
+                    references: roles(id)
+              - column:
+                  name: permission_id
+                  type: smallint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_permission_role
+                    references: permissions(id)
+        - createTable:
+            tableName: user_profiles
             columns:
               - column:
                   name: id
                   type: bigint
                   autoIncrement: true
                   constraints:
+                    nullable: false
                     primaryKey: true
-                    nullable: false
               - column:
-                  name: verifier_id
-                  type: bigint
+                  name: name
+                  type: varchar(256)
                   constraints:
                     nullable: false
               - column:
-                  name: creator
-                  type: bigint
+                  name: password
+                  type: varchar(256)
                   constraints:
                     nullable: false
+              - column:
+                  name: email
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: phone
+                  type: varchar(256)
+              - column:
+                  name: role_id
+                  type: smallint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_profile_role
+                    references: roles(id)
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: true # when user created himself
+                    foreignKeyName: fk_user_profile_creator
+                    references: user_profiles(id)
               - column:
                   name: created
                   type: timestamp
@@ -30,15 +105,66 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: updater
+                  name: updater_id
                   type: bigint
+                  constraints:
+                    foreignKeyName: fk_user_profile_updater
+                    references: user_profiles(id)
               - column:
                   name: updated
                   type: timestamp
               - column:
                   name: version
-                  defaultValueNumeric: 1
                   type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: evaluators
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_evaluator_user_profile
+                    references: user_profiles(id)
+              - column:
+                  name: verifier_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_evaluator_verifier
+                    references: user_profiles(id)
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_evaluator_creator
+                    references: user_profiles(id)
+              - column:
+                  name: created
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_evaluator_updater
+                    references: user_profiles(id)
+              - column:
+                  name: updated
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
                   constraints:
                     nullable: false
         - createTable:
@@ -49,18 +175,21 @@ databaseChangeLog:
                   type: bigint
                   autoIncrement: true
                   constraints:
-                    primaryKey: true
                     nullable: false
+                    primaryKey: true
               - column:
                   name: birthday
                   type: date
                   constraints:
                     nullable: false
+              # METADATA
               - column:
-                  name: creator
+                  name: creator_id
                   type: bigint
                   constraints:
                     nullable: false
+                    foreignKeyName: fk_owner_creator
+                    references: user_profiles(id)
               - column:
                   name: created
                   type: timestamp
@@ -68,71 +197,18 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: updater
+                  name: updater_id
                   type: bigint
+                  constraints:
+                    foreignKeyName: fk_owner_updater
+                    references: user_profiles(id)
               - column:
                   name: updated
                   type: timestamp
               - column:
                   name: version
-                  defaultValueNumeric: 1
                   type: bigint
-                  constraints:
-                    nullable: false
-        - createTable:
-            tableName: user_profiles
-            columns:
-              - column:
-                  name: id
-                  type: bigint
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: name
-                  type: varchar(256)
-                  constraints:
-                      nullable: false
-              - column:
-                    name: email
-                    type: varchar(256)
-                    constraints:
-                        nullable: false
-              - column:
-                  name: password
-                  type: varchar(256)
-                  constraints:
-                      nullable: false
-              - column:
-                  name: phone
-                  type: varchar(256)
-              - column:
-                    name: role_id
-                    type: smallint
-                    constraints:
-                        nullable: false
-              - column:
-                    name: creator
-                    type: bigint
-                    constraints:
-                        nullable: false
-              - column:
-                    name: created
-                    type: timestamp
-                    defaultValueComputed: "CURRENT_TIMESTAMP"
-                    constraints:
-                        nullable: false
-              - column:
-                    name: updater
-                    type: bigint
-              - column:
-                    name: updated
-                    type: timestamp
-              - column:
-                  name: version
-                  defaultValueNumeric: 1
-                  type: bigint
+                  defaultValueNumeric: 0
                   constraints:
                     nullable: false
         - createTable:
@@ -165,11 +241,14 @@ databaseChangeLog:
                   type: timestamp
                   constraints:
                     nullable: false
+              # METADATA
               - column:
-                  name: creator
+                  name: creator_id
                   type: bigint
                   constraints:
                     nullable: false
+                    foreignKeyName: fk_token_creator
+                    references: user_profiles(id)
               - column:
                   name: created
                   type: timestamp
@@ -177,84 +256,17 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: updater
+                  name: updater_id
                   type: bigint
+                  constraints:
+                    foreignKeyName: fk_token_updater
+                    references: user_profiles(id)
               - column:
                   name: updated
                   type: timestamp
               - column:
                   name: version
-                  defaultValueNumeric: 1
                   type: bigint
+                  defaultValueNumeric: 0
                   constraints:
                     nullable: false
-        - createTable:
-            tableName: roles
-            columns:
-              - column:
-                  name: id
-                  type: smallint
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: name
-                  type: varchar(256)
-                  constraints:
-                    nullable: false
-        - createTable:
-            tableName: permissions
-            columns:
-              - column:
-                  name: id
-                  type: smallint
-                  autoIncrement: true
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: name
-                  type: varchar(256)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: creator
-                  type: bigint
-                  constraints:
-                    nullable: false
-              - column:
-                  name: created
-                  type: timestamp
-                  defaultValueComputed: "CURRENT_TIMESTAMP"
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updater
-                  type: bigint
-              - column:
-                  name: updated
-                  type: timestamp
-              - column:
-                  name: version
-                  defaultValueNumeric: 1
-                  type: bigint
-                  constraints:
-                    nullable: false
-        - createTable:
-            tableName: roles_permissions
-            columns:
-              - column:
-                  name: role_id
-                  type: smallint
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_role_permission
-                    references: roles(id)
-              - column:
-                  name: permission_id
-                  type: smallint
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_permission_role
-                    references: permissions(id)
