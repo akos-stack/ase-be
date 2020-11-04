@@ -15,20 +15,21 @@ public class DecodedJwtDto {
     LocalDateTime issuedAt;
     LocalDateTime expiresAt;
     Long userId;
-    String role;
+    Set<String> roles;
     Set<String> permissions;
 
     public DecodedJwtDto(Date issuedAt,
                          Date expiresAt,
                          Long userId,
-                         String role,
+                         Collection<String> roles,
                          Collection<String> permissions)
     {
         this.issuedAt = issuedAt.toInstant().atZone(systemDefault()).toLocalDateTime();
         this.expiresAt = expiresAt.toInstant().atZone(systemDefault()).toLocalDateTime();
         this.userId = userId;
-        this.role = role;
-        this.permissions = Set.copyOf(permissions); // immutable set
+        // immutable set
+        this.roles = Set.copyOf(roles);
+        this.permissions = Set.copyOf(permissions);
     }
 
 }

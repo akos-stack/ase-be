@@ -3,10 +3,8 @@ package com.bloxico.ase.userservice.dto.entity.user;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
 import java.util.Set;
-
-import static java.util.stream.Collectors.toUnmodifiableList;
+import java.util.stream.Stream;
 
 @Data
 @EqualsAndHashCode(of = "name")
@@ -16,11 +14,10 @@ public class RoleDto {
     private String name;
     private Set<PermissionDto> permissions;
 
-    public List<String> getPermissionNames() {
+    public Stream<String> streamPermissionNames() {
         return permissions
                 .stream()
-                .map(PermissionDto::getName)
-                .collect(toUnmodifiableList());
+                .map(PermissionDto::getName);
     }
 
 }

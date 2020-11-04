@@ -15,7 +15,7 @@ public interface JwtToDtoMapper {
                 decodedJWT.getIssuedAt(),
                 decodedJWT.getExpiresAt(),
                 decodedJWT.getClaim("id").asLong(),
-                decodedJWT.getClaim("role").asString(),
+                decodedJWT.getClaim("roles").asList(String.class),
                 decodedJWT.getClaim("permissions").asList(String.class));
     }
 

@@ -9,10 +9,9 @@ import com.bloxico.ase.userservice.util.JwtBlacklistInMemory;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Set;
-
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -51,10 +50,12 @@ public class JwtServiceImplTest extends AbstractSpringTest {
                 userProfileDto.getId(),
                 decodedJwtDto.getUserId());
         assertEquals(
-                userProfileDto.getRole().getName(),
-                decodedJwtDto.getRole());
+                userProfileDto
+                        .streamRoleNames()
+                        .collect(toSet()),
+                decodedJwtDto.getRoles());
         assertEquals(
-                Set.copyOf(userProfileDto.getPermissionNames()),
+                userProfileDto.streamPermissionNames().collect(toSet()),
                 decodedJwtDto.getPermissions());
     }
 

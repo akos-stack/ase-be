@@ -38,7 +38,7 @@ public class MockUtil {
         user.setName("admin");
         user.setPassword(passwordEncoder.encode("admin"));
         user.setEmail("admin@mail.com");
-        user.setRole(role);
+        user.setRoles(Set.of(role));
         return userProfileRepository.saveAndFlush(user);
     }
 
@@ -59,7 +59,7 @@ public class MockUtil {
         user.setName("foobar");
         user.setPassword(passwordEncoder.encode("foobar"));
         user.setEmail("foobar@mail.com");
-        user.setRole(role);
+        user.setRoles(Set.of(role));
         return userProfileRepository.saveAndFlush(user);
     }
 

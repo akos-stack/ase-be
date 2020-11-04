@@ -22,6 +22,7 @@ import java.util.Date;
 
 import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
@@ -58,8 +59,8 @@ public class JwtServiceImpl implements IJwtService {
                 .withIssuedAt(new Date())
                 .withExpiresAt(expiresAt())
                 .withClaim("id", userProfile.getId())
-                .withClaim("role", userProfile.getRole().getName())
-                .withClaim("permissions", userProfile.getPermissionNames())
+                .withClaim("roles", userProfile.streamRoleNames().collect(toList()))
+                .withClaim("permissions", userProfile.streamPermissionNames().collect(toList()))
                 .sign(Algorithm.HMAC256(secret));
         log.debug("JwtServiceImpl.generateToken - end | userProfile: {}", userProfile);
         return token;

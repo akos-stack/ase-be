@@ -6,13 +6,15 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.Set;
 
-import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = "email", callSuper = false)
-@ToString(exclude = "role")
+@ToString(exclude = "roles")
 @Entity
 @Table(name = "user_profiles")
 public class UserProfile extends BaseEntity {
@@ -33,8 +35,11 @@ public class UserProfile extends BaseEntity {
     @Column(name = "phone")
     private String phone;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @ManyToMany(cascade = {PERSIST, MERGE})
+    @JoinTable(
+            name = "user_profiles_roles",
+            joinColumns = @JoinColumn(name = "user_profile_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles;
 
 }

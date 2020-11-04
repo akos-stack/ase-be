@@ -3,7 +3,8 @@ package com.bloxico.ase.userservice.dto.entity.user;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 @Data
 @EqualsAndHashCode(of = "email")
@@ -14,10 +15,19 @@ public class UserProfileDto {
     private String password;
     private String email;
     private String phone;
-    private RoleDto role;
+    private Set<RoleDto> roles;
 
-    public List<String> getPermissionNames() {
-        return role.getPermissionNames();
+    public Stream<String> streamRoleNames() {
+        return roles
+                .stream()
+                .map(RoleDto::getName);
+    }
+
+    public Stream<String> streamPermissionNames() {
+        return roles
+                .stream()
+                .distinct()
+                .flatMap(RoleDto::streamPermissionNames);
     }
 
 }
