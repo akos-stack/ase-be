@@ -30,6 +30,18 @@ public class MockUtil {
     @Autowired
     private UserProfileRepository userProfileRepository;
 
+    public UserProfile savedAdmin() {
+        Role role = new Role();
+        role.setName("admin");
+        roleRepository.save(role);
+        UserProfile user = new UserProfile();
+        user.setName("admin");
+        user.setPassword(passwordEncoder.encode("admin"));
+        user.setEmail("admin@mail.com");
+        user.setRole(role);
+        return userProfileRepository.saveAndFlush(user);
+    }
+
     public UserProfile savedUserProfile() {
         Role role = new Role();
         {

@@ -212,6 +212,50 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - createTable:
+            tableName: blacklisted_jwts
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: token
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_blacklisted_jwt_creator
+                    references: user_profiles(id)
+              - column:
+                  name: created
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_blacklisted_jwt_updater
+                    references: user_profiles(id)
+              - column:
+                  name: updated
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createTable:
             tableName: tokens
             columns:
               - column:

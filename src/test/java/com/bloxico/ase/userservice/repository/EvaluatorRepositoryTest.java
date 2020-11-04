@@ -25,7 +25,7 @@ public class EvaluatorRepositoryTest extends AbstractSpringTest {
         Evaluator user = new Evaluator();
         UserProfile creator = mockUtil.savedUserProfile();
         user.setUserProfile(creator);
-        user.setVerifier(creator); // invalid but ok for testing
+        user.setVerifier(mockUtil.savedAdmin());
         user.setCreator(creator.getId());
         user = repository.saveAndFlush(user);
         assertNotNull(user.getId());
@@ -37,7 +37,7 @@ public class EvaluatorRepositoryTest extends AbstractSpringTest {
         Evaluator user = new Evaluator();
         UserProfile creator = mockUtil.savedUserProfile();
         user.setUserProfile(creator);
-        user.setVerifier(creator); // invalid but ok for testing
+        user.setVerifier(mockUtil.savedAdmin());
         user.setCreator(creator.getId());
         user = repository.saveAndFlush(user);
         assertTrue(repository.findById(user.getId()).isPresent());

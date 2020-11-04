@@ -25,7 +25,7 @@ public class StartupConfig implements ApplicationListener<ApplicationReadyEvent>
         log.info("StartupConfig.onApplicationEvent - end");
     }
 
-    private void initJwtBlacklistInMemory() {
+    void initJwtBlacklistInMemory() {
         log.info("StartupConfig.initJwtBlacklistInMemory - start");
         JwtBlacklistInMemory
                 .addAll(blacklistedJwtRepository

@@ -60,23 +60,25 @@ public class JwtServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = JwtException.class)
     public void verifyToken_blacklistedToken() {
+        var principalId = mockUtil.savedAdmin().getId();
         var userProfileDto = mockUtil.savedUserProfileDto();
         var token = jwtService.generateToken(userProfileDto);
-        jwtService.blacklistToken(1L, token);
+        jwtService.blacklistToken(principalId, token);
         jwtService.verifyToken(token);
     }
 
     @Test(expected = NullPointerException.class)
     public void blacklistToken_nullToken() {
-        jwtService.blacklistToken(1L, null);
+        var principalId = mockUtil.savedAdmin().getId();
+        jwtService.blacklistToken(principalId, null);
     }
 
     @Test
     public void blacklist_generated_token() {
-        blacklistedJwtRepository.deleteAll();
+        var principalId = mockUtil.savedAdmin().getId();
         var userProfileDto = mockUtil.savedUserProfileDto();
         var token = jwtService.generateToken(userProfileDto);
-        jwtService.blacklistToken(1L, token);
+        jwtService.blacklistToken(principalId, token);
         assertTrue(JwtBlacklistInMemory.contains(token));
         var tokens = blacklistedJwtRepository
                 .findAll()
@@ -88,10 +90,10 @@ public class JwtServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void blacklist_same_token_multiple_times() {
-        blacklistedJwtRepository.deleteAll();
+        var principalId = mockUtil.savedAdmin().getId();
         var userProfileDto = mockUtil.savedUserProfileDto();
         var token = jwtService.generateToken(userProfileDto);
-        jwtService.blacklistToken(1L, token);
+        jwtService.blacklistToken(principalId, token);
         assertTrue(JwtBlacklistInMemory.contains(token));
         var tokens = blacklistedJwtRepository
                 .findAll()
@@ -99,7 +101,7 @@ public class JwtServiceImplTest extends AbstractSpringTest {
                 .map(BlacklistedJwt::getToken)
                 .collect(toList());
         assertEquals(singletonList(token), tokens);
-        jwtService.blacklistToken(1L, token);
+        jwtService.blacklistToken(principalId, token);
         tokens = blacklistedJwtRepository
                 .findAll()
                 .stream()
