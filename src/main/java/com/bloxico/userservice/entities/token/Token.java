@@ -12,8 +12,9 @@ import java.util.Date;
 @EqualsAndHashCode(of = {"tokenValue"}, callSuper = false)
 @DiscriminatorColumn(name = "token_type", discriminatorType = DiscriminatorType.STRING)
 @ToString
-@Table(name = "tokens")
+@Table(name = "tokens_old")
 @Data
+//TODO Dzoni: Token logic is implemented, you can either copy this logic or rewire the current to work with new entities
 public class Token extends BaseEntity {
 
     @Column(name = "token_value", nullable = false)

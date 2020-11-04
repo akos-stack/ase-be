@@ -22,6 +22,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
+//TODO Dzoni: Not sure if applied, inject mock MailUtil for local environment (to prevent spam)
 public class MailUtil {
 
     @Autowired
@@ -118,7 +119,8 @@ public class MailUtil {
 
     private void sendMail(MimeMessagePreparator preparator) {
         log.debug("Mail prepared, sending...");
-        mailSender.send(preparator);
+        //TODO Dzoni: Commented this out for now - this sends mail
+//        mailSender.send(preparator);
     }
 
     private static class MailUtilConstants {

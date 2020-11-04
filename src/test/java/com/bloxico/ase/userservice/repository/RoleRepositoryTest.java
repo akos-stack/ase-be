@@ -29,14 +29,11 @@ public class RoleRepositoryTest extends AbstractSpringTest {
             role.setName("foobar");
             Permission p1 = new Permission();
             p1.setName("foo");
-            p1.setCreator(1L);
             permissionRepository.saveAndFlush(p1);
             Permission p2 = new Permission();
             p2.setName("bar");
-            p2.setCreator(1L);
             permissionRepository.saveAndFlush(p2);
             role.setPermissions(Set.of(p1, p2));
-            role.setCreator(1L);
         }
         role = roleRepository.saveAndFlush(role);
         assertNotNull(role.getId());
@@ -50,14 +47,11 @@ public class RoleRepositoryTest extends AbstractSpringTest {
             role.setName("foobar");
             Permission p1 = new Permission();
             p1.setName("foo");
-            p1.setCreator(1L);
             permissionRepository.saveAndFlush(p1);
             Permission p2 = new Permission();
             p2.setName("bar");
-            p2.setCreator(1L);
             permissionRepository.saveAndFlush(p2);
             role.setPermissions(Set.of(p1, p2));
-            role.setCreator(1L);
         }
         role = roleRepository.saveAndFlush(role);
         assertTrue(roleRepository.findById(role.getId()).isPresent());

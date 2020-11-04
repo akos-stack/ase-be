@@ -1,24 +1,23 @@
 package com.bloxico.ase.userservice.entity.user;
 
-import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = "name", callSuper = false)
+@Table(name = "permissions")
 @Entity
-public class Permission extends BaseEntity {
+public class Permission {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Short id;
 
+    @Column(name = "name")
     private String name;
 
 }

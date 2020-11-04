@@ -2,10 +2,13 @@ package com.bloxico.ase.userservice.entity;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.entity.user.Permission;
-import com.bloxico.ase.userservice.repository.user.PermissionRepository;
+import com.bloxico.ase.userservice.entity.user.Owner;
+import com.bloxico.ase.userservice.entity.user.UserProfile;
+import com.bloxico.ase.userservice.repository.user.OwnerRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDate;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -16,52 +19,69 @@ public class BaseEntityTest extends AbstractSpringTest {
     private MockUtil mockUtil;
 
     @Autowired
-    private PermissionRepository permissionRepository;
+    private OwnerRepository ownerRepository;
 
     @Test(expected = NullPointerException.class)
     public void prePersist_creator_isNull() {
-        Permission permission = new Permission();
-        permission.setName("FOO");
-        permissionRepository.saveAndFlush(permission);
+        Owner owner = new Owner();
+        owner.setUserProfile(mockUtil.savedUserProfile());
+        owner.setBirthday(LocalDate.now().minusYears(20));
+        ownerRepository.saveAndFlush(owner);
     }
 
     @Test
     public void prePersist_creator_isNotNull() {
-        Permission permission = new Permission();
-        permission.setName("FOO");
-        permission.setCreator(1L);
-        assertNull(permission.getCreated());
-        permission = permissionRepository.saveAndFlush(permission);
-        assertNotNull(permission.getCreated());
+        Owner owner = new Owner();
+        UserProfile creator = mockUtil.savedUserProfile();
+        owner.setUserProfile(creator);
+        owner.setBirthday(LocalDate.now().minusYears(20));
+        owner.setCreator(creator.getId());
+        assertNull(owner.getCreated());
+        owner = ownerRepository.saveAndFlush(owner);
+        assertNotNull(owner.getCreated());
     }
 
     @Test(expected = NullPointerException.class)
     public void preUpdate_updater_isNull() {
-        Permission oldPermission = new Permission();
-        oldPermission.setName("FOO");
-        oldPermission.setCreator(1L);
-        oldPermission = permissionRepository.saveAndFlush(oldPermission);
-        Permission newPermission = new Permission();
-        newPermission.setId(oldPermission.getId());
-        newPermission.setName("BAR"); // update
-        MockUtil.copyBaseEntityData(oldPermission, newPermission);
-        permissionRepository.saveAndFlush(newPermission);
+        Owner oldOwner = new Owner();
+        {
+            UserProfile creator = mockUtil.savedUserProfile();
+            oldOwner.setUserProfile(creator);
+            oldOwner.setBirthday(LocalDate.now());
+            oldOwner.setCreator(creator.getId());
+            ownerRepository.saveAndFlush(oldOwner);
+        }
+        Owner newOwner = new Owner();
+        {
+            newOwner.setId(oldOwner.getId());
+            newOwner.setUserProfile(oldOwner.getUserProfile());
+            newOwner.setBirthday(LocalDate.now().minusYears(20)); // update
+            MockUtil.copyBaseEntityData(oldOwner, newOwner);
+            ownerRepository.saveAndFlush(newOwner);
+        }
     }
 
     @Test
     public void preUpdate_updater_isNotNull() {
-        Permission oldPermission = new Permission();
-        oldPermission.setName("FOO");
-        oldPermission.setCreator(1L);
-        oldPermission = permissionRepository.saveAndFlush(oldPermission);
-        Permission newPermission = new Permission();
-        newPermission.setId(oldPermission.getId());
-        newPermission.setName("BAR"); // update
-        MockUtil.copyBaseEntityData(oldPermission, newPermission);
-        newPermission.setUpdater(mockUtil.savedUserProfile().getId()); // !null
-        assertNull(newPermission.getUpdated());
-        newPermission = permissionRepository.saveAndFlush(newPermission);
-        assertNotNull(newPermission.getUpdated());
+        Owner oldOwner = new Owner();
+        {
+            UserProfile creator = mockUtil.savedUserProfile();
+            oldOwner.setUserProfile(creator);
+            oldOwner.setBirthday(LocalDate.now());
+            oldOwner.setCreator(creator.getId());
+            ownerRepository.saveAndFlush(oldOwner);
+        }
+        Owner newOwner = new Owner();
+        {
+            newOwner.setId(oldOwner.getId());
+            newOwner.setUserProfile(oldOwner.getUserProfile());
+            newOwner.setBirthday(LocalDate.now().minusYears(20)); // update
+            MockUtil.copyBaseEntityData(oldOwner, newOwner);
+            newOwner.setUpdater(newOwner.getCreator()); // !null
+            assertNull(newOwner.getUpdated());
+            newOwner = ownerRepository.saveAndFlush(newOwner);
+            assertNotNull(newOwner.getUpdated());
+        }
     }
 
 }

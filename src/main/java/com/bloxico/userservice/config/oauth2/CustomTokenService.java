@@ -17,6 +17,7 @@ public class CustomTokenService extends DefaultTokenServices {
     public CustomTokenService(CustomJdbcTokenStore tokenStore, CoinClientDetailsService coinClientDetailsService) {
         setTokenStore(tokenStore);
         setClientDetailsService(coinClientDetailsService);
+        setSupportRefreshToken(true);
     }
 
     @Override

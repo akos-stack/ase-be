@@ -4,7 +4,7 @@ databaseChangeLog:
     author: milos.sekuloski@bloxico.com
     changes:
     - createTable:
-        tableName: coin_users
+        tableName: coin_users_old
         columns:
         - column:
             name: id
@@ -54,7 +54,7 @@ databaseChangeLog:
             type: timestamp
 
     - createTable:
-        tableName: regions
+        tableName: regions_old
         columns:
         - column:
             name: id
@@ -85,7 +85,7 @@ databaseChangeLog:
             type: timestamp
 
     - createTable:
-        tableName: user_profiles
+        tableName: user_profiles_old
         columns:
         - column:
             name: id
@@ -112,7 +112,7 @@ databaseChangeLog:
             constraints:
               nullable: false
               foreignKeyName: fk_user_profile_region
-              references: regions(id)
+              references: regions_old(id)
         - column:
             name: created
             type: timestamp
@@ -128,10 +128,10 @@ databaseChangeLog:
             constraints:
               nullable: false
               foreignKeyName: fk_coin_user_profile
-              references: coin_users(id)
+              references: coin_users_old(id)
 
     - createTable:
-        tableName: tokens
+        tableName: tokens_old
         columns:
         - column:
             name: id
@@ -176,7 +176,7 @@ databaseChangeLog:
               nullable: false
 
     - createTable:
-        tableName: roles
+        tableName: roles_old
         columns:
         - column:
             name: id
@@ -207,7 +207,7 @@ databaseChangeLog:
             type: timestamp
 
     - createTable:
-        tableName: users_roles
+        tableName: users_roles_old
         columns:
         - column:
             name: id
@@ -222,14 +222,14 @@ databaseChangeLog:
             constraints:
               nullable: false
               foreignKeyName: fk_coin_user_role
-              references: coin_users(id)
+              references: coin_users_old(id)
         - column:
             name: role_id
             type: bigint
             constraints:
               nullable: false
               foreignKeyName: fk_role_coin_user
-              references: roles(id)
+              references: roles_old(id)
         - column:
             name: created
             type: timestamp

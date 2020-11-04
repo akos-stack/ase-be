@@ -6,5 +6,5 @@ import com.bloxico.userservice.dto.entities.UserProfileDto;
 public interface IUserProfileService {
     UserProfileDto findProfileByEmail(String email);
 
-    void updateProfile(String email, UpdateProfileDto updateProfileDto);
+    UserProfileDto updateProfile(String email, UpdateProfileDto updateProfileDto);
 }

@@ -15,18 +15,18 @@ import javax.persistence.Table;
  */
 @Entity
 @Data
-@EqualsAndHashCode(of = {"role"}, callSuper = false)
-@Table(name = "users_roles")
+@EqualsAndHashCode(of = {"coinRole"}, callSuper = false)
+@Table(name = "users_roles_old")
 @ToString(exclude = "coinUser")
-public class UserRole extends BaseEntity {
+public class CoinUserRole extends BaseEntity {
 
-    public UserRole() {
+    public CoinUserRole() {
         super();
     }
 
-    public UserRole(CoinUser coinUser, Role role) {
+    public CoinUserRole(CoinUser coinUser, CoinRole coinRole) {
         this.coinUser = coinUser;
-        this.role = role;
+        this.coinRole = coinRole;
     }
 
     @ManyToOne
@@ -35,5 +35,5 @@ public class UserRole extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "role_id")
-    private Role role;
+    private CoinRole coinRole;
 }

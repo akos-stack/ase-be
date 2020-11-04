@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Data
 @EqualsAndHashCode(of = {"name", "city", "region"}, callSuper = false)
 @ToString(exclude = "coinUser")
-@Table(name = "user_profiles")
+@Table(name = "user_profiles_old")
 public class UserProfile extends BaseEntity {
 
     @Column(name = "name")

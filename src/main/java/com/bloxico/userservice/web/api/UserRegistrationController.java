@@ -1,8 +1,10 @@
 package com.bloxico.userservice.web.api;
 
+import com.bloxico.userservice.dto.entities.TokenDto;
 import com.bloxico.userservice.facade.IRegistrationFacade;
 import com.bloxico.userservice.web.model.registration.RegistrationDataResponse;
 import com.bloxico.userservice.web.model.registration.RegistrationRequest;
+import com.bloxico.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.userservice.web.model.token.ResendTokenRequest;
 import com.bloxico.userservice.web.model.token.TokenValidityRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +27,11 @@ public class UserRegistrationController implements UserRegistrationApi {
     }
 
     @Override
-    public ResponseEntity<Void> registerCoinUser(@Valid @RequestBody RegistrationRequest registrationRequest, HttpServletRequest request) {
+    public ResponseEntity<RegistrationResponse> registerCoinUser(@Valid @RequestBody RegistrationRequest registrationRequest, HttpServletRequest request) {
 
-        registrationFacade.registerUserWithVerificationToken(registrationRequest);
+        RegistrationResponse registrationResponse = registrationFacade.registerUserWithVerificationToken(registrationRequest);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(registrationResponse, HttpStatus.OK);
     }
 
     @Override

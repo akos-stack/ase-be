@@ -39,7 +39,6 @@ public class CoinUserDetailsService implements UserDetailsService {
 
         CoinUser coinUser = op.get();
         log.debug("Loading User by username - end, Coin User: {}", coinUser);
-
         return new CoinUserDetails(coinUser);
     }
 }

@@ -50,12 +50,15 @@ public class UserProfileFacadeImpl implements IUserProfileFacade {
 
     @Override
     @Transactional
-    public void updateMyProfile(String email, UpdateProfileRequest updateProfileRequest) {
+    public UserProfileDataResponse updateMyProfile(String email, UpdateProfileRequest updateProfileRequest) {
         log.info("Update my profile request - start , email {}, UpdateProfileRequest: {}", email, updateProfileRequest);
         UpdateProfileDto updateProfileDto = UpdateProfileRequestMapper.INSTANCE.requestToDto(updateProfileRequest);
 
-        userProfileService.updateProfile(email, updateProfileDto);
+        UserProfileDto userProfileDto = userProfileService.updateProfile(email, updateProfileDto);
 
         log.info("Update my profile request - end , email {}, UpdateProfileRequest: {}", email, updateProfileRequest);
+        UserProfileDataResponse dataResponse = new UserProfileDataResponse();
+        dataResponse.setUserProfile(userProfileDto);
+        return dataResponse;
     }
 }

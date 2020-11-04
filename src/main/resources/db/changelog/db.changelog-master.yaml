@@ -2,10 +2,14 @@ databaseChangeLog:
 - include:
   - file: db/changelog/v0.1.0/add-user-management-tables.yaml
 - include:
+  - file: db/changelog/v0.1.0/add-ase-tables.yaml
+- include:
   - file: db/changelog/v0.1.0/add-oauth2-tables.xml
 - include:
    - file: db/changelog/v0.1.0/add-quartz-tables.xml
 - include:
-   - file: db/changelog/v0.1.0/load-initial-data.yaml
+    - file: db/changelog/v0.1.0/load-initial-data.yaml
 - include:
-   - file: db/changelog/v0.1.0/load-mockup-data.yaml
+   - file: db/changelog/v0.1.0/load-ase-initial-data.yaml
+#- include:
+#   - file: db/changelog/v0.1.0/load-mockup-data.yaml

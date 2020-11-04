@@ -32,5 +32,5 @@ public interface UserProfileApi {
     @ApiOperation(value = "Endpoint used to update user profile.")
     @ApiResponses({@ApiResponse(code = 200, message = "Update successful.")
     })
-    ResponseEntity<Void> updateMyProfile(@Valid @RequestBody UpdateProfileRequest updateProfileRequest, Principal principal);
+    ResponseEntity<UserProfileDataResponse> updateMyProfile(@Valid @RequestBody UpdateProfileRequest updateProfileRequest, Principal principal);
 }

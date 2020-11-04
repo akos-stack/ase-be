@@ -35,15 +35,12 @@ public class MockUtil {
         {
             Permission p1 = new Permission();
             p1.setName("permission_1");
-            p1.setCreator(1L);
             p1 = permissionRepository.saveAndFlush(p1);
             Permission p2 = new Permission();
             p2.setName("permission_2");
-            p2.setCreator(1L);
             p2 = permissionRepository.saveAndFlush(p2);
             role.setName("role_x");
             role.setPermissions(Set.of(p1, p2));
-            role.setCreator(1L);
             roleRepository.save(role);
         }
         UserProfile user = new UserProfile();

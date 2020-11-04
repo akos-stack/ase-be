@@ -5,11 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.MapsId;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 import static javax.persistence.FetchType.LAZY;
@@ -17,6 +13,7 @@ import static javax.persistence.FetchType.LAZY;
 @Data
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = "userProfile")
+@Table(name = "owners")
 @Entity
 public class Owner extends BaseEntity {
 
@@ -28,6 +25,7 @@ public class Owner extends BaseEntity {
     @JoinColumn(name = "id")
     private UserProfile userProfile;
 
+    @Column(name = "birthday")
     private LocalDate birthday;
 
 }
