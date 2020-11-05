@@ -43,6 +43,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     static {
         AUTH_WHITELIST = new String[]{
+
+                // Whitelist JWT-secured APIs
+                "/authenticate",
+                "/ase/**",
+                // --------------------------
+
                 "/swagger-resources/**", "/swagger-ui.html", "/api-docs", "/webjars/**",
                 UserRegistrationApi.REGISTRATION_ENDPOINT,
                 UserRegistrationApi.REGISTRATION_CONFIRMATION_ENDPOINT,
