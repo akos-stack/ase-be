@@ -5,6 +5,7 @@ import com.bloxico.ase.userservice.facade.IAuthenticationFacade;
 import com.bloxico.ase.userservice.web.api.AuthenticationApi;
 import com.bloxico.ase.userservice.web.model.auth.AuthenticationRequest;
 import com.bloxico.ase.userservice.web.model.auth.AuthenticationResponse;
+import com.bloxico.ase.userservice.web.model.auth.BlacklistRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +23,8 @@ public class AuthenticationController implements AuthenticationApi {
     }
 
     @Override
-    public ResponseEntity<Void> blacklist(DecodedJwtDto decodedJwt, String token) {
-        facade.blacklist(decodedJwt.getUserId(), token);
+    public ResponseEntity<Void> blacklist(DecodedJwtDto decodedJwt, BlacklistRequest request) {
+        facade.blacklist(decodedJwt.getUserId(), request.getToken());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

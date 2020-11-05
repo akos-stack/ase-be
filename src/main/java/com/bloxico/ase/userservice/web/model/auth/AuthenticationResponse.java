@@ -7,8 +7,8 @@ import lombok.Value;
 @Value
 public class AuthenticationResponse {
 
-    @JsonProperty("jwt")
-    String jwt;
+    @JsonProperty("token")
+    String token;
 
     @JsonProperty("user_profile")
     UserProfileDto userProfile;

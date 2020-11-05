@@ -7,27 +7,21 @@ import com.bloxico.ase.userservice.web.model.auth.AuthenticationRequest;
 import com.bloxico.ase.userservice.web.model.auth.AuthenticationResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-@Transactional
 public class AuthenticationFacadeImpl implements IAuthenticationFacade {
 
     private final IJwtService jwtService;
     private final IUserProfileService userProfileService;
-    private final AuthenticationManager authenticationManager;
 
     @Autowired
     public AuthenticationFacadeImpl(IJwtService jwtService,
-                                    IUserProfileService userProfileService,
-                                    AuthenticationManager authenticationManager)
+                                    IUserProfileService userProfileService)
     {
         this.jwtService = jwtService;
         this.userProfileService = userProfileService;
-        this.authenticationManager = authenticationManager;
     }
 
     @Override

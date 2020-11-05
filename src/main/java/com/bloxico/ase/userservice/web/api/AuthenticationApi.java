@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.web.api;
 import com.bloxico.ase.userservice.dto.token.DecodedJwtDto;
 import com.bloxico.ase.userservice.web.model.auth.AuthenticationRequest;
 import com.bloxico.ase.userservice.web.model.auth.AuthenticationResponse;
+import com.bloxico.ase.userservice.web.model.auth.BlacklistRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -26,13 +27,13 @@ public interface AuthenticationApi {
 
     @PostMapping(
             value = BLACKLIST_ENDPOINT,
-            consumes = {"text/plain"},
+            consumes = {"application/json"},
             produces = {"application/json"})
     ResponseEntity<Void>
         blacklist
             (@RequestAttribute("decodedJwt")
              DecodedJwtDto decodedJwt,
              @RequestBody @Valid
-             String token);
+             BlacklistRequest request);
 
 }

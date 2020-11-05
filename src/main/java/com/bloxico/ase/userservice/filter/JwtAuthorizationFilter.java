@@ -3,7 +3,6 @@ package com.bloxico.ase.userservice.filter;
 import com.bloxico.ase.userservice.service.token.IJwtService;
 import com.bloxico.ase.userservice.web.api.AuthenticationApi;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,7 +16,6 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
-@Slf4j
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
@@ -26,8 +24,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private static final Map<String, String>
             URI_PERMISSION_MAP
-            = Map.ofEntries(entry(AuthenticationApi.BLACKLIST_ENDPOINT, "BLACKLIST"),
-                            entry("/ase/pingSecured", "TEMP"));
+            = Map.ofEntries(entry(AuthenticationApi.BLACKLIST_ENDPOINT, "BLACKLIST"));
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
