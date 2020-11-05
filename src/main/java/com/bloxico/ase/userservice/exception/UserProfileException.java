@@ -1,9 +1,11 @@
 package com.bloxico.ase.userservice.exception;
 
-public class UserProfileException extends RuntimeException {
+import org.springframework.http.HttpStatus;
 
-    public UserProfileException(String message, Throwable cause) {
-        super(message, cause);
+public class UserProfileException extends AseRuntimeException {
+
+    public UserProfileException(HttpStatus httpStatus, String message, Throwable cause) {
+        super(httpStatus, message, cause);
     }
 
 }

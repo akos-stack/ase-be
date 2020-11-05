@@ -1,9 +1,11 @@
 package com.bloxico.ase.userservice.exception;
 
-public class JwtException extends RuntimeException {
+import org.springframework.http.HttpStatus;
 
-    public JwtException(String message, Throwable cause) {
-        super(message, cause);
+public class JwtException extends AseRuntimeException {
+
+    public JwtException(HttpStatus httpStatus, String message, Throwable cause) {
+        super(httpStatus, message, cause);
     }
 
 }
