@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.filter;
 
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.service.token.IJwtService;
 import com.bloxico.ase.userservice.web.api.AuthenticationApi;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
@@ -24,7 +25,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private static final Map<String, String>
             URI_PERMISSION_MAP
-            = Map.ofEntries(entry(AuthenticationApi.BLACKLIST_ENDPOINT, "BLACKLIST"));
+            = Map.ofEntries(entry(AuthenticationApi.BLACKLIST_ENDPOINT, Role.BLACKLIST));
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

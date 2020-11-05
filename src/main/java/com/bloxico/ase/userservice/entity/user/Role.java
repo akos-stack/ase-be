@@ -18,6 +18,8 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Entity
 public class Role {
 
+    public static final String BLACKLIST = "BLACKLIST";
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Short id;
