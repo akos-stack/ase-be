@@ -36,12 +36,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         this.tokenStore = tokenStore;
     }
 
-    private static final Map<String, String>
-            URI_PERMISSION_MAP
-            = Map.ofEntries(entry(AuthenticationApi.BLACKLIST_ENDPOINT, Role.BLACKLIST));
-
-
-    //HINT Authorization is done here
+    //HINT JWT Verification is done here
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -60,9 +55,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(jwt);
 
             var decodedJwt = jwtService.verifyToken(jwt);
-//            var permission = URI_PERMISSION_MAP.get(uri);
-//            if (permission != null && !decodedJwt.getPermissions().contains(permission))
-//                throw ErrorCodes.Jwt.INVALID_TOKEN.newException();
             request.setAttribute("decodedJwt", decodedJwt);
 
             SecurityContextHolder.getContext().setAuthentication(oAuth2Authentication);

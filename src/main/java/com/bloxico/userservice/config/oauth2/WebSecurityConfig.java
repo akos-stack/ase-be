@@ -112,12 +112,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
-                .addFilterBefore(new RepeatableReadRequestFilter(), AbstractPreAuthenticatedProcessingFilter.class)
                 .authorizeRequests().anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
                 and()
                 .addFilterBefore(new JwtAuthorizationFilter(jwtService, tokenStore), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new RepeatableReadRequestFilter(), AbstractPreAuthenticatedProcessingFilter.class)
                 .csrf().disable();
     }
 }
