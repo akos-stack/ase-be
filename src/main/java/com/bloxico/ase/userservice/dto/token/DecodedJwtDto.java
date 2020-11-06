@@ -12,20 +12,16 @@ import static java.time.ZoneId.systemDefault;
 @Value
 public class DecodedJwtDto {
 
-    LocalDateTime issuedAt;
-    LocalDateTime expiresAt;
     Long userId;
     Set<String> roles;
     Set<String> permissions;
 
-    public DecodedJwtDto(Date issuedAt,
-                         Date expiresAt,
+    public DecodedJwtDto(
                          Long userId,
                          Collection<String> roles,
                          Collection<String> permissions)
     {
-        this.issuedAt = issuedAt.toInstant().atZone(systemDefault()).toLocalDateTime();
-        this.expiresAt = expiresAt.toInstant().atZone(systemDefault()).toLocalDateTime();
+        //HINT removed Issued at and expires at since spring security is handling that part
         this.userId = userId;
         // immutable set
         this.roles = Set.copyOf(roles);

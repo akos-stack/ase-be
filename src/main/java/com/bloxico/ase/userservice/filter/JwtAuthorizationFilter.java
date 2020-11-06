@@ -5,6 +5,15 @@ import com.bloxico.ase.userservice.service.token.IJwtService;
 import com.bloxico.ase.userservice.web.api.AuthenticationApi;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.authentication.BearerTokenExtractor;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationManager;
+import org.springframework.security.oauth2.provider.authentication.TokenExtractor;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -17,32 +26,46 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
-@Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    @Autowired
     private IJwtService jwtService;
+    TokenStore tokenStore;
+
+    public JwtAuthorizationFilter(IJwtService jwtService, TokenStore tokenStore) {
+        this.jwtService = jwtService;
+        this.tokenStore = tokenStore;
+    }
 
     private static final Map<String, String>
             URI_PERMISSION_MAP
             = Map.ofEntries(entry(AuthenticationApi.BLACKLIST_ENDPOINT, Role.BLACKLIST));
 
+
+    //HINT Authorization is done here
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain)
             throws ServletException, IOException
     {
+
         var uri = request.getRequestURI().replace(request.getContextPath(), "");
-        if (URI_PERMISSION_MAP.containsKey(uri)) {
+//        if (URI_PERMISSION_MAP.containsKey(uri)) {
+        if (true) {
             var header = request.getHeader("Authorization");
             if (header == null || !header.startsWith("Bearer "))
                 throw ErrorCodes.Jwt.INVALID_TOKEN.newException();
-            var decodedJwt = jwtService.verifyToken(header.substring(7));
-            var permission = URI_PERMISSION_MAP.get(uri);
-            if (permission != null && !decodedJwt.getPermissions().contains(permission))
-                throw ErrorCodes.Jwt.INVALID_TOKEN.newException();
+
+            var jwt = header.substring(7);
+            OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(jwt);
+
+            var decodedJwt = jwtService.verifyToken(jwt);
+//            var permission = URI_PERMISSION_MAP.get(uri);
+//            if (permission != null && !decodedJwt.getPermissions().contains(permission))
+//                throw ErrorCodes.Jwt.INVALID_TOKEN.newException();
             request.setAttribute("decodedJwt", decodedJwt);
+
+            SecurityContextHolder.getContext().setAuthentication(oAuth2Authentication);
         }
         chain.doFilter(request, response);
     }

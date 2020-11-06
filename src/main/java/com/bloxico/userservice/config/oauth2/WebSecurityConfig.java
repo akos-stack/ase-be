@@ -1,5 +1,8 @@
 package com.bloxico.userservice.config.oauth2;
 
+import com.bloxico.ase.userservice.filter.JwtAuthorizationFilter;
+import com.bloxico.ase.userservice.service.token.IJwtService;
+import com.bloxico.userservice.filter.RepeatableReadRequestFilter;
 import com.bloxico.userservice.web.api.UserPasswordApi;
 import com.bloxico.userservice.web.api.UserRegistrationApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +17,14 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -26,8 +34,14 @@ import org.springframework.web.filter.CorsFilter;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+//    @Autowired
+//    private DaoAuthenticationProvider daoAuthenticationProvider;
+
     @Autowired
-    private DaoAuthenticationProvider daoAuthenticationProvider;
+    TokenStore tokenStore;
+
+    @Autowired
+    IJwtService jwtService;
 
     @Value("${front.end.url}")
     protected String FRONTEND_URL;
@@ -95,8 +109,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(AUTH_WHITELIST);
     }
 
-    @Autowired
-    protected void configureGlobal(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(daoAuthenticationProvider);
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        http
+                .addFilterBefore(new RepeatableReadRequestFilter(), AbstractPreAuthenticatedProcessingFilter.class)
+                .authorizeRequests().anyRequest().authenticated()
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
+                and()
+                .addFilterBefore(new JwtAuthorizationFilter(jwtService, tokenStore), UsernamePasswordAuthenticationFilter.class)
+                .csrf().disable();
     }
 }

@@ -41,14 +41,14 @@ public class CommonBeansConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider(PasswordEncoder encoder) {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setPasswordEncoder(encoder);
-        daoAuthenticationProvider.setUserDetailsService(coinUserDetailsService);
-
-        return daoAuthenticationProvider;
-    }
+//    @Bean
+//    public DaoAuthenticationProvider daoAuthenticationProvider(PasswordEncoder encoder) {
+//        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+//        daoAuthenticationProvider.setPasswordEncoder(encoder);
+//        daoAuthenticationProvider.setUserDetailsService(coinUserDetailsService);
+//
+//        return daoAuthenticationProvider;
+//    }
 
 
     @Bean

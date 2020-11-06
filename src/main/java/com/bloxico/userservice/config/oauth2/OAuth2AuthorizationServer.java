@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
 import javax.sql.DataSource;
 
@@ -41,11 +42,14 @@ public class OAuth2AuthorizationServer extends AuthorizationServerConfigurerAdap
     @Autowired
     private CoinClientDetailsService clientDetailsService;
 
-    @Autowired
-    private CustomTokenService customTokenService;
+//    @Autowired
+//    private CustomTokenService customTokenService;
 
     @Autowired
     private TokenStore tokenStore;
+
+    @Autowired
+    private JwtAccessTokenConverter jwtAccessTokenConverter;
 
     @Autowired
     private DataSource dataSource;
@@ -65,10 +69,9 @@ public class OAuth2AuthorizationServer extends AuthorizationServerConfigurerAdap
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints.tokenStore(tokenStore)
-                .approvalStore(approvalStore)
+                .tokenEnhancer(jwtAccessTokenConverter)
                 .authenticationManager(authenticationManager)
-                .userDetailsService(userDetailsService)
-                .tokenServices(customTokenService);
+                .userDetailsService(userDetailsService);
     }
 
     @Override
