@@ -52,9 +52,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 throw ErrorCodes.Jwt.INVALID_TOKEN.newException();
 
             var jwt = header.substring(7);
-            OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(jwt);
-
             var decodedJwt = jwtService.verifyToken(jwt);
+
+            OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(jwt);
+            oAuth2Authentication.setDetails(decodedJwt.getUserId());
+
             request.setAttribute("decodedJwt", decodedJwt);
 
             SecurityContextHolder.getContext().setAuthentication(oAuth2Authentication);
