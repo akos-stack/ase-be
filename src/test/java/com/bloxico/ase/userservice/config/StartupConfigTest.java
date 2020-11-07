@@ -32,7 +32,7 @@ public class StartupConfigTest extends AbstractSpringTest {
 
         BlacklistedJwt jwt = new BlacklistedJwt();
         jwt.setToken(token);
-        jwt.setCreator(mockUtil.savedAdmin().getId());
+        jwt.setCreatorId(mockUtil.savedAdmin().getId());
         blacklistedJwtRepository.save(jwt);
 
         assertFalse(JwtBlacklistInMemory.contains(token));

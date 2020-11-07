@@ -16,16 +16,16 @@ public abstract class BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Column(name = "creator_id")
-    private Long creator;
+    private Long creatorId;
 
     @Column(name = "updater_id")
-    private Long updater;
+    private Long updaterId;
 
-    @Column(name = "created")
-    private LocalDateTime created;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    @Column(name = "updated")
-    private LocalDateTime updated;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Version
     private long version;
@@ -33,14 +33,14 @@ public abstract class BaseEntity implements Serializable {
     @PrePersist
     void prePersist() {
         if (!(this instanceof UserProfile))
-            requireNonNull(getCreator());
-        setCreated(LocalDateTime.now());
+            requireNonNull(getCreatorId());
+        setCreatedAt(LocalDateTime.now());
     }
 
     @PreUpdate
     void preUpdate() {
-        requireNonNull(getUpdater());
-        setUpdated(LocalDateTime.now());
+        requireNonNull(getUpdaterId());
+        setUpdatedAt(LocalDateTime.now());
     }
 
 }

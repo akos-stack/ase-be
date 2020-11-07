@@ -23,7 +23,7 @@ public class BlacklistedJwtRepositoryTest extends AbstractSpringTest {
     public void save() {
         BlacklistedJwt jwt = new BlacklistedJwt();
         jwt.setToken("7WK5T79u5mIzjIXXi2oI9Fglmgivv7RAJ7izyj9tUyQ");
-        jwt.setCreator(mockUtil.savedUserProfile().getId());
+        jwt.setCreatorId(mockUtil.savedUserProfile().getId());
         repository.saveAndFlush(jwt);
         assertNotNull(jwt.getId());
     }
@@ -33,7 +33,7 @@ public class BlacklistedJwtRepositoryTest extends AbstractSpringTest {
         assertFalse(repository.findById(-1L).isPresent());
         BlacklistedJwt jwt = new BlacklistedJwt();
         jwt.setToken("7WK5T79u5mIzjIXXi2oI9Fglmgivv7RAJ7izyj9tUyQ");
-        jwt.setCreator(mockUtil.savedUserProfile().getId());
+        jwt.setCreatorId(mockUtil.savedUserProfile().getId());
         jwt = repository.saveAndFlush(jwt);
         assertTrue(repository.findById(jwt.getId()).isPresent());
     }

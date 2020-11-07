@@ -93,7 +93,7 @@ public class JwtServiceImpl implements IJwtService {
         if (!JwtBlacklistInMemory.contains(token)) {
             var blacklistedJwt = new BlacklistedJwt();
             blacklistedJwt.setToken(token);
-            blacklistedJwt.setCreator(principalId);
+            blacklistedJwt.setCreatorId(principalId);
             blacklistedJwtRepository.save(blacklistedJwt);
             JwtBlacklistInMemory.add(token);
         }

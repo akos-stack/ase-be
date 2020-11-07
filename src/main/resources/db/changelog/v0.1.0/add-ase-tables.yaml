@@ -92,7 +92,7 @@ databaseChangeLog:
                     foreignKeyName: fk_user_profile_creator
                     references: user_profiles(id)
               - column:
-                  name: created
+                  name: created_at
                   type: timestamp
                   defaultValueComputed: "CURRENT_TIMESTAMP"
                   constraints:
@@ -104,7 +104,7 @@ databaseChangeLog:
                     foreignKeyName: fk_user_profile_updater
                     references: user_profiles(id)
               - column:
-                  name: updated
+                  name: updated_at
                   type: timestamp
               - column:
                   name: version
@@ -159,7 +159,7 @@ databaseChangeLog:
                     foreignKeyName: fk_evaluator_creator
                     references: user_profiles(id)
               - column:
-                  name: created
+                  name: created_at
                   type: timestamp
                   defaultValueComputed: "CURRENT_TIMESTAMP"
                   constraints:
@@ -171,7 +171,7 @@ databaseChangeLog:
                     foreignKeyName: fk_evaluator_updater
                     references: user_profiles(id)
               - column:
-                  name: updated
+                  name: updated_at
                   type: timestamp
               - column:
                   name: version
@@ -203,7 +203,7 @@ databaseChangeLog:
                     foreignKeyName: fk_owner_creator
                     references: user_profiles(id)
               - column:
-                  name: created
+                  name: created_at
                   type: timestamp
                   defaultValueComputed: "CURRENT_TIMESTAMP"
                   constraints:
@@ -215,7 +215,7 @@ databaseChangeLog:
                     foreignKeyName: fk_owner_updater
                     references: user_profiles(id)
               - column:
-                  name: updated
+                  name: updated_at
                   type: timestamp
               - column:
                   name: version
@@ -247,7 +247,7 @@ databaseChangeLog:
                     foreignKeyName: fk_blacklisted_jwt_creator
                     references: user_profiles(id)
               - column:
-                  name: created
+                  name: created_at
                   type: timestamp
                   defaultValueComputed: "CURRENT_TIMESTAMP"
                   constraints:
@@ -259,7 +259,7 @@ databaseChangeLog:
                     foreignKeyName: fk_blacklisted_jwt_updater
                     references: user_profiles(id)
               - column:
-                  name: updated
+                  name: updated_at
                   type: timestamp
               - column:
                   name: version
@@ -306,7 +306,7 @@ databaseChangeLog:
                     foreignKeyName: fk_token_creator
                     references: user_profiles(id)
               - column:
-                  name: created
+                  name: created_at
                   type: timestamp
                   defaultValueComputed: "CURRENT_TIMESTAMP"
                   constraints:
@@ -318,7 +318,7 @@ databaseChangeLog:
                     foreignKeyName: fk_token_updater
                     references: user_profiles(id)
               - column:
-                  name: updated
+                  name: updated_at
                   type: timestamp
               - column:
                   name: version

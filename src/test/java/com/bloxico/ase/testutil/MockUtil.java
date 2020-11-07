@@ -68,10 +68,10 @@ public class MockUtil {
     }
 
     public static void copyBaseEntityData(BaseEntity from, BaseEntity to) {
-        to.setCreator(from.getCreator());
-        to.setUpdater(from.getUpdater());
-        to.setCreated(from.getCreated());
-        to.setUpdated(from.getUpdated());
+        to.setCreatorId(from.getCreatorId());
+        to.setUpdaterId(from.getUpdaterId());
+        to.setCreatedAt(from.getCreatedAt());
+        to.setUpdatedAt(from.getUpdatedAt());
     }
 
 }
