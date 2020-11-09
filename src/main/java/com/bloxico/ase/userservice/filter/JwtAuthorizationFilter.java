@@ -4,7 +4,6 @@ import com.bloxico.ase.userservice.service.token.IJwtService;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.userservice.web.model.ApiError;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -20,7 +19,7 @@ import java.io.IOException;
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private IJwtService jwtService;
-    TokenStore tokenStore;
+    private TokenStore tokenStore;
 
     public JwtAuthorizationFilter(IJwtService jwtService, TokenStore tokenStore) {
         this.jwtService = jwtService;
@@ -57,11 +56,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
     }
 
-    private void raiseException(HttpServletResponse response)
-            throws IOException {
+    private void raiseException(HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN, ErrorCodes.Jwt.INVALID_TOKEN.getCode());
+        var status = ErrorCodes.Jwt.INVALID_TOKEN.getHttpStatus();
+        var code   = ErrorCodes.Jwt.INVALID_TOKEN.getCode();
+        ApiError apiError = new ApiError(status, code);
         byte[] body = new ObjectMapper().writeValueAsBytes(apiError);
         response.getOutputStream().write(body);
     }

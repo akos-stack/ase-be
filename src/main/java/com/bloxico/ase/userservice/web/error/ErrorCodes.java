@@ -41,7 +41,7 @@ public interface ErrorCodes {
     enum Jwt implements ErrorCodes {
 
         INVALID_TOKEN(
-                HttpStatus.UNAUTHORIZED,
+                HttpStatus.FORBIDDEN,
                 "10",
                 "Token is not valid (anymore). E.g. it's fake, expired or blacklisted.");
 
