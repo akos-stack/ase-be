@@ -54,9 +54,6 @@ public class JwtServiceImplTest extends AbstractSpringTest {
                         .streamRoleNames()
                         .collect(toSet()),
                 decodedJwtDto.getRoles());
-        assertEquals(
-                userProfileDto.streamPermissionNames().collect(toSet()),
-                decodedJwtDto.getPermissions());
     }
 
     @Test(expected = JwtException.class)

@@ -60,7 +60,6 @@ public class JwtServiceImpl implements IJwtService {
                 .withExpiresAt(expiresAt())
                 .withClaim("id", userProfile.getId())
                 .withClaim("roles", userProfile.streamRoleNames().collect(toList()))
-                .withClaim("permissions", userProfile.streamPermissionNames().collect(toList()))
                 .sign(Algorithm.HMAC256(secret));
         log.debug("JwtServiceImpl.generateToken - end | userProfile: {}", userProfile);
         return token;

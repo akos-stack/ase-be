@@ -13,8 +13,7 @@ public interface JwtToDtoMapper {
     default DecodedJwtDto decodedJwt(DecodedJWT decodedJWT) {
         return new DecodedJwtDto(
                 decodedJWT.getClaim("id").asLong(),
-                decodedJWT.getClaim("roles").asList(String.class),
-                decodedJWT.getClaim("permissions").asList(String.class));
+                decodedJWT.getClaim("roles").asList(String.class));
     }
 
 }
