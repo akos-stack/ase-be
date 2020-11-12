@@ -3,22 +3,29 @@ package com.bloxico.userservice.util.tokencreator;
 import com.bloxico.userservice.entities.token.Token;
 import com.bloxico.userservice.repository.token.TokenRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 
-import java.util.Optional;
-import java.util.Random;
+import java.util.UUID;
 
 @Slf4j
 public class TokenCreatorUtil<T extends Token> {
 
-    private TokenRepository<T> tokenRepository;
+    // Note: This is kept to minimize further changes
+    public TokenCreatorUtil(TokenRepository<T> __) {}
 
-    @Value("${token.digit.size}")
-    private int tokenDigitSize;
+    public String createTokenCode() {
+        return UUID.randomUUID().toString();
+    }
+
+    /* DEPRECATED - We are using UUID instead
+
+    private TokenRepository<T> tokenRepository;
 
     public TokenCreatorUtil(TokenRepository<T> tokenRepository) {
         this.tokenRepository = tokenRepository;
     }
+
+    @Value("${token.digit.size}")
+    private int tokenDigitSize;
 
     public String createTokenCode() {
         Random random = new Random();
@@ -43,4 +50,7 @@ public class TokenCreatorUtil<T extends Token> {
 
         return !op.isPresent();
     }
+
+    */
+
 }
