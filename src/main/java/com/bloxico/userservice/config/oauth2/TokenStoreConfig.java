@@ -1,7 +1,5 @@
 package com.bloxico.userservice.config.oauth2;
 
-
-import com.bloxico.userservice.entities.user.CoinUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -78,8 +75,6 @@ public class TokenStoreConfig {
                     .stream()
                     .map(x -> x.getCoinRole().getRoleName().name())
                     .collect(Collectors.toList()));
-            info.put("permissions", Collections.singletonList("TODO"));
-
 
             DefaultOAuth2AccessToken customAccessToken = new DefaultOAuth2AccessToken(accessToken);
             customAccessToken.setAdditionalInformation(info);
