@@ -13,7 +13,9 @@ public class TokenCreatorUtil<T extends Token> {
     public TokenCreatorUtil(TokenRepository<T> __) {}
 
     public String createTokenCode() {
-        return UUID.randomUUID().toString();
+        String token = UUID.randomUUID().toString();
+        log.debug("Token value generated: " + token);
+        return token;
     }
 
     /* DEPRECATED - We are using UUID instead
