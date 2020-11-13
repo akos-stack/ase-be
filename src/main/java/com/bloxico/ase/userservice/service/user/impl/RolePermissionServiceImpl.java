@@ -41,6 +41,7 @@ public class RolePermissionServiceImpl implements IRolePermissionService {
                                 .getRoles()
                                 .stream()
                                 .map(Role::getName)
+                                .map(name -> "ROLE_" + name)
                                 .map(SimpleGrantedAuthority::new)
                                 .collect(toUnmodifiableSet())));
         log.debug("RolePermissionServiceImpl.permissionNameGrantedAuthoritiesMap - end");
