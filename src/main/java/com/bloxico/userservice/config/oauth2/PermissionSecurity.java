@@ -1,22 +1,27 @@
 package com.bloxico.userservice.config.oauth2;
 
+import com.bloxico.ase.userservice.service.user.IRolePermissionService;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-@Component("permissionSecurity")
 @Slf4j
+@Component("permissionSecurity")
 public class PermissionSecurity {
 
-    public boolean authorize(Authentication authentication, final String permission) {
-        log.info("Checking authorization for permission {} - start", permission);
+    @Autowired
+    private IRolePermissionService rolePermissionService;
 
-        val userRoles = authentication.getAuthorities();
-        //TODO Dzoni - fetch all permissions for user roles and see if "permission" is found
-        // (we can cache all permissions)
-
-
-        return true;
+    public boolean isAuthorized(Authentication auth, String permission) {
+        log.info("PermissionSecurity.isAuthorized - start | auth: {}, permission: {}", auth, permission);
+        var authoritySet = rolePermissionService.permissionNameGrantedAuthoritiesMap().get(permission);
+        var isAuthorized = auth
+                .getAuthorities()
+                .stream()
+                .anyMatch(authoritySet::contains);
+        log.info("PermissionSecurity.isAuthorized - end | auth: {}, permission: {}", auth, permission);
+        return isAuthorized;
     }
+
 }

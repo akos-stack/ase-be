@@ -24,7 +24,7 @@ public class UserProfileController implements UserProfileApi {
     }
 
     @Override
-    @PreAuthorize("@permissionSecurity.authorize(authentication, 'access_profile')")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'access_profile')")
     public ResponseEntity<UserProfileDataResponse> accessMyProfile(Principal principal) {
         String email = principal.getName();
         UserProfileDataResponse userProfileDataResponse = userProfileFacade.returnMyProfileData(email);
@@ -33,6 +33,7 @@ public class UserProfileController implements UserProfileApi {
     }
 
     @Override
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'update_profile')")
     public ResponseEntity<UserProfileDataResponse> updateMyProfile(@Valid @RequestBody UpdateProfileRequest updateProfileRequest, Principal principal) {
         String email = principal.getName();
 
