@@ -6,8 +6,6 @@ import com.bloxico.userservice.web.model.userprofile.UserProfileDataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +22,6 @@ public class UserProfileController implements UserProfileApi {
     }
 
     @Override
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'access_profile')")
     public ResponseEntity<UserProfileDataResponse> accessMyProfile(Principal principal) {
         String email = principal.getName();
         UserProfileDataResponse userProfileDataResponse = userProfileFacade.returnMyProfileData(email);
@@ -33,7 +30,6 @@ public class UserProfileController implements UserProfileApi {
     }
 
     @Override
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'update_profile')")
     public ResponseEntity<UserProfileDataResponse> updateMyProfile(@Valid @RequestBody UpdateProfileRequest updateProfileRequest, Principal principal) {
         String email = principal.getName();
 
