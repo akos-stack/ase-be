@@ -3,6 +3,8 @@ package com.bloxico.ase.userservice.entity.user;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -33,5 +35,9 @@ public class Role {
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id"))
     private Set<Permission> permissions;
+
+    public GrantedAuthority toGrantedAuthority() {
+        return new SimpleGrantedAuthority("ROLE_" + name);
+    }
 
 }
