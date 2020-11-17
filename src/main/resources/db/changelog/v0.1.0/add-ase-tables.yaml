@@ -83,6 +83,16 @@ databaseChangeLog:
               - column:
                   name: phone
                   type: varchar(256)
+              - column:
+                  name: enabled
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: locked
+                  type: boolean
+                  constraints:
+                    nullable: false
               # METADATA
               - column:
                   name: creator_id

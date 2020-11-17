@@ -35,6 +35,12 @@ public class UserProfile extends BaseEntity {
     @Column(name = "phone")
     private String phone;
 
+    @Column(name = "locked")
+    private Boolean locked;
+
+    @Column(name = "enabled")
+    private Boolean enabled;
+
     @ManyToMany(cascade = {PERSIST, MERGE})
     @JoinTable(
             name = "user_profiles_roles",

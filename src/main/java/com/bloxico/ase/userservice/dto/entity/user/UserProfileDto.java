@@ -15,19 +15,14 @@ public class UserProfileDto {
     private String password;
     private String email;
     private String phone;
+    private Boolean locked;
+    private Boolean enabled;
     private Set<RoleDto> roles;
 
     public Stream<String> streamRoleNames() {
         return roles
                 .stream()
                 .map(RoleDto::getName);
-    }
-
-    public Stream<String> streamPermissionNames() {
-        return roles
-                .stream()
-                .distinct()
-                .flatMap(RoleDto::streamPermissionNames);
     }
 
 }
