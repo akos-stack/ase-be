@@ -1,16 +1,15 @@
-package com.bloxico.ase.userservice.repository;
+package com.bloxico.ase.userservice.repository.user;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.userservice.entity.user.Permission;
 import com.bloxico.ase.userservice.entity.user.Role;
-import com.bloxico.ase.userservice.repository.user.PermissionRepository;
-import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
+import java.util.UUID;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -41,7 +40,7 @@ public class RoleRepositoryTest extends AbstractSpringTest {
 
     @Test
     public void findById() {
-        assertFalse(roleRepository.findById((short) -1).isPresent());
+        assertTrue(roleRepository.findById((short) -1).isEmpty());
         Role role = new Role();
         {
             role.setName("foobar");
@@ -55,6 +54,17 @@ public class RoleRepositoryTest extends AbstractSpringTest {
         }
         role = roleRepository.saveAndFlush(role);
         assertTrue(roleRepository.findById(role.getId()).isPresent());
+    }
+
+    @Test
+    public void findByNameIgnoreCase() {
+        assertTrue(roleRepository.findByNameIgnoreCase(UUID.randomUUID().toString()).isEmpty());
+        assertTrue(roleRepository.findByNameIgnoreCase("uSeR").isPresent());
+    }
+
+    @Test
+    public void getUserRole() {
+        assertEquals(Role.USER, roleRepository.getUserRole().getName());
     }
 
 }

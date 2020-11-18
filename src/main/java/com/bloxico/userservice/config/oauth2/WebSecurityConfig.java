@@ -58,11 +58,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     static {
         AUTH_WHITELIST = new String[]{
 
-                // Whitelist JWT-secured APIs
-                "/authenticate",
-                "/ase/**",
-                // --------------------------
-
                 "/swagger-resources/**", "/swagger-ui.html", "/api-docs", "/webjars/**",
                 UserRegistrationApi.REGISTRATION_ENDPOINT,
                 UserRegistrationApi.REGISTRATION_CONFIRMATION_ENDPOINT,
@@ -72,6 +67,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 UserPasswordApi.FORGOT_PASSWORD_ENDPOINT,
                 UserPasswordApi.UPDATE_FORGOTTEN_PASSWORD_ENDPOINT,
                 UserPasswordApi.FORGOT_PASSWORD_TOKEN_RESEND_ENDPOINT,
+
+                com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_ENDPOINT,
+                com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_CONFIRMATION_ENDPOINT,
+                com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_TOKEN_REFRESH_ENDPOINT,
+                com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_TOKEN_RESEND_ENDPOINT,
 
         };
     }

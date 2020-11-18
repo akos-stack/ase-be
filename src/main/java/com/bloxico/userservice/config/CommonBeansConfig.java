@@ -1,15 +1,12 @@
 package com.bloxico.userservice.config;
 
-import com.bloxico.userservice.config.oauth2.CoinUserDetailsService;
 import com.bloxico.userservice.util.resttemplate.DefaultRestTemplateResponseHandler;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
@@ -19,9 +16,6 @@ import java.util.Date;
 
 @Configuration
 public class CommonBeansConfig {
-
-    @Autowired
-    CoinUserDetailsService coinUserDetailsService;
 
     @Bean
     public ObjectMapper createJacksonMapper() {
@@ -41,6 +35,9 @@ public class CommonBeansConfig {
         return new BCryptPasswordEncoder();
     }
 
+//    @Autowired
+//    CoinUserDetailsService coinUserDetailsService;
+//
 //    @Bean
 //    public DaoAuthenticationProvider daoAuthenticationProvider(PasswordEncoder encoder) {
 //        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
@@ -49,7 +46,6 @@ public class CommonBeansConfig {
 //
 //        return daoAuthenticationProvider;
 //    }
-
 
     @Bean
     public Gson gson() {

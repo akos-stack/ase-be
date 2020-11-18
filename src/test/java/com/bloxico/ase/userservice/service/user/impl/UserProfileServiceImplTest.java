@@ -2,10 +2,11 @@ package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.config.AseUserDetails;
 import com.bloxico.ase.userservice.exception.UserProfileException;
+import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.UUID;
 
@@ -17,10 +18,20 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
     private MockUtil mockUtil;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private UserProfileServiceImpl userProfileService;
+
+    @Test(expected = UserProfileException.class)
+    public void findUserById_notFound() {
+        userProfileService.findUserById(-1);
+    }
+
+    @Test
+    public void findUserById_found() {
+        var userProfileDto = mockUtil.savedUserProfileDto();
+        assertEquals(
+                userProfileDto,
+                userProfileService.findUserById(userProfileDto.getId()));
+    }
 
     @Test(expected = NullPointerException.class)
     public void findUserProfileByEmail_nullEmail() {
@@ -41,32 +52,41 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void checkPassword_nullRaw() {
-        userProfileService.checkPassword(null, "foo");
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void checkPassword_nullEncoded() {
-        userProfileService.checkPassword("foo", null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void checkPassword_nullBoth() {
-        userProfileService.checkPassword(null, null);
+    public void updateUserProfile_nullRequest() {
+        userProfileService.updateUserProfile(1, null);
     }
 
     @Test(expected = UserProfileException.class)
-    public void checkPassword_mismatch() {
-        userProfileService.checkPassword(
-                "foo",
-                passwordEncoder.encode("bar"));
+    public void updateUserProfile_notFound() {
+        var request = new UpdateUserProfileRequest("John", null);
+        userProfileService.updateUserProfile(-1, request);
     }
 
     @Test
-    public void checkPassword_match() {
-        userProfileService.checkPassword(
-                "foo",
-                passwordEncoder.encode("foo"));
+    public void updateUserProfile() {
+        var id = mockUtil.savedUserProfile().getId();
+        var request = new UpdateUserProfileRequest("John", "007008123");
+        var updated = userProfileService.updateUserProfile(id, request);
+        assertEquals(request.getName(), updated.getName());
+        assertEquals(request.getPhone(), updated.getPhone());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void loadUserByUsername_nullEmail() {
+        userProfileService.loadUserByUsername(null);
+    }
+
+    @Test(expected = UserProfileException.class)
+    public void loadUserByUsername_notFound() {
+        userProfileService.loadUserByUsername(UUID.randomUUID().toString());
+    }
+
+    @Test
+    public void loadUserByUsername_found() {
+        var userProfileDto = mockUtil.savedUserProfileDto();
+        assertEquals(
+                new AseUserDetails(userProfileDto),
+                userProfileService.loadUserByUsername(userProfileDto.getEmail()));
     }
 
 }

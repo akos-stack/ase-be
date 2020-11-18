@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-@Service
+//@Service
 @Slf4j
 public class CoinUserDetailsService implements UserDetailsService {
 

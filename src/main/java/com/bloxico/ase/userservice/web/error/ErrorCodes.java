@@ -17,10 +17,20 @@ public interface ErrorCodes {
     @Getter
     enum User implements ErrorCodes {
 
+        USER_EXISTS(
+                HttpStatus.CONFLICT,
+                "1",
+                "Upon registration, when given email already exists."),
+
         USER_DOES_NOT_EXIST(
                 HttpStatus.NOT_FOUND,
-                "1",
-                "For various situations, when user passed by parameter (email) does not exist.");
+                "2",
+                "For various situations, when user passed by parameter (email) does not exist."),
+
+        MATCH_REGISTRATION_PASSWORD_ERROR(
+                HttpStatus.BAD_REQUEST,
+                "4",
+                "When registering user, if password and matchPassword values are not valid.");
 
         private final HttpStatus httpStatus;
         private final String code, description;

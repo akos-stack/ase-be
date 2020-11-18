@@ -6,10 +6,11 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 import static javax.persistence.CascadeType.MERGE;
-import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
@@ -36,16 +37,20 @@ public class UserProfile extends BaseEntity {
     private String phone;
 
     @Column(name = "locked")
-    private Boolean locked;
+    private Boolean locked = false;
 
     @Column(name = "enabled")
-    private Boolean enabled;
+    private Boolean enabled = false;
 
-    @ManyToMany(cascade = {PERSIST, MERGE})
+    @ManyToMany(fetch = EAGER, cascade = MERGE)
     @JoinTable(
             name = "user_profiles_roles",
             joinColumns = @JoinColumn(name = "user_profile_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
+
+    public void addRole(Role role) {
+        roles.add(role);
+    }
 
 }

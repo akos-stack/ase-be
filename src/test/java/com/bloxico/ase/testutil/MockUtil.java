@@ -8,12 +8,11 @@ import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.repository.user.PermissionRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
-import com.bloxico.ase.userservice.util.mapper.EntityToDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
+import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 
 @Component
 public class MockUtil {
@@ -40,7 +39,7 @@ public class MockUtil {
         user.setEmail("admin@mail.com");
         user.setLocked(false);
         user.setEnabled(true);
-        user.setRoles(Set.of(role));
+        user.addRole(role);
         return userProfileRepository.saveAndFlush(user);
     }
 
@@ -50,12 +49,13 @@ public class MockUtil {
             Permission p1 = new Permission();
             p1.setName("permission_1");
             p1 = permissionRepository.saveAndFlush(p1);
+            role.addPermission(p1);
             Permission p2 = new Permission();
             p2.setName("permission_2");
             p2 = permissionRepository.saveAndFlush(p2);
             role.setName("role_x");
-            role.setPermissions(Set.of(p1, p2));
-            roleRepository.save(role);
+            role.addPermission(p2);
+            roleRepository.saveAndFlush(role);
         }
         UserProfile user = new UserProfile();
         user.setName("foobar");
@@ -63,12 +63,12 @@ public class MockUtil {
         user.setEmail("foobar@mail.com");
         user.setLocked(false);
         user.setEnabled(true);
-        user.setRoles(Set.of(role));
+        user.addRole(role);
         return userProfileRepository.saveAndFlush(user);
     }
 
     public UserProfileDto savedUserProfileDto() {
-        return EntityToDtoMapper.INSTANCE.userProfile(savedUserProfile());
+        return MAPPER.toUserProfileDto(savedUserProfile());
     }
 
     public static void copyBaseEntityData(BaseEntity from, BaseEntity to) {

@@ -1,5 +1,6 @@
 package com.bloxico.userservice.config.oauth2;
 
+import com.bloxico.ase.userservice.config.AseUserDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +19,8 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import javax.sql.DataSource;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Configuration
 @Slf4j
@@ -65,16 +67,12 @@ public class TokenStoreConfig {
     protected static class CustomTokenEnhancer extends JwtAccessTokenConverter {
         @Override
         public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-            CoinUserDetails user = (CoinUserDetails) authentication.getPrincipal();
+            var userDetails = (AseUserDetails) authentication.getPrincipal();
 
             Map<String, Object> info = new LinkedHashMap<>(accessToken.getAdditionalInformation());
 
-            info.put("id", user.getCoinUser().getId());
-            info.put("roles", user.getCoinUser()
-                    .getCoinUserRoles()
-                    .stream()
-                    .map(x -> x.getCoinRole().getRoleName().name())
-                    .collect(Collectors.toList()));
+            info.put("id", userDetails.getUserProfile().getId());
+            info.put("roles", userDetails.getUserProfile().streamRoleNames().collect(toList()));
 
             DefaultOAuth2AccessToken customAccessToken = new DefaultOAuth2AccessToken(accessToken);
             customAccessToken.setAdditionalInformation(info);

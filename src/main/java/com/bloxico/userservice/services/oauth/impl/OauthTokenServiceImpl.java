@@ -1,7 +1,9 @@
 package com.bloxico.userservice.services.oauth.impl;
 
+import com.bloxico.ase.userservice.config.AseUserDetails;
+import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.userservice.config.oauth2.CoinClientDetailsService;
-import com.bloxico.userservice.config.oauth2.CoinUserDetails;
 import com.bloxico.userservice.config.oauth2.CustomJdbcTokenStore;
 import com.bloxico.userservice.entities.user.CoinUser;
 import com.bloxico.userservice.exceptions.OAuthTokenServiceException;
@@ -30,6 +32,8 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
+import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+
 @Service
 @Slf4j
 public class OauthTokenServiceImpl implements IOauthTokenService {
@@ -45,22 +49,26 @@ public class OauthTokenServiceImpl implements IOauthTokenService {
     private CoinClientDetailsService coinClientDetailsService;
     private CustomJdbcTokenStore customJdbcTokenStore;
 
+    private final UserProfileRepository userProfileRepository;
+
     @Autowired
     public OauthTokenServiceImpl(AccessTokenRepository accessTokenRepository,
                                  CoinUserRepository coinUserRepository,
                                  CoinClientDetailsService coinClientDetailsService,
-                                 CustomJdbcTokenStore customJdbcTokenStore) {
+                                 CustomJdbcTokenStore customJdbcTokenStore,
+                                 UserProfileRepository userProfileRepository) {
         this.accessTokenRepository = accessTokenRepository;
         this.coinUserRepository = coinUserRepository;
         this.coinClientDetailsService = coinClientDetailsService;
         this.customJdbcTokenStore = customJdbcTokenStore;
+        this.userProfileRepository = userProfileRepository;
     }
 
     @Override
     public String authenticateIntegratedUser(String email) {
         log.debug("Authenticating integrated user - start, email: {}", email);
 
-        CoinUser coinUser = getCoinUser(email);
+        var coinUser = getUserProfile(email); //getCoinUser(email);
         ClientDetails clientDetails = coinClientDetailsService.loadClientByClientId(clientId);
         TokenRequest tokenRequest = generateImplicitTokenRequest(coinUser.getEmail());
 
@@ -110,7 +118,7 @@ public class OauthTokenServiceImpl implements IOauthTokenService {
         return new TokenRequest(requestParameters, clientId, scope, grantType);
     }
 
-    private OAuth2AccessToken getImplicitAccessToken(CoinUser coinUser, ClientDetails clientDetails, TokenRequest tokenRequest) {
+    private OAuth2AccessToken getImplicitAccessToken(UserProfileDto coinUser, ClientDetails clientDetails, TokenRequest tokenRequest) {
         DefaultTokenServices tokenServices = new DefaultTokenServices();
         tokenServices.setTokenStore(customJdbcTokenStore);
         tokenServices.setClientDetailsService(coinClientDetailsService);
@@ -119,17 +127,24 @@ public class OauthTokenServiceImpl implements IOauthTokenService {
         return tokenServices.createAccessToken(oAuth2Authentication);
     }
 
-    private OAuth2Authentication getOAuth2Authentication(CoinUser coinUser, ClientDetails clientDetails, TokenRequest tokenRequest) {
+    private OAuth2Authentication getOAuth2Authentication(UserProfileDto coinUser, ClientDetails clientDetails, TokenRequest tokenRequest) {
         DefaultOAuth2RequestFactory requestFactory = new DefaultOAuth2RequestFactory(coinClientDetailsService);
         OAuth2Request storedOAuth2Request = requestFactory.createOAuth2Request(clientDetails, tokenRequest);
 
-        return new OAuth2Authentication(storedOAuth2Request, new UsernamePasswordAuthenticationToken(new CoinUserDetails(coinUser), null));
+        return new OAuth2Authentication(storedOAuth2Request, new UsernamePasswordAuthenticationToken(new AseUserDetails(coinUser), null));
     }
 
     private CoinUser getCoinUser(String email) {
         Optional<CoinUser> op = coinUserRepository.findByEmailIgnoreCase(email);
 
         return op.orElseThrow(EntityNotFoundException::new);
+    }
+
+    private UserProfileDto getUserProfile(String email) {
+        var userProfile = userProfileRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(EntityNotFoundException::new);
+
+        return MAPPER.toUserProfileDto(userProfile);
     }
 
     @Override

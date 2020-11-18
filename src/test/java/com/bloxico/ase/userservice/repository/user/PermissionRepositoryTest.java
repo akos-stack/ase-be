@@ -1,12 +1,10 @@
-package com.bloxico.ase.userservice.repository;
+package com.bloxico.ase.userservice.repository.user;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.userservice.entity.user.Permission;
-import com.bloxico.ase.userservice.repository.user.PermissionRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -25,7 +23,7 @@ public class PermissionRepositoryTest extends AbstractSpringTest {
 
     @Test
     public void findById() {
-        assertFalse(repository.findById((short) -1).isPresent());
+        assertTrue(repository.findById((short) -1).isEmpty());
         Permission permission = new Permission();
         permission.setName("foo");
         permission = repository.saveAndFlush(permission);

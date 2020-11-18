@@ -1,4 +1,4 @@
-package com.bloxico.ase.userservice.web.model.auth;
+package com.bloxico.ase.userservice.web.model.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -13,11 +13,14 @@ import static lombok.AccessLevel.PRIVATE;
 @Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
-public class BlacklistRequest {
+public class UpdateUserProfileRequest {
 
     @NotNull
     @NotEmpty
-    @JsonProperty("token")
-    String token;
+    @JsonProperty("name")
+    String name;
+
+    @JsonProperty("phone")
+    String phone;
 
 }

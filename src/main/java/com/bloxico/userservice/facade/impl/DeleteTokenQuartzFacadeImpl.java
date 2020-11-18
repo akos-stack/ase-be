@@ -4,7 +4,7 @@ import com.bloxico.userservice.facade.IDeleteTokenQuartzFacade;
 import com.bloxico.userservice.services.oauth.IOauthTokenService;
 import com.bloxico.userservice.services.token.impl.PasswordTokenServiceImpl;
 import com.bloxico.userservice.services.token.impl.VerificationTokenServiceImpl;
-import com.bloxico.userservice.services.user.IUserRegistrationService;
+import com.bloxico.ase.userservice.service.user.IUserRegistrationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

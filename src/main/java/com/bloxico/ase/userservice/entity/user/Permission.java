@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import java.util.Set;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -20,8 +19,5 @@ public class Permission {
 
     @Column(name = "name")
     private String name;
-
-    @ManyToMany(mappedBy = "permissions")
-    private Set<Role> roles;
 
 }

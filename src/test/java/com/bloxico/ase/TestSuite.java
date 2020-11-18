@@ -2,9 +2,12 @@ package com.bloxico.ase;
 
 import com.bloxico.ase.userservice.config.StartupConfigTest;
 import com.bloxico.ase.userservice.entity.BaseEntityTest;
-import com.bloxico.ase.userservice.repository.*;
+import com.bloxico.ase.userservice.repository.token.BlacklistedJwtRepositoryTest;
+import com.bloxico.ase.userservice.repository.user.*;
 import com.bloxico.ase.userservice.service.token.impl.JwtServiceImplTest;
+import com.bloxico.ase.userservice.service.user.impl.RolePermissionServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImplTest;
+import com.bloxico.ase.userservice.service.user.impl.UserRegistrationServiceImplTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -26,6 +29,8 @@ import org.junit.runners.Suite;
 
         // service
         UserProfileServiceImplTest.class,
+        UserRegistrationServiceImplTest.class,
+        RolePermissionServiceImplTest.class,
         JwtServiceImplTest.class
 })
 public class TestSuite {

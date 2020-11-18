@@ -10,7 +10,6 @@ import com.bloxico.ase.userservice.entity.token.BlacklistedJwt;
 import com.bloxico.ase.userservice.repository.token.BlacklistedJwtRepository;
 import com.bloxico.ase.userservice.service.token.IJwtService;
 import com.bloxico.ase.userservice.util.JwtBlacklistInMemory;
-import com.bloxico.ase.userservice.util.mapper.JwtToDtoMapper;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
@@ -80,8 +80,9 @@ public class JwtServiceImpl implements IJwtService {
         } catch (JWTVerificationException ex) {
             throw ErrorCodes.Jwt.INVALID_TOKEN.newException(ex);
         }
+        var decodedJwtDto = MAPPER.toDecodedJwtDto(decodedJWT);
         log.debug("JwtServiceImpl.verifyToken - end | token: {}", token);
-        return JwtToDtoMapper.INSTANCE.decodedJwt(decodedJWT);
+        return decodedJwtDto;
     }
 
     @Override

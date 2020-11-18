@@ -9,7 +9,8 @@ import com.bloxico.ase.userservice.util.JwtBlacklistInMemory;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static java.util.Collections.singletonList;
+import java.util.List;
+
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertEquals;
@@ -83,7 +84,7 @@ public class JwtServiceImplTest extends AbstractSpringTest {
                 .stream()
                 .map(BlacklistedJwt::getToken)
                 .collect(toList());
-        assertEquals(singletonList(token), tokens);
+        assertEquals(List.of(token), tokens);
     }
 
     @Test
@@ -98,14 +99,14 @@ public class JwtServiceImplTest extends AbstractSpringTest {
                 .stream()
                 .map(BlacklistedJwt::getToken)
                 .collect(toList());
-        assertEquals(singletonList(token), tokens);
+        assertEquals(List.of(token), tokens);
         jwtService.blacklistToken(principalId, token);
         tokens = blacklistedJwtRepository
                 .findAll()
                 .stream()
                 .map(BlacklistedJwt::getToken)
                 .collect(toList());
-        assertEquals(singletonList(token), tokens);
+        assertEquals(List.of(token), tokens);
     }
 
 }

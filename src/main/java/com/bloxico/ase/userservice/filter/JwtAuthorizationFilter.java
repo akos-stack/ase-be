@@ -11,15 +11,14 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private IJwtService jwtService;
-    private TokenStore tokenStore;
+    private final IJwtService jwtService;
+    private final TokenStore tokenStore;
 
     public JwtAuthorizationFilter(IJwtService jwtService, TokenStore tokenStore) {
         this.jwtService = jwtService;
@@ -31,23 +30,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain)
-            throws ServletException, IOException {
-
+            throws IOException
+    {
         var header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {
             raiseException(response);
             return;
         }
-
         try {
             var jwt = header.substring(7);
             var decodedJwt = jwtService.verifyToken(jwt);
 
             OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(jwt);
             oAuth2Authentication.setDetails(decodedJwt.getUserId());
-
-            request.setAttribute("decodedJwt", decodedJwt);
-
             SecurityContextHolder.getContext().setAuthentication(oAuth2Authentication);
 
             chain.doFilter(request, response);
@@ -56,11 +51,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
     }
 
-    private void raiseException(HttpServletResponse response) throws IOException {
+    private static void raiseException(HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         var status = ErrorCodes.Jwt.INVALID_TOKEN.getHttpStatus();
-        var code   = ErrorCodes.Jwt.INVALID_TOKEN.getCode();
+        var code = ErrorCodes.Jwt.INVALID_TOKEN.getCode();
         ApiError apiError = new ApiError(status, code);
         byte[] body = new ObjectMapper().writeValueAsBytes(apiError);
         response.getOutputStream().write(body);

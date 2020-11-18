@@ -1,13 +1,11 @@
-package com.bloxico.ase.userservice.repository;
+package com.bloxico.ase.userservice.repository.token;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.entity.token.BlacklistedJwt;
-import com.bloxico.ase.userservice.repository.token.BlacklistedJwtRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -30,7 +28,7 @@ public class BlacklistedJwtRepositoryTest extends AbstractSpringTest {
 
     @Test
     public void findById() {
-        assertFalse(repository.findById(-1L).isPresent());
+        assertTrue(repository.findById(-1L).isEmpty());
         BlacklistedJwt jwt = new BlacklistedJwt();
         jwt.setToken("7WK5T79u5mIzjIXXi2oI9Fglmgivv7RAJ7izyj9tUyQ");
         jwt.setCreatorId(mockUtil.savedUserProfile().getId());

@@ -15,8 +15,8 @@ public class UserProfileDto {
     private String password;
     private String email;
     private String phone;
-    private Boolean locked;
-    private Boolean enabled;
+    private Boolean locked = false;
+    private Boolean enabled = false;
     private Set<RoleDto> roles;
 
     public Stream<String> streamRoleNames() {

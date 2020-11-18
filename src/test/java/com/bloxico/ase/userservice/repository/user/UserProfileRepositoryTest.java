@@ -1,9 +1,8 @@
-package com.bloxico.ase.userservice.repository;
+package com.bloxico.ase.userservice.repository.user;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
-import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,8 +33,8 @@ public class UserProfileRepositoryTest extends AbstractSpringTest {
     }
 
     @Test
-    public void findByEmail() {
-        assertFalse(repository.findByEmailIgnoreCase(UUID.randomUUID().toString()).isPresent());
+    public void findByEmailIgnoreCase() {
+        assertTrue(repository.findByEmailIgnoreCase(UUID.randomUUID().toString()).isEmpty());
         UserProfile user = mockUtil.savedUserProfile();
         assertTrue(repository.findByEmailIgnoreCase(user.getEmail()).isPresent());
     }

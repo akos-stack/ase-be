@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 
-@Service
+@Service("userProfileFacadeImplOld")
 @Slf4j
 public class UserProfileFacadeImpl implements IUserProfileFacade {
 
