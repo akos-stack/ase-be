@@ -21,16 +21,16 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
     private UserProfileServiceImpl userProfileService;
 
     @Test(expected = UserProfileException.class)
-    public void findUserById_notFound() {
-        userProfileService.findUserById(-1);
+    public void findUserProfileById_notFound() {
+        userProfileService.findUserProfileById(-1);
     }
 
     @Test
-    public void findUserById_found() {
+    public void findUserProfileById_found() {
         var userProfileDto = mockUtil.savedUserProfileDto();
         assertEquals(
                 userProfileDto,
-                userProfileService.findUserById(userProfileDto.getId()));
+                userProfileService.findUserProfileById(userProfileDto.getId()));
     }
 
     @Test(expected = NullPointerException.class)

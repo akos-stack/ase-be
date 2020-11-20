@@ -5,7 +5,7 @@ import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 
 public interface IUserProfileService {
 
-    UserProfileDto findUserById(long id);
+    UserProfileDto findUserProfileById(long id);
 
     UserProfileDto findUserProfileByEmail(String email);
 

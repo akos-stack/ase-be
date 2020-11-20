@@ -61,7 +61,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public void refreshExpiredToken(String expiredTokenValue) {
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - start | expiredTokenValue: {}", expiredTokenValue);
         var tokenDto = verificationTokenService.refreshExpiredToken(expiredTokenValue);
-        var userProfileDto = userProfileService.findUserById(tokenDto.getId());
+        var userProfileDto = userProfileService.findUserProfileById(tokenDto.getId());
         mailUtil.sendVerificationTokenEmail(userProfileDto.getEmail(), tokenDto.getTokenValue());
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - end | expiredTokenValue: {}", expiredTokenValue);
     }

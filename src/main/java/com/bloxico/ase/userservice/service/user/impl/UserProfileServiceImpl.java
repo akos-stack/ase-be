@@ -27,13 +27,13 @@ public class UserProfileServiceImpl implements IUserProfileService, UserDetailsS
     }
 
     @Override
-    public UserProfileDto findUserById(long id) {
-        log.debug("UserProfileServiceImpl.findUserById - start | id: {}", id);
+    public UserProfileDto findUserProfileById(long id) {
+        log.debug("UserProfileServiceImpl.findUserProfileById - start | id: {}", id);
         var userProfileDto = userProfileRepository
                 .findById(id)
                 .map(MAPPER::toUserProfileDto)
                 .orElseThrow(ErrorCodes.User.USER_DOES_NOT_EXIST::newException);
-        log.debug("UserProfileServiceImpl.findUserById - end | id: {}", id);
+        log.debug("UserProfileServiceImpl.findUserProfileById - end | id: {}", id);
         return userProfileDto;
     }
 
