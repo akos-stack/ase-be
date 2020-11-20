@@ -37,4 +37,14 @@ public class RegistrationRequest {
     @JsonProperty("match_password")
     String matchPassword;
 
+    public boolean isPasswordMatching() {
+        //noinspection ConstantConditions
+        return password.equals(matchPassword);
+    }
+
+    public String extractNameFromEmail() {
+        //noinspection ConstantConditions
+        return email.split("@")[0];
+    }
+
 }

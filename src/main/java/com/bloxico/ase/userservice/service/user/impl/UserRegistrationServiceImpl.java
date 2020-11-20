@@ -43,12 +43,12 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
     public UserProfileDto registerDisabledUser(RegistrationRequest request) {
         log.info("UserRegistrationServiceImpl.registerDisabledUser - start | request: {}", request);
         requireNonNull(request);
-        if (!request.getPassword().equals(request.getMatchPassword()))
+        if (!request.isPasswordMatching())
             throw ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR.newException();
-        if (userProfileRepository.findByEmailIgnoreCase(request.getEmail()).isPresent())
+        if (userAlreadyExists(request.getEmail()))
             throw ErrorCodes.User.USER_EXISTS.newException();
         var userProfile = MAPPER.toUserProfile(request);
-        userProfile.setName(request.getEmail().split("@")[0]);
+        userProfile.setName(request.extractNameFromEmail());
         userProfile.setPassword(passwordEncoder.encode(request.getPassword()));
         userProfile.addRole(roleRepository.getUserRole());
         userProfile = userProfileRepository.saveAndFlush(userProfile);
@@ -86,6 +86,10 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
                 .collect(toUnmodifiableList());
         log.info("UserRegistrationServiceImpl.deleteDisabledUsersWithIds - end | ids: {}", ids);
         return deleted;
+    }
+
+    private boolean userAlreadyExists(String email) {
+        return userProfileRepository.findByEmailIgnoreCase(email).isPresent();
     }
 
 }
