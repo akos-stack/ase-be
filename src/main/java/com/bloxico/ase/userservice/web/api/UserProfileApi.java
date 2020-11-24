@@ -15,13 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.validation.Valid;
 import java.security.Principal;
 
-import static com.bloxico.ase.userservice.web.api.Temp.ASE;
-
 @Api(value = "userProfile")
 public interface UserProfileApi {
 
-    String MY_PROFILE_ENDPOINT        = ASE + "/user/myProfile";
-    String UPDATE_MY_PROFILE_ENDPOINT = ASE + "/user/updateMyProfile";
+    String MY_PROFILE_ENDPOINT        = "/user/myProfile";
+    String UPDATE_MY_PROFILE_ENDPOINT = "/user/updateMyProfile";
 
     @GetMapping(value = MY_PROFILE_ENDPOINT)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'access_profile')")

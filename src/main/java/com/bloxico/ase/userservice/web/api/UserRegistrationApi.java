@@ -13,15 +13,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 
-import static com.bloxico.ase.userservice.web.api.Temp.ASE;
-
 @Api(value = "registration")
 public interface UserRegistrationApi {
 
-    String REGISTRATION_ENDPOINT               = ASE + "/user/registration";
-    String REGISTRATION_CONFIRM_ENDPOINT       = ASE + "/user/registrationConfirm";
-    String REGISTRATION_TOKEN_REFRESH_ENDPOINT = ASE + "/user/registrationTokenRefresh";
-    String REGISTRATION_TOKEN_RESEND_ENDPOINT  = ASE + "/user/registrationTokenResend";
+    String REGISTRATION_ENDPOINT               = "/user/registration";
+    String REGISTRATION_CONFIRM_ENDPOINT       = "/user/registrationConfirm";
+    String REGISTRATION_TOKEN_REFRESH_ENDPOINT = "/user/registrationTokenRefresh";
+    String REGISTRATION_TOKEN_RESEND_ENDPOINT  = "/user/registrationTokenResend";
 
     String TOKEN_PARAM = "token";
 
