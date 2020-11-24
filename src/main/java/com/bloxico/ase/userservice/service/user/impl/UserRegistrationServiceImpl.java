@@ -62,10 +62,10 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         log.info("UserRegistrationServiceImpl.enableUser - start | id: {}", id);
         var user = userProfileRepository
                 .findById(id)
-                .orElseThrow(ErrorCodes.User.USER_DOES_NOT_EXIST::newException);
+                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
         user.setEnabled(true);
         user.setUpdaterId(id);
-        userProfileRepository.save(user);
+        userProfileRepository.saveAndFlush(user);
         log.info("UserRegistrationServiceImpl.enableUser - end | id: {}", id);
     }
 

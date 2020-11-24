@@ -22,7 +22,7 @@ public interface ErrorCodes {
                 "1",
                 "Upon registration, when given email already exists."),
 
-        USER_DOES_NOT_EXIST(
+        USER_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "2",
                 "For various situations, when user passed by parameter (email) does not exist."),
@@ -48,17 +48,22 @@ public interface ErrorCodes {
     }
 
     @Getter
-    enum Jwt implements ErrorCodes {
+    enum Token implements ErrorCodes {
 
         INVALID_TOKEN(
                 HttpStatus.FORBIDDEN,
                 "10",
-                "Token is not valid (anymore). E.g. it's fake, expired or blacklisted.");
+                "Token is not valid (anymore). E.g. it's fake, expired or blacklisted."),
+
+        TOKEN_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "11",
+                "Token cannot be found in the database. It may be deleted due to expiry.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
 
-        Jwt(HttpStatus httpStatus, String code, String description) {
+        Token(HttpStatus httpStatus, String code, String description) {
             this.httpStatus = httpStatus;
             this.code = code;
             this.description = description;

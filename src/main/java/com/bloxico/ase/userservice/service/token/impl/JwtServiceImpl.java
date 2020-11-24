@@ -70,7 +70,7 @@ public class JwtServiceImpl implements IJwtService {
         log.debug("JwtServiceImpl.verifyToken - start | token: {}", token);
         requireNonNull(token);
         if (JwtBlacklistInMemory.contains(token))
-            throw ErrorCodes.Jwt.INVALID_TOKEN.newException();
+            throw ErrorCodes.Token.INVALID_TOKEN.newException();
         DecodedJWT decodedJWT;
         try {
             decodedJWT = JWT
@@ -78,7 +78,7 @@ public class JwtServiceImpl implements IJwtService {
                     .build()
                     .verify(token);
         } catch (JWTVerificationException ex) {
-            throw ErrorCodes.Jwt.INVALID_TOKEN.newException(ex);
+            throw ErrorCodes.Token.INVALID_TOKEN.newException(ex);
         }
         var decodedJwtDto = MAPPER.toDecodedJwtDto(decodedJWT);
         log.debug("JwtServiceImpl.verifyToken - end | token: {}", token);

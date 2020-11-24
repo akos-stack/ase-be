@@ -3,6 +3,7 @@ package com.bloxico.ase.testutil;
 import com.bloxico.AppEntry;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,4 +20,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Transactional
 @DirtiesContext
 public abstract class AbstractSpringTest {
+
+    @Value("${api.url}")
+    protected String API_URL;
+
 }

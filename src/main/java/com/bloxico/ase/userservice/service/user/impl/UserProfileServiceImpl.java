@@ -32,7 +32,7 @@ public class UserProfileServiceImpl implements IUserProfileService, UserDetailsS
         var userProfileDto = userProfileRepository
                 .findById(id)
                 .map(MAPPER::toUserProfileDto)
-                .orElseThrow(ErrorCodes.User.USER_DOES_NOT_EXIST::newException);
+                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
         log.debug("UserProfileServiceImpl.findUserProfileById - end | id: {}", id);
         return userProfileDto;
     }
@@ -44,7 +44,7 @@ public class UserProfileServiceImpl implements IUserProfileService, UserDetailsS
         var userProfileDto = userProfileRepository
                 .findByEmailIgnoreCase(email)
                 .map(MAPPER::toUserProfileDto)
-                .orElseThrow(ErrorCodes.User.USER_DOES_NOT_EXIST::newException);
+                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
         log.debug("UserProfileServiceImpl.findUserByEmail - end | email: {}", email);
         return userProfileDto;
     }
@@ -55,7 +55,7 @@ public class UserProfileServiceImpl implements IUserProfileService, UserDetailsS
         requireNonNull(request);
         var userProfile = userProfileRepository
                 .findById(id)
-                .orElseThrow(ErrorCodes.User.USER_DOES_NOT_EXIST::newException);
+                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
         userProfile.setName(request.getName());
         userProfile.setPhone(request.getPhone());
         userProfile.setUpdaterId(id);

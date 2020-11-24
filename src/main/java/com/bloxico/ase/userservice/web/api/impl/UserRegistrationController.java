@@ -18,25 +18,25 @@ public class UserRegistrationController implements UserRegistrationApi {
     private IUserRegistrationFacade userRegistrationFacade;
 
     @Override
-    public ResponseEntity<RegistrationResponse> registerUser(RegistrationRequest request) {
+    public ResponseEntity<RegistrationResponse> registration(RegistrationRequest request) {
         var response = userRegistrationFacade.registerUserWithVerificationToken(request);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<Void> resendRegistrationMail(TokenValidationRequest request) {
+    public ResponseEntity<Void> confirmRegistration(TokenValidationRequest request) {
         userRegistrationFacade.handleTokenValidation(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Void> refreshVerificationToken(String token) {
+    public ResponseEntity<Void> refreshRegistrationToken(String token) {
         userRegistrationFacade.refreshExpiredToken(token);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Void> resendRegistrationMail(ResendTokenRequest request) {
+    public ResponseEntity<Void> resendRegistrationToken(ResendTokenRequest request) {
         userRegistrationFacade.resendVerificationToken(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -54,8 +54,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private static void raiseException(HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        var status = ErrorCodes.Jwt.INVALID_TOKEN.getHttpStatus();
-        var code = ErrorCodes.Jwt.INVALID_TOKEN.getCode();
+        var status = ErrorCodes.Token.INVALID_TOKEN.getHttpStatus();
+        var code = ErrorCodes.Token.INVALID_TOKEN.getCode();
         ApiError apiError = new ApiError(status, code);
         byte[] body = new ObjectMapper().writeValueAsBytes(apiError);
         response.getOutputStream().write(body);

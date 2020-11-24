@@ -3,13 +3,15 @@ package com.bloxico.ase;
 import com.bloxico.ase.userservice.config.StartupConfigTest;
 import com.bloxico.ase.userservice.entity.BaseEntityTest;
 import com.bloxico.ase.userservice.facade.impl.UserProfileFacadeImplTest;
-import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
+import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImplTest;
 import com.bloxico.ase.userservice.repository.token.BlacklistedJwtRepositoryTest;
 import com.bloxico.ase.userservice.repository.user.*;
 import com.bloxico.ase.userservice.service.token.impl.JwtServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.RolePermissionServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.UserRegistrationServiceImplTest;
+import com.bloxico.ase.userservice.web.api.UserProfileApiTest;
+import com.bloxico.ase.userservice.web.api.UserRegistrationApiTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -37,7 +39,11 @@ import org.junit.runners.Suite;
 
         // facade
         UserProfileFacadeImplTest.class,
-        UserRegistrationFacadeImpl.class
+        UserRegistrationFacadeImplTest.class,
+
+        // api
+        UserRegistrationApiTest.class,
+        UserProfileApiTest.class
 })
 public class TestSuite {
 }

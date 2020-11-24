@@ -8,14 +8,33 @@ import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.repository.user.PermissionRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
+import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
+import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_CONFIRM_ENDPOINT;
+import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_ENDPOINT;
+import static io.restassured.RestAssured.given;
+import static io.restassured.http.ContentType.JSON;
+import static io.restassured.http.ContentType.URLENC;
 
 @Component
 public class MockUtil {
+
+    public static final String ERROR_CODE = "errorCode";
+
+    @Value("${api.url}")
+    private String API_URL;
+
+    @Value("${oauth2.client.id}")
+    private String OAUTH2_CLIENT_ID;
+
+    @Value("${oauth2.secret}")
+    private String OAUTH2_SECRET;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -76,6 +95,53 @@ public class MockUtil {
         to.setUpdaterId(from.getUpdaterId());
         to.setCreatedAt(from.getCreatedAt());
         to.setUpdatedAt(from.getUpdatedAt());
+    }
+
+    @lombok.Value
+    public static class Registration {
+        String email, password, token;
+    }
+
+    public Registration doRegistration() {
+        String email = "passwordMatches@mail.com", pass = "Password1!";
+        return new Registration(
+                email, pass,
+                given()
+                        .contentType(JSON)
+                        .body(new RegistrationRequest(email, pass, pass))
+                        .post(API_URL + REGISTRATION_ENDPOINT)
+                        .getBody()
+                        .path("token_value"));
+    }
+
+    public void doConfirmation(String email, String token) {
+        given()
+                .contentType(JSON)
+                .body(new TokenValidationRequest(email, token))
+                .post(API_URL + REGISTRATION_CONFIRM_ENDPOINT);
+    }
+
+    public String doAuthentication() {
+        var registration = doRegistration();
+        var email = registration.getEmail();
+        var token = registration.getToken();
+        doConfirmation(email, token);
+        return "Bearer " + given()
+                .contentType(URLENC)
+                .accept(JSON)
+                .formParams(
+                        "username", email,
+                        "password", registration.getPassword(),
+                        "grant_type", "password",
+                        "scope", "access_profile")
+                .auth()
+                .preemptive()
+                .basic(OAUTH2_CLIENT_ID, OAUTH2_SECRET)
+                .when()
+                .post(API_URL + "/oauth/token")
+                .body()
+                .jsonPath()
+                .getString("access_token");
     }
 
 }

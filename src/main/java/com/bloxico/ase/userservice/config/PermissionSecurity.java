@@ -19,7 +19,9 @@ public class PermissionSecurity {
         log.info("PermissionSecurity.isAuthorized - start | auth: {}, permission: {}", auth, permission);
         requireNonNull(auth);
         requireNonNull(permission);
-        var authoritySet = rolePermissionService.permissionNameGrantedAuthoritiesMap().get(permission);
+        var authoritySet = rolePermissionService
+                .permissionNameGrantedAuthoritiesMap()
+                .get(permission);
         var isAuthorized = auth
                 .getAuthorities()
                 .stream()
