@@ -31,7 +31,7 @@ public class JwtServiceImpl implements IJwtService {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration.time}")
+    @Value("${token.expiration.time}")
     private long expirationTime;
 
     private final BlacklistedJwtRepository blacklistedJwtRepository;

@@ -84,14 +84,6 @@ databaseChangeLog:
                   name: phone
                   type: varchar(256)
               - column:
-<<<<<<< HEAD
-                  name: role_id
-                  type: smallint
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_user_profile_role
-                    references: roles(id)
-=======
                   name: enabled
                   type: boolean
                   constraints:
@@ -101,7 +93,6 @@ databaseChangeLog:
                   type: boolean
                   constraints:
                     nullable: false
->>>>>>> feature/ASE-18
               # METADATA
               - column:
                   name: creator_id
@@ -111,11 +102,7 @@ databaseChangeLog:
                     foreignKeyName: fk_user_profile_creator
                     references: user_profiles(id)
               - column:
-<<<<<<< HEAD
-                  name: created
-=======
                   name: created_at
->>>>>>> feature/ASE-18
                   type: timestamp
                   defaultValueComputed: "CURRENT_TIMESTAMP"
                   constraints:
@@ -127,11 +114,7 @@ databaseChangeLog:
                     foreignKeyName: fk_user_profile_updater
                     references: user_profiles(id)
               - column:
-<<<<<<< HEAD
-                  name: updated
-=======
                   name: updated_at
->>>>>>> feature/ASE-18
                   type: timestamp
               - column:
                   name: version
@@ -140,8 +123,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - createTable:
-<<<<<<< HEAD
-=======
             tableName: user_profiles_roles
             columns:
               - column:
@@ -161,7 +142,6 @@ databaseChangeLog:
                     foreignKeyName: fk_role_user_profile
                     references: roles(id)
         - createTable:
->>>>>>> feature/ASE-18
             tableName: evaluators
             columns:
               - column:
@@ -189,11 +169,7 @@ databaseChangeLog:
                     foreignKeyName: fk_evaluator_creator
                     references: user_profiles(id)
               - column:
-<<<<<<< HEAD
-                  name: created
-=======
                   name: created_at
->>>>>>> feature/ASE-18
                   type: timestamp
                   defaultValueComputed: "CURRENT_TIMESTAMP"
                   constraints:
@@ -205,11 +181,7 @@ databaseChangeLog:
                     foreignKeyName: fk_evaluator_updater
                     references: user_profiles(id)
               - column:
-<<<<<<< HEAD
-                  name: updated
-=======
                   name: updated_at
->>>>>>> feature/ASE-18
                   type: timestamp
               - column:
                   name: version
@@ -241,11 +213,7 @@ databaseChangeLog:
                     foreignKeyName: fk_owner_creator
                     references: user_profiles(id)
               - column:
-<<<<<<< HEAD
-                  name: created
-=======
                   name: created_at
->>>>>>> feature/ASE-18
                   type: timestamp
                   defaultValueComputed: "CURRENT_TIMESTAMP"
                   constraints:
@@ -257,9 +225,6 @@ databaseChangeLog:
                     foreignKeyName: fk_owner_updater
                     references: user_profiles(id)
               - column:
-<<<<<<< HEAD
-                  name: updated
-=======
                   name: updated_at
                   type: timestamp
               - column:
@@ -305,7 +270,6 @@ databaseChangeLog:
                     references: user_profiles(id)
               - column:
                   name: updated_at
->>>>>>> feature/ASE-18
                   type: timestamp
               - column:
                   name: version
@@ -352,11 +316,7 @@ databaseChangeLog:
                     foreignKeyName: fk_token_creator
                     references: user_profiles(id)
               - column:
-<<<<<<< HEAD
-                  name: created
-=======
                   name: created_at
->>>>>>> feature/ASE-18
                   type: timestamp
                   defaultValueComputed: "CURRENT_TIMESTAMP"
                   constraints:
@@ -368,11 +328,7 @@ databaseChangeLog:
                     foreignKeyName: fk_token_updater
                     references: user_profiles(id)
               - column:
-<<<<<<< HEAD
-                  name: updated
-=======
                   name: updated_at
->>>>>>> feature/ASE-18
                   type: timestamp
               - column:
                   name: version

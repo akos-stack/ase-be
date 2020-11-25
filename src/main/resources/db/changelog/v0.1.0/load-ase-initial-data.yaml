@@ -7,9 +7,6 @@ databaseChangeLog:
         encoding: UTF-8
         file: db/changelog/v0.1.0/initial_data/role.csv
         tableName: roles
-<<<<<<< HEAD
-
-=======
     - loadData:
         encoding: UTF-8
         file: db/changelog/v0.1.0/initial_data/permission.csv
@@ -18,16 +15,8 @@ databaseChangeLog:
         encoding: UTF-8
         file: db/changelog/v0.1.0/initial_data/role_permission.csv
         tableName: roles_permissions
->>>>>>> feature/ASE-18
     - loadData:
         encoding: UTF-8
         file: db/changelog/v0.1.0/initial_data/service_client_details.csv
         tableName: oauth_client_details
         quotchar: '"'
-<<<<<<< HEAD
-
-
-
-
-=======
->>>>>>> feature/ASE-18
