@@ -5,11 +5,15 @@ import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.user.Permission;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
+import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImpl;
 import com.bloxico.ase.userservice.repository.user.PermissionRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
+import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
+import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
+import com.bloxico.userservice.repository.token.PasswordTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,6 +51,15 @@ public class MockUtil {
 
     @Autowired
     private UserProfileRepository userProfileRepository;
+
+    @Autowired
+    private UserProfileServiceImpl userProfileService;
+
+    @Autowired
+    private PasswordTokenRepository passwordTokenRepository;
+
+    @Autowired
+    private UserPasswordFacadeImpl userPasswordFacade;
 
     public UserProfile savedAdmin() {
         Role role = new Role();
@@ -142,6 +155,13 @@ public class MockUtil {
                 .body()
                 .jsonPath()
                 .getString("access_token");
+    }
+
+    public String doForgotPasswordRequest(String email) {
+        var request = new ForgotPasswordRequest(email);
+        userPasswordFacade.handleForgotPasswordRequest(request);
+        var userId = userProfileService.findUserProfileByEmail(email).getId();
+        return passwordTokenRepository.findByUserId(userId).orElseThrow().getTokenValue();
     }
 
 }

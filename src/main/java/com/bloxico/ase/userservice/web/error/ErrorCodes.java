@@ -27,6 +27,11 @@ public interface ErrorCodes {
                 "2",
                 "For various situations, when user passed by parameter (email) does not exist."),
 
+        OLD_PASSWORD_DOES_NOT_MATCH(
+                HttpStatus.BAD_REQUEST,
+                "3",
+                "When updating known password, if provided old password does not match with (current) password."),
+
         MATCH_REGISTRATION_PASSWORD_ERROR(
                 HttpStatus.BAD_REQUEST,
                 "4",

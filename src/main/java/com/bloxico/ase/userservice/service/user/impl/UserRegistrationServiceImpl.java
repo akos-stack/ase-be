@@ -41,7 +41,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 
     @Override
     public UserProfileDto registerDisabledUser(RegistrationRequest request) {
-        log.info("UserRegistrationServiceImpl.registerDisabledUser - start | request: {}", request);
+        log.debug("UserRegistrationServiceImpl.registerDisabledUser - start | request: {}", request);
         requireNonNull(request);
         if (!request.isPasswordMatching())
             throw ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR.newException();
@@ -53,25 +53,25 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         userProfile.addRole(roleRepository.getUserRole());
         userProfile = userProfileRepository.saveAndFlush(userProfile);
         var userProfileDto = MAPPER.toUserProfileDto(userProfile);
-        log.info("UserRegistrationServiceImpl.registerDisabledUser - end | request: {}", request);
+        log.debug("UserRegistrationServiceImpl.registerDisabledUser - end | request: {}", request);
         return userProfileDto;
     }
 
     @Override
     public void enableUser(long id) {
-        log.info("UserRegistrationServiceImpl.enableUser - start | id: {}", id);
+        log.debug("UserRegistrationServiceImpl.enableUser - start | id: {}", id);
         var user = userProfileRepository
                 .findById(id)
                 .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
         user.setEnabled(true);
         user.setUpdaterId(id);
         userProfileRepository.saveAndFlush(user);
-        log.info("UserRegistrationServiceImpl.enableUser - end | id: {}", id);
+        log.debug("UserRegistrationServiceImpl.enableUser - end | id: {}", id);
     }
 
     @Override
     public List<Long> deleteDisabledUsersWithIds(Collection<Long> ids) {
-        log.info("UserRegistrationServiceImpl.deleteDisabledUsersWithIds - start | ids: {}", ids);
+        log.debug("UserRegistrationServiceImpl.deleteDisabledUsersWithIds - start | ids: {}", ids);
         requireNonNull(ids);
         if (ids.isEmpty()) return List.of();
         var disabled = userProfileRepository
@@ -84,7 +84,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
                 .stream()
                 .map(UserProfile::getId)
                 .collect(toUnmodifiableList());
-        log.info("UserRegistrationServiceImpl.deleteDisabledUsersWithIds - end | ids: {}", ids);
+        log.debug("UserRegistrationServiceImpl.deleteDisabledUsersWithIds - end | ids: {}", ids);
         return deleted;
     }
 

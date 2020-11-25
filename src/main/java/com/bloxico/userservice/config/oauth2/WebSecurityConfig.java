@@ -71,6 +71,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_TOKEN_REFRESH_ENDPOINT,
                 com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_TOKEN_RESEND_ENDPOINT,
 
+                com.bloxico.ase.userservice.web.api.UserPasswordApi.PASSWORD_FORGOT_ENDPOINT,
+                com.bloxico.ase.userservice.web.api.UserPasswordApi.PASSWORD_UPDATE_FORGOTTEN_ENDPOINT,
+                com.bloxico.ase.userservice.web.api.UserPasswordApi.PASSWORD_TOKEN_RESEND_ENDPOINT
+
         };
     }
 
