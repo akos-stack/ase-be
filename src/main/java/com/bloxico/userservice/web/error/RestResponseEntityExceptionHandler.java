@@ -1,5 +1,6 @@
 package com.bloxico.userservice.web.error;
 
+import com.bloxico.ase.userservice.exception.AseRuntimeException;
 import com.bloxico.userservice.exceptions.*;
 import com.bloxico.userservice.web.model.ApiError;
 import lombok.extern.slf4j.Slf4j;
@@ -106,6 +107,16 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
+        return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
+
+    @ExceptionHandler(value = {AseRuntimeException.class})
+    protected ResponseEntity<Object> handleAseRuntimeException(Exception exception, WebRequest __) {
+        var aseError = (AseRuntimeException) exception;
+        var apiError = aseError.toApiError();
+        log.info("Returning error response: {}", apiError.toString());
+        if (aseError.getCause() != null)
+            log.error("Error cause: ", aseError.getCause());
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 

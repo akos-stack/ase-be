@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-@RestController
+//@RestController("UserRegistrationControllerOld")
 public class UserRegistrationController implements UserRegistrationApi {
 
     private IRegistrationFacade registrationFacade;

@@ -1,0 +1,84 @@
+package com.bloxico.ase.userservice.web.error;
+
+import com.bloxico.ase.userservice.exception.AseRuntimeException;
+import com.bloxico.ase.userservice.exception.JwtException;
+import com.bloxico.ase.userservice.exception.UserProfileException;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+public interface ErrorCodes {
+
+    AseRuntimeException newException(Throwable cause);
+
+    default AseRuntimeException newException() {
+        return newException(null);
+    }
+
+    @Getter
+    enum User implements ErrorCodes {
+
+        USER_EXISTS(
+                HttpStatus.CONFLICT,
+                "1",
+                "Upon registration, when given email already exists."),
+
+        USER_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "2",
+                "For various situations, when user passed by parameter (email) does not exist."),
+
+        OLD_PASSWORD_DOES_NOT_MATCH(
+                HttpStatus.BAD_REQUEST,
+                "3",
+                "When updating known password, if provided old password does not match with (current) password."),
+
+        MATCH_REGISTRATION_PASSWORD_ERROR(
+                HttpStatus.BAD_REQUEST,
+                "4",
+                "When registering user, if password and matchPassword values are not valid.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        User(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        public AseRuntimeException newException(Throwable cause) {
+            return new UserProfileException(httpStatus, code, cause);
+        }
+
+    }
+
+    @Getter
+    enum Token implements ErrorCodes {
+
+        INVALID_TOKEN(
+                HttpStatus.FORBIDDEN,
+                "10",
+                "Token is not valid (anymore). E.g. it's fake, expired or blacklisted."),
+
+        TOKEN_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "11",
+                "Token cannot be found in the database. It may be deleted due to expiry.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        Token(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new JwtException(httpStatus, code, cause);
+        }
+
+    }
+
+}

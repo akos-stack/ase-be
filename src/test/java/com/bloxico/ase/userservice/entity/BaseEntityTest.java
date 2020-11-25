@@ -24,7 +24,7 @@ public class BaseEntityTest extends AbstractSpringTest {
     @Test(expected = NullPointerException.class)
     public void prePersist_creator_isNull() {
         Owner owner = new Owner();
-        owner.setUserProfile(mockUtil.savedUser());
+        owner.setUserProfile(mockUtil.savedUserProfile());
         owner.setBirthday(LocalDate.now().minusYears(20));
         ownerRepository.saveAndFlush(owner);
     }
@@ -32,23 +32,23 @@ public class BaseEntityTest extends AbstractSpringTest {
     @Test
     public void prePersist_creator_isNotNull() {
         Owner owner = new Owner();
-        UserProfile creator = mockUtil.savedUser();
+        UserProfile creator = mockUtil.savedUserProfile();
         owner.setUserProfile(creator);
         owner.setBirthday(LocalDate.now().minusYears(20));
-        owner.setCreator(creator.getId());
-        assertNull(owner.getCreated());
+        owner.setCreatorId(creator.getId());
+        assertNull(owner.getCreatedAt());
         owner = ownerRepository.saveAndFlush(owner);
-        assertNotNull(owner.getCreated());
+        assertNotNull(owner.getCreatedAt());
     }
 
     @Test(expected = NullPointerException.class)
     public void preUpdate_updater_isNull() {
         Owner oldOwner = new Owner();
         {
-            UserProfile creator = mockUtil.savedUser();
+            UserProfile creator = mockUtil.savedUserProfile();
             oldOwner.setUserProfile(creator);
             oldOwner.setBirthday(LocalDate.now());
-            oldOwner.setCreator(creator.getId());
+            oldOwner.setCreatorId(creator.getId());
             ownerRepository.saveAndFlush(oldOwner);
         }
         Owner newOwner = new Owner();
@@ -65,10 +65,10 @@ public class BaseEntityTest extends AbstractSpringTest {
     public void preUpdate_updater_isNotNull() {
         Owner oldOwner = new Owner();
         {
-            UserProfile creator = mockUtil.savedUser();
+            UserProfile creator = mockUtil.savedUserProfile();
             oldOwner.setUserProfile(creator);
             oldOwner.setBirthday(LocalDate.now());
-            oldOwner.setCreator(creator.getId());
+            oldOwner.setCreatorId(creator.getId());
             ownerRepository.saveAndFlush(oldOwner);
         }
         Owner newOwner = new Owner();
@@ -77,10 +77,10 @@ public class BaseEntityTest extends AbstractSpringTest {
             newOwner.setUserProfile(oldOwner.getUserProfile());
             newOwner.setBirthday(LocalDate.now().minusYears(20)); // update
             MockUtil.copyBaseEntityData(oldOwner, newOwner);
-            newOwner.setUpdater(newOwner.getCreator()); // !null
-            assertNull(newOwner.getUpdated());
+            newOwner.setUpdaterId(newOwner.getCreatorId()); // !null
+            assertNull(newOwner.getUpdatedAt());
             newOwner = ownerRepository.saveAndFlush(newOwner);
-            assertNotNull(newOwner.getUpdated());
+            assertNotNull(newOwner.getUpdatedAt());
         }
     }
 

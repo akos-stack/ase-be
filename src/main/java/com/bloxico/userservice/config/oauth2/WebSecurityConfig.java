@@ -1,5 +1,8 @@
 package com.bloxico.userservice.config.oauth2;
 
+import com.bloxico.ase.userservice.filter.JwtAuthorizationFilter;
+import com.bloxico.ase.userservice.service.token.IJwtService;
+import com.bloxico.userservice.filter.RepeatableReadRequestFilter;
 import com.bloxico.userservice.web.api.UserPasswordApi;
 import com.bloxico.userservice.web.api.UserRegistrationApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,13 +13,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.BeanIds;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -26,8 +32,14 @@ import org.springframework.web.filter.CorsFilter;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+//    @Autowired
+//    private DaoAuthenticationProvider daoAuthenticationProvider;
+
     @Autowired
-    private DaoAuthenticationProvider daoAuthenticationProvider;
+    TokenStore tokenStore;
+
+    @Autowired
+    IJwtService jwtService;
 
     @Value("${front.end.url}")
     protected String FRONTEND_URL;
@@ -43,6 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     static {
         AUTH_WHITELIST = new String[]{
+
                 "/swagger-resources/**", "/swagger-ui.html", "/api-docs", "/webjars/**",
                 UserRegistrationApi.REGISTRATION_ENDPOINT,
                 UserRegistrationApi.REGISTRATION_CONFIRMATION_ENDPOINT,
@@ -52,6 +65,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 UserPasswordApi.FORGOT_PASSWORD_ENDPOINT,
                 UserPasswordApi.UPDATE_FORGOTTEN_PASSWORD_ENDPOINT,
                 UserPasswordApi.FORGOT_PASSWORD_TOKEN_RESEND_ENDPOINT,
+
+                com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_ENDPOINT,
+                com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_CONFIRM_ENDPOINT,
+                com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_TOKEN_REFRESH_ENDPOINT,
+                com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_TOKEN_RESEND_ENDPOINT,
+
+                com.bloxico.ase.userservice.web.api.UserPasswordApi.PASSWORD_FORGOT_ENDPOINT,
+                com.bloxico.ase.userservice.web.api.UserPasswordApi.PASSWORD_UPDATE_FORGOTTEN_ENDPOINT,
+                com.bloxico.ase.userservice.web.api.UserPasswordApi.PASSWORD_TOKEN_RESEND_ENDPOINT
 
         };
     }
@@ -89,8 +111,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(AUTH_WHITELIST);
     }
 
-    @Autowired
-    protected void configureGlobal(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(daoAuthenticationProvider);
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests().anyRequest().authenticated()
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
+                and()
+                .addFilterBefore(new JwtAuthorizationFilter(jwtService, tokenStore), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new RepeatableReadRequestFilter(), AbstractPreAuthenticatedProcessingFilter.class)
+                .csrf().disable();
     }
 }

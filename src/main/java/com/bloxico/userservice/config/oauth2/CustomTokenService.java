@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
+//@Component
 public class CustomTokenService extends DefaultTokenServices {
 
     @Autowired
