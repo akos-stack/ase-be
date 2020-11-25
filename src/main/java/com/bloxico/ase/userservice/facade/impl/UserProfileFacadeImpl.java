@@ -22,20 +22,20 @@ public class UserProfileFacadeImpl implements IUserProfileFacade {
     }
 
     @Override
-    public UserProfileDataResponse returnMyProfileData(long id) {
-        log.info("UserProfileFacadeImpl.returnMyProfileData - start | id: {}", id);
-        var userProfileDto = userProfileService.findUserProfileById(id);
+    public UserProfileDataResponse returnMyProfileData(long principalId) {
+        log.info("UserProfileFacadeImpl.returnMyProfileData - start | principalId: {}", principalId);
+        var userProfileDto = userProfileService.findUserProfileById(principalId);
         var response = new UserProfileDataResponse(userProfileDto);
-        log.info("UserProfileFacadeImpl.returnMyProfileData - end | id: {}", id);
+        log.info("UserProfileFacadeImpl.returnMyProfileData - end | principalId: {}", principalId);
         return response;
     }
 
     @Override
-    public UserProfileDataResponse updateMyProfile(long id, UpdateUserProfileRequest request) {
-        log.info("UserProfileFacadeImpl.updateMyProfile - start | id: {}, request: {}", id, request);
-        var userProfileDto = userProfileService.updateUserProfile(id, request);
+    public UserProfileDataResponse updateMyProfile(long principalId, UpdateUserProfileRequest request) {
+        log.info("UserProfileFacadeImpl.updateMyProfile - start | principalId: {}, request: {}", principalId, request);
+        var userProfileDto = userProfileService.updateUserProfile(principalId, request);
         var response = new UserProfileDataResponse(userProfileDto);
-        log.info("UserProfileFacadeImpl.updateMyProfile - end | id: {}, request: {}", id, request);
+        log.info("UserProfileFacadeImpl.updateMyProfile - end | principalId: {}, request: {}", principalId, request);
         return response;
     }
 
