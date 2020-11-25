@@ -20,11 +20,11 @@ import java.security.Principal;
 @Api(value = "password")
 public interface UserPasswordApi {
 
-    String PASSWORD_FORGOT_ENDPOINT           = "/user/passwordForgot";
-    String PASSWORD_TOKEN_RESEND_ENDPOINT     = "/user/passwordTokenResend";
-    String PASSWORD_UPDATE_FORGOTTEN_ENDPOINT = "/user/passwordUpdateForgotten";
-    String PASSWORD_UPDATE_ENDPOINT           = "/user/passwordUpdate";
-    String PASSWORD_SET_ENDPOINT              = "/user/passwordSet";
+    String PASSWORD_FORGOT_ENDPOINT           = "/user/password/forgot";
+    String PASSWORD_TOKEN_RESEND_ENDPOINT     = "/user/password/token/resend";
+    String PASSWORD_UPDATE_FORGOTTEN_ENDPOINT = "/user/password/update/forgotten";
+    String PASSWORD_UPDATE_ENDPOINT           = "/user/password/update";
+    String PASSWORD_SET_ENDPOINT              = "/user/password/set";
 
     @PostMapping(
             value = PASSWORD_FORGOT_ENDPOINT,

@@ -18,8 +18,8 @@ import java.security.Principal;
 @Api(value = "userProfile")
 public interface UserProfileApi {
 
-    String MY_PROFILE_ENDPOINT        = "/user/myProfile";
-    String MY_PROFILE_UPDATE_ENDPOINT = "/user/myProfileUpdate";
+    String MY_PROFILE_ENDPOINT        = "/user/my-profile";
+    String MY_PROFILE_UPDATE_ENDPOINT = "/user/my-profile/update";
 
     @GetMapping(value = MY_PROFILE_ENDPOINT)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'access_profile')")

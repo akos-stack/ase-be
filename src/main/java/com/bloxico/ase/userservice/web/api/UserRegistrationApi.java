@@ -17,9 +17,9 @@ import javax.validation.Valid;
 public interface UserRegistrationApi {
 
     String REGISTRATION_ENDPOINT               = "/user/registration";
-    String REGISTRATION_CONFIRM_ENDPOINT       = "/user/registrationConfirm";
-    String REGISTRATION_TOKEN_REFRESH_ENDPOINT = "/user/registrationTokenRefresh";
-    String REGISTRATION_TOKEN_RESEND_ENDPOINT  = "/user/registrationTokenResend";
+    String REGISTRATION_CONFIRM_ENDPOINT       = "/user/registration/confirm";
+    String REGISTRATION_TOKEN_REFRESH_ENDPOINT = "/user/registration/token/refresh";
+    String REGISTRATION_TOKEN_RESEND_ENDPOINT  = "/user/registration/token/resend";
 
     String TOKEN_PARAM = "token";
 
