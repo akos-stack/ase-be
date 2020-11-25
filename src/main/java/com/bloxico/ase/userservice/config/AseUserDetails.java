@@ -13,6 +13,8 @@ import static java.util.stream.Collectors.toUnmodifiableSet;
 @Value
 public class AseUserDetails implements UserDetails {
 
+    private static final long serialVersionUID = 1L;
+
     UserProfileDto userProfile;
 
     @Override

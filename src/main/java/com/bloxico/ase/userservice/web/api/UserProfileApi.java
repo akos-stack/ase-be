@@ -19,24 +19,24 @@ import java.security.Principal;
 public interface UserProfileApi {
 
     String MY_PROFILE_ENDPOINT        = "/user/myProfile";
-    String UPDATE_MY_PROFILE_ENDPOINT = "/user/updateMyProfile";
+    String MY_PROFILE_UPDATE_ENDPOINT = "/user/myProfileUpdate";
 
     @GetMapping(value = MY_PROFILE_ENDPOINT)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'access_profile')")
-    @ApiOperation(value = "Endpoint used to fetch user profile data.")
+    @ApiOperation(value = "Fetches profile data of the requester.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Profile data successfully retrieved.")
     })
     ResponseEntity<UserProfileDataResponse> accessMyProfile(Principal principal);
 
     @PostMapping(
-            value = UPDATE_MY_PROFILE_ENDPOINT,
+            value = MY_PROFILE_UPDATE_ENDPOINT,
             produces = {"application/json"},
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'update_profile')")
-    @ApiOperation(value = "Endpoint used to update user profile.")
+    @ApiOperation(value = "Updates profile data of the requester.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Update successful.")
+            @ApiResponse(code = 200, message = "Profile data successfully updated.")
     })
     ResponseEntity<UserProfileDataResponse> updateMyProfile(@Valid @RequestBody UpdateUserProfileRequest request, Principal principal);
 

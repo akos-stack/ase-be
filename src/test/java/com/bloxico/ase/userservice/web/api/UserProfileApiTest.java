@@ -9,7 +9,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_ENDPOINT;
-import static com.bloxico.ase.userservice.web.api.UserProfileApi.UPDATE_MY_PROFILE_ENDPOINT;
+import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_UPDATE_ENDPOINT;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.is;
@@ -47,7 +47,7 @@ public class UserProfileApiTest extends AbstractSpringTest {
                 .contentType(JSON)
                 .body(new UpdateUserProfileRequest("updated_name", "updated_phone"))
                 .when()
-                .post(API_URL + UPDATE_MY_PROFILE_ENDPOINT)
+                .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()
                 .assertThat()
                 .statusCode(200)

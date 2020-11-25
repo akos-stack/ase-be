@@ -27,7 +27,7 @@ public interface UserRegistrationApi {
             value = REGISTRATION_ENDPOINT,
             produces = {"application/json"},
             consumes = {"application/json"})
-    @ApiOperation(value = "Creates disabled user in the database and sends verification token to provided email.")
+    @ApiOperation(value = "Creates disabled user in the database and sends verification token to the provided email.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Registration successfully done."),
             @ApiResponse(code = 400, message = "Values `password` and `match_password` do not match."),
@@ -42,19 +42,16 @@ public interface UserRegistrationApi {
     @ApiOperation(value = "Accepts verification token provided by email and, if correct, enables user.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Validation successful - user is now able to log in."),
-            @ApiResponse(code = 404, message = "Could not find user associated with given email."),
-            @ApiResponse(code = 404, message = "Token provided is either not found or expired."),
+            @ApiResponse(code = 404, message = "Could not find user associated with the given email."),
+            @ApiResponse(code = 404, message = "Provided token is either not found or expired.")
     })
     ResponseEntity<Void> confirmRegistration(@Valid @RequestBody TokenValidationRequest request);
 
     @ApiOperation(
-            value = "Endpoint that has to be called if token that is being validated has expired. " +
-                    "This will rarely happen since all expired tokens are being deleted within 24 hours " +
-                    "but in case if user tries to validate token that is expired, this endpoint needs to be called " +
-                    "in order to refresh the token.")
+            value = "Refreshes expired registration token.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Token is refreshed and email has been sent with updated token value."),
-            @ApiResponse(code = 404, message = "Token provided is not found."),
+            @ApiResponse(code = 404, message = "Provided token is not found.")
     })
     @GetMapping(value = REGISTRATION_TOKEN_REFRESH_ENDPOINT)
     ResponseEntity<Void> refreshRegistrationToken(@ApiParam(value = "Expired token value", required = true)
@@ -64,12 +61,11 @@ public interface UserRegistrationApi {
             value = REGISTRATION_TOKEN_RESEND_ENDPOINT,
             produces = {"application/json"},
             consumes = {"application/json"})
-    @ApiOperation(value = "In case the mail has not been sent with verification token, resend email using " +
-                          "existing token in the database.")
+    @ApiOperation(value = "Resends email with existing token in the database.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Mail is sent successfully."),
             @ApiResponse(code = 404, message = "Could not find user associated with given email."),
-            @ApiResponse(code = 404, message = "Token assigned to user is not found, it probably expired."),
+            @ApiResponse(code = 404, message = "Token assigned to user is not found, it probably expired.")
     })
     ResponseEntity<Void> resendRegistrationToken(@Valid @RequestBody ResendTokenRequest request);
 
