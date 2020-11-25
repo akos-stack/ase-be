@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.web.model.password;
 
 import com.bloxico.userservice.util.validator.password.RegularPassword;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -22,12 +23,14 @@ public class KnownPasswordUpdateRequest {
     @NotEmpty
     @RegularPassword
     @JsonProperty("old_password")
+    @ApiModelProperty(required = true)
     String oldPassword;
 
     @NotNull
     @NotEmpty
     @RegularPassword
     @JsonProperty("new_password")
+    @ApiModelProperty(required = true)
     String newPassword;
 
 }

@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.web.model.password;
 import com.bloxico.userservice.util.validator.email.ValidEmail;
 import com.bloxico.userservice.util.validator.password.RegularPassword;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -23,17 +24,20 @@ public class ForgottenPasswordUpdateRequest {
     @NotEmpty
     @ValidEmail
     @JsonProperty("email")
+    @ApiModelProperty(required = true)
     String email;
 
     @NotNull
     @NotEmpty
     @JsonProperty("token_value")
+    @ApiModelProperty(required = true)
     String tokenValue;
 
     @NotNull
     @NotEmpty
     @RegularPassword
     @JsonProperty("new_password")
+    @ApiModelProperty(required = true)
     String newPassword;
 
 }

@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
 
-@RestController("userPasswordControllerOld")
+//@RestController("userPasswordControllerOld")
 public class UserPasswordController implements UserPasswordApi {
 
     private IUserPasswordFacade userPasswordFacade;
