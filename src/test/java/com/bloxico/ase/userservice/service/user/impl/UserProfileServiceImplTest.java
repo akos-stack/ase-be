@@ -83,10 +83,10 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void loadUserByUsername_found() {
-        var userProfileDto = mockUtil.savedUserProfileDto();
+        var userProfile = mockUtil.savedUserProfile();
         assertEquals(
-                new AseUserDetails(userProfileDto),
-                userProfileService.loadUserByUsername(userProfileDto.getEmail()));
+                new AseUserDetails(userProfile),
+                userProfileService.loadUserByUsername(userProfile.getEmail()));
     }
 
 }

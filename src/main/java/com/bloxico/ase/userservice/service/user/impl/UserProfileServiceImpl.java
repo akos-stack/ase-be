@@ -68,8 +68,11 @@ public class UserProfileServiceImpl implements IUserProfileService, UserDetailsS
     @Override
     public UserDetails loadUserByUsername(String email) {
         log.debug("UserProfileServiceImpl.loadUserByUsername - start | email: {}", email);
-        var userProfileDto = findUserProfileByEmail(email);
-        var aseUserDetails = new AseUserDetails(userProfileDto);
+        requireNonNull(email);
+        var userProfile = userProfileRepository
+                .findByEmailIgnoreCase(email)
+                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
+        var aseUserDetails = new AseUserDetails(userProfile);
         log.debug("UserProfileServiceImpl.loadUserByUsername - end | email: {}", email);
         return aseUserDetails;
     }
