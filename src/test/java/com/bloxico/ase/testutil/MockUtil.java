@@ -134,16 +134,24 @@ public class MockUtil {
                 .post(API_URL + REGISTRATION_CONFIRM_ENDPOINT);
     }
 
-    public String doAuthentication() {
+    public Registration doConfirmedRegistration() {
         var registration = doRegistration();
         var email = registration.getEmail();
         var token = registration.getToken();
         doConfirmation(email, token);
+        return registration;
+    }
+
+    public String doAuthentication() {
+        return doAuthentication(doConfirmedRegistration());
+    }
+
+    public String doAuthentication(Registration registration) {
         return "Bearer " + given()
                 .contentType(URLENC)
                 .accept(JSON)
                 .formParams(
-                        "username", email,
+                        "username", registration.getEmail(),
                         "password", registration.getPassword(),
                         "grant_type", "password",
                         "scope", "access_profile")

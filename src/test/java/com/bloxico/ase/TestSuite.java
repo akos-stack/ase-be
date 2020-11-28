@@ -1,5 +1,6 @@
 package com.bloxico.ase;
 
+import com.bloxico.ase.userservice.config.PersistentJwtTokenStoreTest;
 import com.bloxico.ase.userservice.config.StartupConfigTest;
 import com.bloxico.ase.userservice.entity.BaseEntityTest;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImplTest;
@@ -33,12 +34,12 @@ import org.junit.runners.Suite;
 
         // config
         StartupConfigTest.class,
+        PersistentJwtTokenStoreTest.class,
 
         // service
         UserRegistrationServiceImplTest.class,
         UserPasswordServiceImplTest.class,
         UserProfileServiceImplTest.class,
-
         RolePermissionServiceImplTest.class,
         JwtServiceImplTest.class,
 

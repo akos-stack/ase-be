@@ -30,14 +30,14 @@
             );
 
             create table ${database.defaultSchemaName}.oauth_access_token (
-            authentication_id VARCHAR(256) PRIMARY KEY,
-            token_id VARCHAR(256),
+            authentication_id VARCHAR(256),
+            token_id VARCHAR,
             token bytea,
             user_name VARCHAR(256),
             client_id VARCHAR(256),
             authentication bytea,
             expiration TIMESTAMP,
-            refresh_token VARCHAR(256)
+            refresh_token VARCHAR
             );
 
             create table ${database.defaultSchemaName}.oauth_refresh_token (

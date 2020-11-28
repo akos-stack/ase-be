@@ -1,6 +1,8 @@
 package com.bloxico.userservice.config.oauth2;
 
 import com.bloxico.ase.userservice.config.AseUserDetails;
+import com.bloxico.ase.userservice.config.PersistentJwtTokenStore;
+import com.bloxico.ase.userservice.entity.user.Role;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +17,6 @@ import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import javax.sql.DataSource;
 import java.util.*;
@@ -53,7 +54,7 @@ public class TokenStoreConfig {
     //that will be put into security context
     @Bean
     public TokenStore tokenStore() {
-        return new JwtTokenStore(jwtAccessTokenConverter());
+        return new PersistentJwtTokenStore(dataSource(), jwtAccessTokenConverter());
     }
 
     @Bean
@@ -72,7 +73,7 @@ public class TokenStoreConfig {
             Map<String, Object> info = new LinkedHashMap<>(accessToken.getAdditionalInformation());
 
             info.put("id", userDetails.getUserProfile().getId());
-            info.put("roles", userDetails.getUserProfile().streamRoleNames().collect(toList()));
+            info.put("roles", userDetails.getUserProfile().getRoles().stream().map(Role::getName).collect(toList()));
 
             DefaultOAuth2AccessToken customAccessToken = new DefaultOAuth2AccessToken(accessToken);
             customAccessToken.setAdditionalInformation(info);
