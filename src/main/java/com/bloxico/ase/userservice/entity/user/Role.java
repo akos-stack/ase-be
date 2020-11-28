@@ -13,7 +13,7 @@ import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
-@EqualsAndHashCode(of = "name", callSuper = false)
+@EqualsAndHashCode(of = "name")
 @Table(name = "roles")
 @Entity
 public class Role implements Serializable {
