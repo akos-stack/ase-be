@@ -5,9 +5,5 @@ import org.springframework.security.oauth2.provider.ClientDetails;
 
 public interface IOauthTokenService {
 
-    String authenticateIntegratedUser(String email);
-
-    String authenticateClientCredentials(String clientId, String secret);
-
     void deleteExpiredAccessTokens();
 }
