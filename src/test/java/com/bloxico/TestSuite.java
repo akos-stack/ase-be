@@ -5,7 +5,6 @@ import com.bloxico.userservice.facade.impl.DeleteTokenQuartzFacadeImplTest;
 import com.bloxico.userservice.facade.impl.RegistrationFacadeImplTest;
 import com.bloxico.userservice.facade.impl.UserPasswordFacadeImplTest;
 import com.bloxico.userservice.facade.impl.UserProfileFacadeImplTest;
-import com.bloxico.userservice.services.oauth.impl.OauthTokenServiceImplTest;
 import com.bloxico.userservice.services.token.impl.VerificationTokenServiceImplTest;
 import com.bloxico.userservice.services.user.impl.UserPasswordServiceImplTest;
 import com.bloxico.userservice.services.user.impl.UserProfileServiceImplTest;
@@ -33,7 +32,6 @@ import org.junit.runners.Suite;
         UserProfileServiceImplTest.class,
         DeleteTokenQuartzFacadeImplTest.class,
         CoinUserDetailsServiceTest.class,
-        OauthTokenServiceImplTest.class,
 })
 public class TestSuite {
 }
