@@ -2,8 +2,8 @@ package com.bloxico.ase.userservice.config;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.userservice.entities.oauth.OauthAccessTokenEntity;
-import com.bloxico.userservice.repository.oauth.AccessTokenRepository;
+import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
+import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -25,7 +25,7 @@ public class PersistentJwtTokenStoreTest extends AbstractSpringTest {
     private MockUtil mockUtil;
 
     @Autowired
-    private AccessTokenRepository accessTokenRepository;
+    private OAuthAccessTokenRepository oAuthAccessTokenRepository;
 
     @Test
     public void storeAccessToken_multipleTokensForTheSameUser() {
@@ -33,10 +33,10 @@ public class PersistentJwtTokenStoreTest extends AbstractSpringTest {
         var token1 = mockUtil.doAuthentication(registration);
         var token2 = mockUtil.doAuthentication(registration);
         var token3 = mockUtil.doAuthentication(registration);
-        var dbTokens = accessTokenRepository
+        var dbTokens = oAuthAccessTokenRepository
                 .findAll()
                 .stream()
-                .map(OauthAccessTokenEntity::getTokenId)
+                .map(OAuthAccessToken::getTokenId)
                 .map(token -> "Bearer " + token)
                 .collect(toSet());
         assertEquals(dbTokens, Set.of(token1, token2, token3));

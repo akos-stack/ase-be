@@ -6,6 +6,8 @@ import com.bloxico.ase.userservice.entity.BaseEntityTest;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImplTest;
 import com.bloxico.ase.userservice.facade.impl.UserProfileFacadeImplTest;
 import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImplTest;
+import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepositoryTest;
+import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepositoryTest;
 import com.bloxico.ase.userservice.repository.token.BlacklistedJwtRepositoryTest;
 import com.bloxico.ase.userservice.repository.user.*;
 import com.bloxico.ase.userservice.service.token.impl.JwtServiceImplTest;
@@ -31,6 +33,8 @@ import org.junit.runners.Suite;
         OwnerRepositoryTest.class,
         EvaluatorRepositoryTest.class,
         BlacklistedJwtRepositoryTest.class,
+        OAuthAccessTokenRepositoryTest.class,
+        OAuthClientDetailsRepositoryTest.class,
 
         // config
         StartupConfigTest.class,
