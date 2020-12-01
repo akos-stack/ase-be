@@ -37,8 +37,8 @@ public class SwaggerConfig {
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfoBuilder().title("EnergyCoin Dashboard API").description("This is the EnergyCoin Dashboard API definition.")
-                .contact(new Contact("EnergyCoin Dashboard API", "", ""))
+        return new ApiInfoBuilder().title("ASE Dashboard API").description("This is the Art Stock Exchange API definition.")
+                .contact(new Contact("Art Stock Exchange API", "", ""))
                 .license("")
                 .licenseUrl("")
                 .version("1.0.0")
