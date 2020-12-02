@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Table(name = "oauth_access_token")
@@ -36,7 +36,7 @@ public class OAuthAccessToken implements Serializable {
     private byte[] authentication;
 
     @Column(name = "expiration")
-    private Date expiration;
+    private LocalDateTime expiration;
 
     @Column(name = "refresh_token")
     private String refreshToken;

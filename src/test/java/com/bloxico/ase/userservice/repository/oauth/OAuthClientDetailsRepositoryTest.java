@@ -23,6 +23,15 @@ public class OAuthClientDetailsRepositoryTest extends AbstractSpringTest {
     }
 
     @Test
+    public void findByClientId_nullClientId() {
+        assertTrue(repository.findByClientId(null).isEmpty());
+        var details = new OAuthClientDetails();
+        details.setClientId(UUID.randomUUID().toString());
+        repository.save(details);
+        assertTrue(repository.findByClientId(null).isEmpty());
+    }
+
+    @Test
     public void findByClientId() {
         var id = UUID.randomUUID().toString();
         assertTrue(repository.findByClientId(id).isEmpty());

@@ -11,4 +11,6 @@ public interface IUserProfileService {
 
     UserProfileDto updateUserProfile(long id, UpdateUserProfileRequest request);
 
+    void disableUser(long userId, long principalId);
+
 }

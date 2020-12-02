@@ -66,6 +66,18 @@ public class UserProfileServiceImpl implements IUserProfileService, UserDetailsS
     }
 
     @Override
+    public void disableUser(long userId, long principalId) {
+        log.debug("UserProfileServiceImpl.disableUser - start | userId: {}, principalId: {}", userId, principalId);
+        var userProfile = userProfileRepository
+                .findById(userId)
+                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
+        userProfile.setEnabled(false);
+        userProfile.setUpdaterId(principalId);
+        userProfileRepository.saveAndFlush(userProfile);
+        log.debug("UserProfileServiceImpl.disableUser - end | userId: {}, principalId: {}", userId, principalId);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String email) {
         log.debug("UserProfileServiceImpl.loadUserByUsername - start | email: {}", email);
         requireNonNull(email);

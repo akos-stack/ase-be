@@ -1,15 +1,15 @@
 package com.bloxico.ase;
 
 import com.bloxico.ase.userservice.config.PersistentJwtTokenStoreTest;
-import com.bloxico.ase.userservice.config.StartupConfigTest;
 import com.bloxico.ase.userservice.entity.BaseEntityTest;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImplTest;
 import com.bloxico.ase.userservice.facade.impl.UserProfileFacadeImplTest;
 import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImplTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepositoryTest;
-import com.bloxico.ase.userservice.repository.token.BlacklistedJwtRepositoryTest;
+import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.user.*;
+import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
 import com.bloxico.ase.userservice.service.token.impl.JwtServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.RolePermissionServiceImplTest;
@@ -33,12 +33,11 @@ import org.junit.runners.Suite;
         UserProfileRepositoryTest.class,
         OwnerRepositoryTest.class,
         EvaluatorRepositoryTest.class,
-        BlacklistedJwtRepositoryTest.class,
+        BlacklistedTokenRepositoryTest.class,
         OAuthAccessTokenRepositoryTest.class,
         OAuthClientDetailsRepositoryTest.class,
 
         // config
-        StartupConfigTest.class,
         PersistentJwtTokenStoreTest.class,
 
         // service
@@ -47,6 +46,7 @@ import org.junit.runners.Suite;
         UserProfileServiceImplTest.class,
         RolePermissionServiceImplTest.class,
         JwtServiceImplTest.class,
+        OAuthAccessTokenServiceImplTest.class,
         OAuthClientDetailsServiceImplTest.class,
 
         // facade

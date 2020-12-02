@@ -17,4 +17,11 @@ public class CacheConfig {
                 Caffeine.newBuilder().build());
     }
 
+    @Bean
+    public CaffeineCache blacklistedTokensCache() {
+        return new CaffeineCache(
+                "blacklistedTokensCache",
+                Caffeine.newBuilder().build());
+    }
+
 }

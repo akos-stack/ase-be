@@ -234,7 +234,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - createTable:
-            tableName: blacklisted_jwts
+            tableName: blacklisted_tokens
             columns:
               - column:
                   name: id
@@ -248,6 +248,9 @@ databaseChangeLog:
                   type: varchar(256)
                   constraints:
                     nullable: false
+              - column:
+                  name: expiration
+                  type: timestamp
               # METADATA
               - column:
                   name: creator_id

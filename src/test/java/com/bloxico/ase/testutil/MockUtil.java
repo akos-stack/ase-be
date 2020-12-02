@@ -1,11 +1,14 @@
 package com.bloxico.ase.testutil;
 
+import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.entity.BaseEntity;
+import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.user.Permission;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImpl;
+import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import com.bloxico.ase.userservice.repository.user.PermissionRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
@@ -19,12 +22,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
+
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_CONFIRM_ENDPOINT;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_ENDPOINT;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static io.restassured.http.ContentType.URLENC;
+import static java.util.stream.Collectors.toList;
 
 @Component
 public class MockUtil {
@@ -60,6 +70,9 @@ public class MockUtil {
 
     @Autowired
     private UserPasswordFacadeImpl userPasswordFacade;
+
+    @Autowired
+    private OAuthAccessTokenRepository oAuthAccessTokenRepository;
 
     public UserProfile savedAdmin() {
         Role role = new Role();
@@ -108,6 +121,20 @@ public class MockUtil {
         to.setUpdaterId(from.getUpdaterId());
         to.setCreatedAt(from.getCreatedAt());
         to.setUpdatedAt(from.getUpdatedAt());
+    }
+
+    public List<OAuthAccessTokenDto> toOAuthAccessTokenDtoList(UserProfileDto userProfile, String... tokens) {
+        return Arrays
+                .stream(tokens)
+                .map(token -> new OAuthAccessTokenDto(
+                        token,
+                        null, null,
+                        userProfile.getEmail(),
+                        "appId",
+                        null,
+                        LocalDateTime.now().plusHours(2),
+                        UUID.randomUUID().toString()))
+                .collect(toList());
     }
 
     @lombok.Value
@@ -170,6 +197,15 @@ public class MockUtil {
         userPasswordFacade.handleForgotPasswordRequest(request);
         var userId = userProfileService.findUserProfileByEmail(email).getId();
         return passwordTokenRepository.findByUserId(userId).orElseThrow().getTokenValue();
+    }
+
+    public List<OAuthAccessToken> genSavedTokens(int count, String email) {
+        return oAuthAccessTokenRepository.saveAll(Stream
+                .generate(OAuthAccessToken::new)
+                .peek(t -> t.setTokenId(UUID.randomUUID().toString()))
+                .peek(t -> t.setUserName(email))
+                .limit(count)
+                .collect(toList()));
     }
 
 }
