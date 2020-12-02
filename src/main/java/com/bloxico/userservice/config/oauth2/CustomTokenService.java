@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.stereotype.Component;
 
+// DEPRECATED
 @Slf4j
 //@Component
 public class CustomTokenService extends DefaultTokenServices {

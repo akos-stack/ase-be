@@ -12,10 +12,11 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 import java.sql.Types;
 
+// DEPRECATED
 /**
  * This extension is required in order to add expiration field inside access token table, since JdbcTokenStore does not provide this feature.
  */
-@Component
+//@Component
 public class CustomJdbcTokenStore extends JdbcTokenStore {
 
     private final JdbcTemplate jdbcTemplate;
