@@ -22,8 +22,8 @@ public class OAuthAccessTokenServiceImpl implements IOAuthAccessTokenService {
     public List<OAuthAccessTokenDto> deleteTokensByEmail(String email) {
         log.debug("OAuthAccessTokenServiceImpl.deleteTokensByEmail - start | email: {}", email);
         requireNonNull(email);
-        var tokens = oAuthAccessTokenRepository.findAllByUserName(email);
-        oAuthAccessTokenRepository.deleteByUserName(email);
+        var tokens = oAuthAccessTokenRepository.findAllByUserNameIgnoreCase(email);
+        oAuthAccessTokenRepository.deleteByUserNameIgnoreCase(email);
         log.debug("OAuthAccessTokenServiceImpl.deleteTokensByEmail - end | email: {}", email);
         return tokens;
     }

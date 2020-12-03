@@ -39,45 +39,45 @@ public class OAuthAccessTokenRepositoryTest extends AbstractSpringTest {
     }
 
     @Test
-    public void findAllByUserName_nullEmail() {
-        assertTrue(repository.findAllByUserName(null).isEmpty());
+    public void findAllByUserNameIgnoreCase_nullEmail() {
+        assertTrue(repository.findAllByUserNameIgnoreCase(null).isEmpty());
         mockUtil.genSavedTokens(5, "fooBar@mail.com");
-        assertTrue(repository.findAllByUserName(null).isEmpty());
+        assertTrue(repository.findAllByUserNameIgnoreCase(null).isEmpty());
     }
 
     @Test
-    public void findAllByUserName() {
+    public void findAllByUserNameIgnoreCase() {
         var email = "fooBar@mail.com";
-        assertTrue(repository.findAllByUserName(email).isEmpty());
+        assertTrue(repository.findAllByUserNameIgnoreCase(email).isEmpty());
         var size = 5;
-        var tokens = mockUtil.genSavedTokens(size, email);
+        var tokens = mockUtil.genSavedTokens(size, email.toUpperCase());
         repository.saveAll(tokens);
-        assertEquals(size, repository.findAllByUserName(email).size());
+        assertEquals(size, repository.findAllByUserNameIgnoreCase(email).size());
     }
 
     @Test
-    public void deleteByUserName_nullEmail() {
+    public void deleteByUserNameIgnoreCase_nullEmail() {
         var email = "fooBar@mail.com";
-        assertTrue(repository.findAllByUserName(email).isEmpty());
+        assertTrue(repository.findAllByUserNameIgnoreCase(email).isEmpty());
         var size = 5;
         mockUtil.genSavedTokens(size, email);
-        assertEquals(size, repository.findAllByUserName(email).size());
-        repository.deleteByUserName(null);
-        assertEquals(size, repository.findAllByUserName(email).size());
+        assertEquals(size, repository.findAllByUserNameIgnoreCase(email).size());
+        repository.deleteByUserNameIgnoreCase(null);
+        assertEquals(size, repository.findAllByUserNameIgnoreCase(email).size());
     }
 
     @Test
-    public void deleteByUserName() {
+    public void deleteByUserNameIgnoreCase() {
         var email1 = "fooBar@mail.com";
         var email2 = "barFoo@mail.com";
         var size = 5;
-        mockUtil.genSavedTokens(size, email1);
+        mockUtil.genSavedTokens(size, email1.toUpperCase());
         mockUtil.genSavedTokens(size, email2);
-        assertEquals(size, repository.findAllByUserName(email1).size());
-        assertEquals(size, repository.findAllByUserName(email2).size());
-        repository.deleteByUserName(email1);
-        assertEquals(0, repository.findAllByUserName(email1).size());
-        assertEquals(size, repository.findAllByUserName(email2).size());
+        assertEquals(size, repository.findAllByUserNameIgnoreCase(email1).size());
+        assertEquals(size, repository.findAllByUserNameIgnoreCase(email2).size());
+        repository.deleteByUserNameIgnoreCase(email1);
+        assertEquals(0, repository.findAllByUserNameIgnoreCase(email1).size());
+        assertEquals(size, repository.findAllByUserNameIgnoreCase(email2).size());
     }
 
 }

@@ -41,8 +41,8 @@ public class OAuthAccessTokenServiceImplTest extends AbstractSpringTest {
         mockUtil.genSavedTokens(size, email1);
         mockUtil.genSavedTokens(size, email2);
         assertEquals(size, service.deleteTokensByEmail(email1).size());
-        assertEquals(0, repository.findAllByUserName(email1).size());
-        assertEquals(size, repository.findAllByUserName(email2).size());
+        assertEquals(0, repository.findAllByUserNameIgnoreCase(email1).size());
+        assertEquals(size, repository.findAllByUserNameIgnoreCase(email2).size());
     }
 
 }
