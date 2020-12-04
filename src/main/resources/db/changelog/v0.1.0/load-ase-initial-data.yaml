@@ -17,6 +17,14 @@ databaseChangeLog:
         tableName: roles_permissions
     - loadData:
         encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/user_profile.csv
+        tableName: user_profiles
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/user_profile_role.csv
+        tableName: user_profiles_roles
+    - loadData:
+        encoding: UTF-8
         file: db/changelog/v0.1.0/initial_data/service_client_details.csv
         tableName: oauth_client_details
         quotchar: '"'
