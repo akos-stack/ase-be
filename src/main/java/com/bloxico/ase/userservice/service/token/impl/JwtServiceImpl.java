@@ -112,4 +112,10 @@ public class JwtServiceImpl implements IJwtService {
         log.debug("JwtServiceImpl.blacklistTokens - end | tokens: {}, principalId: {}", tokens, principalId);
     }
 
+    @Override
+    public void checkIfBlacklisted(String token) {
+        if (blacklistedTokens().contains(token))
+            throw ErrorCodes.Token.INVALID_TOKEN.newException();
+    }
+
 }

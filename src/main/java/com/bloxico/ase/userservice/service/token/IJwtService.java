@@ -17,4 +17,6 @@ public interface IJwtService {
 
     void blacklistTokens(List<OAuthAccessTokenDto> tokens, long principalId);
 
+    void checkIfBlacklisted(String token);
+
 }
