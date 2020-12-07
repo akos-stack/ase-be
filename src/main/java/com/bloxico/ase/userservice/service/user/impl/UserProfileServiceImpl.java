@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -83,7 +84,7 @@ public class UserProfileServiceImpl implements IUserProfileService, UserDetailsS
         requireNonNull(email);
         var userProfile = userProfileRepository
                 .findByEmailIgnoreCase(email)
-                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
+                .orElseThrow(() -> new UsernameNotFoundException(email));
         var aseUserDetails = new AseUserDetails(userProfile);
         log.debug("UserProfileServiceImpl.loadUserByUsername - end | email: {}", email);
         return aseUserDetails;
