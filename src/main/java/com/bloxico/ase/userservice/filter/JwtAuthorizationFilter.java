@@ -39,10 +39,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
         try {
             var jwt = header.substring(7);
-            var decodedJwt = jwtService.verifyToken(jwt);
+            jwtService.checkIfBlacklisted(jwt);
 
-            OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(jwt);
-            oAuth2Authentication.setDetails(decodedJwt.getUserId());
+            var authFromRead = tokenStore.readAccessToken(jwt);
+            OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(authFromRead);
+            oAuth2Authentication.setDetails(authFromRead.getAdditionalInformation().get("id"));
+
             SecurityContextHolder.getContext().setAuthentication(oAuth2Authentication);
 
             chain.doFilter(request, response);

@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class UserProfileServiceImplTest extends AbstractSpringTest {
 
@@ -71,6 +73,21 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
         assertEquals(request.getPhone(), updated.getPhone());
     }
 
+    @Test(expected = UserProfileException.class)
+    public void disableUser_notFound() {
+        var adminId = mockUtil.savedAdmin().getId();
+        userProfileService.disableUser(-1, adminId);
+    }
+
+    @Test
+    public void disableUser() {
+        var adminId = mockUtil.savedAdmin().getId();
+        var userId = mockUtil.savedUserProfileDto().getId();
+        assertTrue(userProfileService.findUserProfileById(userId).getEnabled());
+        userProfileService.disableUser(userId, adminId);
+        assertFalse(userProfileService.findUserProfileById(userId).getEnabled());
+    }
+
     @Test(expected = NullPointerException.class)
     public void loadUserByUsername_nullEmail() {
         userProfileService.loadUserByUsername(null);
@@ -83,10 +100,10 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void loadUserByUsername_found() {
-        var userProfileDto = mockUtil.savedUserProfileDto();
+        var userProfile = mockUtil.savedUserProfile();
         assertEquals(
-                new AseUserDetails(userProfileDto),
-                userProfileService.loadUserByUsername(userProfileDto.getEmail()));
+                new AseUserDetails(userProfile),
+                userProfileService.loadUserByUsername(userProfile.getEmail()));
     }
 
 }

@@ -15,4 +15,8 @@ public interface RoleRepository extends JpaRepository<Role, Short> {
         return findByNameIgnoreCase(Role.USER).orElseThrow();
     }
 
+    default Role getAdminRole() {
+        return findByNameIgnoreCase(Role.ADMIN).orElseThrow();
+    }
+
 }

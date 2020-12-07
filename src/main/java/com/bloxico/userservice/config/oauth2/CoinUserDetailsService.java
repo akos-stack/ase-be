@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+// DEPRECATED
 //@Service
 @Slf4j
 public class CoinUserDetailsService implements UserDetailsService {

@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+// DEPRECATED
 @Data
 public class CoinUserDetails implements UserDetails {
 

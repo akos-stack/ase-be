@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Entity
+@Entity(name = "OauthClientDetailsOld")
 @Table(name = "oauth_client_details")
 @Data
 public class OauthClientDetails {

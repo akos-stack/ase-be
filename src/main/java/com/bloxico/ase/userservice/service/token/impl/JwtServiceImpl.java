@@ -4,20 +4,23 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.dto.token.DecodedJwtDto;
-import com.bloxico.ase.userservice.entity.token.BlacklistedJwt;
-import com.bloxico.ase.userservice.repository.token.BlacklistedJwtRepository;
+import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
 import com.bloxico.ase.userservice.service.token.IJwtService;
-import com.bloxico.ase.userservice.util.JwtBlacklistInMemory;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.time.ZoneId.systemDefault;
@@ -34,11 +37,11 @@ public class JwtServiceImpl implements IJwtService {
     @Value("${token.expiration.time}")
     private long expirationTime;
 
-    private final BlacklistedJwtRepository blacklistedJwtRepository;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
 
     @Autowired
-    public JwtServiceImpl(BlacklistedJwtRepository blacklistedJwtRepository) {
-        this.blacklistedJwtRepository = blacklistedJwtRepository;
+    public JwtServiceImpl(BlacklistedTokenRepository blacklistedTokenRepository) {
+        this.blacklistedTokenRepository = blacklistedTokenRepository;
     }
 
     private Date expiresAt() {
@@ -69,7 +72,7 @@ public class JwtServiceImpl implements IJwtService {
     public DecodedJwtDto verifyToken(String token) {
         log.debug("JwtServiceImpl.verifyToken - start | token: {}", token);
         requireNonNull(token);
-        if (JwtBlacklistInMemory.contains(token))
+        if (blacklistedTokens().contains(token))
             throw ErrorCodes.Token.INVALID_TOKEN.newException();
         DecodedJWT decodedJWT;
         try {
@@ -86,18 +89,33 @@ public class JwtServiceImpl implements IJwtService {
     }
 
     @Override
-    public void blacklistToken(long principalId, String token) {
-        log.debug("JwtServiceImpl.blacklistToken - start | token: {}", token);
-        requireNonNull(token);
-        // Race condition below is tolerated, duplicate tokens may exist in db
-        if (!JwtBlacklistInMemory.contains(token)) {
-            var blacklistedJwt = new BlacklistedJwt();
-            blacklistedJwt.setToken(token);
-            blacklistedJwt.setCreatorId(principalId);
-            blacklistedJwtRepository.save(blacklistedJwt);
-            JwtBlacklistInMemory.add(token);
-        }
-        log.debug("JwtServiceImpl.blacklistToken - end | token: {}", token);
+    @Cacheable("blacklistedTokensCache")
+    public Set<String> blacklistedTokens() {
+        log.debug("JwtServiceImpl.blacklistedTokens - start");
+        var blacklist = blacklistedTokenRepository.findDistinctTokenValues();
+        log.debug("JwtServiceImpl.blacklistedTokens - end");
+        return Set.copyOf(blacklist); // immutable set
+    }
+
+    @Override
+    @CacheEvict(value = "blacklistedTokensCache", allEntries = true)
+    public void blacklistTokens(List<OAuthAccessTokenDto> tokens, long principalId) {
+        log.debug("JwtServiceImpl.blacklistTokens - start | tokens: {}, principalId: {}", tokens, principalId);
+        requireNonNull(tokens);
+        var bTokens = tokens
+                .stream()
+                .map(MAPPER::toBlacklistedToken)
+                .peek(bt -> bt.setCreatorId(principalId))
+                .collect(toList());
+        blacklistedTokenRepository.saveAll(bTokens);
+        blacklistedTokenRepository.flush();
+        log.debug("JwtServiceImpl.blacklistTokens - end | tokens: {}, principalId: {}", tokens, principalId);
+    }
+
+    @Override
+    public void checkIfBlacklisted(String token) {
+        if (blacklistedTokens().contains(token))
+            throw ErrorCodes.Token.INVALID_TOKEN.newException();
     }
 
 }

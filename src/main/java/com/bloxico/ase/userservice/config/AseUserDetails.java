@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.config;
 
-import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.entity.user.Role;
+import com.bloxico.ase.userservice.entity.user.UserProfile;
 import lombok.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,12 +16,14 @@ public class AseUserDetails implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 
-    UserProfileDto userProfile;
+    UserProfile userProfile;
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
         return userProfile
-                .streamRoleNames()
+                .getRoles()
+                .stream()
+                .map(Role::getName)
                 .map(AseUserDetails::authorityOf)
                 .collect(toUnmodifiableSet());
     }

@@ -19,14 +19,15 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-@Service
-@Transactional
+// DEPRECATED
+//@Service
+//@Transactional
 @Slf4j
 public class CoinClientDetailsService implements ClientDetailsService {
 
     private ClientDetailsRepository clientDetailsRepository;
 
-    @Autowired
+    //@Autowired
     public CoinClientDetailsService(ClientDetailsRepository clientDetailsRepository) {
         this.clientDetailsRepository = clientDetailsRepository;
     }

@@ -2,10 +2,9 @@ package com.bloxico.ase.userservice.service.token.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.entity.token.BlacklistedJwt;
+import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.exception.JwtException;
-import com.bloxico.ase.userservice.repository.token.BlacklistedJwtRepository;
-import com.bloxico.ase.userservice.util.JwtBlacklistInMemory;
+import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,6 +13,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class JwtServiceImplTest extends AbstractSpringTest {
@@ -25,7 +25,7 @@ public class JwtServiceImplTest extends AbstractSpringTest {
     private JwtServiceImpl jwtService;
 
     @Autowired
-    private BlacklistedJwtRepository blacklistedJwtRepository;
+    private BlacklistedTokenRepository blacklistedTokenRepository;
 
     @Test(expected = NullPointerException.class)
     public void generateToken_nullUserProfile() {
@@ -62,51 +62,69 @@ public class JwtServiceImplTest extends AbstractSpringTest {
         var principalId = mockUtil.savedAdmin().getId();
         var userProfileDto = mockUtil.savedUserProfileDto();
         var token = jwtService.generateToken(userProfileDto);
-        jwtService.blacklistToken(principalId, token);
+        var oTokens = mockUtil.toOAuthAccessTokenDtoList(userProfileDto, token);
+        jwtService.blacklistTokens(oTokens, principalId);
+        assertTrue(jwtService.blacklistedTokens().contains(token));
         jwtService.verifyToken(token);
     }
 
     @Test(expected = NullPointerException.class)
-    public void blacklistToken_nullToken() {
+    public void blacklistTokens_nullTokens() {
         var principalId = mockUtil.savedAdmin().getId();
-        jwtService.blacklistToken(principalId, null);
+        jwtService.blacklistTokens(null, principalId);
     }
 
     @Test
-    public void blacklist_generated_token() {
+    public void blacklistTokens_emptyTokens() {
+        var principalId = mockUtil.savedAdmin().getId();
+        jwtService.blacklistTokens(List.of(), principalId);
+        assertTrue(jwtService.blacklistedTokens().isEmpty());
+    }
+
+    @Test
+    public void blacklistTokens_generatedTokens() {
         var principalId = mockUtil.savedAdmin().getId();
         var userProfileDto = mockUtil.savedUserProfileDto();
         var token = jwtService.generateToken(userProfileDto);
-        jwtService.blacklistToken(principalId, token);
-        assertTrue(JwtBlacklistInMemory.contains(token));
-        var tokens = blacklistedJwtRepository
-                .findAll()
-                .stream()
-                .map(BlacklistedJwt::getToken)
-                .collect(toList());
+        var oTokens = mockUtil.toOAuthAccessTokenDtoList(userProfileDto, token);
+        jwtService.blacklistTokens(oTokens, principalId);
+        assertTrue(jwtService.blacklistedTokens().contains(token));
+        var tokens = blacklistedTokenRepository.findDistinctTokenValues();
         assertEquals(List.of(token), tokens);
     }
 
     @Test
-    public void blacklist_same_token_multiple_times() {
+    public void blacklistTokens_sameTokenMultipleTimes() {
         var principalId = mockUtil.savedAdmin().getId();
         var userProfileDto = mockUtil.savedUserProfileDto();
         var token = jwtService.generateToken(userProfileDto);
-        jwtService.blacklistToken(principalId, token);
-        assertTrue(JwtBlacklistInMemory.contains(token));
-        var tokens = blacklistedJwtRepository
-                .findAll()
-                .stream()
-                .map(BlacklistedJwt::getToken)
-                .collect(toList());
-        assertEquals(List.of(token), tokens);
-        jwtService.blacklistToken(principalId, token);
-        tokens = blacklistedJwtRepository
-                .findAll()
-                .stream()
-                .map(BlacklistedJwt::getToken)
-                .collect(toList());
-        assertEquals(List.of(token), tokens);
+        var oTokens = mockUtil.toOAuthAccessTokenDtoList(userProfileDto, token);
+        jwtService.blacklistTokens(oTokens, principalId);
+        assertTrue(jwtService.blacklistedTokens().contains(token));
+        assertEquals(
+                List.of(token),
+                blacklistedTokenRepository.findDistinctTokenValues());
+        jwtService.blacklistTokens(oTokens, principalId);
+        assertEquals(
+                List.of(token, token),
+                blacklistedTokenRepository
+                        .findAll()
+                        .stream()
+                        .map(BlacklistedToken::getToken)
+                        .collect(toList()));
+    }
+
+    @Test // test with Thread.sleep(...) in blacklistedTokens()
+    public void blacklistedTokens_caching() {
+        assertTrue(jwtService.blacklistedTokens().isEmpty());
+        assertTrue(jwtService.blacklistedTokens().isEmpty());
+        var principalId = mockUtil.savedAdmin().getId();
+        var userProfileDto = mockUtil.savedUserProfileDto();
+        var token = jwtService.generateToken(userProfileDto);
+        var oTokens = mockUtil.toOAuthAccessTokenDtoList(userProfileDto, token);
+        jwtService.blacklistTokens(oTokens, principalId); // evicts cache
+        assertFalse(jwtService.blacklistedTokens().isEmpty());
+        assertFalse(jwtService.blacklistedTokens().isEmpty());
     }
 
 }

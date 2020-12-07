@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,12 +13,15 @@ import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
-@EqualsAndHashCode(of = "name", callSuper = false)
+@EqualsAndHashCode(of = "name")
 @Table(name = "roles")
 @Entity
-public class Role {
+public class Role implements Serializable {
 
-    public static final String USER = "USER";
+    private static final long serialVersionUID = 1L;
+
+    public static final String ADMIN = "admin";
+    public static final String USER = "user";
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

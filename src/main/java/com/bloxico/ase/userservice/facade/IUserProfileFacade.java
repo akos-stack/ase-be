@@ -9,4 +9,8 @@ public interface IUserProfileFacade {
 
     UserProfileDataResponse updateMyProfile(long principalId, UpdateUserProfileRequest request);
 
+    void disableUser(long userId, long principalId);
+
+    void blacklistTokens(long userId, long principalId);
+
 }

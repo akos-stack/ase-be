@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface AccessTokenRepository extends JpaRepository<OauthAccessTokenEntity, String> {
 
-    @Transactional
     @Modifying
     @Query("delete FROM OauthAccessTokenEntity e WHERE e.expiration < CURRENT_TIMESTAMP")
     void deleteExpiredTokens();

@@ -31,7 +31,7 @@ import org.junit.runners.Suite;
         UserPasswordServiceImplTest.class,
         UserProfileServiceImplTest.class,
         DeleteTokenQuartzFacadeImplTest.class,
-        CoinUserDetailsServiceTest.class,
+        CoinUserDetailsServiceTest.class
 })
 public class TestSuite {
 }
