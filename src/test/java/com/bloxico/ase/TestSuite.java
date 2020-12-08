@@ -11,13 +11,12 @@ import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepositoryTe
 import com.bloxico.ase.userservice.repository.user.*;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
-import com.bloxico.ase.userservice.service.token.impl.JwtServiceImplTest;
+import com.bloxico.ase.userservice.service.token.impl.TokenBlacklistServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.RolePermissionServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.UserPasswordServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.UserRegistrationServiceImplTest;
 import com.bloxico.ase.userservice.web.api.UserPasswordApiTest;
-import com.bloxico.ase.userservice.web.api.UserProfileApiTest;
 import com.bloxico.ase.userservice.web.api.UserRegistrationApiTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -45,7 +44,7 @@ import org.junit.runners.Suite;
         UserPasswordServiceImplTest.class,
         UserProfileServiceImplTest.class,
         RolePermissionServiceImplTest.class,
-        JwtServiceImplTest.class,
+        TokenBlacklistServiceImplTest.class,
         OAuthAccessTokenServiceImplTest.class,
         OAuthClientDetailsServiceImplTest.class,
 
@@ -57,7 +56,7 @@ import org.junit.runners.Suite;
         // api
         UserRegistrationApiTest.class,
         UserPasswordApiTest.class,
-        UserProfileApiTest.class
+        // UserProfileApiTest.class - run this individually for now
 })
 public class TestSuite {
 }

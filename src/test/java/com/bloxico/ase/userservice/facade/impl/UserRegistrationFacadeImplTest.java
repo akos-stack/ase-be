@@ -12,6 +12,7 @@ import com.bloxico.userservice.repository.token.VerificationTokenRepository;
 import com.bloxico.userservice.util.mappers.EntityDataMapper;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.test.annotation.DirtiesContext.MethodMode.BEFORE_METHOD;
 
 public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
@@ -104,6 +106,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @DirtiesContext(methodMode = BEFORE_METHOD)
     public void refreshExpiredToken() {
         var request = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");
         var tokenValue = userRegistrationFacade.registerUserWithVerificationToken(request).getTokenValue();

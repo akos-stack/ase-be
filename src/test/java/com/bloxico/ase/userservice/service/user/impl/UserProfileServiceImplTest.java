@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.exception.UserProfileException;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.UUID;
 
@@ -93,7 +94,7 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
         userProfileService.loadUserByUsername(null);
     }
 
-    @Test(expected = UserProfileException.class)
+    @Test(expected = UsernameNotFoundException.class)
     public void loadUserByUsername_notFound() {
         userProfileService.loadUserByUsername(UUID.randomUUID().toString());
     }
