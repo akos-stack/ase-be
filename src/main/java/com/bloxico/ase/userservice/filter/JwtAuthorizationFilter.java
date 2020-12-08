@@ -1,12 +1,11 @@
 package com.bloxico.ase.userservice.filter;
 
-import com.bloxico.ase.userservice.service.token.IJwtService;
+import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.userservice.web.model.ApiError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -17,11 +16,11 @@ import java.io.IOException;
 
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private final IJwtService jwtService;
+    private final ITokenBlacklistService tokenBlacklistService;
     private final TokenStore tokenStore;
 
-    public JwtAuthorizationFilter(IJwtService jwtService, TokenStore tokenStore) {
-        this.jwtService = jwtService;
+    public JwtAuthorizationFilter(ITokenBlacklistService tokenBlacklistService, TokenStore tokenStore) {
+        this.tokenBlacklistService = tokenBlacklistService;
         this.tokenStore = tokenStore;
     }
 
@@ -39,13 +38,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
         try {
             var jwt = header.substring(7);
-            jwtService.checkIfBlacklisted(jwt);
+            tokenBlacklistService.checkIfBlacklisted(jwt);
 
-            var authFromRead = tokenStore.readAccessToken(jwt);
-            OAuth2Authentication oAuth2Authentication = tokenStore.readAuthentication(authFromRead);
-            oAuth2Authentication.setDetails(authFromRead.getAdditionalInformation().get("id"));
+            var accessToken = tokenStore.readAccessToken(jwt);
+            var authentication = tokenStore.readAuthentication(accessToken);
+            authentication.setDetails(accessToken.getAdditionalInformation().get("id"));
 
-            SecurityContextHolder.getContext().setAuthentication(oAuth2Authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
             chain.doFilter(request, response);
         } catch (Exception e) {

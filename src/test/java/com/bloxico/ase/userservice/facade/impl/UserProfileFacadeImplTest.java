@@ -4,7 +4,7 @@ import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.exception.UserProfileException;
-import com.bloxico.ase.userservice.service.token.impl.JwtServiceImpl;
+import com.bloxico.ase.userservice.service.token.impl.TokenBlacklistServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
     private MockUtil mockUtil;
 
     @Autowired
-    private JwtServiceImpl jwtService;
+    private TokenBlacklistServiceImpl tokenBlacklistService;
 
     @Autowired
     private UserProfileServiceImpl userProfileService;
@@ -82,10 +82,10 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
                 .stream()
                 .map(OAuthAccessToken::getTokenId)
                 .collect(toSet());
-        assertEquals(Set.of(), jwtService.blacklistedTokens());
+        assertEquals(Set.of(), tokenBlacklistService.blacklistedTokens());
         assertTrue(userProfileService.findUserProfileById(userId).getEnabled());
         userProfileFacade.disableUser(userId, principalId);
-        assertEquals(tokens, jwtService.blacklistedTokens());
+        assertEquals(tokens, tokenBlacklistService.blacklistedTokens());
         assertFalse(userProfileService.findUserProfileById(userId).getEnabled());
     }
 
@@ -106,10 +106,10 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
                 .stream()
                 .map(OAuthAccessToken::getTokenId)
                 .collect(toSet());
-        assertEquals(Set.of(), jwtService.blacklistedTokens());
+        assertEquals(Set.of(), tokenBlacklistService.blacklistedTokens());
         assertTrue(userProfileService.findUserProfileById(userId).getEnabled());
         userProfileFacade.blacklistTokens(userId, principalId);
-        assertEquals(tokens, jwtService.blacklistedTokens());
+        assertEquals(tokens, tokenBlacklistService.blacklistedTokens());
         assertTrue(userProfileService.findUserProfileById(userId).getEnabled());
     }
 

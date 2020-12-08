@@ -1,7 +1,7 @@
 package com.bloxico.userservice.config.oauth2;
 
 import com.bloxico.ase.userservice.filter.JwtAuthorizationFilter;
-import com.bloxico.ase.userservice.service.token.IJwtService;
+import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
 import com.bloxico.userservice.filter.RepeatableReadRequestFilter;
 import com.bloxico.userservice.web.api.UserPasswordApi;
 import com.bloxico.userservice.web.api.UserRegistrationApi;
@@ -39,7 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     TokenStore tokenStore;
 
     @Autowired
-    IJwtService jwtService;
+    ITokenBlacklistService tokenBlacklistService;
 
     @Value("${front.end.url}")
     protected String FRONTEND_URL;
@@ -118,7 +118,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
                 and()
-                .addFilterBefore(new JwtAuthorizationFilter(jwtService, tokenStore), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthorizationFilter(tokenBlacklistService, tokenStore), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new RepeatableReadRequestFilter(), AbstractPreAuthenticatedProcessingFilter.class)
                 .csrf().disable();
     }
