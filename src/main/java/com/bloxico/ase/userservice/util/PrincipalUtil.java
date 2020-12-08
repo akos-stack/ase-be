@@ -14,9 +14,10 @@ public class PrincipalUtil {
 
     public static long extractId(Principal principal) {
         requireNonNull(principal);
-        Long id = ((Long) ((OAuth2Authentication) principal).getDetails());
-        requireNonNull(id);
-        return id;
+        var details = ((OAuth2Authentication) principal).getDetails();
+        return details instanceof Long
+                ? (Long) details
+                : Long.valueOf((Integer) details);
     }
 
 }

@@ -2,7 +2,7 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.facade.IUserProfileFacade;
 import com.bloxico.ase.userservice.service.oauth.IOAuthAccessTokenService;
-import com.bloxico.ase.userservice.service.token.IJwtService;
+import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import com.bloxico.ase.userservice.web.model.user.UserProfileDataResponse;
@@ -17,16 +17,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserProfileFacadeImpl implements IUserProfileFacade {
 
     private final IUserProfileService userProfileService;
-    private final IJwtService jwtService;
+    private final ITokenBlacklistService tokenBlacklistService;
     private final IOAuthAccessTokenService oAuthAccessTokenService;
 
     @Autowired
     public UserProfileFacadeImpl(IUserProfileService userProfileService,
-                                 IJwtService jwtService,
+                                 ITokenBlacklistService tokenBlacklistService,
                                  IOAuthAccessTokenService oAuthAccessTokenService)
     {
         this.userProfileService = userProfileService;
-        this.jwtService = jwtService;
+        this.tokenBlacklistService = tokenBlacklistService;
         this.oAuthAccessTokenService = oAuthAccessTokenService;
     }
 
@@ -61,7 +61,7 @@ public class UserProfileFacadeImpl implements IUserProfileFacade {
         log.info("UserProfileFacadeImpl.blacklistTokens - start | userId: {}, principalId: {}", userId, principalId);
         var email = userProfileService.findUserProfileById(userId).getEmail();
         var tokens = oAuthAccessTokenService.deleteTokensByEmail(email);
-        jwtService.blacklistTokens(tokens, principalId);
+        tokenBlacklistService.blacklistTokens(tokens, principalId);
         log.info("UserProfileFacadeImpl.blacklistTokens - end | userId: {}, principalId: {}", userId, principalId);
     }
 
