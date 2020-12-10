@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.web.error;
 
 import com.bloxico.ase.userservice.exception.AseRuntimeException;
-import com.bloxico.ase.userservice.exception.JwtException;
+import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserProfileException;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -76,7 +76,7 @@ public interface ErrorCodes {
 
         @Override
         public AseRuntimeException newException(Throwable cause) {
-            return new JwtException(httpStatus, code, cause);
+            return new TokenException(httpStatus, code, cause);
         }
 
     }
