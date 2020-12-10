@@ -28,7 +28,7 @@ public class BlacklistedTokenRepositoryTest extends AbstractSpringTest {
     public void save() {
         BlacklistedToken jwt = new BlacklistedToken();
         jwt.setToken(UUID.randomUUID().toString());
-        jwt.setExpiration(LocalDateTime.now());
+        jwt.setExpiryDate(LocalDateTime.now());
         jwt.setCreatorId(mockUtil.savedUserProfile().getId());
         repository.saveAndFlush(jwt);
         assertNotNull(jwt.getId());
@@ -39,7 +39,7 @@ public class BlacklistedTokenRepositoryTest extends AbstractSpringTest {
         assertTrue(repository.findById(-1L).isEmpty());
         BlacklistedToken jwt = new BlacklistedToken();
         jwt.setToken(UUID.randomUUID().toString());
-        jwt.setExpiration(LocalDateTime.now());
+        jwt.setExpiryDate(LocalDateTime.now());
         jwt.setCreatorId(mockUtil.savedUserProfile().getId());
         jwt = repository.saveAndFlush(jwt);
         assertTrue(repository.findById(jwt.getId()).isPresent());
@@ -53,7 +53,7 @@ public class BlacklistedTokenRepositoryTest extends AbstractSpringTest {
         var tokens = Stream
                 .generate(BlacklistedToken::new)
                 .peek(t -> t.setToken(UUID.randomUUID().toString()))
-                .peek(t -> t.setExpiration(LocalDateTime.now()))
+                .peek(t -> t.setExpiryDate(LocalDateTime.now()))
                 .peek(t -> t.setCreatorId(creatorId))
                 .limit(size)
                 .collect(toSet());

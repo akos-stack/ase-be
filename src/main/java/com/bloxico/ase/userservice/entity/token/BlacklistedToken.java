@@ -22,7 +22,7 @@ public class BlacklistedToken extends BaseEntity {
     @Column(name = "token")
     private String token;
 
-    @Column(name = "expiration")
-    private LocalDateTime expiration;
+    @Column(name = "expiry_date")
+    private LocalDateTime expiryDate;
 
 }
