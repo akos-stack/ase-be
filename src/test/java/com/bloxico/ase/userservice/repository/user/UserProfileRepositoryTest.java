@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.UUID;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class UserProfileRepositoryTest extends AbstractSpringTest {
@@ -21,15 +20,10 @@ public class UserProfileRepositoryTest extends AbstractSpringTest {
     private UserProfileRepository repository;
 
     @Test
-    public void save() {
-        assertNotNull(mockUtil.savedUserProfile().getId());
-    }
-
-    @Test
-    public void findById() {
+    public void saveAndFindById() {
         assertFalse(repository.findById(-1L).isPresent());
-        UserProfile user = mockUtil.savedUserProfile();
-        assertTrue(repository.findById(user.getId()).isPresent());
+        var id = mockUtil.savedUserProfile().getId();
+        assertTrue(repository.findById(id).isPresent());
     }
 
     @Test

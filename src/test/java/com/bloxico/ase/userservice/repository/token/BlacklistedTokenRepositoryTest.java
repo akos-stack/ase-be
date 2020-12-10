@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class BlacklistedTokenRepositoryTest extends AbstractSpringTest {
@@ -25,24 +24,14 @@ public class BlacklistedTokenRepositoryTest extends AbstractSpringTest {
     private BlacklistedTokenRepository repository;
 
     @Test
-    public void save() {
-        BlacklistedToken jwt = new BlacklistedToken();
-        jwt.setToken(UUID.randomUUID().toString());
-        jwt.setExpiryDate(LocalDateTime.now());
-        jwt.setCreatorId(mockUtil.savedUserProfile().getId());
-        repository.saveAndFlush(jwt);
-        assertNotNull(jwt.getId());
-    }
-
-    @Test
-    public void findById() {
+    public void saveAndFindById() {
         assertTrue(repository.findById(-1L).isEmpty());
-        BlacklistedToken jwt = new BlacklistedToken();
-        jwt.setToken(UUID.randomUUID().toString());
-        jwt.setExpiryDate(LocalDateTime.now());
-        jwt.setCreatorId(mockUtil.savedUserProfile().getId());
-        jwt = repository.saveAndFlush(jwt);
-        assertTrue(repository.findById(jwt.getId()).isPresent());
+        var token = new BlacklistedToken();
+        token.setToken(UUID.randomUUID().toString());
+        token.setExpiryDate(LocalDateTime.now());
+        token.setCreatorId(mockUtil.savedUserProfile().getId());
+        var id = repository.saveAndFlush(token).getId();
+        assertTrue(repository.findById(id).isPresent());
     }
 
     @Test

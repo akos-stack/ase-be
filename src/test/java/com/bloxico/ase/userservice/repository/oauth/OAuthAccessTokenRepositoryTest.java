@@ -20,22 +20,14 @@ public class OAuthAccessTokenRepositoryTest extends AbstractSpringTest {
     private OAuthAccessTokenRepository repository;
 
     @Test
-    public void save() {
-        var token = new OAuthAccessToken();
-        token.setUserName("fooBar@mail.com");
-        token.setTokenId(UUID.randomUUID().toString());
-        repository.save(token);
-    }
-
-    @Test
-    public void findById() {
+    public void saveAndFindById() {
         var id = UUID.randomUUID().toString();
         assertTrue(repository.findById(id).isEmpty());
         var token = new OAuthAccessToken();
         token.setUserName("fooBar@mail.com");
         token.setTokenId(id);
         repository.save(token);
-        assertTrue(repository.findById(token.getTokenId()).isPresent());
+        assertTrue(repository.findById(id).isPresent());
     }
 
     @Test
