@@ -12,9 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 import static com.bloxico.ase.testutil.MockUtil.ERROR_CODE;
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -108,9 +107,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     public void registrationConfirm_404_userNotFound() {
         given()
                 .contentType(JSON)
-                .body(new TokenValidationRequest(
-                        "userNotFound@mail.com",
-                        UUID.randomUUID().toString()))
+                .body(new TokenValidationRequest("userNotFound@mail.com", uuid()))
                 .when()
                 .post(API_URL + REGISTRATION_CONFIRM_ENDPOINT)
                 .then()
@@ -122,7 +119,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     @Test
     public void registrationConfirm_404_tokenNotFound() {
         var email = mockUtil.doRegistration().getEmail();
-        var token = UUID.randomUUID().toString();
+        var token = uuid();
         given()
                 .contentType(JSON)
                 .body(new TokenValidationRequest(email, token))
@@ -149,7 +146,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     public void registrationTokenRefresh_404_tokenNotFound() {
         given()
                 .when()
-                .param(TOKEN_PARAM, UUID.randomUUID().toString())
+                .param(TOKEN_PARAM, uuid())
                 .get(API_URL + REGISTRATION_TOKEN_REFRESH_ENDPOINT)
                 .then()
                 .assertThat()

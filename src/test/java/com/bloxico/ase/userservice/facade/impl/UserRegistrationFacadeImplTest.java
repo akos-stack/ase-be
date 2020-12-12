@@ -13,8 +13,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.UUID;
-
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static org.junit.Assert.assertNotEquals;
@@ -70,7 +69,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test(expected = UserProfileException.class)
     public void handleTokenValidation_userNotFound() {
-        var invalid = UUID.randomUUID().toString();
+        var invalid = uuid();
         var request = new TokenValidationRequest(invalid, invalid);
         userRegistrationFacade.handleTokenValidation(request);
     }
@@ -79,7 +78,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     public void handleTokenValidation_tokenNotFound() {
         var regRequest = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");
         userRegistrationFacade.registerUserWithVerificationToken(regRequest);
-        var invalid = UUID.randomUUID().toString();
+        var invalid = uuid();
         var tknRequest = new TokenValidationRequest(regRequest.getEmail(), invalid);
         userRegistrationFacade.handleTokenValidation(tknRequest);
     }
@@ -102,7 +101,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void refreshExpiredToken_tokenNotFound() {
-        var token = UUID.randomUUID().toString();
+        var token = uuid();
         userRegistrationFacade.refreshExpiredToken(token);
     }
 
@@ -133,7 +132,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test(expected = UserProfileException.class)
     public void resendVerificationToken_userNotFound() {
-        var request = new ResendTokenRequest(UUID.randomUUID().toString());
+        var request = new ResendTokenRequest(uuid());
         userRegistrationFacade.resendVerificationToken(request);
     }
 

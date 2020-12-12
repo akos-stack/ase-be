@@ -7,8 +7,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
-import java.util.UUID;
 
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -40,7 +40,7 @@ public class RoleRepositoryTest extends AbstractSpringTest {
 
     @Test
     public void findByNameIgnoreCase() {
-        assertTrue(roleRepository.findByNameIgnoreCase(UUID.randomUUID().toString()).isEmpty());
+        assertTrue(roleRepository.findByNameIgnoreCase(uuid()).isEmpty());
         assertTrue(roleRepository.findByNameIgnoreCase("uSeR").isPresent());
     }
 

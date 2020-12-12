@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static org.junit.Assert.*;
 
@@ -47,7 +47,7 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void refreshToken_tokenNotFound() {
-        var token = UUID.randomUUID().toString();
+        var token = uuid();
         tokenService().refreshToken(token);
     }
 
@@ -68,7 +68,7 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void consumeTokenForUser_tokenNotFound() {
-        var token = UUID.randomUUID().toString();
+        var token = uuid();
         tokenService().consumeTokenForUser(token, -5);
     }
 

@@ -9,8 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_UPDATE_ENDPOINT;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -31,7 +30,7 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
     @Test
     public void doFilterInternal_403_invalidAccessToken() {
         given()
-                .header("Authorization", UUID.randomUUID().toString())
+                .header("Authorization", uuid())
                 .contentType(JSON)
                 .body(new UpdateUserProfileRequest("updated_name", "updated_phone"))
                 .when()

@@ -119,7 +119,7 @@ public class MockUtil {
     }
 
     public Token savedToken(Token.Type type) {
-        return savedToken(type, UUID.randomUUID().toString());
+        return savedToken(type, uuid());
     }
 
     public Token savedToken(Token.Type type, String value) {
@@ -134,7 +134,7 @@ public class MockUtil {
     }
 
     public Token savedExpiredToken(Token.Type type) {
-        return savedExpiredToken(type, UUID.randomUUID().toString());
+        return savedExpiredToken(type, uuid());
     }
 
     public Token savedExpiredToken(Token.Type type, String value) {
@@ -165,7 +165,7 @@ public class MockUtil {
                         "appId",
                         null,
                         LocalDateTime.now().plusHours(2),
-                        UUID.randomUUID().toString()))
+                        uuid()))
                 .collect(toList());
     }
 
@@ -260,13 +260,17 @@ public class MockUtil {
         return tokenRepository.findByTypeAndUserId(PASSWORD_RESET, userId).orElseThrow().getValue();
     }
 
-    public List<OAuthAccessToken> genSavedTokens(int count, String email) {
+    public List<OAuthAccessToken> genSavedOauthTokens(int count, String email) {
         return oAuthAccessTokenRepository.saveAll(Stream
                 .generate(OAuthAccessToken::new)
-                .peek(t -> t.setTokenId(UUID.randomUUID().toString()))
+                .peek(t -> t.setTokenId(uuid()))
                 .peek(t -> t.setUserName(email))
                 .limit(count)
                 .collect(toList()));
+    }
+
+    public static String uuid() {
+        return UUID.randomUUID().toString();
     }
 
 }

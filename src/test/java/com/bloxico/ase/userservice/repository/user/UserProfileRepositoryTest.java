@@ -6,8 +6,7 @@ import com.bloxico.ase.userservice.entity.user.UserProfile;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.UUID;
-
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -28,7 +27,7 @@ public class UserProfileRepositoryTest extends AbstractSpringTest {
 
     @Test
     public void findByEmailIgnoreCase() {
-        assertTrue(repository.findByEmailIgnoreCase(UUID.randomUUID().toString()).isEmpty());
+        assertTrue(repository.findByEmailIgnoreCase(uuid()).isEmpty());
         UserProfile user = mockUtil.savedUserProfile();
         assertTrue(repository.findByEmailIgnoreCase(user.getEmail()).isPresent());
     }

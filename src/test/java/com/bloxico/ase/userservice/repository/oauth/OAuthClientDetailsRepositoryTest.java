@@ -5,8 +5,7 @@ import com.bloxico.ase.userservice.entity.oauth.OAuthClientDetails;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.UUID;
-
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.assertTrue;
 
 public class OAuthClientDetailsRepositoryTest extends AbstractSpringTest {
@@ -16,7 +15,7 @@ public class OAuthClientDetailsRepositoryTest extends AbstractSpringTest {
 
     @Test
     public void saveAndFindById() {
-        var id = UUID.randomUUID().toString();
+        var id = uuid();
         assertTrue(repository.findById(id).isEmpty());
         var details = new OAuthClientDetails();
         details.setClientId(id);
@@ -28,14 +27,14 @@ public class OAuthClientDetailsRepositoryTest extends AbstractSpringTest {
     public void findByClientId_nullClientId() {
         assertTrue(repository.findByClientId(null).isEmpty());
         var details = new OAuthClientDetails();
-        details.setClientId(UUID.randomUUID().toString());
+        details.setClientId(uuid());
         repository.save(details);
         assertTrue(repository.findByClientId(null).isEmpty());
     }
 
     @Test
     public void findByClientId() {
-        var id = UUID.randomUUID().toString();
+        var id = uuid();
         assertTrue(repository.findByClientId(id).isEmpty());
         var details = new OAuthClientDetails();
         details.setClientId(id);

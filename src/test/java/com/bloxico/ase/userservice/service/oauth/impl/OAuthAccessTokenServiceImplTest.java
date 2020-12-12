@@ -6,8 +6,7 @@ import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.UUID;
-
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -29,7 +28,7 @@ public class OAuthAccessTokenServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void deleteTokensByEmail_notFound() {
-        var email = UUID.randomUUID().toString();
+        var email = uuid();
         assertTrue(service.deleteTokensByEmail(email).isEmpty());
     }
 
@@ -38,8 +37,8 @@ public class OAuthAccessTokenServiceImplTest extends AbstractSpringTest {
         var email1 = "fooBar@mail.com";
         var email2 = "barFoo@mail.com";
         var size = 5;
-        mockUtil.genSavedTokens(size, email1);
-        mockUtil.genSavedTokens(size, email2);
+        mockUtil.genSavedOauthTokens(size, email1);
+        mockUtil.genSavedOauthTokens(size, email2);
         assertEquals(size, service.deleteTokensByEmail(email1).size());
         assertEquals(0, repository.findAllByUserNameIgnoreCase(email1).size());
         assertEquals(size, repository.findAllByUserNameIgnoreCase(email2).size());

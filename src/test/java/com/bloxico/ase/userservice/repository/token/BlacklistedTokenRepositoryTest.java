@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Stream;
 
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -27,7 +27,7 @@ public class BlacklistedTokenRepositoryTest extends AbstractSpringTest {
     public void saveAndFindById() {
         assertTrue(repository.findById(-1L).isEmpty());
         var token = new BlacklistedToken();
-        token.setToken(UUID.randomUUID().toString());
+        token.setToken(uuid());
         token.setExpiryDate(LocalDateTime.now());
         token.setCreatorId(mockUtil.savedUserProfile().getId());
         var id = repository.saveAndFlush(token).getId();
@@ -41,7 +41,7 @@ public class BlacklistedTokenRepositoryTest extends AbstractSpringTest {
         var size = 5;
         var tokens = Stream
                 .generate(BlacklistedToken::new)
-                .peek(t -> t.setToken(UUID.randomUUID().toString()))
+                .peek(t -> t.setToken(uuid()))
                 .peek(t -> t.setExpiryDate(LocalDateTime.now()))
                 .peek(t -> t.setCreatorId(creatorId))
                 .limit(size)

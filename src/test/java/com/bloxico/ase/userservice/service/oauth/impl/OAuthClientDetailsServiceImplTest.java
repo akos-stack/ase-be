@@ -7,7 +7,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.UUID;
+
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 
 public class OAuthClientDetailsServiceImplTest extends AbstractSpringTest {
 
@@ -24,13 +25,13 @@ public class OAuthClientDetailsServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = EntityNotFoundException.class)
     public void findOAuthClientDetailsByClientId_notFound() {
-        var id = UUID.randomUUID().toString();
+        var id = uuid();
         service.findOAuthClientDetailsByClientId(id);
     }
 
     @Test
     public void findOAuthClientDetailsByClientId() {
-        var id = UUID.randomUUID().toString();
+        var id = uuid();
         var oAuthClientDetails = new OAuthClientDetails();
         oAuthClientDetails.setClientId(id);
         repository.save(oAuthClientDetails);
@@ -44,13 +45,13 @@ public class OAuthClientDetailsServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = EntityNotFoundException.class)
     public void loadClientByClientId_notFound() {
-        var id = UUID.randomUUID().toString();
+        var id = uuid();
         service.loadClientByClientId(id);
     }
 
     @Test
     public void loadClientByClientId() {
-        var id = UUID.randomUUID().toString();
+        var id = uuid();
         var oAuthClientDetails = new OAuthClientDetails();
         oAuthClientDetails.setClientId(id);
         oAuthClientDetails.setScope("foo,bar,baz");

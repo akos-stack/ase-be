@@ -8,8 +8,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.UUID;
 
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -43,7 +43,7 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
     public void blacklistTokens_generatedTokens() {
         var principalId = mockUtil.savedAdmin().getId();
         var userProfileDto = mockUtil.savedUserProfileDto();
-        var token = UUID.randomUUID().toString();
+        var token = uuid();
         var oTokens = mockUtil.toOAuthAccessTokenDtoList(userProfileDto, token);
         service.blacklistTokens(oTokens, principalId);
         assertTrue(service.blacklistedTokens().contains(token));
@@ -55,7 +55,7 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
     public void blacklistTokens_sameTokenMultipleTimes() {
         var principalId = mockUtil.savedAdmin().getId();
         var userProfileDto = mockUtil.savedUserProfileDto();
-        var token = UUID.randomUUID().toString();
+        var token = uuid();
         var oTokens = mockUtil.toOAuthAccessTokenDtoList(userProfileDto, token);
         service.blacklistTokens(oTokens, principalId);
         assertTrue(service.blacklistedTokens().contains(token));
@@ -78,7 +78,7 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
         assertTrue(service.blacklistedTokens().isEmpty());
         var principalId = mockUtil.savedAdmin().getId();
         var userProfileDto = mockUtil.savedUserProfileDto();
-        var token = UUID.randomUUID().toString();
+        var token = uuid();
         var oTokens = mockUtil.toOAuthAccessTokenDtoList(userProfileDto, token);
         service.blacklistTokens(oTokens, principalId); // evicts cache
         assertFalse(service.blacklistedTokens().isEmpty());

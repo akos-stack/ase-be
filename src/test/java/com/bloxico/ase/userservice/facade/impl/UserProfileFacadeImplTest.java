@@ -78,7 +78,7 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
         var user = mockUtil.savedUserProfileDto();
         var userId = user.getId();
         var tokens = mockUtil
-                .genSavedTokens(3, user.getEmail())
+                .genSavedOauthTokens(3, user.getEmail())
                 .stream()
                 .map(OAuthAccessToken::getTokenId)
                 .collect(toSet());
@@ -102,7 +102,7 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
         var user = mockUtil.savedUserProfileDto();
         var userId = user.getId();
         var tokens = mockUtil
-                .genSavedTokens(3, user.getEmail())
+                .genSavedOauthTokens(3, user.getEmail())
                 .stream()
                 .map(OAuthAccessToken::getTokenId)
                 .collect(toSet());

@@ -15,8 +15,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.UUID;
-
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -45,7 +44,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
 
     @Test(expected = UserProfileException.class)
     public void handleForgotPasswordRequest_userNotFound() {
-        var email = UUID.randomUUID().toString();
+        var email = uuid();
         var request = new ForgotPasswordRequest(email);
         userPasswordFacade.handleForgotPasswordRequest(request);
     }
@@ -69,7 +68,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
 
     @Test(expected = UserProfileException.class)
     public void resendPasswordToken_userNotFound() {
-        var email = UUID.randomUUID().toString();
+        var email = uuid();
         var request = new ResendTokenRequest(email);
         userPasswordFacade.resendPasswordToken(request);
     }
@@ -97,7 +96,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
     @Test(expected = UserProfileException.class)
     public void updateForgottenPassword_userNotFound() {
         var token = mockUtil.doForgotPasswordRequest(mockUtil.savedAdmin().getEmail());
-        var email = UUID.randomUUID().toString();
+        var email = uuid();
         var password = "password";
         var request = new ForgottenPasswordUpdateRequest(email, token, password);
         userPasswordFacade.updateForgottenPassword(request);
@@ -106,7 +105,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
     @Test(expected = TokenException.class)
     public void updateForgottenPassword_tokenNotFound() {
         var email = mockUtil.savedAdmin().getEmail();
-        var token = UUID.randomUUID().toString();
+        var token = uuid();
         var password = "password";
         var request = new ForgottenPasswordUpdateRequest(email, token, password);
         userPasswordFacade.updateForgottenPassword(request);
@@ -139,7 +138,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
 
     @Test(expected = UserProfileException.class)
     public void updateKnownPassword_oldPasswordMismatch() {
-        var oldPassword = UUID.randomUUID().toString();
+        var oldPassword = uuid();
         var newPassword = "newPassword";
         var request = new KnownPasswordUpdateRequest(oldPassword, newPassword);
         var userId = mockUtil.savedAdmin().getId();

@@ -6,8 +6,7 @@ import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.UUID;
-
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -21,7 +20,7 @@ public class OAuthAccessTokenRepositoryTest extends AbstractSpringTest {
 
     @Test
     public void saveAndFindById() {
-        var id = UUID.randomUUID().toString();
+        var id = uuid();
         assertTrue(repository.findById(id).isEmpty());
         var token = new OAuthAccessToken();
         token.setUserName("fooBar@mail.com");
@@ -33,7 +32,7 @@ public class OAuthAccessTokenRepositoryTest extends AbstractSpringTest {
     @Test
     public void findAllByUserNameIgnoreCase_nullEmail() {
         assertTrue(repository.findAllByUserNameIgnoreCase(null).isEmpty());
-        mockUtil.genSavedTokens(5, "fooBar@mail.com");
+        mockUtil.genSavedOauthTokens(5, "fooBar@mail.com");
         assertTrue(repository.findAllByUserNameIgnoreCase(null).isEmpty());
     }
 
@@ -42,7 +41,7 @@ public class OAuthAccessTokenRepositoryTest extends AbstractSpringTest {
         var email = "fooBar@mail.com";
         assertTrue(repository.findAllByUserNameIgnoreCase(email).isEmpty());
         var size = 5;
-        var tokens = mockUtil.genSavedTokens(size, email.toUpperCase());
+        var tokens = mockUtil.genSavedOauthTokens(size, email.toUpperCase());
         repository.saveAll(tokens);
         assertEquals(size, repository.findAllByUserNameIgnoreCase(email).size());
     }
@@ -52,7 +51,7 @@ public class OAuthAccessTokenRepositoryTest extends AbstractSpringTest {
         var email = "fooBar@mail.com";
         assertTrue(repository.findAllByUserNameIgnoreCase(email).isEmpty());
         var size = 5;
-        mockUtil.genSavedTokens(size, email);
+        mockUtil.genSavedOauthTokens(size, email);
         assertEquals(size, repository.findAllByUserNameIgnoreCase(email).size());
         repository.deleteByUserNameIgnoreCase(null);
         assertEquals(size, repository.findAllByUserNameIgnoreCase(email).size());
@@ -63,8 +62,8 @@ public class OAuthAccessTokenRepositoryTest extends AbstractSpringTest {
         var email1 = "fooBar@mail.com";
         var email2 = "barFoo@mail.com";
         var size = 5;
-        mockUtil.genSavedTokens(size, email1.toUpperCase());
-        mockUtil.genSavedTokens(size, email2);
+        mockUtil.genSavedOauthTokens(size, email1.toUpperCase());
+        mockUtil.genSavedOauthTokens(size, email2);
         assertEquals(size, repository.findAllByUserNameIgnoreCase(email1).size());
         assertEquals(size, repository.findAllByUserNameIgnoreCase(email2).size());
         repository.deleteByUserNameIgnoreCase(email1);
