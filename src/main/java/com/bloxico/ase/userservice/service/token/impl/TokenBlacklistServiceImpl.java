@@ -48,7 +48,6 @@ public class TokenBlacklistServiceImpl implements ITokenBlacklistService {
                 .peek(bt -> bt.setCreatorId(principalId))
                 .collect(toList());
         blacklistedTokenRepository.saveAll(bTokens);
-        blacklistedTokenRepository.flush();
         log.debug("TokenBlacklistServiceImpl.blacklistTokens - end | tokens: {}, principalId: {}", tokens, principalId);
     }
 

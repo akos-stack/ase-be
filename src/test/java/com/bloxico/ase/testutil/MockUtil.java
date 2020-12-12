@@ -4,17 +4,17 @@ import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
+import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImpl;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
-import com.bloxico.ase.userservice.repository.user.PermissionRepository;
+import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
-import com.bloxico.userservice.repository.token.PasswordTokenRepository;
 import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_CONFIRM_ENDPOINT;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_ENDPOINT;
@@ -49,29 +50,31 @@ public class MockUtil {
     @Value("${oauth2.secret}")
     private String OAUTH2_SECRET;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+    private final UserProfileRepository userProfileRepository;
+    private final UserProfileServiceImpl userProfileService;
+    private final UserPasswordFacadeImpl userPasswordFacade;
+    private final OAuthAccessTokenRepository oAuthAccessTokenRepository;
+    private final TokenRepository tokenRepository;
 
     @Autowired
-    private PermissionRepository permissionRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private UserProfileRepository userProfileRepository;
-
-    @Autowired
-    private UserProfileServiceImpl userProfileService;
-
-    @Autowired
-    private PasswordTokenRepository passwordTokenRepository;
-
-    @Autowired
-    private UserPasswordFacadeImpl userPasswordFacade;
-
-    @Autowired
-    private OAuthAccessTokenRepository oAuthAccessTokenRepository;
+    public MockUtil(PasswordEncoder passwordEncoder,
+                    RoleRepository roleRepository,
+                    UserProfileRepository userProfileRepository,
+                    UserProfileServiceImpl userProfileService,
+                    UserPasswordFacadeImpl userPasswordFacade,
+                    OAuthAccessTokenRepository oAuthAccessTokenRepository,
+                    TokenRepository tokenRepository)
+    {
+        this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
+        this.userProfileRepository = userProfileRepository;
+        this.userProfileService = userProfileService;
+        this.userPasswordFacade = userPasswordFacade;
+        this.oAuthAccessTokenRepository = oAuthAccessTokenRepository;
+        this.tokenRepository = tokenRepository;
+    }
 
     public UserProfile savedAdmin() {
         return savedAdmin("admin");
@@ -113,6 +116,36 @@ public class MockUtil {
 
     public UserProfileDto savedUserProfileDto() {
         return MAPPER.toUserProfileDto(savedUserProfile());
+    }
+
+    public Token savedToken(Token.Type type) {
+        return savedToken(type, UUID.randomUUID().toString());
+    }
+
+    public Token savedToken(Token.Type type, String value) {
+        var adminId = savedAdmin().getId();
+        var token = new Token();
+        token.setUserId(adminId);
+        token.setValue(value);
+        token.setType(type);
+        token.setExpiryDate(LocalDateTime.now().plusHours(1));
+        token.setCreatorId(adminId);
+        return tokenRepository.saveAndFlush(token);
+    }
+
+    public Token savedExpiredToken(Token.Type type) {
+        return savedExpiredToken(type, UUID.randomUUID().toString());
+    }
+
+    public Token savedExpiredToken(Token.Type type, String value) {
+        var userId = savedUserProfile().getId();
+        var token = new Token();
+        token.setUserId(userId);
+        token.setValue(value);
+        token.setType(type);
+        token.setExpiryDate(LocalDateTime.now().minusDays(1));
+        token.setCreatorId(userId);
+        return tokenRepository.saveAndFlush(token);
     }
 
     public static void copyBaseEntityData(BaseEntity from, BaseEntity to) {
@@ -224,7 +257,7 @@ public class MockUtil {
         var request = new ForgotPasswordRequest(email);
         userPasswordFacade.handleForgotPasswordRequest(request);
         var userId = userProfileService.findUserProfileByEmail(email).getId();
-        return passwordTokenRepository.findByUserId(userId).orElseThrow().getTokenValue();
+        return tokenRepository.findByTypeAndUserId(PASSWORD_RESET, userId).orElseThrow().getValue();
     }
 
     public List<OAuthAccessToken> genSavedTokens(int count, String email) {

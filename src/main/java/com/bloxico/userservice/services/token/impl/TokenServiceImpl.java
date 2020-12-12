@@ -31,7 +31,7 @@ public class TokenServiceImpl<T extends Token> implements ITokenService<T> {
 
     private EntityDataMapper entityDataMapper = EntityDataMapper.INSTANCE;
 
-    @Value("${token.expiration.time}")
+    @Value("${token.expiry.time}")
     private int expirationTime;
 
     public TokenServiceImpl(TokenRepository<T> tokenRepository, TokenCreatorUtil<T> tokenCreatorUtil, RegistrationTokenFactory registrationTokenFactory) {

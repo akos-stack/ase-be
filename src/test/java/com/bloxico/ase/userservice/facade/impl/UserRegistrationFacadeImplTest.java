@@ -2,24 +2,25 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserProfileException;
+import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
-import com.bloxico.userservice.exceptions.TokenException;
-import com.bloxico.userservice.repository.token.VerificationTokenRepository;
-import com.bloxico.userservice.util.mappers.EntityDataMapper;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
+import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.annotation.DirtiesContext.MethodMode.BEFORE_METHOD;
 
 public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
@@ -28,7 +29,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     private MockUtil mockUtil;
 
     @Autowired
-    private VerificationTokenRepository tokenRepository;
+    private TokenRepository tokenRepository;
 
     @Autowired
     private UserProfileRepository userProfileRepository;
@@ -90,11 +91,11 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         var token = userRegistrationFacade.registerUserWithVerificationToken(regRequest).getTokenValue();
         var tknRequest = new TokenValidationRequest(email, token);
         userRegistrationFacade.handleTokenValidation(tknRequest);
-        assertTrue(tokenRepository.findByTokenValue(token).isEmpty());
+        assertTrue(tokenRepository.findByValue(token).isEmpty());
         assertTrue(userProfileRepository.findByEmailIgnoreCase(email).orElseThrow().getEnabled());
     }
 
-    @Test(expected = TokenException.class)
+    @Test(expected = NullPointerException.class)
     public void refreshExpiredToken_nullRequest() {
         userRegistrationFacade.refreshExpiredToken(null);
     }
@@ -110,19 +111,19 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     public void refreshExpiredToken() {
         var request = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");
         var tokenValue = userRegistrationFacade.registerUserWithVerificationToken(request).getTokenValue();
-        var originalTokenDto = EntityDataMapper.INSTANCE.tokenToDto(
+        var originalTokenDto = MAPPER.toTokenDto(
                 tokenRepository
-                        .findByTokenValue(tokenValue)
+                        .findByValue(tokenValue)
                         .orElseThrow());
         userRegistrationFacade.refreshExpiredToken(tokenValue);
-        var refreshedTokenDto = EntityDataMapper.INSTANCE.tokenToDto(
+        var refreshedTokenDto = MAPPER.toTokenDto(
                 tokenRepository
-                        .findByUserId(originalTokenDto.getUserId())
+                        .findByTypeAndUserId(REGISTRATION, originalTokenDto.getUserId())
                         .orElseThrow());
         assertEquals(originalTokenDto.getId(), refreshedTokenDto.getId());
         assertEquals(originalTokenDto.getUserId(), refreshedTokenDto.getUserId());
-        assertNotEquals(originalTokenDto.getTokenValue(), refreshedTokenDto.getTokenValue());
-        assertTrue(originalTokenDto.getExpiryDate().before(refreshedTokenDto.getExpiryDate()));
+        assertNotEquals(originalTokenDto.getValue(), refreshedTokenDto.getValue());
+        assertTrue(originalTokenDto.getExpiryDate().isBefore(refreshedTokenDto.getExpiryDate()));
     }
 
     @Test(expected = NullPointerException.class)

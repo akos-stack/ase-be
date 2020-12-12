@@ -2,11 +2,11 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
-import com.bloxico.userservice.repository.token.VerificationTokenRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -33,7 +33,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     private MockUtil mockUtil;
 
     @Autowired
-    private VerificationTokenRepository tokenRepository;
+    private TokenRepository tokenRepository;
 
     @Test
     public void registration_200_ok() {
@@ -186,7 +186,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     public void registrationTokenResend_404_tokenNotFound() {
         var registration = mockUtil.doRegistration();
         var tokenId = tokenRepository
-                .findByTokenValue(registration.getToken())
+                .findByValue(registration.getToken())
                 .orElseThrow()
                 .getId();
         tokenRepository.deleteById(tokenId);

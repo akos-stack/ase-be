@@ -8,9 +8,12 @@ import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImplTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepositoryTest;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepositoryTest;
+import com.bloxico.ase.userservice.repository.token.TokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.user.*;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
+import com.bloxico.ase.userservice.service.token.impl.PasswordResetTokenServiceImplTest;
+import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.token.impl.TokenBlacklistServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.RolePermissionServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.UserPasswordServiceImplTest;
@@ -33,6 +36,7 @@ import org.junit.runners.Suite;
         BlacklistedTokenRepositoryTest.class,
         OAuthAccessTokenRepositoryTest.class,
         OAuthClientDetailsRepositoryTest.class,
+        TokenRepositoryTest.class,
 
         // config
         PersistentJwtTokenStoreTest.class,
@@ -45,6 +49,8 @@ import org.junit.runners.Suite;
         TokenBlacklistServiceImplTest.class,
         OAuthAccessTokenServiceImplTest.class,
         OAuthClientDetailsServiceImplTest.class,
+        RegistrationTokenServiceImplTest.class,
+        PasswordResetTokenServiceImplTest.class,
 
         // facade
         UserRegistrationFacadeImplTest.class,
@@ -54,11 +60,13 @@ import org.junit.runners.Suite;
         // Run these individually for now
         // They stuck for some reason
 
+        // filter
+        // JwtAuthorizationFilterTest.class
+
         // api
         // UserRegistrationApiTest.class,
         // UserPasswordApiTest.class,
         // UserProfileApiTest.class,
-        // JwtAuthorizationFilterTest.class
 })
 public class TestSuite {
 }
