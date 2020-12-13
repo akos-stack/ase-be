@@ -150,7 +150,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
         var oldPassword = "Password1!";
         var newPassword = "Password2!";
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", mockUtil.doAuthentication(oldPassword))
                 .contentType(JSON)
                 .body(new KnownPasswordUpdateRequest(oldPassword, newPassword))
                 .when()

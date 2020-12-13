@@ -282,6 +282,11 @@ public class MockUtil {
         return doAuthentication(doConfirmedRegistration());
     }
 
+    public String doAuthentication(String password) {
+        var email = savedUserProfile(password).getEmail();
+        return doAuthentication(email, password);
+    }
+
     public String doAuthentication(Registration registration) {
         return doAuthentication(
                 registration.getEmail(),
