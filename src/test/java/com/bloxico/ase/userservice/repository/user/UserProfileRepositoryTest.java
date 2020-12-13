@@ -6,7 +6,11 @@ import com.bloxico.ase.userservice.entity.user.UserProfile;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+import java.util.Set;
+
 import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -30,6 +34,22 @@ public class UserProfileRepositoryTest extends AbstractSpringTest {
         assertTrue(repository.findByEmailIgnoreCase(uuid()).isEmpty());
         UserProfile user = mockUtil.savedUserProfile();
         assertTrue(repository.findByEmailIgnoreCase(user.getEmail()).isPresent());
+    }
+
+    @Test
+    public void findAllDisabledByIds() {
+        var up1 = mockUtil.savedUserProfile();
+        var up2 = mockUtil.savedUserProfile();
+        var up3 = mockUtil.savedUserProfile();
+        var ids = List.of(up1.getId(), up2.getId(), up3.getId());
+        assertEquals(
+                List.of(),
+                repository.findAllDisabledByIds(ids));
+        mockUtil.disableUser(up1.getId());
+        mockUtil.disableUser(up3.getId());
+        assertEquals(
+                Set.of(up1, up3),
+                Set.copyOf(repository.findAllDisabledByIds(ids)));
     }
 
 }

@@ -17,8 +17,6 @@ import java.util.List;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.Objects.requireNonNull;
-import static java.util.function.Predicate.not;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Slf4j
@@ -74,11 +72,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         log.debug("UserRegistrationServiceImpl.deleteDisabledUsersWithIds - start | ids: {}", ids);
         requireNonNull(ids);
         if (ids.isEmpty()) return List.of();
-        var disabled = userProfileRepository
-                .findAllById(ids)
-                .stream()
-                .filter(not(UserProfile::getEnabled))
-                .collect(toList());
+        var disabled = userProfileRepository.findAllDisabledByIds(ids);
         userProfileRepository.deleteInBatch(disabled);
         var deleted = disabled
                 .stream()
