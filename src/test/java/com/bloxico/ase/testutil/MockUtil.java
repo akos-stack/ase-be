@@ -194,7 +194,7 @@ public class MockUtil {
         return blacklistedTokenRepository
                 .findAll()
                 .stream()
-                .filter(t -> t.getToken().equals(value))
+                .filter(t -> t.getValue().equals(value))
                 .findAny()
                 .orElseThrow();
     }

@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface BlacklistedTokenRepository extends JpaRepository<BlacklistedToken, Long> {
 
-    @Query("SELECT DISTINCT t.token FROM BlacklistedToken t")
+    @Query("SELECT DISTINCT t.value FROM BlacklistedToken t")
     List<String> findDistinctTokenValues();
 
     @Modifying

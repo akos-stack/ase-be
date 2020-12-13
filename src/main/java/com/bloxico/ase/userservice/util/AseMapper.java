@@ -29,7 +29,7 @@ public interface AseMapper {
 
     UserProfile toUserProfile(RegistrationRequest request);
 
-    @Mapping(target = "token", source = "tokenId")
+    @Mapping(target = "value", source = "tokenId")
     @Mapping(target = "expiryDate", source = "expiration")
     BlacklistedToken toBlacklistedToken(OAuthAccessTokenDto token);
 

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
-@Component("permissionSecurity")
+@Component
 public class PermissionSecurity {
 
     @Autowired

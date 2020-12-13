@@ -244,7 +244,7 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
               - column:
-                  name: token
+                  name: value
                   type: varchar
                   constraints:
                     nullable: false

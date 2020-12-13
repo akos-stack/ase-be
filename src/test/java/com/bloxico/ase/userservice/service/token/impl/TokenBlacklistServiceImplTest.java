@@ -83,7 +83,7 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
                 repository
                         .findAll()
                         .stream()
-                        .map(BlacklistedToken::getToken)
+                        .map(BlacklistedToken::getValue)
                         .collect(toList()));
     }
 
@@ -95,7 +95,7 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
     @Test(expected = TokenException.class)
     public void checkIfBlacklisted_blacklistedToken() {
         var token = mockUtil.savedBlacklistedToken();
-        service.checkIfBlacklisted(token.getToken());
+        service.checkIfBlacklisted(token.getValue());
     }
 
     @Test
