@@ -9,7 +9,8 @@ import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImplTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepositoryTest;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepositoryTest;
-import com.bloxico.ase.userservice.repository.token.TokenRepositoryTest;
+import com.bloxico.ase.userservice.repository.token.PasswordResetTokenRepositoryTest;
+import com.bloxico.ase.userservice.repository.token.RegistrationTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.user.*;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
@@ -37,7 +38,8 @@ import org.junit.runners.Suite;
         BlacklistedTokenRepositoryTest.class,
         OAuthAccessTokenRepositoryTest.class,
         OAuthClientDetailsRepositoryTest.class,
-        TokenRepositoryTest.class,
+        RegistrationTokenRepositoryTest.class,
+        PasswordResetTokenRepositoryTest.class,
 
         // config
         PersistentJwtTokenStoreTest.class,

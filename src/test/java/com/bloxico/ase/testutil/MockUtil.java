@@ -26,8 +26,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -36,6 +38,8 @@ import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATI
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static io.restassured.http.ContentType.URLENC;
+import static java.util.concurrent.ThreadLocalRandom.current;
+import static java.util.function.Predicate.not;
 import static org.junit.Assert.assertTrue;
 
 @Component
@@ -348,6 +352,22 @@ public class MockUtil {
 
     public static LocalDateTime notExpired() {
         return LocalDateTime.now().plusHours(1);
+    }
+
+    public static <T> T randElt(List<? extends T> list) {
+        return list.get(current().nextInt(0, list.size()));
+    }
+
+    public static <T extends Enum<T>> T randEnumConst(Class<T> type) {
+        return randElt(List.of(type.getEnumConstants()));
+    }
+
+    public static <T extends Enum<T>> T randOtherEnumConst(T eConst) {
+        return Stream
+                .generate(() -> randEnumConst(eConst.getDeclaringClass()))
+                .filter(not(eConst::equals))
+                .findAny()
+                .orElseThrow();
     }
 
 }

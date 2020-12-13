@@ -9,13 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.bloxico.ase.testutil.MockUtil.randOtherEnumConst;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
-import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
-import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TokenRepositoryTest extends AbstractSpringTest {
+public abstract class TokenRepositoryTest extends AbstractSpringTest {
+
+    protected abstract Token.Type tokenType();
 
     @Autowired
     private MockUtil mockUtil;
@@ -30,7 +31,7 @@ public class TokenRepositoryTest extends AbstractSpringTest {
         var token = new Token();
         token.setUserId(admin.getId());
         token.setValue(uuid());
-        token.setType(REGISTRATION);
+        token.setType(tokenType());
         token.setExpiryDate(LocalDateTime.now().plusHours(1));
         token.setCreatorId(admin.getId());
         var id = repository.saveAndFlush(token).getId();
@@ -41,25 +42,29 @@ public class TokenRepositoryTest extends AbstractSpringTest {
     public void findByValue() {
         var value = uuid();
         assertTrue(repository.findByValue(value).isEmpty());
-        mockUtil.savedToken(PASSWORD_RESET, value);
+        mockUtil.savedToken(tokenType(), value);
         assertTrue(repository.findByValue(value).isPresent());
     }
 
     @Test
     public void findByTypeAndUserId() {
-        var token = mockUtil.savedToken(REGISTRATION);
-        assertTrue(repository.findByTypeAndUserId(PASSWORD_RESET, token.getUserId()).isEmpty());
-        assertTrue(repository.findByTypeAndUserId(REGISTRATION, token.getUserId()).isPresent());
+        var type = tokenType();
+        var otherType = randOtherEnumConst(type);
+        var token = mockUtil.savedToken(type);
+        assertTrue(repository.findByTypeAndUserId(type, token.getUserId()).isPresent());
+        assertTrue(repository.findByTypeAndUserId(otherType, token.getUserId()).isEmpty());
     }
 
     @Test
     public void findAllExpiredTokensByType() {
-        mockUtil.savedToken(REGISTRATION);
-        mockUtil.savedExpiredToken(PASSWORD_RESET);
-        var expired = mockUtil.savedExpiredToken(REGISTRATION);
+        var type = tokenType();
+        var otherType = randOtherEnumConst(type);
+        mockUtil.savedToken(type);
+        mockUtil.savedExpiredToken(otherType);
+        var expired = mockUtil.savedExpiredToken(type);
         assertEquals(
                 List.of(expired),
-                repository.findAllExpiredTokensByType(REGISTRATION));
+                repository.findAllExpiredTokensByType(type));
     }
 
 }
