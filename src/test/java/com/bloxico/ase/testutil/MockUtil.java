@@ -36,6 +36,7 @@ import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATI
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static io.restassured.http.ContentType.URLENC;
+import static org.junit.Assert.assertTrue;
 
 @Component
 public class MockUtil {
@@ -228,6 +229,16 @@ public class MockUtil {
                 null,
                 notExpired(),
                 uuid());
+    }
+
+    public void disableUser(Long userId) {
+        var user = userProfileRepository
+                .findById(userId)
+                .orElseThrow();
+        assertTrue(user.getEnabled());
+        user.setEnabled(false);
+        user.setUpdaterId(user.getId());
+        userProfileRepository.saveAndFlush(user);
     }
 
     @lombok.Value

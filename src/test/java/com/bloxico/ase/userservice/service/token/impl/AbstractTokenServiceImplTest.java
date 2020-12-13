@@ -161,10 +161,13 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
         assertEquals(
                 Set.of(valid, expired),
                 Set.copyOf(tokenRepository.findAll()));
-        tokenService().deleteExpiredTokens();
+        var userIds = tokenService().deleteExpiredTokens();
         assertEquals(
                 Set.of(valid),
                 Set.copyOf(tokenRepository.findAll()));
+        assertEquals(
+                Set.of(expired.getUserId()),
+                Set.copyOf(userIds));
     }
 
 }

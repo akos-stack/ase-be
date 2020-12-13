@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
@@ -53,16 +53,13 @@ public class TokenRepositoryTest extends AbstractSpringTest {
     }
 
     @Test
-    public void deleteExpiredTokens() {
-        var valid = mockUtil.savedToken(REGISTRATION);
-        var expired = mockUtil.savedExpiredToken(PASSWORD_RESET);
+    public void findAllExpiredTokensByType() {
+        mockUtil.savedToken(REGISTRATION);
+        mockUtil.savedExpiredToken(PASSWORD_RESET);
+        var expired = mockUtil.savedExpiredToken(REGISTRATION);
         assertEquals(
-                Set.of(valid, expired),
-                Set.copyOf(repository.findAll()));
-        repository.deleteExpiredTokens();
-        assertEquals(
-                Set.of(valid),
-                Set.copyOf(repository.findAll()));
+                List.of(expired),
+                repository.findAllExpiredTokensByType(REGISTRATION));
     }
 
 }

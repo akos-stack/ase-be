@@ -9,11 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Slf4j
 abstract class AbstractTokenServiceImpl implements ITokenService {
@@ -100,10 +102,17 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
     }
 
     @Override
-    public void deleteExpiredTokens() {
-        log.debug("TokenServiceImpl.deleteExpiredTokens - start");
-        tokenRepository.deleteExpiredTokens();
-        log.debug("TokenServiceImpl.deleteExpiredTokens - end");
+    public List<Long> deleteExpiredTokens() {
+        var type = getType();
+        log.debug("TokenServiceImpl[{}].deleteExpiredTokens - start", type);
+        var expired = tokenRepository.findAllExpiredTokensByType(type);
+        tokenRepository.deleteInBatch(expired);
+        var userIds = expired
+                .stream()
+                .map(Token::getUserId)
+                .collect(toUnmodifiableList());
+        log.debug("TokenServiceImpl[{}].deleteExpiredTokens - end", type);
+        return userIds;
     }
 
     private static String newTokenValue() {

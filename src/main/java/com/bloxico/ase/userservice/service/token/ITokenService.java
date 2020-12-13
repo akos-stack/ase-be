@@ -2,6 +2,8 @@ package com.bloxico.ase.userservice.service.token;
 
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 
+import java.util.List;
+
 public interface ITokenService {
 
     TokenDto createTokenForUser(long userId);
@@ -14,6 +16,6 @@ public interface ITokenService {
 
     TokenDto getTokenByUserId(long userId);
 
-    void deleteExpiredTokens();
+    List<Long> deleteExpiredTokens();
 
 }
