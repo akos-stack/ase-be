@@ -110,12 +110,12 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     public void refreshExpiredToken() {
         var request = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");
         var tokenValue = userRegistrationFacade.registerUserWithVerificationToken(request).getTokenValue();
-        var originalTokenDto = MAPPER.toTokenDto(
+        var originalTokenDto = MAPPER.toDto(
                 tokenRepository
                         .findByValue(tokenValue)
                         .orElseThrow());
         userRegistrationFacade.refreshExpiredToken(tokenValue);
-        var refreshedTokenDto = MAPPER.toTokenDto(
+        var refreshedTokenDto = MAPPER.toDto(
                 tokenRepository
                         .findByTypeAndUserId(REGISTRATION, originalTokenDto.getUserId())
                         .orElseThrow());

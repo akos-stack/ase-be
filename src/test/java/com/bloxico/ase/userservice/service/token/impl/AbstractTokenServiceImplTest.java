@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import static com.bloxico.ase.testutil.MockUtil.uuid;
-import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static org.junit.Assert.*;
 
 public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
@@ -110,7 +109,7 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void getOrCreateTokenForUser_expiredToken() {
-        var token1 = MAPPER.toTokenDto(mockUtil.savedExpiredToken(tokenType()));
+        var token1 = mockUtil.savedExpiredTokenDto(tokenType());
         var userId = token1.getUserId();
         var count1 = tokenRepository.findAll().size();
         var token2 = tokenService().getOrCreateTokenForUser(userId);
@@ -157,15 +156,15 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void deleteExpiredTokens() {
-        var token = mockUtil.savedToken(tokenType());
-        var expiredToken = mockUtil.savedExpiredToken(tokenType());
+        var valid = mockUtil.savedToken(tokenType());
+        var expired = mockUtil.savedExpiredToken(tokenType());
         assertEquals(
-                Set.copyOf(tokenRepository.findAll()),
-                Set.of(token, expiredToken));
+                Set.of(valid, expired),
+                Set.copyOf(tokenRepository.findAll()));
         tokenService().deleteExpiredTokens();
         assertEquals(
-                Set.copyOf(tokenRepository.findAll()),
-                Set.of(token));
+                Set.of(valid),
+                Set.copyOf(tokenRepository.findAll()));
     }
 
 }

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_UPDATE_ENDPOINT;
 import static io.restassured.RestAssured.given;
@@ -61,10 +63,10 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
     @Test
     public void doFilterInternal_403_blacklistedAccessToken() {
         var admin = mockUtil.savedAdmin();
-        var user = mockUtil.savedUserProfileDto();
+        var user = mockUtil.savedUserProfile();
         var accessToken = mockUtil.doAuthentication(user.getEmail(), user.getPassword());
-        var oauthTokens = mockUtil.toOAuthAccessTokenDtoList(user, accessToken);
-        blacklistService.blacklistTokens(oauthTokens, admin.getId());
+        var oauthToken = mockUtil.toOAuthAccessTokenDto(user, accessToken);
+        blacklistService.blacklistTokens(List.of(oauthToken), admin.getId());
         given()
                 .header("Authorization", accessToken)
                 .contentType(JSON)

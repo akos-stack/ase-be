@@ -60,4 +60,12 @@ public class TokenBlacklistServiceImpl implements ITokenBlacklistService {
         log.debug("TokenBlacklistServiceImpl.checkIfBlacklisted - start | token: {}", token);
     }
 
+    @Override
+    @CacheEvict(value = "blacklistedTokensCache", allEntries = true)
+    public void deleteExpiredTokens() {
+        log.debug("TokenBlacklistServiceImpl.deleteExpiredTokens - start");
+        blacklistedTokenRepository.deleteExpiredTokens();
+        log.debug("TokenBlacklistServiceImpl.deleteExpiredTokens - end");
+    }
+
 }

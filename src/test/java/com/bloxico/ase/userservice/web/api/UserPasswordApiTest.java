@@ -31,7 +31,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void initForgotPasswordProcedure_200_ok() {
-        var email = mockUtil.savedUserProfileDto().getEmail();
+        var email = mockUtil.savedUserProfile().getEmail();
         given()
                 .contentType(JSON)
                 .body(new ForgotPasswordRequest(email))

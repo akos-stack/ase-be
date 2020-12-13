@@ -2,6 +2,7 @@ package com.bloxico.ase;
 
 import com.bloxico.ase.userservice.config.PersistentJwtTokenStoreTest;
 import com.bloxico.ase.userservice.entity.BaseEntityTest;
+import com.bloxico.ase.userservice.facade.impl.QuartzOperationsFacadeImplTest;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImplTest;
 import com.bloxico.ase.userservice.facade.impl.UserProfileFacadeImplTest;
 import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImplTest;
@@ -53,6 +54,7 @@ import org.junit.runners.Suite;
         PasswordResetTokenServiceImplTest.class,
 
         // facade
+        QuartzOperationsFacadeImplTest.class,
         UserRegistrationFacadeImplTest.class,
         UserPasswordFacadeImplTest.class,
         UserProfileFacadeImplTest.class,

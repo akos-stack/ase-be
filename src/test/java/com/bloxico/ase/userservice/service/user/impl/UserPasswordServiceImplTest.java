@@ -95,7 +95,7 @@ public class UserPasswordServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void setNewPassword() {
-        var user = mockUtil.savedUserProfileDto();
+        var user = mockUtil.savedUserProfile();
         var newPassword = "setNewPassword";
         userPasswordService.setNewPassword(user.getId(), newPassword);
         assertTrue(passwordEncoder.matches(

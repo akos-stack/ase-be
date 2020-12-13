@@ -1,13 +1,17 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
+import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
+import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImpl;
+import com.bloxico.ase.userservice.facade.impl.UserProfileFacadeImpl;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
+import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
@@ -22,10 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -34,7 +35,6 @@ import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATI
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static io.restassured.http.ContentType.URLENC;
-import static java.util.stream.Collectors.toList;
 
 @Component
 public class MockUtil {
@@ -57,6 +57,8 @@ public class MockUtil {
     private final UserPasswordFacadeImpl userPasswordFacade;
     private final OAuthAccessTokenRepository oAuthAccessTokenRepository;
     private final TokenRepository tokenRepository;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
+    private final UserProfileFacadeImpl userProfileFacade;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
@@ -65,7 +67,9 @@ public class MockUtil {
                     UserProfileServiceImpl userProfileService,
                     UserPasswordFacadeImpl userPasswordFacade,
                     OAuthAccessTokenRepository oAuthAccessTokenRepository,
-                    TokenRepository tokenRepository)
+                    TokenRepository tokenRepository,
+                    BlacklistedTokenRepository blacklistedTokenRepository,
+                    UserProfileFacadeImpl userProfileFacade)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -74,6 +78,8 @@ public class MockUtil {
         this.userPasswordFacade = userPasswordFacade;
         this.oAuthAccessTokenRepository = oAuthAccessTokenRepository;
         this.tokenRepository = tokenRepository;
+        this.blacklistedTokenRepository = blacklistedTokenRepository;
+        this.userProfileFacade = userProfileFacade;
     }
 
     public UserProfile savedAdmin() {
@@ -85,14 +91,18 @@ public class MockUtil {
     }
 
     public UserProfile savedAdmin(String email, String password) {
-        UserProfile user = new UserProfile();
-        user.setName(email.split("@")[0]);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setEmail(email);
-        user.setLocked(false);
-        user.setEnabled(true);
-        user.addRole(roleRepository.getAdminRole());
-        return userProfileRepository.saveAndFlush(user);
+        return userProfileRepository
+                .findByEmailIgnoreCase(email)
+                .orElseGet(() -> {
+                    var user = new UserProfile();
+                    user.setName(email.split("@")[0]);
+                    user.setPassword(passwordEncoder.encode(password));
+                    user.setEmail(email);
+                    user.setLocked(false);
+                    user.setEnabled(true);
+                    user.addRole(roleRepository.getAdminRole());
+                    return userProfileRepository.saveAndFlush(user);
+                });
     }
 
     public UserProfile savedUserProfile() {
@@ -104,18 +114,22 @@ public class MockUtil {
     }
 
     public UserProfile savedUserProfile(String email, String password) {
-        UserProfile user = new UserProfile();
-        user.setName(email.split("@")[0]);
-        user.setPassword(passwordEncoder.encode(password));
-        user.setEmail(email);
-        user.setLocked(false);
-        user.setEnabled(true);
-        user.addRole(roleRepository.getUserRole());
-        return userProfileRepository.saveAndFlush(user);
+        return userProfileRepository
+                .findByEmailIgnoreCase(email)
+                .orElseGet(() -> {
+                    var user = new UserProfile();
+                    user.setName(email.split("@")[0]);
+                    user.setPassword(passwordEncoder.encode(password));
+                    user.setEmail(email);
+                    user.setLocked(false);
+                    user.setEnabled(true);
+                    user.addRole(roleRepository.getUserRole());
+                    return userProfileRepository.saveAndFlush(user);
+                });
     }
 
     public UserProfileDto savedUserProfileDto() {
-        return MAPPER.toUserProfileDto(savedUserProfile());
+        return MAPPER.toDto(savedUserProfile());
     }
 
     public Token savedToken(Token.Type type) {
@@ -128,7 +142,7 @@ public class MockUtil {
         token.setUserId(adminId);
         token.setValue(value);
         token.setType(type);
-        token.setExpiryDate(LocalDateTime.now().plusHours(1));
+        token.setExpiryDate(notExpired());
         token.setCreatorId(adminId);
         return tokenRepository.saveAndFlush(token);
     }
@@ -143,9 +157,62 @@ public class MockUtil {
         token.setUserId(userId);
         token.setValue(value);
         token.setType(type);
-        token.setExpiryDate(LocalDateTime.now().minusDays(1));
+        token.setExpiryDate(expired());
         token.setCreatorId(userId);
         return tokenRepository.saveAndFlush(token);
+    }
+
+    public TokenDto savedExpiredTokenDto(Token.Type type) {
+        return MAPPER.toDto(savedExpiredToken(type));
+    }
+
+    public OAuthAccessToken savedOauthToken(String email) {
+        var token = new OAuthAccessToken();
+        token.setTokenId(uuid());
+        token.setUserName(email);
+        token.setExpiration(notExpired());
+        return oAuthAccessTokenRepository.saveAndFlush(token);
+    }
+
+    public OAuthAccessTokenDto savedOauthTokenDto(String email) {
+        return MAPPER.toDto(savedOauthToken(email));
+    }
+
+    public OAuthAccessToken savedExpiredOauthToken(String email) {
+        var token = new OAuthAccessToken();
+        token.setTokenId(uuid());
+        token.setUserName(email);
+        token.setExpiration(expired());
+        return oAuthAccessTokenRepository.saveAndFlush(token);
+    }
+
+    public OAuthAccessTokenDto savedExpiredOauthTokenDto(String email) {
+        return MAPPER.toDto(savedExpiredOauthToken(email));
+    }
+
+    public BlacklistedToken getBlacklistedToken(String value) {
+        return blacklistedTokenRepository
+                .findAll()
+                .stream()
+                .filter(t -> t.getToken().equals(value))
+                .findAny()
+                .orElseThrow();
+    }
+
+    public BlacklistedToken savedBlacklistedToken() {
+        var adminId = savedAdmin().getId();
+        var user = savedUserProfile();
+        var token = savedOauthTokenDto(user.getEmail());
+        userProfileFacade.blacklistTokens(user.getId(), adminId);
+        return getBlacklistedToken(token.getTokenId());
+    }
+
+    public BlacklistedToken savedExpiredBlacklistedToken() {
+        var adminId = savedAdmin().getId();
+        var user = savedUserProfile();
+        var token = savedExpiredOauthTokenDto(user.getEmail());
+        userProfileFacade.blacklistTokens(user.getId(), adminId);
+        return getBlacklistedToken(token.getTokenId());
     }
 
     public static void copyBaseEntityData(BaseEntity from, BaseEntity to) {
@@ -155,18 +222,19 @@ public class MockUtil {
         to.setUpdatedAt(from.getUpdatedAt());
     }
 
-    public List<OAuthAccessTokenDto> toOAuthAccessTokenDtoList(UserProfileDto userProfile, String... tokens) {
-        return Arrays
-                .stream(tokens)
-                .map(token -> new OAuthAccessTokenDto(
-                        token,
-                        null, null,
-                        userProfile.getEmail(),
-                        "appId",
-                        null,
-                        LocalDateTime.now().plusHours(2),
-                        uuid()))
-                .collect(toList());
+    public OAuthAccessTokenDto toOAuthAccessTokenDto(UserProfile userProfile, String token) {
+        return toOAuthAccessTokenDto(userProfile.getEmail(), token);
+    }
+
+    public OAuthAccessTokenDto toOAuthAccessTokenDto(String email, String token) {
+        return new OAuthAccessTokenDto(
+                token,
+                null, null,
+                email,
+                "appId",
+                null,
+                notExpired(),
+                uuid());
     }
 
     @lombok.Value
@@ -260,17 +328,16 @@ public class MockUtil {
         return tokenRepository.findByTypeAndUserId(PASSWORD_RESET, userId).orElseThrow().getValue();
     }
 
-    public List<OAuthAccessToken> genSavedOauthTokens(int count, String email) {
-        return oAuthAccessTokenRepository.saveAll(Stream
-                .generate(OAuthAccessToken::new)
-                .peek(t -> t.setTokenId(uuid()))
-                .peek(t -> t.setUserName(email))
-                .limit(count)
-                .collect(toList()));
-    }
-
     public static String uuid() {
         return UUID.randomUUID().toString();
+    }
+
+    public static LocalDateTime expired() {
+        return LocalDateTime.now().minusHours(1);
+    }
+
+    public static LocalDateTime notExpired() {
+        return LocalDateTime.now().plusHours(1);
     }
 
 }

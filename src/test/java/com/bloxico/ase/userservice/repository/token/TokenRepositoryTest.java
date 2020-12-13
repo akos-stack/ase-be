@@ -7,10 +7,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TokenRepositoryTest extends AbstractSpringTest {
@@ -52,13 +54,15 @@ public class TokenRepositoryTest extends AbstractSpringTest {
 
     @Test
     public void deleteExpiredTokens() {
-        var expiredToken = mockUtil.savedExpiredToken(PASSWORD_RESET);
-        var validToken = mockUtil.savedToken(REGISTRATION);
-        assertTrue(repository.findByValue(expiredToken.getValue()).isPresent());
-        assertTrue(repository.findByValue(validToken.getValue()).isPresent());
+        var valid = mockUtil.savedToken(REGISTRATION);
+        var expired = mockUtil.savedExpiredToken(PASSWORD_RESET);
+        assertEquals(
+                Set.of(valid, expired),
+                Set.copyOf(repository.findAll()));
         repository.deleteExpiredTokens();
-        assertTrue(repository.findByValue(expiredToken.getValue()).isEmpty());
-        assertTrue(repository.findByValue(validToken.getValue()).isPresent());
+        assertEquals(
+                Set.of(valid),
+                Set.copyOf(repository.findAll()));
     }
 
 }

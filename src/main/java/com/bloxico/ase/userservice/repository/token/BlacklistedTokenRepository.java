@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.repository.token;
 
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -12,5 +13,9 @@ public interface BlacklistedTokenRepository extends JpaRepository<BlacklistedTok
 
     @Query("SELECT DISTINCT t.token FROM BlacklistedToken t")
     List<String> findDistinctTokenValues();
+
+    @Modifying
+    @Query("DELETE FROM BlacklistedToken t WHERE t.expiryDate < CURRENT_TIMESTAMP")
+    void deleteExpiredTokens();
 
 }

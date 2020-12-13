@@ -40,7 +40,7 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
         token.setCreatorId(userId);
         token.setExpiryDate(newExpiryDate());
         token = tokenRepository.saveAndFlush(token);
-        var tokenDto = MAPPER.toTokenDto(token);
+        var tokenDto = MAPPER.toDto(token);
         log.debug("TokenServiceImpl[{}].createTokenForUser - end | userId: {}", type, userId);
         return tokenDto;
     }
@@ -56,7 +56,7 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
         token.setExpiryDate(newExpiryDate());
         token.setUpdaterId(token.getCreatorId());
         token = tokenRepository.saveAndFlush(token);
-        var tokenDto = MAPPER.toTokenDto(token);
+        var tokenDto = MAPPER.toDto(token);
         log.debug("TokenServiceImpl.refreshToken - end | tokenValue: {}", tokenValue);
         return tokenDto;
     }
@@ -81,7 +81,7 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
         var tokenDto = tokenRepository
                 .findByTypeAndUserId(type, userId)
                 .filter(not(Token::isExpired))
-                .map(MAPPER::toTokenDto)
+                .map(MAPPER::toDto)
                 .orElseGet(() -> createTokenForUser(userId));
         log.debug("TokenServiceImpl[{}].getOrCreateTokenForUser - end | userId: {}", type, userId);
         return tokenDto;
@@ -93,7 +93,7 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
         log.debug("TokenServiceImpl[{}].getTokenByUserId - start | userId: {}", type, userId);
         var tokenDto = tokenRepository
                 .findByTypeAndUserId(type, userId)
-                .map(MAPPER::toTokenDto)
+                .map(MAPPER::toDto)
                 .orElseThrow(ErrorCodes.Token.TOKEN_NOT_FOUND::newException);
         log.debug("TokenServiceImpl[{}].getTokenByUserId - end | userId: {}", type, userId);
         return tokenDto;

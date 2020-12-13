@@ -82,7 +82,7 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
     @Test
     public void disableUser() {
         var adminId = mockUtil.savedAdmin().getId();
-        var userId = mockUtil.savedUserProfileDto().getId();
+        var userId = mockUtil.savedUserProfile().getId();
         assertTrue(userProfileService.findUserProfileById(userId).getEnabled());
         userProfileService.disableUser(userId, adminId);
         assertFalse(userProfileService.findUserProfileById(userId).getEnabled());

@@ -58,4 +58,17 @@ public class BlacklistedTokenRepositoryTest extends AbstractSpringTest {
         assertEquals(inMemorySet, inDatabaseSet);
     }
 
+    @Test
+    public void deleteExpiredTokens() {
+        var valid = mockUtil.savedBlacklistedToken();
+        var expired = mockUtil.savedExpiredBlacklistedToken();
+        assertEquals(
+                Set.of(valid, expired),
+                Set.copyOf(repository.findAll()));
+        repository.deleteExpiredTokens();
+        assertEquals(
+                Set.of(valid),
+                Set.copyOf(repository.findAll()));
+    }
+
 }

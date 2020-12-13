@@ -52,7 +52,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         userProfile.setPassword(passwordEncoder.encode(request.getPassword()));
         userProfile.addRole(roleRepository.getUserRole());
         userProfile = userProfileRepository.saveAndFlush(userProfile);
-        var userProfileDto = MAPPER.toUserProfileDto(userProfile);
+        var userProfileDto = MAPPER.toDto(userProfile);
         log.debug("UserRegistrationServiceImpl.registerDisabledUser - end | request: {}", request);
         return userProfileDto;
     }
