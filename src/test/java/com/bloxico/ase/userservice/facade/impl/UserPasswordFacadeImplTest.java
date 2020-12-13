@@ -150,7 +150,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
         var oldPassword = "admin";
         var newPassword = "updateKnownPassword";
         var request = new KnownPasswordUpdateRequest(oldPassword, newPassword);
-        var userId = mockUtil.savedAdmin().getId();
+        var userId = mockUtil.savedAdmin(oldPassword).getId();
         userPasswordFacade.updateKnownPassword(userId, request);
         assertTrue(passwordEncoder.matches(
                 newPassword,

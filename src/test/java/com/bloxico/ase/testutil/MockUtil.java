@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -83,49 +84,41 @@ public class MockUtil {
     }
 
     public UserProfile savedAdmin() {
-        return savedAdmin("admin");
+        return savedAdmin(genEmail());
     }
 
     public UserProfile savedAdmin(String password) {
-        return savedAdmin("admin@mail.com", password);
+        return savedAdmin(genEmail(), password);
     }
 
     public UserProfile savedAdmin(String email, String password) {
-        return userProfileRepository
-                .findByEmailIgnoreCase(email)
-                .orElseGet(() -> {
-                    var user = new UserProfile();
-                    user.setName(email.split("@")[0]);
-                    user.setPassword(passwordEncoder.encode(password));
-                    user.setEmail(email);
-                    user.setLocked(false);
-                    user.setEnabled(true);
-                    user.addRole(roleRepository.getAdminRole());
-                    return userProfileRepository.saveAndFlush(user);
-                });
+        var user = new UserProfile();
+        user.setName(email.split("@")[0]);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setEmail(email);
+        user.setLocked(false);
+        user.setEnabled(true);
+        user.addRole(roleRepository.getAdminRole());
+        return userProfileRepository.saveAndFlush(user);
     }
 
     public UserProfile savedUserProfile() {
-        return savedUserProfile("foobar");
+        return savedUserProfile(genEmail());
     }
 
     public UserProfile savedUserProfile(String password) {
-        return savedUserProfile("foobar@mail.com", password);
+        return savedUserProfile(genEmail(), password);
     }
 
     public UserProfile savedUserProfile(String email, String password) {
-        return userProfileRepository
-                .findByEmailIgnoreCase(email)
-                .orElseGet(() -> {
-                    var user = new UserProfile();
-                    user.setName(email.split("@")[0]);
-                    user.setPassword(passwordEncoder.encode(password));
-                    user.setEmail(email);
-                    user.setLocked(false);
-                    user.setEnabled(true);
-                    user.addRole(roleRepository.getUserRole());
-                    return userProfileRepository.saveAndFlush(user);
-                });
+        var user = new UserProfile();
+        user.setName(email.split("@")[0]);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setEmail(email);
+        user.setLocked(false);
+        user.setEnabled(true);
+        user.addRole(roleRepository.getUserRole());
+        return userProfileRepository.saveAndFlush(user);
     }
 
     public UserProfileDto savedUserProfileDto() {
@@ -244,7 +237,7 @@ public class MockUtil {
     }
 
     public Registration doRegistration() {
-        String email = "passwordMatches@mail.com", pass = "Password1!";
+        String email = genEmail(), pass = genEmail();
         String token = given()
                 .contentType(JSON)
                 .body(new RegistrationRequest(email, pass, pass))
@@ -326,6 +319,12 @@ public class MockUtil {
         userPasswordFacade.handleForgotPasswordRequest(request);
         var userId = userProfileService.findUserProfileByEmail(email).getId();
         return tokenRepository.findByTypeAndUserId(PASSWORD_RESET, userId).orElseThrow().getValue();
+    }
+
+    private static final AtomicLong along = new AtomicLong(0);
+
+    public static String genEmail() {
+        return along.incrementAndGet() + "aseUser@mail.com";
     }
 
     public static String uuid() {
