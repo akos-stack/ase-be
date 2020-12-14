@@ -45,7 +45,7 @@
 								},
 								{
 									"key": "username",
-									"value": "nikola.vojicic@gmail.com",
+									"value": "sekuloskimilos@gmail.com",
 									"type": "text"
 								},
 								{
@@ -58,12 +58,15 @@
 									"value": "access_profile",
 									"type": "text"
 								}
-							]
+							],
+							"options": {
+								"urlencoded": {}
+							}
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/oauth/token",
+							"raw": "{{endpoint_ase}}/api/oauth/token",
 							"host": [
-								"{{endpoint}}"
+								"{{endpoint_ase}}"
 							],
 							"path": [
 								"api",
@@ -200,12 +203,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"sekuloskimilos@gmail.com\",\n    \"password\": \"Sekula123!\",\n    \"matchPassword\": \"Sekula123!\",\n    \"regionName\": \"Serbia\"\n}"
+							"raw": "{\n    \"email\": \"sekuloskimilos@gmail.com\",\n    \"password\": \"Sekula123!\",\n    \"match_password\": \"Sekula123!\",\n    \"regionName\": \"Serbia\"\n}"
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/user/registration",
+							"raw": "{{endpoint_ase}}/api/user/registration",
 							"host": [
-								"{{endpoint}}"
+								"{{endpoint_ase}}"
 							],
 							"path": [
 								"api",
@@ -229,17 +232,18 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"sekuloskimilos@gmail.com\",\n    \"tokenValue\": {{verification_token}}\n}"
+							"raw": "{\n    \"email\": \"sekuloskimilos@gmail.com\",\n    \"token_value\": \"{{verification_token}}\"\n}"
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/user/registrationConfirm",
+							"raw": "{{endpoint_ase}}/api/user/registration/confirm",
 							"host": [
-								"{{endpoint}}"
+								"{{endpoint_ase}}"
 							],
 							"path": [
 								"api",
 								"user",
-								"registrationConfirm"
+								"registration",
+								"confirm"
 							]
 						},
 						"description": "This happens on valid verification token sending"
@@ -301,14 +305,133 @@
 							"raw": "{\n    \"name\": \"Nikola\",\n    \"region\": \"Afghanistan\",\n    \"city\": \"Kabul\"\n}"
 						},
 						"url": {
-							"raw": "{{endpoint}}/api/user/updateMyProfile",
+							"raw": "{{endpoint_ase}}/api/user/my-profile/update",
 							"host": [
-								"{{endpoint}}"
+								"{{endpoint_ase}}"
 							],
 							"path": [
 								"api",
 								"user",
-								"updateMyProfile"
+								"my-profile",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"old_password\": \"this_is_old_password\",\n    \"new_password\": \"this_is_old_password\"\n}"
+						},
+						"url": {
+							"raw": "{{endpoint_ase}}/api/user/password/set",
+							"host": [
+								"{{endpoint_ase}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"password",
+								"set"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Disable User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{endpoint_ase}}/api/user/disable",
+							"host": [
+								"{{endpoint_ase}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"disable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Blacklist Token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{endpoint_ase}}/api/user/blacklist-tokens",
+							"host": [
+								"{{endpoint_ase}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"blacklist-tokens"
 							]
 						}
 					},
