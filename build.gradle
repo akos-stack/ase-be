@@ -73,6 +73,7 @@ dependencies {
     // Security
     compile("org.springframework.security.oauth:spring-security-oauth2:${oauth2Version}")
     compile("org.springframework.security:spring-security-jwt:${jwtVersion}")
+    compile("org.springframework.boot:spring-boot-starter-oauth2-client")
     // Security - managed dependencies
     compile("org.springframework.security:spring-security-core")
     compile("org.springframework.security:spring-security-web")
