@@ -8,7 +8,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import java.util.Date;
 
-@Entity
+@Entity(name = "token_old")
 @EqualsAndHashCode(of = {"tokenValue"}, callSuper = false)
 @DiscriminatorColumn(name = "token_type", discriminatorType = DiscriminatorType.STRING)
 @ToString

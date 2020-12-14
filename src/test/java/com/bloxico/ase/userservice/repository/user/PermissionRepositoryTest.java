@@ -5,7 +5,6 @@ import com.bloxico.ase.userservice.entity.user.Permission;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class PermissionRepositoryTest extends AbstractSpringTest {
@@ -14,20 +13,12 @@ public class PermissionRepositoryTest extends AbstractSpringTest {
     private PermissionRepository repository;
 
     @Test
-    public void save() {
-        Permission permission = new Permission();
-        permission.setName("foo");
-        permission = repository.saveAndFlush(permission);
-        assertNotNull(permission.getId());
-    }
-
-    @Test
-    public void findById() {
+    public void saveAndFindById() {
         assertTrue(repository.findById((short) -1).isEmpty());
-        Permission permission = new Permission();
+        var permission = new Permission();
         permission.setName("foo");
-        permission = repository.saveAndFlush(permission);
-        assertTrue(repository.findById(permission.getId()).isPresent());
+        var id = repository.saveAndFlush(permission).getId();
+        assertTrue(repository.findById(id).isPresent());
     }
 
 }

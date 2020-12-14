@@ -10,17 +10,25 @@ import org.springframework.context.annotation.Configuration;
 @EnableCaching
 public class CacheConfig {
 
+    public static final String
+            PERMISSION_NAME_GRANTED_AUTHORITIES_MAP_CACHE
+            = "permissionNameGrantedAuthoritiesMapCache";
+
+    public static final String
+            BLACKLISTED_TOKENS_CACHE
+            = "blacklistedTokensCache";
+
     @Bean
     public CaffeineCache permissionNameGrantedAuthoritiesMapCache() {
         return new CaffeineCache(
-                "permissionNameGrantedAuthoritiesMapCache",
+                PERMISSION_NAME_GRANTED_AUTHORITIES_MAP_CACHE,
                 Caffeine.newBuilder().build());
     }
 
     @Bean
     public CaffeineCache blacklistedTokensCache() {
         return new CaffeineCache(
-                "blacklistedTokensCache",
+                BLACKLISTED_TOKENS_CACHE,
                 Caffeine.newBuilder().build());
     }
 

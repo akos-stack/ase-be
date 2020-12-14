@@ -7,8 +7,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.UUID;
-
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.assertTrue;
 
 public class UserPasswordServiceImplTest extends AbstractSpringTest {
@@ -68,15 +67,15 @@ public class UserPasswordServiceImplTest extends AbstractSpringTest {
     @Test(expected = UserProfileException.class)
     public void updateKnownPassword_oldPasswordMismatch() {
         var user = mockUtil.savedAdmin();
-        var oldPassword = UUID.randomUUID().toString();
+        var oldPassword = uuid();
         var newPassword = "updateKnownPassword";
         userPasswordService.updateKnownPassword(user.getId(), oldPassword, newPassword);
     }
 
     @Test
     public void updateKnownPassword() {
-        var user = mockUtil.savedAdmin();
         var oldPassword = "admin";
+        var user = mockUtil.savedAdmin(oldPassword);
         var newPassword = "updateKnownPassword";
         userPasswordService.updateKnownPassword(user.getId(), oldPassword, newPassword);
         assertTrue(passwordEncoder.matches(
@@ -96,7 +95,7 @@ public class UserPasswordServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void setNewPassword() {
-        var user = mockUtil.savedUserProfileDto();
+        var user = mockUtil.savedUserProfile();
         var newPassword = "setNewPassword";
         userPasswordService.setNewPassword(user.getId(), newPassword);
         assertTrue(passwordEncoder.matches(

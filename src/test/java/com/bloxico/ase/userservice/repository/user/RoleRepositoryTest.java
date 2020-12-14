@@ -7,10 +7,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
-import java.util.UUID;
 
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class RoleRepositoryTest extends AbstractSpringTest {
@@ -22,26 +21,9 @@ public class RoleRepositoryTest extends AbstractSpringTest {
     private PermissionRepository permissionRepository;
 
     @Test
-    public void save() {
-        Role role = new Role();
-        {
-            role.setName("foobar");
-            Permission p1 = new Permission();
-            p1.setName("foo");
-            permissionRepository.saveAndFlush(p1);
-            Permission p2 = new Permission();
-            p2.setName("bar");
-            permissionRepository.saveAndFlush(p2);
-            role.setPermissions(Set.of(p1, p2));
-        }
-        role = roleRepository.saveAndFlush(role);
-        assertNotNull(role.getId());
-    }
-
-    @Test
-    public void findById() {
+    public void saveAndFindById() {
         assertTrue(roleRepository.findById((short) -1).isEmpty());
-        Role role = new Role();
+        var role = new Role();
         {
             role.setName("foobar");
             Permission p1 = new Permission();
@@ -52,13 +34,13 @@ public class RoleRepositoryTest extends AbstractSpringTest {
             permissionRepository.saveAndFlush(p2);
             role.setPermissions(Set.of(p1, p2));
         }
-        role = roleRepository.saveAndFlush(role);
-        assertTrue(roleRepository.findById(role.getId()).isPresent());
+        var id = roleRepository.saveAndFlush(role).getId();
+        assertTrue(roleRepository.findById(id).isPresent());
     }
 
     @Test
     public void findByNameIgnoreCase() {
-        assertTrue(roleRepository.findByNameIgnoreCase(UUID.randomUUID().toString()).isEmpty());
+        assertTrue(roleRepository.findByNameIgnoreCase(uuid()).isEmpty());
         assertTrue(roleRepository.findByNameIgnoreCase("uSeR").isPresent());
     }
 

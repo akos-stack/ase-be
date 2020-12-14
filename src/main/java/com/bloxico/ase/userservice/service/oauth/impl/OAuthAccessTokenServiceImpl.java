@@ -29,12 +29,10 @@ public class OAuthAccessTokenServiceImpl implements IOAuthAccessTokenService {
     }
 
     @Override
-    public void deleteExpiredAccessTokens() {
-        log.debug("Deleting expired oauth access tokens - start");
-
+    public void deleteExpiredTokens() {
+        log.debug("OAuthAccessTokenServiceImpl.deleteExpiredTokens - start");
         oAuthAccessTokenRepository.deleteExpiredTokens();
-
-        log.debug("Deleting expired oauth access tokens - end");
+        log.debug("OAuthAccessTokenServiceImpl.deleteExpiredTokens - end");
     }
 
 }

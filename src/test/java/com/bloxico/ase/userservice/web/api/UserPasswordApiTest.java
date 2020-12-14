@@ -31,7 +31,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void initForgotPasswordProcedure_200_ok() {
-        var email = mockUtil.savedUserProfileDto().getEmail();
+        var email = mockUtil.savedUserProfile().getEmail();
         given()
                 .contentType(JSON)
                 .body(new ForgotPasswordRequest(email))
@@ -150,7 +150,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
         var oldPassword = "Password1!";
         var newPassword = "Password2!";
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", mockUtil.doAuthentication(oldPassword))
                 .contentType(JSON)
                 .body(new KnownPasswordUpdateRequest(oldPassword, newPassword))
                 .when()

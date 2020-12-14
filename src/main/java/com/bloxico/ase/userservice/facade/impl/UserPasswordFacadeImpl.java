@@ -1,6 +1,8 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.facade.IUserPasswordFacade;
+import com.bloxico.ase.userservice.service.token.ITokenService;
+import com.bloxico.ase.userservice.service.token.impl.PasswordResetTokenServiceImpl;
 import com.bloxico.ase.userservice.service.user.IUserPasswordService;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
@@ -8,8 +10,6 @@ import com.bloxico.ase.userservice.web.model.password.ForgottenPasswordUpdateReq
 import com.bloxico.ase.userservice.web.model.password.KnownPasswordUpdateRequest;
 import com.bloxico.ase.userservice.web.model.password.SetPasswordRequest;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
-import com.bloxico.userservice.entities.token.PasswordResetToken;
-import com.bloxico.userservice.services.token.ITokenService;
 import com.bloxico.userservice.util.MailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +23,13 @@ public class UserPasswordFacadeImpl implements IUserPasswordFacade {
 
     private final IUserProfileService userProfileService;
     private final IUserPasswordService userPasswordService;
-    private final ITokenService<PasswordResetToken> passwordResetTokenService;
+    private final ITokenService passwordResetTokenService;
     private final MailUtil mailUtil;
 
     @Autowired
     public UserPasswordFacadeImpl(IUserProfileService userProfileService,
                                   IUserPasswordService userPasswordService,
-                                  ITokenService<PasswordResetToken> passwordResetTokenService,
+                                  PasswordResetTokenServiceImpl passwordResetTokenService,
                                   MailUtil mailUtil)
     {
         this.userProfileService = userProfileService;
@@ -43,8 +43,8 @@ public class UserPasswordFacadeImpl implements IUserPasswordFacade {
         log.info("UserPasswordFacadeImpl.handleForgotPasswordRequest - start | request: {}", request);
         var email = request.getEmail();
         var userId = userProfileService.findUserProfileByEmail(email).getId();
-        var token = passwordResetTokenService.createNewOrReturnNonExpiredTokenForUser(userId);
-        mailUtil.sendResetPasswordTokenEmail(email, token.getTokenValue());
+        var token = passwordResetTokenService.getOrCreateTokenForUser(userId);
+        mailUtil.sendResetPasswordTokenEmail(email, token.getValue());
         log.info("UserPasswordFacadeImpl.handleForgotPasswordRequest - end | request: {}", request);
     }
 
@@ -54,7 +54,7 @@ public class UserPasswordFacadeImpl implements IUserPasswordFacade {
         var email = request.getEmail();
         var userId = userProfileService.findUserProfileByEmail(email).getId();
         var token = passwordResetTokenService.getTokenByUserId(userId);
-        mailUtil.sendResetPasswordTokenEmail(email, token.getTokenValue());
+        mailUtil.sendResetPasswordTokenEmail(email, token.getValue());
         log.info("UserPasswordFacadeImpl.resendPasswordToken - end | request: {}", request);
     }
 
@@ -63,7 +63,7 @@ public class UserPasswordFacadeImpl implements IUserPasswordFacade {
         log.info("UserPasswordFacadeImpl.updateForgottenPassword - start | request: {}", request);
         var email = request.getEmail();
         var userId = userProfileService.findUserProfileByEmail(email).getId();
-        passwordResetTokenService.consumeTokenForUser(userId, request.getTokenValue());
+        passwordResetTokenService.consumeTokenForUser(request.getTokenValue(), userId);
         userPasswordService.updateForgottenPassword(userId, request.getNewPassword());
         log.info("UserPasswordFacadeImpl.updateForgottenPassword - end | request: {}", request);
     }

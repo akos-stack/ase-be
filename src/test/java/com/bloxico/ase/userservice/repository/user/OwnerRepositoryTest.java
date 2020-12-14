@@ -3,13 +3,11 @@ package com.bloxico.ase.userservice.repository.user;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.entity.user.Owner;
-import com.bloxico.ase.userservice.entity.user.UserProfile;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class OwnerRepositoryTest extends AbstractSpringTest {
@@ -21,26 +19,15 @@ public class OwnerRepositoryTest extends AbstractSpringTest {
     private OwnerRepository repository;
 
     @Test
-    public void save() {
-        Owner user = new Owner();
-        UserProfile creator = mockUtil.savedUserProfile();
-        user.setUserProfile(creator);
-        user.setBirthday(LocalDate.now());
-        user.setCreatorId(creator.getId());
-        user = repository.saveAndFlush(user);
-        assertNotNull(user.getId());
-    }
-
-    @Test
-    public void findById() {
+    public void saveAndFindById() {
         assertTrue(repository.findById(-1L).isEmpty());
-        Owner user = new Owner();
-        UserProfile creator = mockUtil.savedUserProfile();
-        user.setUserProfile(creator);
-        user.setBirthday(LocalDate.now());
-        user.setCreatorId(creator.getId());
-        user = repository.saveAndFlush(user);
-        assertTrue(repository.findById(user.getId()).isPresent());
+        var owner = new Owner();
+        var creator = mockUtil.savedUserProfile();
+        owner.setUserProfile(creator);
+        owner.setBirthday(LocalDate.now());
+        owner.setCreatorId(creator.getId());
+        var id = repository.saveAndFlush(owner).getId();
+        assertTrue(repository.findById(id).isPresent());
     }
 
 }

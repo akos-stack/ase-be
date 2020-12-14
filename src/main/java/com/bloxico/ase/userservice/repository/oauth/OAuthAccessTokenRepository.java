@@ -16,7 +16,7 @@ public interface OAuthAccessTokenRepository extends JpaRepository<OAuthAccessTok
     void deleteByUserNameIgnoreCase(String email);
 
     @Modifying
-    @Query("delete FROM OauthAccessTokenEntity e WHERE e.expiration < CURRENT_TIMESTAMP")
+    @Query("DELETE FROM OauthAccessTokenEntity e WHERE e.expiration < CURRENT_TIMESTAMP")
     void deleteExpiredTokens();
 
 }

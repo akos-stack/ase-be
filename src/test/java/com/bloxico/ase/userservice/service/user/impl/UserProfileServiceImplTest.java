@@ -9,8 +9,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.UUID;
-
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -43,7 +42,7 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = UserProfileException.class)
     public void findUserProfileByEmail_notFound() {
-        userProfileService.findUserProfileByEmail(UUID.randomUUID().toString());
+        userProfileService.findUserProfileByEmail(uuid());
     }
 
     @Test
@@ -83,7 +82,7 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
     @Test
     public void disableUser() {
         var adminId = mockUtil.savedAdmin().getId();
-        var userId = mockUtil.savedUserProfileDto().getId();
+        var userId = mockUtil.savedUserProfile().getId();
         assertTrue(userProfileService.findUserProfileById(userId).getEnabled());
         userProfileService.disableUser(userId, adminId);
         assertFalse(userProfileService.findUserProfileById(userId).getEnabled());
@@ -96,7 +95,7 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = UsernameNotFoundException.class)
     public void loadUserByUsername_notFound() {
-        userProfileService.loadUserByUsername(UUID.randomUUID().toString());
+        userProfileService.loadUserByUsername(uuid());
     }
 
     @Test

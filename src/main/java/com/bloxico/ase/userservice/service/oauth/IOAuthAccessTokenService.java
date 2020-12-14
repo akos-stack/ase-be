@@ -8,5 +8,6 @@ public interface IOAuthAccessTokenService {
 
     List<OAuthAccessTokenDto> deleteTokensByEmail(String email);
 
-    void deleteExpiredAccessTokens();
+    void deleteExpiredTokens();
+
 }
