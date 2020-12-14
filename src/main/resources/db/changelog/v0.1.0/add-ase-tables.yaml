@@ -244,12 +244,12 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
               - column:
-                  name: token
+                  name: value
                   type: varchar
                   constraints:
                     nullable: false
               - column:
-                  name: expiration
+                  name: expiry_date
                   type: timestamp
               # METADATA
               - column:
@@ -291,20 +291,22 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: user_profile_id
+                  name: value
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
                   type: bigint
                   constraints:
                     nullable: false
-              - column:
-                  name: token_type
-                  type: varchar(256)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: token_value
-                  type: varchar(256)
-                  constraints:
-                    nullable: false
+                    foreignKeyName: fk_token_user_id
+                    references: user_profiles(id)
               - column:
                   name: expiry_date
                   type: timestamp

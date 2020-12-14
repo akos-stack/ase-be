@@ -1,14 +1,14 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
+import com.bloxico.ase.userservice.service.token.ITokenService;
+import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImpl;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.service.user.IUserRegistrationService;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
-import com.bloxico.userservice.entities.token.VerificationToken;
-import com.bloxico.userservice.services.token.ITokenService;
 import com.bloxico.userservice.util.MailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,18 +22,18 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
 
     private final IUserProfileService userProfileService;
     private final IUserRegistrationService userRegistrationService;
-    private final ITokenService<VerificationToken> verificationTokenService;
+    private final ITokenService registrationTokenService;
     private final MailUtil mailUtil;
 
     @Autowired
     public UserRegistrationFacadeImpl(IUserProfileService userProfileService,
                                       IUserRegistrationService userRegistrationService,
-                                      ITokenService<VerificationToken> verificationTokenService,
+                                      RegistrationTokenServiceImpl registrationTokenService,
                                       MailUtil mailUtil)
     {
         this.userProfileService = userProfileService;
         this.userRegistrationService = userRegistrationService;
-        this.verificationTokenService = verificationTokenService;
+        this.registrationTokenService = registrationTokenService;
         this.mailUtil = mailUtil;
     }
 
@@ -41,9 +41,9 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public RegistrationResponse registerUserWithVerificationToken(RegistrationRequest request) {
         log.info("UserRegistrationFacadeImpl.registerUserWithVerificationToken - start | request: {}", request);
         var userProfileDto = userRegistrationService.registerDisabledUser(request);
-        var tokenDto = verificationTokenService.createTokenForUser(userProfileDto.getId());
-        mailUtil.sendVerificationTokenEmail(userProfileDto.getEmail(), tokenDto.getTokenValue());
-        var response = new RegistrationResponse(tokenDto.getTokenValue());
+        var tokenDto = registrationTokenService.createTokenForUser(userProfileDto.getId());
+        mailUtil.sendVerificationTokenEmail(userProfileDto.getEmail(), tokenDto.getValue());
+        var response = new RegistrationResponse(tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.registerUserWithVerificationToken - end | request: {}", request);
         return response;
     }
@@ -52,7 +52,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public void handleTokenValidation(TokenValidationRequest request) {
         log.info("UserRegistrationFacadeImpl.handleTokenValidation - start | request: {}", request);
         var userProfileDto = userProfileService.findUserProfileByEmail(request.getEmail());
-        verificationTokenService.consumeTokenForUser(userProfileDto.getId(), request.getTokenValue());
+        registrationTokenService.consumeTokenForUser(request.getTokenValue(), userProfileDto.getId());
         userRegistrationService.enableUser(userProfileDto.getId());
         log.info("UserRegistrationFacadeImpl.handleTokenValidation - end | request: {}", request);
     }
@@ -60,9 +60,9 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public void refreshExpiredToken(String expiredTokenValue) {
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - start | expiredTokenValue: {}", expiredTokenValue);
-        var tokenDto = verificationTokenService.refreshExpiredToken(expiredTokenValue);
+        var tokenDto = registrationTokenService.refreshToken(expiredTokenValue);
         var userProfileDto = userProfileService.findUserProfileById(tokenDto.getId());
-        mailUtil.sendVerificationTokenEmail(userProfileDto.getEmail(), tokenDto.getTokenValue());
+        mailUtil.sendVerificationTokenEmail(userProfileDto.getEmail(), tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - end | expiredTokenValue: {}", expiredTokenValue);
     }
 
@@ -70,8 +70,8 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public void resendVerificationToken(ResendTokenRequest request) {
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - start | request: {}", request);
         var userProfileDto = userProfileService.findUserProfileByEmail(request.getEmail());
-        var tokenDto = verificationTokenService.getTokenByUserId(userProfileDto.getId());
-        mailUtil.sendVerificationTokenEmail(request.getEmail(), tokenDto.getTokenValue());
+        var tokenDto = registrationTokenService.getTokenByUserId(userProfileDto.getId());
+        mailUtil.sendVerificationTokenEmail(request.getEmail(), tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - end | request: {}", request);
     }
 

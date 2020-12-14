@@ -1,20 +1,24 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
+import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
+import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
+import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImpl;
+import com.bloxico.ase.userservice.facade.impl.UserProfileFacadeImpl;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
-import com.bloxico.ase.userservice.repository.user.PermissionRepository;
+import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
+import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
-import com.bloxico.userservice.repository.token.PasswordTokenRepository;
 import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,18 +26,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
+import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_CONFIRM_ENDPOINT;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_ENDPOINT;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static io.restassured.http.ContentType.URLENC;
-import static java.util.stream.Collectors.toList;
+import static java.util.concurrent.ThreadLocalRandom.current;
+import static java.util.function.Predicate.not;
+import static org.junit.Assert.assertTrue;
 
 @Component
 public class MockUtil {
@@ -49,40 +56,48 @@ public class MockUtil {
     @Value("${oauth2.secret}")
     private String OAUTH2_SECRET;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+    private final UserProfileRepository userProfileRepository;
+    private final UserProfileServiceImpl userProfileService;
+    private final UserPasswordFacadeImpl userPasswordFacade;
+    private final OAuthAccessTokenRepository oAuthAccessTokenRepository;
+    private final TokenRepository tokenRepository;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
+    private final UserProfileFacadeImpl userProfileFacade;
 
     @Autowired
-    private PermissionRepository permissionRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private UserProfileRepository userProfileRepository;
-
-    @Autowired
-    private UserProfileServiceImpl userProfileService;
-
-    @Autowired
-    private PasswordTokenRepository passwordTokenRepository;
-
-    @Autowired
-    private UserPasswordFacadeImpl userPasswordFacade;
-
-    @Autowired
-    private OAuthAccessTokenRepository oAuthAccessTokenRepository;
+    public MockUtil(PasswordEncoder passwordEncoder,
+                    RoleRepository roleRepository,
+                    UserProfileRepository userProfileRepository,
+                    UserProfileServiceImpl userProfileService,
+                    UserPasswordFacadeImpl userPasswordFacade,
+                    OAuthAccessTokenRepository oAuthAccessTokenRepository,
+                    TokenRepository tokenRepository,
+                    BlacklistedTokenRepository blacklistedTokenRepository,
+                    UserProfileFacadeImpl userProfileFacade)
+    {
+        this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
+        this.userProfileRepository = userProfileRepository;
+        this.userProfileService = userProfileService;
+        this.userPasswordFacade = userPasswordFacade;
+        this.oAuthAccessTokenRepository = oAuthAccessTokenRepository;
+        this.tokenRepository = tokenRepository;
+        this.blacklistedTokenRepository = blacklistedTokenRepository;
+        this.userProfileFacade = userProfileFacade;
+    }
 
     public UserProfile savedAdmin() {
-        return savedAdmin("admin");
+        return savedAdmin(genEmail());
     }
 
     public UserProfile savedAdmin(String password) {
-        return savedAdmin("admin@mail.com", password);
+        return savedAdmin(genEmail(), password);
     }
 
     public UserProfile savedAdmin(String email, String password) {
-        UserProfile user = new UserProfile();
+        var user = new UserProfile();
         user.setName(email.split("@")[0]);
         user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
@@ -93,15 +108,15 @@ public class MockUtil {
     }
 
     public UserProfile savedUserProfile() {
-        return savedUserProfile("foobar");
+        return savedUserProfile(genEmail());
     }
 
     public UserProfile savedUserProfile(String password) {
-        return savedUserProfile("foobar@mail.com", password);
+        return savedUserProfile(genEmail(), password);
     }
 
     public UserProfile savedUserProfile(String email, String password) {
-        UserProfile user = new UserProfile();
+        var user = new UserProfile();
         user.setName(email.split("@")[0]);
         user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
@@ -112,7 +127,90 @@ public class MockUtil {
     }
 
     public UserProfileDto savedUserProfileDto() {
-        return MAPPER.toUserProfileDto(savedUserProfile());
+        return MAPPER.toDto(savedUserProfile());
+    }
+
+    public Token savedToken(Token.Type type) {
+        return savedToken(type, uuid());
+    }
+
+    public Token savedToken(Token.Type type, String value) {
+        var adminId = savedAdmin().getId();
+        var token = new Token();
+        token.setUserId(adminId);
+        token.setValue(value);
+        token.setType(type);
+        token.setExpiryDate(notExpired());
+        token.setCreatorId(adminId);
+        return tokenRepository.saveAndFlush(token);
+    }
+
+    public Token savedExpiredToken(Token.Type type) {
+        return savedExpiredToken(type, uuid());
+    }
+
+    public Token savedExpiredToken(Token.Type type, String value) {
+        var userId = savedUserProfile().getId();
+        var token = new Token();
+        token.setUserId(userId);
+        token.setValue(value);
+        token.setType(type);
+        token.setExpiryDate(expired());
+        token.setCreatorId(userId);
+        return tokenRepository.saveAndFlush(token);
+    }
+
+    public TokenDto savedExpiredTokenDto(Token.Type type) {
+        return MAPPER.toDto(savedExpiredToken(type));
+    }
+
+    public OAuthAccessToken savedOauthToken(String email) {
+        var token = new OAuthAccessToken();
+        token.setTokenId(uuid());
+        token.setUserName(email);
+        token.setExpiration(notExpired());
+        return oAuthAccessTokenRepository.saveAndFlush(token);
+    }
+
+    public OAuthAccessTokenDto savedOauthTokenDto(String email) {
+        return MAPPER.toDto(savedOauthToken(email));
+    }
+
+    public OAuthAccessToken savedExpiredOauthToken(String email) {
+        var token = new OAuthAccessToken();
+        token.setTokenId(uuid());
+        token.setUserName(email);
+        token.setExpiration(expired());
+        return oAuthAccessTokenRepository.saveAndFlush(token);
+    }
+
+    public OAuthAccessTokenDto savedExpiredOauthTokenDto(String email) {
+        return MAPPER.toDto(savedExpiredOauthToken(email));
+    }
+
+    public BlacklistedToken getBlacklistedToken(String value) {
+        return blacklistedTokenRepository
+                .findAll()
+                .stream()
+                .filter(t -> t.getValue().equals(value))
+                .findAny()
+                .orElseThrow();
+    }
+
+    public BlacklistedToken savedBlacklistedToken() {
+        var adminId = savedAdmin().getId();
+        var user = savedUserProfile();
+        var token = savedOauthTokenDto(user.getEmail());
+        userProfileFacade.blacklistTokens(user.getId(), adminId);
+        return getBlacklistedToken(token.getTokenId());
+    }
+
+    public BlacklistedToken savedExpiredBlacklistedToken() {
+        var adminId = savedAdmin().getId();
+        var user = savedUserProfile();
+        var token = savedExpiredOauthTokenDto(user.getEmail());
+        userProfileFacade.blacklistTokens(user.getId(), adminId);
+        return getBlacklistedToken(token.getTokenId());
     }
 
     public static void copyBaseEntityData(BaseEntity from, BaseEntity to) {
@@ -122,18 +220,29 @@ public class MockUtil {
         to.setUpdatedAt(from.getUpdatedAt());
     }
 
-    public List<OAuthAccessTokenDto> toOAuthAccessTokenDtoList(UserProfileDto userProfile, String... tokens) {
-        return Arrays
-                .stream(tokens)
-                .map(token -> new OAuthAccessTokenDto(
-                        token,
-                        null, null,
-                        userProfile.getEmail(),
-                        "appId",
-                        null,
-                        LocalDateTime.now().plusHours(2),
-                        UUID.randomUUID().toString()))
-                .collect(toList());
+    public OAuthAccessTokenDto toOAuthAccessTokenDto(UserProfile userProfile, String token) {
+        return toOAuthAccessTokenDto(userProfile.getEmail(), token);
+    }
+
+    public OAuthAccessTokenDto toOAuthAccessTokenDto(String email, String token) {
+        return new OAuthAccessTokenDto(
+                token,
+                null, null,
+                email,
+                "appId",
+                null,
+                notExpired(),
+                uuid());
+    }
+
+    public void disableUser(Long userId) {
+        var user = userProfileRepository
+                .findById(userId)
+                .orElseThrow();
+        assertTrue(user.getEnabled());
+        user.setEnabled(false);
+        user.setUpdaterId(user.getId());
+        userProfileRepository.saveAndFlush(user);
     }
 
     @lombok.Value
@@ -143,7 +252,7 @@ public class MockUtil {
     }
 
     public Registration doRegistration() {
-        String email = "passwordMatches@mail.com", pass = "Password1!";
+        String email = genEmail(), pass = genEmail();
         String token = given()
                 .contentType(JSON)
                 .body(new RegistrationRequest(email, pass, pass))
@@ -171,6 +280,11 @@ public class MockUtil {
 
     public String doAuthentication() {
         return doAuthentication(doConfirmedRegistration());
+    }
+
+    public String doAuthentication(String password) {
+        var email = savedUserProfile(password).getEmail();
+        return doAuthentication(email, password);
     }
 
     public String doAuthentication(Registration registration) {
@@ -224,16 +338,41 @@ public class MockUtil {
         var request = new ForgotPasswordRequest(email);
         userPasswordFacade.handleForgotPasswordRequest(request);
         var userId = userProfileService.findUserProfileByEmail(email).getId();
-        return passwordTokenRepository.findByUserId(userId).orElseThrow().getTokenValue();
+        return tokenRepository.findByTypeAndUserId(PASSWORD_RESET, userId).orElseThrow().getValue();
     }
 
-    public List<OAuthAccessToken> genSavedTokens(int count, String email) {
-        return oAuthAccessTokenRepository.saveAll(Stream
-                .generate(OAuthAccessToken::new)
-                .peek(t -> t.setTokenId(UUID.randomUUID().toString()))
-                .peek(t -> t.setUserName(email))
-                .limit(count)
-                .collect(toList()));
+    private static final AtomicLong along = new AtomicLong(0);
+
+    public static String genEmail() {
+        return along.incrementAndGet() + "aseUser@mail.com";
+    }
+
+    public static String uuid() {
+        return UUID.randomUUID().toString();
+    }
+
+    public static LocalDateTime expired() {
+        return LocalDateTime.now().minusHours(1);
+    }
+
+    public static LocalDateTime notExpired() {
+        return LocalDateTime.now().plusHours(1);
+    }
+
+    public static <T> T randElt(List<? extends T> list) {
+        return list.get(current().nextInt(0, list.size()));
+    }
+
+    public static <T extends Enum<T>> T randEnumConst(Class<T> type) {
+        return randElt(List.of(type.getEnumConstants()));
+    }
+
+    public static <T extends Enum<T>> T randOtherEnumConst(T eConst) {
+        return Stream
+                .generate(() -> randEnumConst(eConst.getDeclaringClass()))
+                .filter(not(eConst::equals))
+                .findAny()
+                .orElseThrow();
     }
 
 }

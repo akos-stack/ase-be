@@ -2,7 +2,6 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.exception.UserProfileException;
 import com.bloxico.ase.userservice.service.token.impl.TokenBlacklistServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
@@ -13,7 +12,6 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Set;
 
-import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -75,13 +73,12 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
     @DirtiesContext(methodMode = BEFORE_METHOD) // clear cache
     public void disableUser() {
         var principalId = mockUtil.savedAdmin().getId();
-        var user = mockUtil.savedUserProfileDto();
+        var user = mockUtil.savedUserProfile();
         var userId = user.getId();
-        var tokens = mockUtil
-                .genSavedTokens(3, user.getEmail())
-                .stream()
-                .map(OAuthAccessToken::getTokenId)
-                .collect(toSet());
+        var tokens = Set.of(
+                mockUtil.savedOauthToken(user.getEmail()).getTokenId(),
+                mockUtil.savedOauthToken(user.getEmail()).getTokenId(),
+                mockUtil.savedOauthToken(user.getEmail()).getTokenId());
         assertEquals(Set.of(), tokenBlacklistService.blacklistedTokens());
         assertTrue(userProfileService.findUserProfileById(userId).getEnabled());
         userProfileFacade.disableUser(userId, principalId);
@@ -99,13 +96,12 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
     @DirtiesContext(methodMode = BEFORE_METHOD) // clear cache
     public void blacklistTokens() {
         var principalId = mockUtil.savedAdmin().getId();
-        var user = mockUtil.savedUserProfileDto();
+        var user = mockUtil.savedUserProfile();
         var userId = user.getId();
-        var tokens = mockUtil
-                .genSavedTokens(3, user.getEmail())
-                .stream()
-                .map(OAuthAccessToken::getTokenId)
-                .collect(toSet());
+        var tokens = Set.of(
+                mockUtil.savedOauthToken(user.getEmail()).getTokenId(),
+                mockUtil.savedOauthToken(user.getEmail()).getTokenId(),
+                mockUtil.savedOauthToken(user.getEmail()).getTokenId());
         assertEquals(Set.of(), tokenBlacklistService.blacklistedTokens());
         assertTrue(userProfileService.findUserProfileById(userId).getEnabled());
         userProfileFacade.blacklistTokens(userId, principalId);

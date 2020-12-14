@@ -13,4 +13,6 @@ public interface ITokenBlacklistService {
 
     void checkIfBlacklisted(String token);
 
+    void deleteExpiredTokens();
+
 }

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
-@EqualsAndHashCode(of = "token", callSuper = false)
+@EqualsAndHashCode(of = "value", callSuper = false)
 @Entity
 @Table(name = "blacklisted_tokens")
 public class BlacklistedToken extends BaseEntity {
@@ -19,10 +19,10 @@ public class BlacklistedToken extends BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(name = "token")
-    private String token;
+    @Column(name = "value")
+    private String value;
 
-    @Column(name = "expiration")
-    private LocalDateTime expiration;
+    @Column(name = "expiry_date")
+    private LocalDateTime expiryDate;
 
 }

@@ -32,7 +32,7 @@ public class UserProfileServiceImpl implements IUserProfileService, UserDetailsS
         log.debug("UserProfileServiceImpl.findUserProfileById - start | id: {}", id);
         var userProfileDto = userProfileRepository
                 .findById(id)
-                .map(MAPPER::toUserProfileDto)
+                .map(MAPPER::toDto)
                 .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
         log.debug("UserProfileServiceImpl.findUserProfileById - end | id: {}", id);
         return userProfileDto;
@@ -44,7 +44,7 @@ public class UserProfileServiceImpl implements IUserProfileService, UserDetailsS
         requireNonNull(email);
         var userProfileDto = userProfileRepository
                 .findByEmailIgnoreCase(email)
-                .map(MAPPER::toUserProfileDto)
+                .map(MAPPER::toDto)
                 .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
         log.debug("UserProfileServiceImpl.findUserByEmail - end | email: {}", email);
         return userProfileDto;
@@ -61,7 +61,7 @@ public class UserProfileServiceImpl implements IUserProfileService, UserDetailsS
         userProfile.setPhone(request.getPhone());
         userProfile.setUpdaterId(id);
         userProfile = userProfileRepository.saveAndFlush(userProfile);
-        var userProfileDto = MAPPER.toUserProfileDto(userProfile);
+        var userProfileDto = MAPPER.toDto(userProfile);
         log.debug("UserProfileServiceImpl.updateUserProfile - end | id: {}, request: {}", id, request);
         return userProfileDto;
     }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
+import static com.bloxico.ase.userservice.config.CacheConfig.BLACKLISTED_TOKENS_CACHE;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
@@ -29,7 +30,7 @@ public class TokenBlacklistServiceImpl implements ITokenBlacklistService {
     }
 
     @Override
-    @Cacheable("blacklistedTokensCache")
+    @Cacheable(BLACKLISTED_TOKENS_CACHE)
     public Set<String> blacklistedTokens() {
         log.debug("TokenBlacklistServiceImpl.blacklistedTokens - start");
         var blacklist = blacklistedTokenRepository.findDistinctTokenValues();
@@ -38,7 +39,7 @@ public class TokenBlacklistServiceImpl implements ITokenBlacklistService {
     }
 
     @Override
-    @CacheEvict(value = "blacklistedTokensCache", allEntries = true)
+    @CacheEvict(value = BLACKLISTED_TOKENS_CACHE, allEntries = true)
     public void blacklistTokens(List<OAuthAccessTokenDto> tokens, long principalId) {
         log.debug("TokenBlacklistServiceImpl.blacklistTokens - start | tokens: {}, principalId: {}", tokens, principalId);
         requireNonNull(tokens);
@@ -48,7 +49,6 @@ public class TokenBlacklistServiceImpl implements ITokenBlacklistService {
                 .peek(bt -> bt.setCreatorId(principalId))
                 .collect(toList());
         blacklistedTokenRepository.saveAll(bTokens);
-        blacklistedTokenRepository.flush();
         log.debug("TokenBlacklistServiceImpl.blacklistTokens - end | tokens: {}, principalId: {}", tokens, principalId);
     }
 
@@ -59,6 +59,14 @@ public class TokenBlacklistServiceImpl implements ITokenBlacklistService {
         if (blacklistedTokens().contains(token))
             throw ErrorCodes.Token.INVALID_TOKEN.newException();
         log.debug("TokenBlacklistServiceImpl.checkIfBlacklisted - start | token: {}", token);
+    }
+
+    @Override
+    @CacheEvict(value = BLACKLISTED_TOKENS_CACHE, allEntries = true)
+    public void deleteExpiredTokens() {
+        log.debug("TokenBlacklistServiceImpl.deleteExpiredTokens - start");
+        blacklistedTokenRepository.deleteExpiredTokens();
+        log.debug("TokenBlacklistServiceImpl.deleteExpiredTokens - end");
     }
 
 }
