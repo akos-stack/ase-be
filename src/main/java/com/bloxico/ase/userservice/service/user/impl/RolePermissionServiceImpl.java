@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.bloxico.ase.userservice.config.AseUserDetails.authorityOf;
+import static com.bloxico.ase.userservice.config.CacheConfig.PERMISSION_NAME_GRANTED_AUTHORITIES_MAP_CACHE;
 import static java.util.Map.entry;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
@@ -29,7 +30,7 @@ public class RolePermissionServiceImpl implements IRolePermissionService {
     }
 
     @Override
-    @Cacheable("permissionNameGrantedAuthoritiesMapCache")
+    @Cacheable(PERMISSION_NAME_GRANTED_AUTHORITIES_MAP_CACHE)
     public Map<String, Set<GrantedAuthority>> permissionNameGrantedAuthoritiesMap() {
         log.debug("RolePermissionServiceImpl.permissionNameGrantedAuthoritiesMap - start");
         var map = roleRepository
