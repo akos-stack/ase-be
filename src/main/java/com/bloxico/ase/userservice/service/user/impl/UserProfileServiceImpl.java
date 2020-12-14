@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.userservice.config.AseUserDetails;
+import com.bloxico.ase.userservice.config.ExternalUserInfoExtractor;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
@@ -8,17 +9,22 @@ import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
-@Service
-public class UserProfileServiceImpl implements IUserProfileService, UserDetailsService {
+@Service // TODO Composition instead of inheritance
+public class UserProfileServiceImpl extends DefaultOAuth2UserService implements IUserProfileService, UserDetailsService {
 
     private final UserProfileRepository userProfileRepository;
 
@@ -88,6 +94,36 @@ public class UserProfileServiceImpl implements IUserProfileService, UserDetailsS
         var aseUserDetails = new AseUserDetails(userProfile);
         log.debug("UserProfileServiceImpl.loadUserByUsername - end | email: {}", email);
         return aseUserDetails;
+    }
+
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest request) {
+        log.debug("UserProfileServiceImpl.loadUser - start | request: {}", request);
+        var oAuth2User = super.loadUser(request);
+        try {
+            var provider = request.getClientRegistration().getRegistrationId();
+            var extractor = ExternalUserInfoExtractor.of(provider);
+            var attributes = oAuth2User.getAttributes();
+            var email = extractor.getEmail(attributes);
+            if (email == null || email.isBlank())
+                // TODO extend
+                throw new RuntimeException("Email not found from OAuth2 provider");
+            // TODO refactor provider and disabled checking
+            var userProfile = userProfileRepository
+                    .findByEmailIgnoreCase(email)
+                    .map(user -> extractor.updateUserProfile(user, attributes, provider))
+                    .orElseGet(() -> extractor.newUserProfile(attributes));
+            // TODO check if changed?
+            userProfile = userProfileRepository.saveAndFlush(userProfile);
+            var aseOauth2User = new AseUserDetails(userProfile, attributes);
+            log.debug("UserProfileServiceImpl.loadUser - end | request: {}", request);
+            return aseOauth2User;
+        } catch (AuthenticationException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            // Trigger OAuth2AuthenticationFailureHandler with this exception
+            throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
+        }
     }
 
 }

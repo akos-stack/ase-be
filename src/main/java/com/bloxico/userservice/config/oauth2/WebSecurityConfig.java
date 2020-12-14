@@ -1,7 +1,10 @@
 package com.bloxico.userservice.config.oauth2;
 
+import com.bloxico.ase.userservice.config.OAuth2FailureHandler;
+import com.bloxico.ase.userservice.config.OAuth2SuccessHandler;
 import com.bloxico.ase.userservice.filter.JwtAuthorizationFilter;
 import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
+import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.userservice.filter.RepeatableReadRequestFilter;
 import com.bloxico.userservice.web.api.UserPasswordApi;
 import com.bloxico.userservice.web.api.UserRegistrationApi;
@@ -19,13 +22,15 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @EnableWebSecurity
 @Configuration("WebSecurityConfig")
@@ -111,15 +116,51 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(AUTH_WHITELIST);
     }
 
+    private final DefaultOAuth2UserService oAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
+
+    @Autowired
+    public WebSecurityConfig(UserProfileServiceImpl oAuth2UserService,
+                             OAuth2SuccessHandler oAuth2SuccessHandler,
+                             OAuth2FailureHandler oAuth2FailureHandler)
+    {
+        this.oAuth2UserService = oAuth2UserService;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
+        this.oAuth2FailureHandler = oAuth2FailureHandler;
+    }
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests().anyRequest().authenticated()
+                .authorizeRequests()
+                .antMatchers("/oauth2/**")
+                .permitAll()
+                .anyRequest().authenticated()
                 .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
-                and()
-                .addFilterBefore(new JwtAuthorizationFilter(tokenBlacklistService, tokenStore), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new RepeatableReadRequestFilter(), AbstractPreAuthenticatedProcessingFilter.class)
+                .sessionManagement().sessionCreationPolicy(STATELESS)
+                .and()
+                .oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorize")
+                //.authorizationRequestRepository(cookieAuthorizationRequestRepository())
+                .and()
+                .redirectionEndpoint()
+                .baseUri("/oauth2/callback/*")
+                .and()
+                .userInfoEndpoint()
+                .userService(oAuth2UserService)
+                .and()
+                .successHandler(oAuth2SuccessHandler)
+                .failureHandler(oAuth2FailureHandler)
+                .and()
+                .addFilterBefore(
+                        new JwtAuthorizationFilter(tokenBlacklistService, tokenStore),
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(
+                        new RepeatableReadRequestFilter(),
+                        AbstractPreAuthenticatedProcessingFilter.class)
                 .csrf().disable();
     }
+
 }

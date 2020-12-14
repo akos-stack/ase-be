@@ -17,6 +17,8 @@ public class UserProfileDto {
     private String phone;
     private Boolean locked = false;
     private Boolean enabled = false;
+    private String provider;
+    private String providerId;
     private Set<RoleDto> roles;
 
     public Stream<String> streamRoleNames() {

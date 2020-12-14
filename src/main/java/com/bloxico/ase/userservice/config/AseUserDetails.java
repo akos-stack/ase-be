@@ -6,17 +6,30 @@ import lombok.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
 @Value
-public class AseUserDetails implements UserDetails {
+public class AseUserDetails implements UserDetails, OAuth2User {
 
     private static final long serialVersionUID = 1L;
 
     UserProfile userProfile;
+    Map<String, Object> attributes;
+
+    public AseUserDetails(UserProfile userProfile) {
+        this.userProfile = userProfile;
+        attributes = Map.of();
+    }
+
+    public AseUserDetails(UserProfile userProfile, Map<String, Object> attributes) {
+        this.userProfile = userProfile;
+        this.attributes = Map.copyOf(attributes);
+    }
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
@@ -29,12 +42,23 @@ public class AseUserDetails implements UserDetails {
     }
 
     @Override
+    public Map<String, Object> getAttributes() {
+        return null;
+    }
+
+    @Override
     public String getPassword() {
         return userProfile.getPassword();
     }
 
     @Override
     public String getUsername() {
+        return userProfile.getEmail();
+    }
+
+    @Override
+    public String getName() {
+        // TODO is it ok?
         return userProfile.getEmail();
     }
 

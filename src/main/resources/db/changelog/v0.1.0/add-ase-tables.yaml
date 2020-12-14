@@ -93,6 +93,12 @@ databaseChangeLog:
                   type: boolean
                   constraints:
                     nullable: false
+              - column:
+                  name: provider
+                  type: varchar(256)
+              - column:
+                  name: provider_id
+                  type: varchar
               # METADATA
               - column:
                   name: creator_id

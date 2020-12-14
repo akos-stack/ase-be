@@ -42,6 +42,12 @@ public class UserProfile extends BaseEntity {
     @Column(name = "enabled")
     private Boolean enabled = false;
 
+    @Column(name = "provider")
+    private String provider;
+
+    @Column(name = "provider_id")
+    private String providerId;
+
     @ManyToMany(fetch = EAGER, cascade = MERGE)
     @JoinTable(
             name = "user_profiles_roles",
