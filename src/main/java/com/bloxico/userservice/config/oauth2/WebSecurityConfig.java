@@ -103,6 +103,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     static {
         AUTH_WHITELIST = new String[]{
 
+                "/oauth2/authorize",
                 "/swagger-resources/**", "/swagger-ui.html", "/api-docs", "/webjars/**",
                 UserRegistrationApi.REGISTRATION_ENDPOINT,
                 UserRegistrationApi.REGISTRATION_CONFIRMATION_ENDPOINT,
@@ -126,7 +127,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         web.ignoring().antMatchers(AUTH_WHITELIST);
     }
 
@@ -145,9 +146,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
 
                 .authorizeRequests()
-
-                .antMatchers("/oauth2/**")
-                .permitAll()
 
                 .anyRequest().authenticated()
                 .and()

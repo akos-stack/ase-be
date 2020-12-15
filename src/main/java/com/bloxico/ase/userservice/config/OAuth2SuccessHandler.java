@@ -39,7 +39,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             throws IOException
     {
         var targetUrl = determineTargetUrl(request, authentication);
-        if (!response.isCommitted()) {
+        if (response.isCommitted()) {
             log.debug("Response has already been committed. Unable to redirect to: " + targetUrl);
             return;
         }
@@ -54,7 +54,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .orElse(super.getDefaultTargetUrl());
         return UriComponentsBuilder
                 .fromUriString(redirectUri) // TODO !!!!!
-                .queryParam("token", "TODO Authentication->JWT"
+                .queryParam("token", "TODO->Authentication->JWT"
                         /*tokenStore. tokenProvider.createToken(authentication)*/)
                 .build()
                 .toUriString();
@@ -76,7 +76,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private static boolean isAuthorizedRedirectUri(String uri) {
         var clientRedirectUri = URI.create(uri);
         // TODO fetch authorizedRedirectUris from database
-        return List.of("http://localhost:8089/api/oauth2/redirect")
+        return List.of("http://localhost:8089/api/")
                 .stream()
                 .anyMatch(authorizedRedirectUri -> {
                     // Only validate host and port. Let the clients use different paths if they want to

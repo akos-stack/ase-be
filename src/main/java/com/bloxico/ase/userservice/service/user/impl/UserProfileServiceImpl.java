@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.Objects.requireNonNull;
 
@@ -97,6 +99,7 @@ public class UserProfileServiceImpl extends DefaultOAuth2UserService implements 
     }
 
     @Override
+    @Transactional
     public OAuth2User loadUser(OAuth2UserRequest request) {
         log.debug("UserProfileServiceImpl.loadUser - start | request: {}", request);
         var oAuth2User = super.loadUser(request);

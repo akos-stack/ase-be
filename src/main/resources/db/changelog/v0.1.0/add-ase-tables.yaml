@@ -72,8 +72,6 @@ databaseChangeLog:
               - column:
                   name: password
                   type: varchar(256)
-                  constraints:
-                    nullable: false
               - column:
                   name: email
                   type: varchar(256)
