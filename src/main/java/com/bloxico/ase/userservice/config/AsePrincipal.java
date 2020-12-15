@@ -9,8 +9,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
@@ -24,11 +26,15 @@ public class AsePrincipal implements UserDetails, OAuth2User {
 
     private AsePrincipal(UserProfile userProfile, Map<String, Object> attributes) {
         this.userProfile = requireNonNull(userProfile);
-        this.attributes = Map.copyOf(requireNonNull(attributes));
+        //noinspection Java9CollectionFactory
+        this.attributes = attributes == null
+                ? Map.of()
+                // Map.copyOf() doesn't accept null keys
+                : unmodifiableMap(new HashMap<>(attributes));
     }
 
     public static AsePrincipal newUserDetails(UserProfile userProfile) {
-        return new AsePrincipal(userProfile, Map.of());
+        return new AsePrincipal(userProfile, null);
     }
 
     public static AsePrincipal newOAuth2User(UserProfile userProfile, Map<String, Object> attributes) {
