@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
-import com.bloxico.ase.userservice.config.AseUserDetails;
-import com.bloxico.ase.userservice.config.ExternalUserInfoExtractor;
+import com.bloxico.ase.userservice.config.AsePrincipal;
+import com.bloxico.ase.userservice.config.ExternalUserDataExtractor;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
@@ -23,7 +23,7 @@ import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
-@Service // TODO Composition instead of inheritance
+@Service
 public class UserProfileServiceImpl extends DefaultOAuth2UserService implements IUserProfileService, UserDetailsService {
 
     private final UserProfileRepository userProfileRepository;
@@ -91,7 +91,7 @@ public class UserProfileServiceImpl extends DefaultOAuth2UserService implements 
         var userProfile = userProfileRepository
                 .findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
-        var aseUserDetails = new AseUserDetails(userProfile);
+        var aseUserDetails = AsePrincipal.newUserDetails(userProfile);
         log.debug("UserProfileServiceImpl.loadUserByUsername - end | email: {}", email);
         return aseUserDetails;
     }
@@ -102,26 +102,25 @@ public class UserProfileServiceImpl extends DefaultOAuth2UserService implements 
         var oAuth2User = super.loadUser(request);
         try {
             var provider = request.getClientRegistration().getRegistrationId();
-            var extractor = ExternalUserInfoExtractor.of(provider);
+            var extractor = ExternalUserDataExtractor.of(provider);
             var attributes = oAuth2User.getAttributes();
             var email = extractor.getEmail(attributes);
             if (email == null || email.isBlank())
-                // TODO extend
-                throw new RuntimeException("Email not found from OAuth2 provider");
-            // TODO refactor provider and disabled checking
+                throw new InternalAuthenticationServiceException(
+                        "Email not found from OAuth2 provider");
             var userProfile = userProfileRepository
                     .findByEmailIgnoreCase(email)
-                    .map(user -> extractor.updateUserProfile(user, attributes, provider))
+                    .map(extractor::validateUserProfile)
+                    .map(user -> extractor.updatedUserProfile(user, attributes))
                     .orElseGet(() -> extractor.newUserProfile(attributes));
-            // TODO check if changed?
             userProfile = userProfileRepository.saveAndFlush(userProfile);
-            var aseOauth2User = new AseUserDetails(userProfile, attributes);
+            var aseOauth2User = AsePrincipal.newOAuth2User(userProfile, attributes);
             log.debug("UserProfileServiceImpl.loadUser - end | request: {}", request);
             return aseOauth2User;
         } catch (AuthenticationException ex) {
             throw ex;
         } catch (Exception ex) {
-            // Trigger OAuth2AuthenticationFailureHandler with this exception
+            // AuthenticationServiceException triggers OAuth2FailureHandler
             throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
         }
     }

@@ -1,10 +1,11 @@
 package com.bloxico.ase.userservice.config;
 
 import com.bloxico.ase.userservice.entity.user.UserProfile;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 
 import java.util.Map;
 
-public enum ExternalUserInfoExtractor {
+public enum ExternalUserDataExtractor {
 
     GOOGLE {
         @Override
@@ -14,12 +15,12 @@ public enum ExternalUserInfoExtractor {
 
         @Override
         public String getEmail(Map<String, Object> attributes) {
-            return (String) attributes.get("name");
+            return (String) attributes.get("email");
         }
 
         @Override
         public String getName(Map<String, Object> attributes) {
-            return (String) attributes.get("email");
+            return (String) attributes.get("name");
         }
     },
 
@@ -31,12 +32,12 @@ public enum ExternalUserInfoExtractor {
 
         @Override
         public String getEmail(Map<String, Object> attributes) {
-            return (String) attributes.get("name");
+            return (String) attributes.get("email");
         }
 
         @Override
         public String getName(Map<String, Object> attributes) {
-            return (String) attributes.get("email");
+            return (String) attributes.get("name");
         }
     },
 
@@ -48,16 +49,16 @@ public enum ExternalUserInfoExtractor {
 
         @Override
         public String getEmail(Map<String, Object> attributes) {
-            return (String) attributes.get("name");
+            return (String) attributes.get("email");
         }
 
         @Override
         public String getName(Map<String, Object> attributes) {
-            return (String) attributes.get("email");
+            return (String) attributes.get("name");
         }
     };
 
-    public static ExternalUserInfoExtractor of(String name) {
+    public static ExternalUserDataExtractor of(String name) {
         return valueOf(name.toUpperCase());
     }
 
@@ -67,6 +68,22 @@ public enum ExternalUserInfoExtractor {
 
     public abstract String getName(Map<String, Object> attributes);
 
+    public UserProfile validateUserProfile(UserProfile user) {
+        if (!user.getProvider().equalsIgnoreCase(name()))
+            throw new InternalAuthenticationServiceException(
+                    "Use " + user.getProvider() + " provider");
+        if (!user.getEnabled())
+            throw new InternalAuthenticationServiceException(
+                    "User is disabled");
+        return user;
+    }
+
+    public UserProfile updatedUserProfile(UserProfile user, Map<String, Object> attributes) {
+        user.setName(getName(attributes));
+        user.setUpdaterId(user.getId());
+        return user;
+    }
+
     public UserProfile newUserProfile(Map<String, Object> attributes) {
         var user = new UserProfile();
         user.setProvider(name());
@@ -74,17 +91,6 @@ public enum ExternalUserInfoExtractor {
         user.setEmail(getEmail(attributes));
         user.setName(getName(attributes));
         user.setEnabled(true);
-        return user;
-    }
-
-    public UserProfile updateUserProfile(UserProfile user, Map<String, Object> attributes, String provider) {
-        if (!provider.equalsIgnoreCase(user.getProvider()))
-            // TODO extend
-            throw new RuntimeException("Please use your " + user.getProvider() + " account to login.");
-        if (!user.getEnabled())
-            // TODO extend
-            throw new RuntimeException("User is disabled");
-        user.setName(getName(attributes));
         return user;
     }
 

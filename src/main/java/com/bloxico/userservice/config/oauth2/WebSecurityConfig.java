@@ -1,5 +1,6 @@
 package com.bloxico.userservice.config.oauth2;
 
+import com.bloxico.ase.userservice.config.CookieOAuth2RequestRepository;
 import com.bloxico.ase.userservice.config.OAuth2FailureHandler;
 import com.bloxico.ase.userservice.config.OAuth2SuccessHandler;
 import com.bloxico.ase.userservice.filter.JwtAuthorizationFilter;
@@ -33,27 +34,68 @@ import org.springframework.web.filter.CorsFilter;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @EnableWebSecurity
-@Configuration("WebSecurityConfig")
+@Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-//    @Autowired
-//    private DaoAuthenticationProvider daoAuthenticationProvider;
-
-    @Autowired
-    TokenStore tokenStore;
-
-    @Autowired
-    ITokenBlacklistService tokenBlacklistService;
 
     @Value("${front.end.url}")
     protected String FRONTEND_URL;
 
+    private final TokenStore tokenStore;
+    private final ITokenBlacklistService tokenBlacklistService;
+    private final DefaultOAuth2UserService oAuth2UserService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
+    private final CookieOAuth2RequestRepository cookieOAuth2RequestRepository;
+
+    @Autowired
+    public WebSecurityConfig(TokenStore tokenStore,
+                             ITokenBlacklistService tokenBlacklistService,
+                             UserProfileServiceImpl oAuth2UserService,
+                             OAuth2SuccessHandler oAuth2SuccessHandler,
+                             OAuth2FailureHandler oAuth2FailureHandler,
+                             CookieOAuth2RequestRepository cookieOAuth2RequestRepository)
+    {
+        this.tokenStore = tokenStore;
+        this.tokenBlacklistService = tokenBlacklistService;
+        this.oAuth2UserService = oAuth2UserService;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
+        this.oAuth2FailureHandler = oAuth2FailureHandler;
+        this.cookieOAuth2RequestRepository = cookieOAuth2RequestRepository;
+    }
 
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean
+    @Profile(value = "prod")
+    public FilterRegistrationBean<CorsFilter> prodCorsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin(FRONTEND_URL);
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        var bean = new FilterRegistrationBean<>(new CorsFilter(source));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
+
+    @Bean
+    @Profile(value = "!prod")
+    public FilterRegistrationBean<CorsFilter> notProdCorsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", config);
+        var bean = new FilterRegistrationBean<>(new CorsFilter(source));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
     }
 
     private static final String[] AUTH_WHITELIST;
@@ -83,84 +125,59 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         };
     }
 
-    @Profile(value = "prod")
-    @Bean
-    public FilterRegistrationBean prodCorsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin(FRONTEND_URL);
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return bean;
-    }
-
-    @Profile(value = "!prod")
-    @Bean
-    public FilterRegistrationBean notProdCorsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        source.registerCorsConfiguration("/**", config);
-        FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
-        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return bean;
-    }
-
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(AUTH_WHITELIST);
     }
 
-    private final DefaultOAuth2UserService oAuth2UserService;
-    private final OAuth2SuccessHandler oAuth2SuccessHandler;
-    private final OAuth2FailureHandler oAuth2FailureHandler;
-
-    @Autowired
-    public WebSecurityConfig(UserProfileServiceImpl oAuth2UserService,
-                             OAuth2SuccessHandler oAuth2SuccessHandler,
-                             OAuth2FailureHandler oAuth2FailureHandler)
-    {
-        this.oAuth2UserService = oAuth2UserService;
-        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
-        this.oAuth2FailureHandler = oAuth2FailureHandler;
-    }
-
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
+                .cors()
+                .and()
+
+                .sessionManagement()
+                .sessionCreationPolicy(STATELESS)
+                .and()
+
+                .csrf().disable()
+                .formLogin().disable()
+                .httpBasic().disable()
+
                 .authorizeRequests()
+
                 .antMatchers("/oauth2/**")
                 .permitAll()
+
                 .anyRequest().authenticated()
                 .and()
-                .sessionManagement().sessionCreationPolicy(STATELESS)
-                .and()
+
                 .oauth2Login()
+
                 .authorizationEndpoint()
                 .baseUri("/oauth2/authorize")
-                //.authorizationRequestRepository(cookieAuthorizationRequestRepository())
+                .authorizationRequestRepository(cookieOAuth2RequestRepository)
                 .and()
+
                 .redirectionEndpoint()
                 .baseUri("/oauth2/callback/*")
                 .and()
+
                 .userInfoEndpoint()
                 .userService(oAuth2UserService)
                 .and()
+
                 .successHandler(oAuth2SuccessHandler)
                 .failureHandler(oAuth2FailureHandler)
                 .and()
+
                 .addFilterBefore(
                         new JwtAuthorizationFilter(tokenBlacklistService, tokenStore),
                         UsernamePasswordAuthenticationFilter.class)
+
                 .addFilterBefore(
                         new RepeatableReadRequestFilter(),
-                        AbstractPreAuthenticatedProcessingFilter.class)
-                .csrf().disable();
+                        AbstractPreAuthenticatedProcessingFilter.class);
     }
 
 }

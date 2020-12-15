@@ -63,7 +63,7 @@ public class TokenStoreConfig {
     private static class CustomTokenEnhancer extends JwtAccessTokenConverter {
         @Override
         public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-            var userDetails = (AseUserDetails) authentication.getPrincipal();
+            var userDetails = (AsePrincipal) authentication.getPrincipal();
 
             var info = new LinkedHashMap<>(accessToken.getAdditionalInformation());
             info.put("id", userDetails.getUserProfile().getId());

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.Set;
 
-import static com.bloxico.ase.userservice.config.AseUserDetails.authorityOf;
+import static com.bloxico.ase.userservice.config.AsePrincipal.authorityOf;
 import static com.bloxico.ase.userservice.config.CacheConfig.PERMISSION_NAME_GRANTED_AUTHORITIES_MAP_CACHE;
 import static java.util.Map.entry;
 import static java.util.stream.Collectors.groupingBy;

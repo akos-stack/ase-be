@@ -11,24 +11,28 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.util.Collection;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
 @Value
-public class AseUserDetails implements UserDetails, OAuth2User {
+public class AsePrincipal implements UserDetails, OAuth2User {
 
     private static final long serialVersionUID = 1L;
 
     UserProfile userProfile;
     Map<String, Object> attributes;
 
-    public AseUserDetails(UserProfile userProfile) {
-        this.userProfile = userProfile;
-        attributes = Map.of();
+    private AsePrincipal(UserProfile userProfile, Map<String, Object> attributes) {
+        this.userProfile = requireNonNull(userProfile);
+        this.attributes = Map.copyOf(requireNonNull(attributes));
     }
 
-    public AseUserDetails(UserProfile userProfile, Map<String, Object> attributes) {
-        this.userProfile = userProfile;
-        this.attributes = Map.copyOf(attributes);
+    public static AsePrincipal newUserDetails(UserProfile userProfile) {
+        return new AsePrincipal(userProfile, Map.of());
+    }
+
+    public static AsePrincipal newOAuth2User(UserProfile userProfile, Map<String, Object> attributes) {
+        return new AsePrincipal(userProfile, attributes);
     }
 
     @Override
@@ -37,13 +41,13 @@ public class AseUserDetails implements UserDetails, OAuth2User {
                 .getRoles()
                 .stream()
                 .map(Role::getName)
-                .map(AseUserDetails::authorityOf)
+                .map(AsePrincipal::authorityOf)
                 .collect(toUnmodifiableSet());
     }
 
     @Override
     public Map<String, Object> getAttributes() {
-        return null;
+        return attributes;
     }
 
     @Override
@@ -58,7 +62,6 @@ public class AseUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getName() {
-        // TODO is it ok?
         return userProfile.getEmail();
     }
 

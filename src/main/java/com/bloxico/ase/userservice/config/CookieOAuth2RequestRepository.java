@@ -8,11 +8,20 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.bloxico.ase.userservice.util.Cookies.deleteCookie;
+import static com.bloxico.ase.userservice.util.Cookies.newCookie;
+
+/**
+ * By default, Spring OAuth2 uses HttpSessionOAuth2AuthorizationRequestRepository to save
+ * the authorization request. But, since our service is stateless, we can't save it in
+ * the session. We'll save the request in a Base64 encoded cookie instead.
+ */
 @Component
 public class CookieOAuth2RequestRepository implements AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
 
-    public static final String OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME = "oauth2_auth_request";
     public static final String REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri";
+    public static final String OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME = "oauth2_auth_request";
+
     private static final int cookieExpireSeconds = 180;
 
     @Override
@@ -29,28 +38,34 @@ public class CookieOAuth2RequestRepository implements AuthorizationRequestReposi
                                          HttpServletResponse response)
     {
         if (authorizationRequest == null) {
-            Cookies.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-            Cookies.deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME);
+            deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
+            deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME);
             return;
         }
-        Cookies.addCookie(
-                response,
+        var stateCookie = newCookie(
                 OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME,
                 Cookies.serialize(authorizationRequest),
                 cookieExpireSeconds);
+        response.addCookie(stateCookie);
+
         String redirectUriAfterLogin = request.getParameter(REDIRECT_URI_PARAM_COOKIE_NAME);
-        if (!redirectUriAfterLogin.isBlank())
-            Cookies.addCookie(response, REDIRECT_URI_PARAM_COOKIE_NAME, redirectUriAfterLogin, cookieExpireSeconds);
+        if (!redirectUriAfterLogin.isBlank()) {
+            var redirectUriCookie = newCookie(
+                    REDIRECT_URI_PARAM_COOKIE_NAME,
+                    redirectUriAfterLogin,
+                    cookieExpireSeconds);
+            response.addCookie(redirectUriCookie);
+        }
     }
 
     @Override
     public OAuth2AuthorizationRequest removeAuthorizationRequest(HttpServletRequest request) {
-        return this.loadAuthorizationRequest(request);
+        return loadAuthorizationRequest(request);
     }
 
-    public void removeAuthorizationRequestCookies(HttpServletRequest request, HttpServletResponse response) {
-        Cookies.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
-        Cookies.deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME);
+    public static void removeAuthorizationRequestCookies(HttpServletRequest request, HttpServletResponse response) {
+        deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME);
+        deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME);
     }
 
 }
