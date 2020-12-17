@@ -1,6 +1,7 @@
 package com.bloxico.userservice.config.oauth2;
 
 import com.bloxico.ase.userservice.config.CookieOAuth2RequestRepository;
+import com.bloxico.ase.userservice.config.OAuth2AccessTokenResponseConverterWithDefaults;
 import com.bloxico.ase.userservice.config.OAuth2FailureHandler;
 import com.bloxico.ase.userservice.config.OAuth2SuccessHandler;
 import com.bloxico.ase.userservice.filter.JwtAuthorizationFilter;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -23,13 +25,21 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import java.util.Arrays;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -54,8 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                              UserProfileServiceImpl oAuth2UserService,
                              OAuth2SuccessHandler oAuth2SuccessHandler,
                              OAuth2FailureHandler oAuth2FailureHandler,
-                             CookieOAuth2RequestRepository cookieOAuth2RequestRepository)
-    {
+                             CookieOAuth2RequestRepository cookieOAuth2RequestRepository) {
         this.tokenStore = tokenStore;
         this.tokenBlacklistService = tokenBlacklistService;
         this.oAuth2UserService = oAuth2UserService;
@@ -165,8 +174,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .userService(oAuth2UserService)
                 .and()
 
+                .tokenEndpoint()
+                .accessTokenResponseClient(authorizationCodeTokenResponseClient())
+
+                .and()
                 .successHandler(oAuth2SuccessHandler)
                 .failureHandler(oAuth2FailureHandler)
+
                 .and()
 
                 .addFilterBefore(
@@ -178,4 +192,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         AbstractPreAuthenticatedProcessingFilter.class);
     }
 
+    private OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> authorizationCodeTokenResponseClient() {
+        OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter =
+                new OAuth2AccessTokenResponseHttpMessageConverter();
+        tokenResponseHttpMessageConverter.setTokenResponseConverter(new OAuth2AccessTokenResponseConverterWithDefaults());
+
+        RestTemplate restTemplate = new RestTemplate(Arrays.asList(
+                new FormHttpMessageConverter(), tokenResponseHttpMessageConverter));
+        restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
+
+        DefaultAuthorizationCodeTokenResponseClient tokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
+        tokenResponseClient.setRestOperations(restTemplate);
+
+        return tokenResponseClient;
+
+    }
 }
