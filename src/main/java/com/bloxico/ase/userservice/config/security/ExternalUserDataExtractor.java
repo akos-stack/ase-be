@@ -3,8 +3,6 @@ package com.bloxico.ase.userservice.config.security;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,30 +58,26 @@ public enum ExternalUserDataExtractor {
             return (String) attributes.get("name");
         }
     },
+
     LINKEDIN {
         @Override
         public String getId(Map<String, Object> attributes) {
-//            List elements =  (ArrayList) attributes.get("elements");
-////            LinkedHashMap<String, LinkedHashMap<String, String>> firstElement = (LinkedHashMap<String, LinkedHashMap<String, String>>) elements.get(0);
-////            LinkedHashMap<String, String> handleElement = firstElement.get("handle~");
-////            return handleElement.get("emailAddress");
             return null;
         }
 
         @Override
         public String getEmail(Map<String, Object> attributes) {
-            List elements =  (ArrayList) attributes.get("elements");
-            LinkedHashMap<String, LinkedHashMap<String, String>> firstElement = (LinkedHashMap<String, LinkedHashMap<String, String>>) elements.get(0);
-            LinkedHashMap<String, String> handleElement = firstElement.get("handle~");
-            return handleElement.get("emailAddress");
+            @SuppressWarnings("unchecked")
+            var elements = (List<Map<String, Map<String, String>>>) attributes.get("elements");
+            return elements
+                    .get(0)
+                    .get("handle~")
+                    .get("emailAddress");
         }
 
         @Override
         public String getName(Map<String, Object> attributes) {
-            List elements =  (ArrayList) attributes.get("elements");
-            LinkedHashMap<String, LinkedHashMap<String, String>> firstElement = (LinkedHashMap<String, LinkedHashMap<String, String>>) elements.get(0);
-            LinkedHashMap<String, String> handleElement = firstElement.get("handle~");
-            return handleElement.get("emailAddress");
+            return getEmail(attributes);
         }
     };
 
