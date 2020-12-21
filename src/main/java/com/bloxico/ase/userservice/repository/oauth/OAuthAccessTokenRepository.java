@@ -5,9 +5,11 @@ import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface OAuthAccessTokenRepository extends JpaRepository<OAuthAccessToken, String> {
 
     List<OAuthAccessTokenDto> findAllByUserNameIgnoreCase(String email);
