@@ -1,4 +1,4 @@
-package com.bloxico.ase.userservice.config;
+package com.bloxico.ase.userservice.config.security;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
