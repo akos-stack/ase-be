@@ -1,6 +1,7 @@
 package com.bloxico.ase;
 
-import com.bloxico.ase.userservice.config.PersistentJwtTokenStoreTest;
+import com.bloxico.ase.userservice.config.security.AsePrincipalServiceTest;
+import com.bloxico.ase.userservice.config.security.PersistentJwtTokenStoreTest;
 import com.bloxico.ase.userservice.entity.BaseEntityTest;
 import com.bloxico.ase.userservice.facade.impl.QuartzOperationsFacadeImplTest;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImplTest;
@@ -43,6 +44,7 @@ import org.junit.runners.Suite;
 
         // config
         PersistentJwtTokenStoreTest.class,
+        AsePrincipalServiceTest.class,
 
         // service
         UserRegistrationServiceImplTest.class,

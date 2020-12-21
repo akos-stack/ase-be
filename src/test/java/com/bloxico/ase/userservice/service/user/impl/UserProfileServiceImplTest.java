@@ -6,10 +6,8 @@ import com.bloxico.ase.userservice.exception.UserProfileException;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import static com.bloxico.ase.testutil.MockUtil.uuid;
-import static com.bloxico.ase.userservice.config.security.AsePrincipal.newUserDetails;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -86,24 +84,6 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
         assertTrue(userProfileService.findUserProfileById(userId).getEnabled());
         userProfileService.disableUser(userId, adminId);
         assertFalse(userProfileService.findUserProfileById(userId).getEnabled());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void loadUserByUsername_nullEmail() {
-        userProfileService.loadUserByUsername(null);
-    }
-
-    @Test(expected = UsernameNotFoundException.class)
-    public void loadUserByUsername_notFound() {
-        userProfileService.loadUserByUsername(uuid());
-    }
-
-    @Test
-    public void loadUserByUsername_found() {
-        var userProfile = mockUtil.savedUserProfile();
-        assertEquals(
-                newUserDetails(userProfile),
-                userProfileService.loadUserByUsername(userProfile.getEmail()));
     }
 
 }

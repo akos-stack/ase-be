@@ -1,12 +1,8 @@
 package com.bloxico.userservice.config.oauth2;
 
-import com.bloxico.ase.userservice.config.security.CookieOAuth2RequestRepository;
-import com.bloxico.ase.userservice.config.security.OAuth2AccessTokenResponseConverterWithDefaults;
-import com.bloxico.ase.userservice.config.security.OAuth2FailureHandler;
-import com.bloxico.ase.userservice.config.security.OAuth2SuccessHandler;
+import com.bloxico.ase.userservice.config.security.*;
 import com.bloxico.ase.userservice.filter.JwtAuthorizationFilter;
 import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
-import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.userservice.filter.RepeatableReadRequestFilter;
 import com.bloxico.userservice.web.api.UserPasswordApi;
 import com.bloxico.userservice.web.api.UserRegistrationApi;
@@ -61,7 +57,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public WebSecurityConfig(TokenStore tokenStore,
                              ITokenBlacklistService tokenBlacklistService,
-                             UserProfileServiceImpl oAuth2UserService,
+                             AsePrincipalService oAuth2UserService,
                              OAuth2SuccessHandler oAuth2SuccessHandler,
                              OAuth2FailureHandler oAuth2FailureHandler,
                              CookieOAuth2RequestRepository cookieOAuth2RequestRepository) {
