@@ -1,4 +1,4 @@
-package com.bloxico.ase.userservice.config;
+package com.bloxico.ase.userservice.config.security;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.support.SqlLobValue;

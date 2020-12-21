@@ -1,5 +1,7 @@
-package com.bloxico.ase.userservice.config;
+package com.bloxico.ase.userservice.config.security;
 
+import com.bloxico.ase.userservice.config.security.AsePrincipal;
+import com.bloxico.ase.userservice.config.security.PersistentJwtTokenStore;
 import com.bloxico.ase.userservice.entity.user.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,9 +1,9 @@
 package com.bloxico.userservice.config.oauth2;
 
-import com.bloxico.ase.userservice.config.CookieOAuth2RequestRepository;
-import com.bloxico.ase.userservice.config.OAuth2AccessTokenResponseConverterWithDefaults;
-import com.bloxico.ase.userservice.config.OAuth2FailureHandler;
-import com.bloxico.ase.userservice.config.OAuth2SuccessHandler;
+import com.bloxico.ase.userservice.config.security.CookieOAuth2RequestRepository;
+import com.bloxico.ase.userservice.config.security.OAuth2AccessTokenResponseConverterWithDefaults;
+import com.bloxico.ase.userservice.config.security.OAuth2FailureHandler;
+import com.bloxico.ase.userservice.config.security.OAuth2SuccessHandler;
 import com.bloxico.ase.userservice.filter.JwtAuthorizationFilter;
 import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;

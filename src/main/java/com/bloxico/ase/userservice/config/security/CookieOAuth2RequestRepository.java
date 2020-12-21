@@ -1,4 +1,4 @@
-package com.bloxico.ase.userservice.config;
+package com.bloxico.ase.userservice.config.security;
 
 import com.bloxico.ase.userservice.util.Cookies;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;

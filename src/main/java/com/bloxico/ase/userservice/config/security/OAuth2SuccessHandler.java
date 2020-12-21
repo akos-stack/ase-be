@@ -1,9 +1,8 @@
-package com.bloxico.ase.userservice.config;
+package com.bloxico.ase.userservice.config.security;
 
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.util.Cookies;
-import com.bloxico.userservice.config.oauth2.CoinClientDetailsService;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +26,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import static com.bloxico.ase.userservice.config.CookieOAuth2RequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
-import static com.bloxico.ase.userservice.config.CookieOAuth2RequestRepository.removeAuthorizationRequestCookies;
+import static com.bloxico.ase.userservice.config.security.CookieOAuth2RequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+import static com.bloxico.ase.userservice.config.security.CookieOAuth2RequestRepository.removeAuthorizationRequestCookies;
 
 @Slf4j
 @Component

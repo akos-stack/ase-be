@@ -5,7 +5,7 @@ import com.bloxico.ase.testutil.MockUtil;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.bloxico.ase.userservice.config.AsePrincipal.authorityOf;
+import static com.bloxico.ase.userservice.config.security.AsePrincipal.authorityOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;

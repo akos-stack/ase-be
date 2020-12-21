@@ -1,4 +1,4 @@
-package com.bloxico.ase.userservice.config;
+package com.bloxico.ase.userservice.config.security;
 
 import com.bloxico.ase.userservice.service.user.IRolePermissionService;
 import lombok.extern.slf4j.Slf4j;

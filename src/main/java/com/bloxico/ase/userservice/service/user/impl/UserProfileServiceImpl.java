@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
-import com.bloxico.ase.userservice.config.AsePrincipal;
-import com.bloxico.ase.userservice.config.ExternalUserDataExtractor;
+import com.bloxico.ase.userservice.config.security.AsePrincipal;
+import com.bloxico.ase.userservice.config.security.ExternalUserDataExtractor;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;

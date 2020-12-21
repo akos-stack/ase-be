@@ -1,4 +1,4 @@
-package com.bloxico.ase.userservice.config;
+package com.bloxico.ase.userservice.config.security;
 
 import com.bloxico.ase.userservice.util.Cookies;
 import org.springframework.security.core.AuthenticationException;
@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.bloxico.ase.userservice.config.CookieOAuth2RequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
-import static com.bloxico.ase.userservice.config.CookieOAuth2RequestRepository.removeAuthorizationRequestCookies;
+import static com.bloxico.ase.userservice.config.security.CookieOAuth2RequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+import static com.bloxico.ase.userservice.config.security.CookieOAuth2RequestRepository.removeAuthorizationRequestCookies;
 
 @Component
 public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler {

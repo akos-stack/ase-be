@@ -1,4 +1,4 @@
-package com.bloxico.ase.userservice.config;
+package com.bloxico.ase.userservice.config.security;
 
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
