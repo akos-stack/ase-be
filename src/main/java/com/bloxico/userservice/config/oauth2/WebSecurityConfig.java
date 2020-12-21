@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationC
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -57,10 +58,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     public WebSecurityConfig(TokenStore tokenStore,
                              ITokenBlacklistService tokenBlacklistService,
-                             AsePrincipalService oAuth2UserService,
+                             AseSecurityService oAuth2UserService,
                              OAuth2SuccessHandler oAuth2SuccessHandler,
                              OAuth2FailureHandler oAuth2FailureHandler,
-                             CookieOAuth2RequestRepository cookieOAuth2RequestRepository) {
+                             CookieOAuth2RequestRepository cookieOAuth2RequestRepository)
+    {
         this.tokenStore = tokenStore;
         this.tokenBlacklistService = tokenBlacklistService;
         this.oAuth2UserService = oAuth2UserService;

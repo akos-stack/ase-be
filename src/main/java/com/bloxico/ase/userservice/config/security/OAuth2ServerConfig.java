@@ -1,6 +1,5 @@
 package com.bloxico.ase.userservice.config.security;
 
-import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,8 +28,8 @@ public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
     public OAuth2ServerConfig(AuthenticationManager authenticationManager,
-                              AsePrincipalService userDetailsService,
-                              OAuthClientDetailsServiceImpl clientDetailsService,
+                              AseSecurityService userDetailsService,
+                              AseSecurityService clientDetailsService,
                               TokenStore tokenStore,
                               JwtAccessTokenConverter jwtAccessTokenConverter,
                               DataSource dataSource)

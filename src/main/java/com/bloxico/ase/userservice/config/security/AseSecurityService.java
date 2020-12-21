@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.config.security;
 
+import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.provider.ClientDetails;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.ClientRegistrationException;
+import org.springframework.security.oauth2.provider.client.BaseClientDetails;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -19,13 +24,17 @@ import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @Service
-public class AsePrincipalService extends DefaultOAuth2UserService implements UserDetailsService {
+public class AseSecurityService extends DefaultOAuth2UserService implements UserDetailsService, ClientDetailsService {
 
     private final UserProfileRepository userProfileRepository;
+    private final OAuthClientDetailsRepository oAuthClientDetailsRepository;
 
     @Autowired
-    public AsePrincipalService(UserProfileRepository userProfileRepository) {
+    public AseSecurityService(UserProfileRepository userProfileRepository,
+                              OAuthClientDetailsRepository oAuthClientDetailsRepository)
+    {
         this.userProfileRepository = userProfileRepository;
+        this.oAuthClientDetailsRepository = oAuthClientDetailsRepository;
     }
 
     @Override
@@ -68,6 +77,24 @@ public class AsePrincipalService extends DefaultOAuth2UserService implements Use
             // AuthenticationServiceException triggers OAuth2FailureHandler
             throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
         }
+    }
+
+    @Override
+    public ClientDetails loadClientByClientId(String clientId) {
+        log.debug("OAuthClientDetailsServiceImpl.loadClientByClientId - start | clientId: {}", clientId);
+        requireNonNull(clientId);
+        var dto = oAuthClientDetailsRepository
+                .findByClientId(clientId)
+                .orElseThrow(() -> new ClientRegistrationException(clientId));
+        var bcd = new BaseClientDetails();
+        bcd.setClientId(dto.getClientId());
+        bcd.setClientSecret(dto.getClientSecret());
+        bcd.setScope(dto.scopesAsSet());
+        bcd.setAuthorizedGrantTypes(dto.authorizedGrantTypesAsSet());
+        bcd.setAuthorities(dto.authoritiesAsGrantedAuthoritiesSet());
+        bcd.setAccessTokenValiditySeconds(dto.getAccessTokenValidity());
+        log.debug("OAuthClientDetailsServiceImpl.loadClientByClientId - end | clientId: {}", clientId);
+        return bcd;
     }
 
 }

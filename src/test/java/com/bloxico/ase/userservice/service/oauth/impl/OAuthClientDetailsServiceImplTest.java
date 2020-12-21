@@ -38,27 +38,4 @@ public class OAuthClientDetailsServiceImplTest extends AbstractSpringTest {
         service.findOAuthClientDetailsByClientId(id);
     }
 
-    @Test(expected = NullPointerException.class)
-    public void loadClientByClientId_null() {
-        service.loadClientByClientId(null);
-    }
-
-    @Test(expected = EntityNotFoundException.class)
-    public void loadClientByClientId_notFound() {
-        var id = uuid();
-        service.loadClientByClientId(id);
-    }
-
-    @Test
-    public void loadClientByClientId() {
-        var id = uuid();
-        var oAuthClientDetails = new OAuthClientDetails();
-        oAuthClientDetails.setClientId(id);
-        oAuthClientDetails.setScope("foo,bar,baz");
-        oAuthClientDetails.setAuthorizedGrantTypes("foo,bar,baz");
-        oAuthClientDetails.setAuthorities("foo,bar,baz");
-        repository.save(oAuthClientDetails);
-        service.loadClientByClientId(id);
-    }
-
 }
