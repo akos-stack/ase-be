@@ -7,8 +7,7 @@ import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepository
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import javax.persistence.EntityNotFoundException;
+import org.springframework.security.oauth2.provider.ClientRegistrationException;
 
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.config.security.AsePrincipal.newUserDetails;
@@ -48,7 +47,7 @@ public class AseSecurityServiceTest extends AbstractSpringTest {
         service.loadClientByClientId(null);
     }
 
-    @Test(expected = EntityNotFoundException.class)
+    @Test(expected = ClientRegistrationException.class)
     public void loadClientByClientId_notFound() {
         var id = uuid();
         service.loadClientByClientId(id);
