@@ -349,13 +349,13 @@ databaseChangeLog:
             tableName: pending_evaluators
             columns:
               - column:
-                  name: token
+                  name: email
                   type: varchar(256)
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: email
+                  name: token
                   type: varchar(256)
                   constraints:
                     nullable: false

@@ -16,10 +16,10 @@ import javax.persistence.Table;
 public class PendingEvaluator extends BaseEntity {
 
     @Id
-    @Column(name = "token")
-    private String token;
-
     @Column(name = "email")
     private String email;
+
+    @Column(name = "token")
+    private String token;
 
 }
