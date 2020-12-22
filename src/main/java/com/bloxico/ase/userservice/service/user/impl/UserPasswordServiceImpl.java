@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -32,7 +33,7 @@ public class UserPasswordServiceImpl implements IUserPasswordService {
         requireNonNull(newPassword);
         var userProfile = userProfileRepository
                 .findById(userProfileId)
-                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
+                .orElseThrow(USER_NOT_FOUND::newException);
         doSetPassword(userProfile, newPassword);
         log.debug("UserPasswordServiceImpl.updateForgottenPassword - end | userProfileId: {}", userProfileId);
     }
@@ -44,7 +45,7 @@ public class UserPasswordServiceImpl implements IUserPasswordService {
         requireNonNull(newPassword);
         var userProfile = userProfileRepository
                 .findById(principalId)
-                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
+                .orElseThrow(USER_NOT_FOUND::newException);
         if (!passwordEncoder.matches(oldPassword, userProfile.getPassword()))
             throw ErrorCodes.User.OLD_PASSWORD_DOES_NOT_MATCH.newException();
         doSetPassword(userProfile, newPassword);
@@ -57,7 +58,7 @@ public class UserPasswordServiceImpl implements IUserPasswordService {
         requireNonNull(password);
         var userProfile = userProfileRepository
                 .findById(principalId)
-                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
+                .orElseThrow(USER_NOT_FOUND::newException);
         doSetPassword(userProfile, password);
         log.debug("UserPasswordServiceImpl.setNewPassword - end | principalId: {}", principalId);
     }

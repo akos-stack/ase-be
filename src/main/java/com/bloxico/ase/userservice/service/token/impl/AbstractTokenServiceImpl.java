@@ -4,7 +4,6 @@ import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.service.token.ITokenService;
-import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -13,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toUnmodifiableList;
@@ -53,7 +53,7 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
         requireNonNull(tokenValue);
         var token = tokenRepository
                 .findByValue(tokenValue)
-                .orElseThrow(ErrorCodes.Token.TOKEN_NOT_FOUND::newException);
+                .orElseThrow(TOKEN_NOT_FOUND::newException);
         token.setValue(newTokenValue());
         token.setExpiryDate(newExpiryDate());
         token.setUpdaterId(token.getCreatorId());
@@ -71,7 +71,7 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
                 .findByValue(tokenValue)
                 .filter(t -> t.getUserId() == userId)
                 .filter(not(Token::isExpired))
-                .orElseThrow(ErrorCodes.Token.TOKEN_NOT_FOUND::newException);
+                .orElseThrow(TOKEN_NOT_FOUND::newException);
         tokenRepository.delete(token);
         log.debug("TokenServiceImpl.consumeTokenForUser - start | tokenValue: {}, userId: {}", tokenValue, userId);
     }
@@ -96,7 +96,7 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
         var tokenDto = tokenRepository
                 .findByTypeAndUserId(type, userId)
                 .map(MAPPER::toDto)
-                .orElseThrow(ErrorCodes.Token.TOKEN_NOT_FOUND::newException);
+                .orElseThrow(TOKEN_NOT_FOUND::newException);
         log.debug("TokenServiceImpl[{}].getTokenByUserId - end | userId: {}", type, userId);
         return tokenDto;
     }

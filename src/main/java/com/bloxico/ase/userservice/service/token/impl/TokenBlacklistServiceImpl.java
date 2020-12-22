@@ -3,7 +3,6 @@ package com.bloxico.ase.userservice.service.token.impl;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
 import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
-import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,6 +14,7 @@ import java.util.Set;
 
 import static com.bloxico.ase.userservice.config.CacheConfig.BLACKLISTED_TOKENS_CACHE;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.INVALID_TOKEN;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -57,7 +57,7 @@ public class TokenBlacklistServiceImpl implements ITokenBlacklistService {
         log.debug("TokenBlacklistServiceImpl.checkIfBlacklisted - start | token: {}", token);
         requireNonNull(token);
         if (blacklistedTokens().contains(token))
-            throw ErrorCodes.Token.INVALID_TOKEN.newException();
+            throw INVALID_TOKEN.newException();
         log.debug("TokenBlacklistServiceImpl.checkIfBlacklisted - start | token: {}", token);
     }
 

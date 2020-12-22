@@ -3,13 +3,13 @@ package com.bloxico.ase.userservice.service.user.impl;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
-import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -29,7 +29,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
         var userProfileDto = userProfileRepository
                 .findById(id)
                 .map(MAPPER::toDto)
-                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
+                .orElseThrow(USER_NOT_FOUND::newException);
         log.debug("UserProfileServiceImpl.findUserProfileById - end | id: {}", id);
         return userProfileDto;
     }
@@ -41,7 +41,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
         var userProfileDto = userProfileRepository
                 .findByEmailIgnoreCase(email)
                 .map(MAPPER::toDto)
-                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
+                .orElseThrow(USER_NOT_FOUND::newException);
         log.debug("UserProfileServiceImpl.findUserByEmail - end | email: {}", email);
         return userProfileDto;
     }
@@ -52,7 +52,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
         requireNonNull(request);
         var userProfile = userProfileRepository
                 .findById(id)
-                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
+                .orElseThrow(USER_NOT_FOUND::newException);
         userProfile.setName(request.getName());
         userProfile.setPhone(request.getPhone());
         userProfile.setUpdaterId(id);
@@ -67,7 +67,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
         log.debug("UserProfileServiceImpl.disableUser - start | userId: {}, principalId: {}", userId, principalId);
         var userProfile = userProfileRepository
                 .findById(userId)
-                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
+                .orElseThrow(USER_NOT_FOUND::newException);
         userProfile.setEnabled(false);
         userProfile.setUpdaterId(principalId);
         userProfileRepository.saveAndFlush(userProfile);

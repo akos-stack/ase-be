@@ -5,7 +5,6 @@ import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserRegistrationService;
-import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,9 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_EXISTS;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
@@ -42,9 +44,9 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         log.debug("UserRegistrationServiceImpl.registerDisabledUser - start | request: {}", request);
         requireNonNull(request);
         if (!request.isPasswordMatching())
-            throw ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR.newException();
+            throw MATCH_REGISTRATION_PASSWORD_ERROR.newException();
         if (userAlreadyExists(request.getEmail()))
-            throw ErrorCodes.User.USER_EXISTS.newException();
+            throw USER_EXISTS.newException();
         var userProfile = MAPPER.toUserProfile(request);
         userProfile.setName(request.extractNameFromEmail());
         userProfile.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -60,7 +62,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         log.debug("UserRegistrationServiceImpl.enableUser - start | id: {}", id);
         var user = userProfileRepository
                 .findById(id)
-                .orElseThrow(ErrorCodes.User.USER_NOT_FOUND::newException);
+                .orElseThrow(USER_NOT_FOUND::newException);
         user.setEnabled(true);
         user.setUpdaterId(id);
         userProfileRepository.saveAndFlush(user);
