@@ -2,24 +2,28 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
-import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
-import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
+import com.bloxico.ase.userservice.web.model.token.*;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @Api(value = "registration")
 public interface UserRegistrationApi {
 
-    String REGISTRATION_ENDPOINT               = "/user/registration";
-    String REGISTRATION_CONFIRM_ENDPOINT       = "/user/registration/confirm";
-    String REGISTRATION_TOKEN_REFRESH_ENDPOINT = "/user/registration/token/refresh";
-    String REGISTRATION_TOKEN_RESEND_ENDPOINT  = "/user/registration/token/resend";
+    String REGISTRATION_ENDPOINT                      = "/user/registration";
+    String REGISTRATION_CONFIRM_ENDPOINT              = "/user/registration/confirm";
+    String REGISTRATION_TOKEN_REFRESH_ENDPOINT        = "/user/registration/token/refresh";
+    String REGISTRATION_TOKEN_RESEND_ENDPOINT         = "/user/registration/token/resend";
+    String REGISTRATION_EVALUATOR_INVITATION          = "/user/registration/evaluator/invitation";
+    String REGISTRATION_EVALUATOR_INVITATION_RESEND   = "/user/registration/evaluator/invitation/resend";
+    String REGISTRATION_EVALUATOR_INVITATION_WITHDRAW = "/user/registration/evaluator/invitation/withdraw";
 
     String TOKEN_PARAM = "token";
 
@@ -68,5 +72,41 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "Token assigned to user is not found, it probably expired.")
     })
     ResponseEntity<Void> resendRegistrationToken(@Valid @RequestBody ResendTokenRequest request);
+
+    @PostMapping(
+            value = REGISTRATION_EVALUATOR_INVITATION,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'invite_evaluator')")
+    @ApiOperation(value = "Sends an evaluator invitation to the provided email.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Invitation is sent successfully."),
+            @ApiResponse(code = 409, message = "Evaluator with given email is already invited.")
+    })
+    ResponseEntity<Void> sendEvaluatorInvitation(@Valid @RequestBody EvaluatorInvitationRequest request, Principal principal);
+
+    @PostMapping(
+            value = REGISTRATION_EVALUATOR_INVITATION_RESEND,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'invite_evaluator')")
+    @ApiOperation(value = "Sends an evaluator invitation to the provided email.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Invitation is sent successfully."),
+            @ApiResponse(code = 404, message = "Evaluator with given email is not invited.")
+    })
+    ResponseEntity<Void> resendEvaluatorInvitation(@Valid @RequestBody EvaluatorInvitationResendRequest request);
+
+    @PostMapping(
+            value = REGISTRATION_EVALUATOR_INVITATION_WITHDRAW,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'invite_evaluator')")
+    @ApiOperation(value = "Withdraws an existing evaluator invitation.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Invitation is withdrawn successfully."),
+            @ApiResponse(code = 404, message = "Evaluator with given email is not invited.")
+    })
+    ResponseEntity<Void> withdrawEvaluatorInvitation(@Valid @RequestBody EvaluatorInvitationWithdrawalRequest request);
 
 }
