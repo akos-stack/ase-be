@@ -86,6 +86,29 @@ public class MailUtil {
         return preparator;
     }
 
+    public void sendEvaluatorInvitationEmail(String email, String token) {
+        log.debug("Sending Evaluator Invitation Token mail to email: {}", email);
+        MimeMessagePreparator messagePreparator = createEvaluatorInvitationEmailAsPreparator(email, token);
+        sendMail(messagePreparator);
+    }
+
+    private MimeMessagePreparator createEvaluatorInvitationEmailAsPreparator(String email, String tokenValue) {
+
+        String tokenKey = "token";
+        String enrgLogoKey = "logo";
+
+        String subject = MailUtilConstants.SubjectConstants.EVALUATOR_INVITATION_MAIL_SUBJECT;
+
+        Map<String, Object> emailModel;
+        emailModel = new HashMap<>();
+        emailModel.put(tokenKey, tokenValue);
+        emailModel.put(enrgLogoKey, logoImage);
+
+        MimeMessagePreparator preparator = prepareMimeMail(email, subject, emailModel, MailUtilConstants.TemplateConstants.EVALUATOR_INVITATION_MAIL_TEMPLATE);
+
+        return preparator;
+    }
+
     private MimeMessagePreparator prepareMimeMail(String recipientAddress, String subject, Map model, String pebbleTemplate) {
 
         String templateString = getTemplate(pebbleTemplate, model);
@@ -127,12 +150,13 @@ public class MailUtil {
         private static class TemplateConstants {
             private static final String VERIFICATION_EMAIL_TEMPLATE = "verificationMailTemplate";
             private static final String RESET_PASSWORD_MAIL_TEMPLATE = "resetPasswordMailTemplate";
+            private static final String EVALUATOR_INVITATION_MAIL_TEMPLATE = "evaluatorInvitationMailTemplate";
         }
 
         private static class SubjectConstants {
             private static final String VERIFICATION_EMAIL_SUBJECT = "EnergyCoin Dashboard - Registration Confirmation";
             private static final String RESET_PASSWORD_MAIL_SUBJECT = "EnergyCoin Dashboard - Forgotten password retrieval";
-
+            private static final String EVALUATOR_INVITATION_MAIL_SUBJECT = "Art Stock Exchange - Evaluator Invitation";
         }
     }
 }
