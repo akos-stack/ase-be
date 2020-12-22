@@ -11,11 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.bloxico.ase.userservice.config.security.CookieOAuth2RequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
-import static com.bloxico.ase.userservice.config.security.CookieOAuth2RequestRepository.removeAuthorizationRequestCookies;
+import static com.bloxico.ase.userservice.config.security.CookieOAuthRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+import static com.bloxico.ase.userservice.config.security.CookieOAuthRequestRepository.removeAuthorizationRequestCookies;
 
 @Component
-public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler {
+public class OAuthFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,

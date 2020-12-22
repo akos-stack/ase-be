@@ -26,12 +26,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import static com.bloxico.ase.userservice.config.security.CookieOAuth2RequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
-import static com.bloxico.ase.userservice.config.security.CookieOAuth2RequestRepository.removeAuthorizationRequestCookies;
+import static com.bloxico.ase.userservice.config.security.CookieOAuthRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+import static com.bloxico.ase.userservice.config.security.CookieOAuthRequestRepository.removeAuthorizationRequestCookies;
 
 @Slf4j
 @Component
-public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Value("${oauth2.client.id}")
     private String clientId;
@@ -39,12 +39,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final Gson gson;
     private final ClientDetailsService clientDetailsService;
     private final UserProfileRepository userProfileRepository;
-    private final CookieOAuth2RequestRepository requestRepository;
+    private final CookieOAuthRequestRepository requestRepository;
     private final PersistentJwtTokenStore persistentJwtTokenStore;
     private final JwtAccessTokenConverter tokenEnhancer;
 
     @Autowired
-    public OAuth2SuccessHandler(Gson gson, ClientDetailsService clientDetailsService, UserProfileRepository userProfileRepository, CookieOAuth2RequestRepository requestRepository, PersistentJwtTokenStore persistentJwtTokenStore, JwtAccessTokenConverter tokenEnhancer) {
+    public OAuthSuccessHandler(Gson gson, ClientDetailsService clientDetailsService, UserProfileRepository userProfileRepository, CookieOAuthRequestRepository requestRepository, PersistentJwtTokenStore persistentJwtTokenStore, JwtAccessTokenConverter tokenEnhancer) {
         this.gson = gson;
         this.clientDetailsService = clientDetailsService;
         this.userProfileRepository = userProfileRepository;
@@ -71,7 +71,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuth2AccessToken token = authenticateSsoUser(authentication.getName());
         var redirectUri = Cookies
                 .getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(OAuth2SuccessHandler::getAndValidateRedirectUri)
+                .map(OAuthSuccessHandler::getAndValidateRedirectUri)
                 .orElse(super.getDefaultTargetUrl());
         return UriComponentsBuilder
                 .fromUriString(redirectUri) // TODO !!!!!

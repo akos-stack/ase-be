@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableAuthorizationServer
-public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
+public class OAuthServerConfig extends AuthorizationServerConfigurerAdapter {
 
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
@@ -27,12 +27,12 @@ public class OAuth2ServerConfig extends AuthorizationServerConfigurerAdapter {
     private final DataSource dataSource;
 
     @Autowired
-    public OAuth2ServerConfig(AuthenticationManager authenticationManager,
-                              AseSecurityService userDetailsService,
-                              AseSecurityService clientDetailsService,
-                              TokenStore tokenStore,
-                              JwtAccessTokenConverter jwtAccessTokenConverter,
-                              DataSource dataSource)
+    public OAuthServerConfig(AuthenticationManager authenticationManager,
+                             AseSecurityService userDetailsService,
+                             AseSecurityService clientDetailsService,
+                             TokenStore tokenStore,
+                             JwtAccessTokenConverter jwtAccessTokenConverter,
+                             DataSource dataSource)
     {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;

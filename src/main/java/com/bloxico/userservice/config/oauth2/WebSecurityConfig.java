@@ -25,7 +25,6 @@ import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationC
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -51,24 +50,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final TokenStore tokenStore;
     private final ITokenBlacklistService tokenBlacklistService;
     private final DefaultOAuth2UserService oAuth2UserService;
-    private final OAuth2SuccessHandler oAuth2SuccessHandler;
-    private final OAuth2FailureHandler oAuth2FailureHandler;
-    private final CookieOAuth2RequestRepository cookieOAuth2RequestRepository;
+    private final OAuthSuccessHandler oAuthSuccessHandler;
+    private final OAuthFailureHandler oAuthFailureHandler;
+    private final CookieOAuthRequestRepository cookieOAuthRequestRepository;
 
     @Autowired
     public WebSecurityConfig(TokenStore tokenStore,
                              ITokenBlacklistService tokenBlacklistService,
                              AseSecurityService oAuth2UserService,
-                             OAuth2SuccessHandler oAuth2SuccessHandler,
-                             OAuth2FailureHandler oAuth2FailureHandler,
-                             CookieOAuth2RequestRepository cookieOAuth2RequestRepository)
+                             OAuthSuccessHandler oAuthSuccessHandler,
+                             OAuthFailureHandler oAuthFailureHandler,
+                             CookieOAuthRequestRepository cookieOAuthRequestRepository)
     {
         this.tokenStore = tokenStore;
         this.tokenBlacklistService = tokenBlacklistService;
         this.oAuth2UserService = oAuth2UserService;
-        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
-        this.oAuth2FailureHandler = oAuth2FailureHandler;
-        this.cookieOAuth2RequestRepository = cookieOAuth2RequestRepository;
+        this.oAuthSuccessHandler = oAuthSuccessHandler;
+        this.oAuthFailureHandler = oAuthFailureHandler;
+        this.cookieOAuthRequestRepository = cookieOAuthRequestRepository;
     }
 
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
@@ -161,7 +160,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizationEndpoint()
                 .baseUri("/oauth2/authorize")
-                .authorizationRequestRepository(cookieOAuth2RequestRepository)
+                .authorizationRequestRepository(cookieOAuthRequestRepository)
                 .and()
 
                 .redirectionEndpoint()
@@ -176,8 +175,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessTokenResponseClient(authorizationCodeTokenResponseClient())
 
                 .and()
-                .successHandler(oAuth2SuccessHandler)
-                .failureHandler(oAuth2FailureHandler)
+                .successHandler(oAuthSuccessHandler)
+                .failureHandler(oAuthFailureHandler)
 
                 .and()
 
