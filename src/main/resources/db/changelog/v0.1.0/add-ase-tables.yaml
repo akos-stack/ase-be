@@ -346,6 +346,49 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - createTable:
+            tableName: pending_evaluators
+            columns:
+              - column:
+                  name: token
+                  type: varchar(256)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_token_creator
+                    references: user_profiles(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_token_updater
+                    references: user_profiles(id)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createTable:
             tableName: oauth_client_registrations
             columns:
               - column:
