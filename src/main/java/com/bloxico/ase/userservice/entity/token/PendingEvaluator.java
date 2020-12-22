@@ -17,9 +17,9 @@ public class PendingEvaluator extends BaseEntity {
 
     @Id
     @Column(name = "token")
-    public String token;
+    private String token;
 
     @Column(name = "email")
-    public String email;
+    private String email;
 
 }
