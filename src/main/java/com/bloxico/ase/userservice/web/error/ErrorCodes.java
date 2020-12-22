@@ -63,7 +63,12 @@ public interface ErrorCodes {
         TOKEN_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "11",
-                "Token cannot be found in the database. It may be deleted due to expiry.");
+                "Token cannot be found in the database. It may be deleted due to expiry."),
+
+        TOKEN_EXISTS(
+                HttpStatus.CONFLICT,
+                "12",
+                "Token already exists for given parameters.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
