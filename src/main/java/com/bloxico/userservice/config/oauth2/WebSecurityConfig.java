@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationC
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -53,6 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final OAuthSuccessHandler oAuthSuccessHandler;
     private final OAuthFailureHandler oAuthFailureHandler;
     private final CookieOAuthRequestRepository cookieOAuthRequestRepository;
+    private final ClientRegistrationRepository clientRegistrationRepository;
 
     @Autowired
     public WebSecurityConfig(TokenStore tokenStore,
@@ -60,7 +62,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                              AseSecurityService oAuth2UserService,
                              OAuthSuccessHandler oAuthSuccessHandler,
                              OAuthFailureHandler oAuthFailureHandler,
-                             CookieOAuthRequestRepository cookieOAuthRequestRepository)
+                             CookieOAuthRequestRepository cookieOAuthRequestRepository,
+                             AseSecurityService clientRegistrationRepository)
     {
         this.tokenStore = tokenStore;
         this.tokenBlacklistService = tokenBlacklistService;
@@ -68,6 +71,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.oAuthSuccessHandler = oAuthSuccessHandler;
         this.oAuthFailureHandler = oAuthFailureHandler;
         this.cookieOAuthRequestRepository = cookieOAuthRequestRepository;
+        this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
@@ -157,6 +161,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 
                 .oauth2Login()
+
+                .clientRegistrationRepository(clientRegistrationRepository)
 
                 .authorizationEndpoint()
                 .baseUri("/oauth2/authorize")

@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.config.security;
 
 import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepository;
+import com.bloxico.ase.userservice.repository.oauth.OAuthClientRegistrationRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -24,35 +27,41 @@ import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @Service
-public class AseSecurityService extends DefaultOAuth2UserService implements UserDetailsService, ClientDetailsService {
+public class AseSecurityService extends DefaultOAuth2UserService
+        implements UserDetailsService,
+                   ClientDetailsService,
+                   ClientRegistrationRepository {
 
     private final UserProfileRepository userProfileRepository;
     private final OAuthClientDetailsRepository oAuthClientDetailsRepository;
+    private final OAuthClientRegistrationRepository oAuthClientRegistrationRepository;
 
     @Autowired
     public AseSecurityService(UserProfileRepository userProfileRepository,
-                              OAuthClientDetailsRepository oAuthClientDetailsRepository)
+                              OAuthClientDetailsRepository oAuthClientDetailsRepository,
+                              OAuthClientRegistrationRepository oAuthClientRegistrationRepository)
     {
         this.userProfileRepository = userProfileRepository;
         this.oAuthClientDetailsRepository = oAuthClientDetailsRepository;
+        this.oAuthClientRegistrationRepository = oAuthClientRegistrationRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        log.debug("AsePrincipalService.loadUserByUsername - start | email: {}", email);
+        log.debug("AseSecurityService.loadUserByUsername - start | email: {}", email);
         requireNonNull(email);
         var userProfile = userProfileRepository
                 .findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
         var aseUserDetails = AsePrincipal.newUserDetails(userProfile);
-        log.debug("AsePrincipalService.loadUserByUsername - end | email: {}", email);
+        log.debug("AseSecurityService.loadUserByUsername - end | email: {}", email);
         return aseUserDetails;
     }
 
     @Override
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest request) {
-        log.debug("AsePrincipalService.loadUser - start | request: {}", request);
+        log.debug("AseSecurityService.loadUser - start | request: {}", request);
         var oAuth2User = super.loadUser(request);
         try {
             var provider = request.getClientRegistration().getRegistrationId();
@@ -69,7 +78,7 @@ public class AseSecurityService extends DefaultOAuth2UserService implements User
                     .orElseGet(() -> extractor.newUserProfile(attributes));
             userProfile = userProfileRepository.saveAndFlush(userProfile);
             var aseOauth2User = AsePrincipal.newOAuth2User(userProfile, attributes);
-            log.debug("AsePrincipalService.loadUser - end | request: {}", request);
+            log.debug("AseSecurityService.loadUser - end | request: {}", request);
             return aseOauth2User;
         } catch (AuthenticationException ex) {
             throw ex;
@@ -81,7 +90,7 @@ public class AseSecurityService extends DefaultOAuth2UserService implements User
 
     @Override
     public ClientDetails loadClientByClientId(String clientId) {
-        log.debug("OAuthClientDetailsServiceImpl.loadClientByClientId - start | clientId: {}", clientId);
+        log.debug("AseSecurityService.loadClientByClientId - start | clientId: {}", clientId);
         requireNonNull(clientId);
         var dto = oAuthClientDetailsRepository
                 .findByClientId(clientId)
@@ -93,8 +102,34 @@ public class AseSecurityService extends DefaultOAuth2UserService implements User
         bcd.setAuthorizedGrantTypes(dto.authorizedGrantTypesAsSet());
         bcd.setAuthorities(dto.authoritiesAsGrantedAuthoritiesSet());
         bcd.setAccessTokenValiditySeconds(dto.getAccessTokenValidity());
-        log.debug("OAuthClientDetailsServiceImpl.loadClientByClientId - end | clientId: {}", clientId);
+        log.debug("AseSecurityService.loadClientByClientId - end | clientId: {}", clientId);
         return bcd;
+    }
+
+    @Override
+    public ClientRegistration findByRegistrationId(String registrationId) {
+        log.debug("AseSecurityService.findByRegistrationId - start | registrationId: {}", registrationId);
+        var registration = oAuthClientRegistrationRepository
+                .findByRegistrationId(registrationId)
+                .map(dto -> ClientRegistration
+                        .withRegistrationId(dto.getRegistrationId())
+                        .clientId(dto.getClientId())
+                        .clientSecret(dto.getClientSecret())
+                        .clientAuthenticationMethod(dto.typedClientAuthenticationMethod())
+                        .authorizationGrantType(dto.typedAuthorizationGrantType())
+                        .redirectUriTemplate(dto.getRedirectUriTemplate())
+                        .scope(dto.scopesAsSet())
+                        .clientName(dto.getClientName())
+                        .authorizationUri(dto.getAuthorizationUri())
+                        .tokenUri(dto.getTokenUri())
+                        .userInfoUri(dto.getUserInfoUri())
+                        .userInfoAuthenticationMethod(dto.typedUserInfoAuthenticationMethod())
+                        .userNameAttributeName(dto.getUserNameAttributeName())
+                        .jwkSetUri(dto.getJwkSetUri())
+                        .build())
+                .orElse(null);
+        log.debug("AseSecurityService.findByRegistrationId - end | registrationId: {}", registrationId);
+        return registration;
     }
 
 }

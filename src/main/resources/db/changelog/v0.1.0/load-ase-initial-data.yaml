@@ -28,3 +28,8 @@ databaseChangeLog:
         file: db/changelog/v0.1.0/initial_data/service_client_details.csv
         tableName: oauth_client_details
         quotchar: '"'
+#    - loadData:
+#        encoding: UTF-8
+#        file: db/changelog/v0.1.0/initial_data/oauth_client_registrations.csv
+#        tableName: oauth_client_registrations
+#        quotchar: '"'
