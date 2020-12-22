@@ -2,8 +2,7 @@ package com.bloxico.ase.userservice.facade;
 
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
-import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
-import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
+import com.bloxico.ase.userservice.web.model.token.*;
 
 public interface IUserRegistrationFacade {
 
@@ -14,5 +13,11 @@ public interface IUserRegistrationFacade {
     void refreshExpiredToken(String expiredTokenValue);
 
     void resendVerificationToken(ResendTokenRequest request);
+
+    void sendEvaluatorInvitation(EvaluatorInvitationRequest request, long principalId);
+
+    void resendEvaluatorInvitation(EvaluatorInvitationResendRequest request);
+
+    void withdrawEvaluatorInvitation(EvaluatorInvitationWithdrawalRequest request);
 
 }

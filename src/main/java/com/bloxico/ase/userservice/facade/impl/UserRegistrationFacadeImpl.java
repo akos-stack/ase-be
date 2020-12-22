@@ -1,14 +1,14 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
+import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
 import com.bloxico.ase.userservice.service.token.ITokenService;
 import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImpl;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.service.user.IUserRegistrationService;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
-import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
-import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
+import com.bloxico.ase.userservice.web.model.token.*;
 import com.bloxico.userservice.util.MailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,17 +23,20 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     private final IUserProfileService userProfileService;
     private final IUserRegistrationService userRegistrationService;
     private final ITokenService registrationTokenService;
+    private final IPendingEvaluatorService pendingEvaluatorService;
     private final MailUtil mailUtil;
 
     @Autowired
     public UserRegistrationFacadeImpl(IUserProfileService userProfileService,
                                       IUserRegistrationService userRegistrationService,
                                       RegistrationTokenServiceImpl registrationTokenService,
+                                      IPendingEvaluatorService pendingEvaluatorService,
                                       MailUtil mailUtil)
     {
         this.userProfileService = userProfileService;
         this.userRegistrationService = userRegistrationService;
         this.registrationTokenService = registrationTokenService;
+        this.pendingEvaluatorService = pendingEvaluatorService;
         this.mailUtil = mailUtil;
     }
 
@@ -73,6 +76,29 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var tokenDto = registrationTokenService.getTokenByUserId(userProfileDto.getId());
         mailUtil.sendVerificationTokenEmail(request.getEmail(), tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - end | request: {}", request);
+    }
+
+    @Override
+    public void sendEvaluatorInvitation(EvaluatorInvitationRequest request, long principalId) {
+        log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - start | request: {}, principalId: {}", request, principalId);
+        var token = pendingEvaluatorService.createPendingEvaluator(request.getEmail(), principalId);
+        mailUtil.sendEvaluatorInvitationEmail(request.getEmail(), token);
+        log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - end | request: {}, principalId: {}", request, principalId);
+    }
+
+    @Override
+    public void resendEvaluatorInvitation(EvaluatorInvitationResendRequest request) {
+        log.info("UserRegistrationFacadeImpl.resendEvaluatorInvitation - start | request: {}", request);
+        var token = pendingEvaluatorService.getPendingEvaluatorToken(request.getEmail());
+        mailUtil.sendEvaluatorInvitationEmail(request.getEmail(), token);
+        log.info("UserRegistrationFacadeImpl.resendEvaluatorInvitation - end | request: {}", request);
+    }
+
+    @Override
+    public void withdrawEvaluatorInvitation(EvaluatorInvitationWithdrawalRequest request) {
+        log.info("UserRegistrationFacadeImpl.withdrawEvaluatorInvitation - start | request: {}", request);
+        pendingEvaluatorService.deletePendingEvaluator(request.getEmail());
+        log.info("UserRegistrationFacadeImpl.withdrawEvaluatorInvitation - end | request: {}", request);
     }
 
 }
