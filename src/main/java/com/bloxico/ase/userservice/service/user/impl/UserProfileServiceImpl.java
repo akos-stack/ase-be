@@ -6,7 +6,13 @@ import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_NOT_FOUND;
@@ -72,6 +78,19 @@ public class UserProfileServiceImpl implements IUserProfileService {
         userProfile.setUpdaterId(principalId);
         userProfileRepository.saveAndFlush(userProfile);
         log.debug("UserProfileServiceImpl.disableUser - end | userId: {}, principalId: {}", userId, principalId);
+    }
+
+    @Override
+    public List<UserProfileDto> findUsersByEmail(String email, int page, int size) {
+        log.debug("UserProfileServiceImpl.findUsersByEmail - start | email: {}, page: {}, size: {}", email, page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+        var userProfiles = userProfileRepository.findAllByEmailContaining(email, pageable);
+        var userProfileDtos = userProfiles
+                .stream()
+                .map(user -> MAPPER.toDto(user))
+                .collect(Collectors.toList());
+        log.debug("UserProfileServiceImpl.findUsersByEmail - end | email: {}, page: {}, size: {}", email, page, size);
+        return userProfileDtos;
     }
 
 }

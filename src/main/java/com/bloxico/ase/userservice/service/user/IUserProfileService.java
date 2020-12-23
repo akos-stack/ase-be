@@ -3,6 +3,8 @@ package com.bloxico.ase.userservice.service.user;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 
+import java.util.List;
+
 public interface IUserProfileService {
 
     UserProfileDto findUserProfileById(long id);
@@ -13,4 +15,5 @@ public interface IUserProfileService {
 
     void disableUser(long userId, long principalId);
 
+    List<UserProfileDto> findUsersByEmail(String email, int page, int size);
 }
