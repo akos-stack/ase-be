@@ -8,6 +8,7 @@ import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
+import com.bloxico.ase.userservice.facade.impl.UserManagementFacadeImpl;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImpl;
 import com.bloxico.ase.userservice.facade.impl.UserProfileFacadeImpl;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
@@ -65,6 +66,7 @@ public class MockUtil {
     private final TokenRepository tokenRepository;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
     private final UserProfileFacadeImpl userProfileFacade;
+    private final UserManagementFacadeImpl userManagementFacade;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
@@ -75,7 +77,8 @@ public class MockUtil {
                     OAuthAccessTokenRepository oAuthAccessTokenRepository,
                     TokenRepository tokenRepository,
                     BlacklistedTokenRepository blacklistedTokenRepository,
-                    UserProfileFacadeImpl userProfileFacade)
+                    UserProfileFacadeImpl userProfileFacade,
+                    UserManagementFacadeImpl userManagementFacade)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -86,6 +89,7 @@ public class MockUtil {
         this.tokenRepository = tokenRepository;
         this.blacklistedTokenRepository = blacklistedTokenRepository;
         this.userProfileFacade = userProfileFacade;
+        this.userManagementFacade = userManagementFacade;
     }
 
     public UserProfile savedAdmin() {
@@ -201,7 +205,7 @@ public class MockUtil {
         var adminId = savedAdmin().getId();
         var user = savedUserProfile();
         var token = savedOauthTokenDto(user.getEmail());
-        userProfileFacade.blacklistTokens(user.getId(), adminId);
+        userManagementFacade.blacklistTokens(user.getId(), adminId);
         return getBlacklistedToken(token.getTokenId());
     }
 
@@ -209,7 +213,7 @@ public class MockUtil {
         var adminId = savedAdmin().getId();
         var user = savedUserProfile();
         var token = savedExpiredOauthTokenDto(user.getEmail());
-        userProfileFacade.blacklistTokens(user.getId(), adminId);
+        userManagementFacade.blacklistTokens(user.getId(), adminId);
         return getBlacklistedToken(token.getTokenId());
     }
 

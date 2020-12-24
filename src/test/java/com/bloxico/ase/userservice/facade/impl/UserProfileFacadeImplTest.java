@@ -31,6 +31,9 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
     @Autowired
     private UserProfileFacadeImpl userProfileFacade;
 
+    @Autowired
+    private UserManagementFacadeImpl userManagementFacade;
+
     @Test(expected = UserProfileException.class)
     public void returnMyProfileData_notFound() {
         userProfileFacade.returnMyProfileData(-1);
@@ -66,7 +69,7 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
     @Test(expected = UserProfileException.class)
     public void disableUser_notFound() {
         var principalId = mockUtil.savedAdmin().getId();
-        userProfileFacade.disableUser(-1, principalId);
+        userManagementFacade.disableUser(-1, principalId);
     }
 
     @Test
@@ -81,7 +84,7 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
                 mockUtil.savedOauthToken(user.getEmail()).getTokenId());
         assertEquals(Set.of(), tokenBlacklistService.blacklistedTokens());
         assertTrue(userProfileService.findUserProfileById(userId).getEnabled());
-        userProfileFacade.disableUser(userId, principalId);
+        userManagementFacade.disableUser(userId, principalId);
         assertEquals(tokens, tokenBlacklistService.blacklistedTokens());
         assertFalse(userProfileService.findUserProfileById(userId).getEnabled());
     }
@@ -89,7 +92,7 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
     @Test(expected = UserProfileException.class)
     public void blacklistTokens_notFound() {
         var principalId = mockUtil.savedAdmin().getId();
-        userProfileFacade.blacklistTokens(-1, principalId);
+        userManagementFacade.blacklistTokens(-1, principalId);
     }
 
     @Test
@@ -104,7 +107,7 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
                 mockUtil.savedOauthToken(user.getEmail()).getTokenId());
         assertEquals(Set.of(), tokenBlacklistService.blacklistedTokens());
         assertTrue(userProfileService.findUserProfileById(userId).getEnabled());
-        userProfileFacade.blacklistTokens(userId, principalId);
+        userManagementFacade.blacklistTokens(userId, principalId);
         assertEquals(tokens, tokenBlacklistService.blacklistedTokens());
         assertTrue(userProfileService.findUserProfileById(userId).getEnabled());
     }

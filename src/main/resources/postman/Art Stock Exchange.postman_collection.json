@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "97630208-1ef4-4b6c-bfcb-947d8a5c5df1",
+		"_postman_id": "0b446a42-a0ce-422c-afc9-1334546110b5",
 		"name": "Art Stock Exchange",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -58,10 +58,7 @@
 									"value": "access_profile",
 									"type": "text"
 								}
-							],
-							"options": {
-								"urlencoded": {}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{endpoint_ase}}/api/oauth/token",
@@ -184,8 +181,7 @@
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		},
 		{
 			"name": "User",
@@ -266,14 +262,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{endpoint}}/api/user/myProfile",
+							"raw": "{{endpoint}}/api/user/my-profile",
 							"host": [
 								"{{endpoint}}"
 							],
 							"path": [
 								"api",
 								"user",
-								"myProfile"
+								"my-profile"
 							]
 						}
 					},
@@ -342,7 +338,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"old_password\": \"this_is_old_password\",\n    \"new_password\": \"this_is_old_password\"\n}"
+							"raw": "{\n    \"password\": \"this_is_new_password\"\n}"
 						},
 						"url": {
 							"raw": "{{endpoint_ase}}/api/user/password/set",
@@ -354,6 +350,53 @@
 								"user",
 								"password",
 								"set"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Search",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ase-endpoint}}/api/users?email=a&page=0&size=100",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "a"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "100"
+								}
 							]
 						}
 					},
@@ -385,13 +428,13 @@
 							"raw": "{\n    \"user_id\": 1\n}"
 						},
 						"url": {
-							"raw": "{{endpoint_ase}}/api/user/disable",
+							"raw": "{{endpoint_ase}}/api/users/disable",
 							"host": [
 								"{{endpoint_ase}}"
 							],
 							"path": [
 								"api",
-								"user",
+								"users",
 								"disable"
 							]
 						}
@@ -424,22 +467,54 @@
 							"raw": "{\n    \"user_id\": 1\n}"
 						},
 						"url": {
-							"raw": "{{endpoint_ase}}/api/user/blacklist-tokens",
+							"raw": "{{endpoint_ase}}/api/users/blacklist-tokens",
 							"host": [
 								"{{endpoint_ase}}"
 							],
 							"path": [
 								"api",
-								"user",
+								"users",
 								"blacklist-tokens"
 							]
 						}
 					},
 					"response": []
 				}
-			],
-			"protocolProfileBehavior": {}
+			]
 		}
 	],
-	"protocolProfileBehavior": {}
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "endpoint_ase",
+			"value": "localhost:8089"
+		},
+		{
+			"key": "ase-endpoint",
+			"value": "localhost:8089"
+		},
+		{
+			"key": "endpoint",
+			"value": "localhost:8089"
+		}
+	]
 }
