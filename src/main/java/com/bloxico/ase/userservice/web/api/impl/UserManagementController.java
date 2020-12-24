@@ -22,8 +22,8 @@ public class UserManagementController implements UserManagementApi {
     private IUserManagementFacade userManagementFacade;
 
     @Override
-    public ResponseEntity<ArrayUserProfileDataResponse> searchUsers(@Valid String email, @Valid int page, @Valid int size) {
-        var arrayUserProfileDataResponse = userManagementFacade.searchUsers(email, page, size);
+    public ResponseEntity<ArrayUserProfileDataResponse> searchUsers(@Valid String email, @Valid int page, @Valid int size, @Valid String sort) {
+        var arrayUserProfileDataResponse = userManagementFacade.searchUsers(email, page, size, sort);
         return ResponseEntity.ok(arrayUserProfileDataResponse);
     }
 

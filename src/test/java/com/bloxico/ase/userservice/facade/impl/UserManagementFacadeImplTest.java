@@ -28,6 +28,13 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
     @Autowired
     private UserManagementFacadeImpl userManagementFacade;
 
+
+    @Test
+    public void searchUsers() {
+        mockUtil.saveUserProfiles();
+        assertTrue(userManagementFacade.searchUsers("user1", 0, 10, "name").getUserProfiles().size() == 1);
+    }
+
     @Test(expected = UserProfileException.class)
     public void disableUser_notFound() {
         var principalId = mockUtil.savedAdmin().getId();

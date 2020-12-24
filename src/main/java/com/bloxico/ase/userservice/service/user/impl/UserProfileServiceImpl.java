@@ -81,9 +81,9 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     @Override
-    public List<UserProfileDto> findUsersByEmail(String email, int page, int size) {
+    public List<UserProfileDto> findUsersByEmail(String email, int page, int size, String sort) {
         log.debug("UserProfileServiceImpl.findUsersByEmail - start | email: {}, page: {}, size: {}", email, page, size);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
         var userProfiles = userProfileRepository.findAllByEmailContaining(email, pageable);
         var userProfileDtos = userProfiles
                 .stream()

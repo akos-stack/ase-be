@@ -4,7 +4,7 @@ import com.bloxico.ase.userservice.web.model.user.ArrayUserProfileDataResponse;
 
 public interface IUserManagementFacade {
 
-    ArrayUserProfileDataResponse searchUsers(String email, int page, int size);
+    ArrayUserProfileDataResponse searchUsers(String email, int page, int size, String sort);
 
     void disableUser(long userId, long principalId);
 

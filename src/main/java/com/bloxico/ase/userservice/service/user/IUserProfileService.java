@@ -15,5 +15,5 @@ public interface IUserProfileService {
 
     void disableUser(long userId, long principalId);
 
-    List<UserProfileDto> findUsersByEmail(String email, int page, int size);
+    List<UserProfileDto> findUsersByEmail(String email, int page, int size, String sort);
 }

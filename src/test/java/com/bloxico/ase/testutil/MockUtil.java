@@ -345,6 +345,12 @@ public class MockUtil {
         return tokenRepository.findByTypeAndUserId(PASSWORD_RESET, userId).orElseThrow().getValue();
     }
 
+    public void saveUserProfiles() {
+        savedUserProfile("user1@gmail.com", "123!");
+        savedUserProfile("user2@gmail.com", "123!");
+        savedUserProfile("user3@gmail.com", "123!");
+    }
+
     private static final AtomicLong along = new AtomicLong(0);
 
     public static String genEmail() {

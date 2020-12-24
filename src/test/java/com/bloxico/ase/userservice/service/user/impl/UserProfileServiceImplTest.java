@@ -86,4 +86,10 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
         assertFalse(userProfileService.findUserProfileById(userId).getEnabled());
     }
 
+    @Test
+    public void findUsersByEmail() {
+        mockUtil.saveUserProfiles();
+        assertTrue(userProfileService.findUsersByEmail("user1", 0, 100, "name").size() == 1);
+    }
+
 }

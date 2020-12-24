@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.security.Principal;
 
 @Api(value = "userManagement")
@@ -30,7 +31,7 @@ public interface UserManagementApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Paginated list of users successfully retrieved.")
     })
-    ResponseEntity<ArrayUserProfileDataResponse> searchUsers(@Valid @RequestParam("email") String email, @Valid @RequestParam("page") int page, @Valid @RequestParam("size") int size);
+    ResponseEntity<ArrayUserProfileDataResponse> searchUsers(@Valid @RequestParam("email") String email, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "name") String sort);
 
     @PostMapping(
             value = USER_DISABLE,
