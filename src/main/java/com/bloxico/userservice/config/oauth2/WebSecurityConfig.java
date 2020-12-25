@@ -54,7 +54,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final OAuthSuccessHandler oAuthSuccessHandler;
     private final OAuthFailureHandler oAuthFailureHandler;
     private final CookieOAuthRequestRepository cookieOAuthRequestRepository;
-    private final ClientRegistrationRepository clientRegistrationRepository;
 
     @Autowired
     public WebSecurityConfig(TokenStore tokenStore,
@@ -62,8 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                              AseSecurityService oAuth2UserService,
                              OAuthSuccessHandler oAuthSuccessHandler,
                              OAuthFailureHandler oAuthFailureHandler,
-                             CookieOAuthRequestRepository cookieOAuthRequestRepository,
-                             AseSecurityService clientRegistrationRepository)
+                             CookieOAuthRequestRepository cookieOAuthRequestRepository)
     {
         this.tokenStore = tokenStore;
         this.tokenBlacklistService = tokenBlacklistService;
@@ -71,7 +69,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         this.oAuthSuccessHandler = oAuthSuccessHandler;
         this.oAuthFailureHandler = oAuthFailureHandler;
         this.cookieOAuthRequestRepository = cookieOAuthRequestRepository;
-        this.clientRegistrationRepository = clientRegistrationRepository;
     }
 
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
@@ -161,8 +158,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 
                 .oauth2Login()
-
-                .clientRegistrationRepository(clientRegistrationRepository)
 
                 .authorizationEndpoint()
                 .baseUri("/oauth2/authorize")

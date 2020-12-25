@@ -7,6 +7,8 @@ import com.google.gson.*;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
@@ -15,7 +17,11 @@ import java.lang.reflect.Type;
 import java.util.Date;
 
 @Configuration
-public class CommonBeansConfig {
+
+@PropertySources({
+        @PropertySource("classpath:sso.properties"),
+        @PropertySource(value = "classpath:sso-${spring.profiles.active}.properties", ignoreResourceNotFound=true)
+})public class CommonBeansConfig {
 
     @Bean
     public ObjectMapper createJacksonMapper() {

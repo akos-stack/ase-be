@@ -2,7 +2,7 @@ databaseChangeLog:
 - changeSet:
     id: v0.1.0
     author: milos.sekuloski@bloxico.com
-    context: dev or test or stage
+    context: local or dev or test or stage
     changes:
     - loadData:
         encoding: UTF-8
