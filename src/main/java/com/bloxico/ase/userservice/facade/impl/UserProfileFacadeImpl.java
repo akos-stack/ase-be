@@ -1,8 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.facade.IUserProfileFacade;
-import com.bloxico.ase.userservice.service.oauth.IOAuthAccessTokenService;
-import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import com.bloxico.ase.userservice.web.model.user.UserProfileDataResponse;
@@ -17,17 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserProfileFacadeImpl implements IUserProfileFacade {
 
     private final IUserProfileService userProfileService;
-    private final ITokenBlacklistService tokenBlacklistService;
-    private final IOAuthAccessTokenService oAuthAccessTokenService;
 
     @Autowired
-    public UserProfileFacadeImpl(IUserProfileService userProfileService,
-                                 ITokenBlacklistService tokenBlacklistService,
-                                 IOAuthAccessTokenService oAuthAccessTokenService)
+    public UserProfileFacadeImpl(IUserProfileService userProfileService)
     {
         this.userProfileService = userProfileService;
-        this.tokenBlacklistService = tokenBlacklistService;
-        this.oAuthAccessTokenService = oAuthAccessTokenService;
     }
 
     @Override
@@ -46,23 +38,6 @@ public class UserProfileFacadeImpl implements IUserProfileFacade {
         var response = new UserProfileDataResponse(userProfileDto);
         log.info("UserProfileFacadeImpl.updateMyProfile - end | principalId: {}, request: {}", principalId, request);
         return response;
-    }
-
-    @Override
-    public void disableUser(long userId, long principalId) {
-        log.info("UserProfileFacadeImpl.disableUser - start | userId: {}, principalId: {}", userId, principalId);
-        userProfileService.disableUser(userId, principalId);
-        blacklistTokens(userId, principalId);
-        log.info("UserProfileFacadeImpl.disableUser - end | userId: {}, principalId: {}", userId, principalId);
-    }
-
-    @Override
-    public void blacklistTokens(long userId, long principalId) {
-        log.info("UserProfileFacadeImpl.blacklistTokens - start | userId: {}, principalId: {}", userId, principalId);
-        var email = userProfileService.findUserProfileById(userId).getEmail();
-        var tokens = oAuthAccessTokenService.deleteTokensByEmail(email);
-        tokenBlacklistService.blacklistTokens(tokens, principalId);
-        log.info("UserProfileFacadeImpl.blacklistTokens - end | userId: {}, principalId: {}", userId, principalId);
     }
 
 }
