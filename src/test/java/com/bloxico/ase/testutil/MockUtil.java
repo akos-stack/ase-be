@@ -4,13 +4,16 @@ import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.entity.BaseEntity;
+import com.bloxico.ase.userservice.entity.address.City;
+import com.bloxico.ase.userservice.entity.address.Country;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.facade.impl.UserManagementFacadeImpl;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImpl;
-import com.bloxico.ase.userservice.facade.impl.UserProfileFacadeImpl;
+import com.bloxico.ase.userservice.repository.address.CityRepository;
+import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
@@ -65,8 +68,9 @@ public class MockUtil {
     private final OAuthAccessTokenRepository oAuthAccessTokenRepository;
     private final TokenRepository tokenRepository;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
-    private final UserProfileFacadeImpl userProfileFacade;
     private final UserManagementFacadeImpl userManagementFacade;
+    private final CountryRepository countryRepository;
+    private final CityRepository cityRepository;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
@@ -77,8 +81,9 @@ public class MockUtil {
                     OAuthAccessTokenRepository oAuthAccessTokenRepository,
                     TokenRepository tokenRepository,
                     BlacklistedTokenRepository blacklistedTokenRepository,
-                    UserProfileFacadeImpl userProfileFacade,
-                    UserManagementFacadeImpl userManagementFacade)
+                    UserManagementFacadeImpl userManagementFacade,
+                    CountryRepository countryRepository,
+                    CityRepository cityRepository)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -88,8 +93,9 @@ public class MockUtil {
         this.oAuthAccessTokenRepository = oAuthAccessTokenRepository;
         this.tokenRepository = tokenRepository;
         this.blacklistedTokenRepository = blacklistedTokenRepository;
-        this.userProfileFacade = userProfileFacade;
         this.userManagementFacade = userManagementFacade;
+        this.countryRepository = countryRepository;
+        this.cityRepository = cityRepository;
     }
 
     public UserProfile savedAdmin() {
@@ -132,6 +138,24 @@ public class MockUtil {
 
     public UserProfileDto savedUserProfileDto() {
         return MAPPER.toDto(savedUserProfile());
+    }
+
+    public Country savedCountry() {
+        var creatorId = savedAdmin().getId();
+        var country = new Country();
+        country.setName(uuid());
+        country.setCreatorId(creatorId);
+        return countryRepository.saveAndFlush(country);
+    }
+
+    public City savedCity() {
+        var country = savedCountry();
+        var city = new City();
+        city.setCountry(country);
+        city.setName(uuid());
+        city.setZipCode(uuid());
+        city.setCreatorId(country.getCreatorId());
+        return cityRepository.saveAndFlush(city);
     }
 
     public Token savedToken(Token.Type type) {

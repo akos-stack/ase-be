@@ -22,7 +22,6 @@ public class EvaluatorRepositoryTest extends AbstractSpringTest {
         var evaluator = new Evaluator();
         var creator = mockUtil.savedUserProfile();
         evaluator.setUserProfile(creator);
-        evaluator.setVerifier(mockUtil.savedAdmin());
         evaluator.setCreatorId(creator.getId());
         var id = repository.saveAndFlush(evaluator).getId();
         assertTrue(repository.findById(id).isPresent());

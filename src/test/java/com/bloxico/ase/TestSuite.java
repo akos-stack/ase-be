@@ -7,6 +7,9 @@ import com.bloxico.ase.userservice.facade.impl.QuartzOperationsFacadeImplTest;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImplTest;
 import com.bloxico.ase.userservice.facade.impl.UserProfileFacadeImplTest;
 import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImplTest;
+import com.bloxico.ase.userservice.repository.address.CityRepositoryTest;
+import com.bloxico.ase.userservice.repository.address.CountryRepositoryTest;
+import com.bloxico.ase.userservice.repository.address.LocationRepositoryTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepositoryTest;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepositoryTest;
@@ -31,6 +34,9 @@ import org.junit.runners.Suite;
         BaseEntityTest.class,
 
         // repository
+        CountryRepositoryTest.class,
+        CityRepositoryTest.class,
+        LocationRepositoryTest.class,
         PermissionRepositoryTest.class,
         RoleRepositoryTest.class,
         UserProfileRepositoryTest.class,

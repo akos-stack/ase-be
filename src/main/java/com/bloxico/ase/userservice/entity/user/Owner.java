@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -24,8 +23,5 @@ public class Owner extends BaseEntity {
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "id")
     private UserProfile userProfile;
-
-    @Column(name = "birthday")
-    private LocalDate birthday;
 
 }

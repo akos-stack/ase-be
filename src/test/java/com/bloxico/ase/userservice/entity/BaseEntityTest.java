@@ -2,13 +2,13 @@ package com.bloxico.ase.userservice.entity;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.entity.user.Owner;
-import com.bloxico.ase.userservice.repository.user.OwnerRepository;
+import com.bloxico.ase.userservice.entity.address.Country;
+import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
-
+import static com.bloxico.ase.testutil.MockUtil.copyBaseEntityData;
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -18,68 +18,62 @@ public class BaseEntityTest extends AbstractSpringTest {
     private MockUtil mockUtil;
 
     @Autowired
-    private OwnerRepository ownerRepository;
+    private CountryRepository countryRepository;
 
     @Test(expected = NullPointerException.class)
     public void prePersist_creator_isNull() {
-        var owner = new Owner();
-        owner.setUserProfile(mockUtil.savedUserProfile());
-        owner.setBirthday(LocalDate.now().minusYears(20));
-        ownerRepository.saveAndFlush(owner);
+        var country = new Country();
+        country.setName(uuid());
+        countryRepository.saveAndFlush(country);
     }
 
     @Test
     public void prePersist_creator_isNotNull() {
-        var owner = new Owner();
+        var country = new Country();
         var creator = mockUtil.savedUserProfile();
-        owner.setUserProfile(creator);
-        owner.setBirthday(LocalDate.now().minusYears(20));
-        owner.setCreatorId(creator.getId());
-        assertNull(owner.getCreatedAt());
-        owner = ownerRepository.saveAndFlush(owner);
-        assertNotNull(owner.getCreatedAt());
+        country.setName(uuid());
+        country.setCreatorId(creator.getId());
+        assertNull(country.getCreatedAt());
+        country = countryRepository.saveAndFlush(country);
+        assertNotNull(country.getCreatedAt());
     }
 
     @Test(expected = NullPointerException.class)
     public void preUpdate_updater_isNull() {
-        var oldOwner = new Owner();
+        var oldCountry = new Country();
         {
             var creator = mockUtil.savedUserProfile();
-            oldOwner.setUserProfile(creator);
-            oldOwner.setBirthday(LocalDate.now());
-            oldOwner.setCreatorId(creator.getId());
-            ownerRepository.saveAndFlush(oldOwner);
+            oldCountry.setName(uuid());
+            oldCountry.setCreatorId(creator.getId());
+            countryRepository.saveAndFlush(oldCountry);
         }
-        var newOwner = new Owner();
+        var newCountry = new Country();
         {
-            newOwner.setId(oldOwner.getId());
-            newOwner.setUserProfile(oldOwner.getUserProfile());
-            newOwner.setBirthday(LocalDate.now().minusYears(20)); // update
-            MockUtil.copyBaseEntityData(oldOwner, newOwner);
-            ownerRepository.saveAndFlush(newOwner);
+            newCountry.setId(oldCountry.getId());
+            newCountry.setName(uuid()); // update
+            copyBaseEntityData(oldCountry, newCountry);
+            countryRepository.saveAndFlush(newCountry);
         }
     }
 
     @Test
     public void preUpdate_updater_isNotNull() {
-        var oldOwner = new Owner();
+        var oldCountry = new Country();
         {
             var creator = mockUtil.savedUserProfile();
-            oldOwner.setUserProfile(creator);
-            oldOwner.setBirthday(LocalDate.now());
-            oldOwner.setCreatorId(creator.getId());
-            ownerRepository.saveAndFlush(oldOwner);
+            oldCountry.setName(uuid());
+            oldCountry.setCreatorId(creator.getId());
+            countryRepository.saveAndFlush(oldCountry);
         }
-        var newOwner = new Owner();
+        var newCountry = new Country();
         {
-            newOwner.setId(oldOwner.getId());
-            newOwner.setUserProfile(oldOwner.getUserProfile());
-            newOwner.setBirthday(LocalDate.now().minusYears(20)); // update
-            MockUtil.copyBaseEntityData(oldOwner, newOwner);
-            newOwner.setUpdaterId(newOwner.getCreatorId()); // !null
-            assertNull(newOwner.getUpdatedAt());
-            newOwner = ownerRepository.saveAndFlush(newOwner);
-            assertNotNull(newOwner.getUpdatedAt());
+            newCountry.setId(oldCountry.getId());
+            newCountry.setName(uuid()); // update
+            copyBaseEntityData(oldCountry, newCountry);
+            assertNull(newCountry.getUpdatedAt());
+            newCountry.setUpdaterId(newCountry.getCreatorId());
+            newCountry = countryRepository.saveAndFlush(newCountry);
+            assertNotNull(newCountry.getUpdatedAt());
         }
     }
 

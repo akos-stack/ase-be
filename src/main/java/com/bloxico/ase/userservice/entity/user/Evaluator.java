@@ -6,12 +6,13 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 import static javax.persistence.FetchType.LAZY;
 
 @Data
 @EqualsAndHashCode(of = "id", callSuper = false)
-@ToString(exclude = {"userProfile", "verifier"})
+@ToString(exclude = "userProfile")
 @Table(name = "evaluators")
 @Entity
 public class Evaluator extends BaseEntity {
@@ -24,8 +25,7 @@ public class Evaluator extends BaseEntity {
     @JoinColumn(name = "id")
     private UserProfile userProfile;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "verifier_id")
-    private UserProfile verifier;
+    @Column(name = "verified_at")
+    private LocalDateTime verifiedAt;
 
 }
