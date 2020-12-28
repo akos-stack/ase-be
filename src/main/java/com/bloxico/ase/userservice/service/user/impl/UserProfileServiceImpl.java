@@ -1,8 +1,10 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
+import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
@@ -28,13 +30,16 @@ public class UserProfileServiceImpl implements IUserProfileService {
 
     private final UserProfileRepository userProfileRepository;
     private final EvaluatorRepository evaluatorRepository;
+    private final LocationRepository locationRepository;
 
     @Autowired
     public UserProfileServiceImpl(UserProfileRepository userProfileRepository,
-                                  EvaluatorRepository evaluatorRepository)
+                                  EvaluatorRepository evaluatorRepository,
+                                  LocationRepository locationRepository)
     {
         this.userProfileRepository = userProfileRepository;
         this.evaluatorRepository = evaluatorRepository;
+        this.locationRepository = locationRepository;
     }
 
     @Override
@@ -77,15 +82,29 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     @Override
-    public UserProfileDto saveEnabledUserProfile(UserProfileDto dto, long principalId) {
-        log.debug("UserProfileServiceImpl.saveUserProfile - start | dto: {}, principalId: {}", dto, principalId);
+    public UserProfileDto saveEnabledUserProfile(UserProfileDto dto) {
+        log.debug("UserProfileServiceImpl.saveUserProfile - start | dto: {}", dto);
         requireNonNull(dto);
         var userProfile = MAPPER.toEntity(dto);
         userProfile.setEnabled(true);
-        userProfile.setCreatorId(principalId);
         var userProfileDto = MAPPER.toDto(userProfileRepository.saveAndFlush(userProfile));
-        log.debug("UserProfileServiceImpl.saveUserProfile - end | dto: {}, principalId: {}", dto, principalId);
+        log.debug("UserProfileServiceImpl.saveUserProfile - end | dto: {}", dto);
         return userProfileDto;
+    }
+
+    @Override
+    public UserProfileDto updateLocation(UserProfileDto userProfileDto, LocationDto locationDto) {
+        log.debug("UserProfileServiceImpl.updateLocation - start | userProfileDto: {}, locationDto: {}", userProfileDto, locationDto);
+        requireNonNull(userProfileDto);
+        requireNonNull(locationDto);
+        var userProfile = userProfileRepository
+                .findById(userProfileDto.getId())
+                .orElseThrow(USER_NOT_FOUND::newException);
+        userProfile.setLocation(locationRepository.fetchById(locationDto.getId()));
+        userProfile.setUpdaterId(userProfile.getId());
+        var updatedUserProfileDto = MAPPER.toDto(userProfileRepository.saveAndFlush(userProfile));
+        log.debug("UserProfileServiceImpl.updateLocation - end | userProfileDto: {}, locationDto: {}", userProfileDto, locationDto);
+        return updatedUserProfileDto;
     }
 
     @Override

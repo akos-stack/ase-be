@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.service.user;
 
+import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
@@ -14,7 +15,9 @@ public interface IUserProfileService {
 
     UserProfileDto updateUserProfile(long id, UpdateUserProfileRequest request);
 
-    UserProfileDto saveEnabledUserProfile(UserProfileDto userProfileDto, long principalId);
+    UserProfileDto saveEnabledUserProfile(UserProfileDto userProfileDto);
+
+    UserProfileDto updateLocation(UserProfileDto userProfileDto, LocationDto locationDto);
 
     EvaluatorDto saveEvaluator(EvaluatorDto evaluatorDto, long principalId);
 

@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.exception.UserProfileException;
@@ -15,7 +16,10 @@ import java.util.Set;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.entity.user.Role.USER;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class UserProfileServiceImplTest extends AbstractSpringTest {
 
@@ -81,12 +85,11 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = NullPointerException.class)
     public void saveEnabledUserProfile_nullDto() {
-        userProfileService.saveEnabledUserProfile(null, 1);
+        userProfileService.saveEnabledUserProfile(null);
     }
 
     @Test
     public void saveEnabledUserProfile() {
-        var principalId = mockUtil.savedAdmin().getId();
         var userProfileDto = new UserProfileDto();
         userProfileDto.setName(uuid());
         userProfileDto.setEmail(uuid());
@@ -97,9 +100,29 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
         userProfileDto.setGender(uuid());
         userProfileDto.setPhone(uuid());
         userProfileDto.setLocation(mockUtil.savedLocationDto());
-        userProfileDto = userProfileService.saveEnabledUserProfile(userProfileDto, principalId);
+        userProfileDto = userProfileService.saveEnabledUserProfile(userProfileDto);
         assertTrue(userProfileDto.getEnabled());
         assertEquals(Set.of(), userProfileDto.getRoles());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void updateLocation_nullUserProfile() {
+        userProfileService.updateLocation(null, new LocationDto());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void updateLocation_nullLocation() {
+        userProfileService.updateLocation(new UserProfileDto(), null);
+    }
+
+    @Test
+    public void updateLocation() {
+        var userProfileDto = mockUtil.savedUserProfileDto();
+        var locationDto = mockUtil.savedLocationDto();
+        userProfileService.updateLocation(userProfileDto, locationDto);
+        assertEquals(
+                locationDto,
+                userProfileService.findUserProfileById(userProfileDto.getId()).getLocation());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -117,7 +140,7 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
             userProfileDto.setPhone(uuid());
             userProfileDto.setLocation(mockUtil.savedLocationDto());
             userProfileDto.addRole(rolePermissionService.findRoleByName(USER));
-            userProfileDto = userProfileService.saveEnabledUserProfile(userProfileDto, principalId);
+            userProfileDto = userProfileService.saveEnabledUserProfile(userProfileDto);
         }
         var evaluatorDto = new EvaluatorDto();
         evaluatorDto.setUserProfile(userProfileDto);
@@ -139,7 +162,7 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
             userProfileDto.setPhone(uuid());
             userProfileDto.setLocation(mockUtil.savedLocationDto());
             userProfileDto.addRole(rolePermissionService.findRoleByName(EVALUATOR));
-            userProfileDto = userProfileService.saveEnabledUserProfile(userProfileDto, principalId);
+            userProfileDto = userProfileService.saveEnabledUserProfile(userProfileDto);
         }
         var evaluatorDto = new EvaluatorDto();
         evaluatorDto.setUserProfile(userProfileDto);

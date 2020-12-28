@@ -22,6 +22,6 @@ public interface IUserRegistrationFacade {
 
     void withdrawEvaluatorInvitation(EvaluatorInvitationWithdrawalRequest request);
 
-    EvaluatorDto submitEvaluator(SubmitEvaluatorRequest request, long principalId);
+    EvaluatorDto submitEvaluator(SubmitEvaluatorRequest request);
 
 }

@@ -117,23 +117,24 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     }
 
     @Override
-    public EvaluatorDto submitEvaluator(SubmitEvaluatorRequest request, long principalId) {
-        log.info("UserRegistrationFacadeImpl.submitEvaluator - start | request: {}, principalId: {}", request, principalId);
+    public EvaluatorDto submitEvaluator(SubmitEvaluatorRequest request) {
+        log.info("UserRegistrationFacadeImpl.submitEvaluator - start | request: {}", request);
         pendingEvaluatorService.consumePendingEvaluator(request.getEmail(), request.getToken());
-        var userProfileDto = obtainUserProfileDto(request, principalId);
+        var userProfileDto = obtainUserProfileDto(request);
+        var principalId = userProfileDto.getId();
         var evaluatorDto = MAPPER.toEvaluatorDto(request);
         evaluatorDto.setUserProfile(userProfileDto);
         evaluatorDto = userProfileService.saveEvaluator(evaluatorDto, principalId);
-        log.info("UserRegistrationFacadeImpl.submitEvaluator - end | request: {}, principalId: {}", request, principalId);
+        log.info("UserRegistrationFacadeImpl.submitEvaluator - end | request: {}", request);
         return evaluatorDto;
     }
 
-    private UserProfileDto obtainUserProfileDto(SubmitEvaluatorRequest request, long principalId) {
-        var locationDto = obtainLocationDto(request, principalId);
+    private UserProfileDto obtainUserProfileDto(SubmitEvaluatorRequest request) {
         var userProfileDto = MAPPER.toUserProfileDto(request);
-        userProfileDto.setLocation(locationDto);
         userProfileDto.addRole(rolePermissionService.findRoleByName(EVALUATOR));
-        return userProfileService.saveEnabledUserProfile(userProfileDto, principalId);
+        userProfileDto = userProfileService.saveEnabledUserProfile(userProfileDto);
+        var locationDto = obtainLocationDto(request, userProfileDto.getId());
+        return userProfileService.updateLocation(userProfileDto, locationDto);
     }
 
     private LocationDto obtainLocationDto(SubmitEvaluatorRequest request, long principalId) {
