@@ -359,6 +359,16 @@ databaseChangeLog:
                   type: varchar(256)
                   constraints:
                     nullable: false
+              - column:
+                  name: status
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cv_path
+                  type: varchar(256)
+                  constraints:
+                    nullable: true
               # METADATA
               - column:
                   name: creator_id

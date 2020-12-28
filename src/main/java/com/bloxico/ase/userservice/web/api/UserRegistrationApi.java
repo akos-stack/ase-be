@@ -24,6 +24,8 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_INVITATION          = "/user/registration/evaluator/invitation";
     String REGISTRATION_EVALUATOR_INVITATION_RESEND   = "/user/registration/evaluator/invitation/resend";
     String REGISTRATION_EVALUATOR_INVITATION_WITHDRAW = "/user/registration/evaluator/invitation/withdraw";
+    String REGISTRATION_EVALUATOR_REQUEST             = "/user/registration/evaluator/request";
+    String REGISTRATION_EVALUATOR_SEARCH              = "/user/registration/evaluator/search";
 
     String TOKEN_PARAM = "token";
 
@@ -108,5 +110,17 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "Evaluator with given email is not invited.")
     })
     ResponseEntity<Void> withdrawEvaluatorInvitation(@Valid @RequestBody EvaluatorInvitationWithdrawalRequest request);
+
+    @PostMapping(
+            value = REGISTRATION_EVALUATOR_REQUEST,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'register_as_evaluator')")
+    @ApiOperation(value = "Registers user as a pending evaluator in status REQUESTED.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Invitation is sent successfully."),
+            @ApiResponse(code = 409, message = "Evaluator with given email is already pending evaluator.")
+    })
+    ResponseEntity<Void> requestEvaluatorRegistration(@Valid @RequestBody EvaluatorRegistrationRequest request, Principal principal);
 
 }

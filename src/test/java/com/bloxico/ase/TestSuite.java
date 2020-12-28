@@ -3,10 +3,7 @@ package com.bloxico.ase;
 import com.bloxico.ase.userservice.config.security.AseSecurityServiceTest;
 import com.bloxico.ase.userservice.config.security.PersistentJwtTokenStoreTest;
 import com.bloxico.ase.userservice.entity.BaseEntityTest;
-import com.bloxico.ase.userservice.facade.impl.QuartzOperationsFacadeImplTest;
-import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImplTest;
-import com.bloxico.ase.userservice.facade.impl.UserProfileFacadeImplTest;
-import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImplTest;
+import com.bloxico.ase.userservice.facade.impl.*;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepositoryTest;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepositoryTest;
@@ -22,6 +19,7 @@ import com.bloxico.ase.userservice.service.user.impl.RolePermissionServiceImplTe
 import com.bloxico.ase.userservice.service.user.impl.UserPasswordServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImplTest;
 import com.bloxico.ase.userservice.service.user.impl.UserRegistrationServiceImplTest;
+import com.bloxico.ase.userservice.web.api.UserManagementApiTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -62,6 +60,7 @@ import org.junit.runners.Suite;
         UserRegistrationFacadeImplTest.class,
         UserPasswordFacadeImplTest.class,
         UserProfileFacadeImplTest.class,
+        UserManagementFacadeImplTest.class,
 
         // Run these individually for now
         // They stuck for some reason
@@ -73,6 +72,7 @@ import org.junit.runners.Suite;
         // UserRegistrationApiTest.class,
         // UserPasswordApiTest.class,
         // UserProfileApiTest.class,
+        // UserManagementApiTest.class,
 })
 public class TestSuite {
 }

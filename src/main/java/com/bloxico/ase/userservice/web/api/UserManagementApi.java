@@ -21,11 +21,11 @@ import java.security.Principal;
 @Api(value = "userManagement")
 public interface UserManagementApi {
 
-    String USER_MANAGEMENT_ENDPOINT        = "/users";
+    String USER_SEARCH_ENDPOINT            = "/users";
     String USER_DISABLE                    = "/users/disable";
     String USER_BLACKLIST_TOKENS           = "/users/blacklist-tokens";
 
-    @GetMapping(value = USER_MANAGEMENT_ENDPOINT)
+    @GetMapping(value = USER_SEARCH_ENDPOINT)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_users')")
     @ApiOperation(value = "Search users by email.")
     @ApiResponses({

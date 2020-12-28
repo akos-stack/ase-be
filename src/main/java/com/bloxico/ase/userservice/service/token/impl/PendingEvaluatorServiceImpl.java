@@ -25,18 +25,25 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     }
 
     @Override
-    public String createPendingEvaluator(String email, long principalId) {
-        log.debug("PendingEvaluatorServiceImpl.createPendingEvaluator - start | email: {}, principalId: {}", email, principalId);
+    public String createPendingEvaluator(String email, String cvPath, boolean invited, long principalId) {
+        log.debug("PendingEvaluatorServiceImpl.createPendingEvaluator - start | email: {}, cvPath: {}, invited: {}, principalId: {}", email, cvPath, invited, principalId);
         requireNonNull(email);
-        if (evaluatorAlreadyPending(email))
-            throw TOKEN_EXISTS.newException();
+        if (evaluatorAlreadyPending(email)) {
+            updatePendingEvaluator(email, invited, principalId);
+        }
         var token = UUID.randomUUID().toString();
         var pendingEvaluator = new PendingEvaluator();
         pendingEvaluator.setEmail(email);
         pendingEvaluator.setToken(token);
+        pendingEvaluator.setCvPath(cvPath);
+        if(invited) {
+            pendingEvaluator.setStatus(PendingEvaluator.PendingEvaluatorStatus.PENDING);
+        } else {
+            pendingEvaluator.setStatus(PendingEvaluator.PendingEvaluatorStatus.REQUESTED);
+        }
         pendingEvaluator.setCreatorId(principalId);
         pendingEvaluatorRepository.save(pendingEvaluator);
-        log.debug("PendingEvaluatorServiceImpl.createPendingEvaluator - end | email: {}, principalId: {}", email, principalId);
+        log.debug("PendingEvaluatorServiceImpl.createPendingEvaluator - start | email: {}, cvPath: {}, invited: {}, principalId: {}", email, cvPath, invited, principalId);
         return token;
     }
 
@@ -77,6 +84,21 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
 
     private boolean evaluatorAlreadyPending(String email) {
         return pendingEvaluatorRepository.findByEmailIgnoreCase(email).isPresent();
+    }
+
+    private String updatePendingEvaluator(String email, boolean invited, long principalId) {
+        var pendingEvaluator = pendingEvaluatorRepository.findByEmailIgnoreCase(email).get();
+        if(PendingEvaluator.PendingEvaluatorStatus.PENDING == pendingEvaluator.getStatus()) {
+            throw TOKEN_EXISTS.newException();
+        } else {
+            if(!invited) {
+                throw TOKEN_EXISTS.newException();
+            }
+            pendingEvaluator.setStatus(PendingEvaluator.PendingEvaluatorStatus.PENDING);
+            pendingEvaluator.setUpdaterId(principalId);
+            pendingEvaluator = pendingEvaluatorRepository.save(pendingEvaluator);
+            return pendingEvaluator.getToken();
+        }
     }
 
 }

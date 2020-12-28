@@ -81,7 +81,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public void sendEvaluatorInvitation(EvaluatorInvitationRequest request, long principalId) {
         log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - start | request: {}, principalId: {}", request, principalId);
-        var token = pendingEvaluatorService.createPendingEvaluator(request.getEmail(), principalId);
+        var token = pendingEvaluatorService.createPendingEvaluator(request.getEmail(), "", true, principalId);
         mailUtil.sendEvaluatorInvitationEmail(request.getEmail(), token);
         log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - end | request: {}, principalId: {}", request, principalId);
     }
@@ -99,6 +99,13 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         log.info("UserRegistrationFacadeImpl.withdrawEvaluatorInvitation - start | request: {}", request);
         pendingEvaluatorService.deletePendingEvaluator(request.getEmail());
         log.info("UserRegistrationFacadeImpl.withdrawEvaluatorInvitation - end | request: {}", request);
+    }
+
+    @Override
+    public void requestEvaluatorRegistration(EvaluatorRegistrationRequest request, long principalId) {
+        log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - start | request: {}, principalId: {}", request, principalId);
+        var token = pendingEvaluatorService.createPendingEvaluator(request.getEmail(), request.getCvPath(), false, principalId);
+        log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - end | request: {}, principalId: {}", request, principalId);
     }
 
 }

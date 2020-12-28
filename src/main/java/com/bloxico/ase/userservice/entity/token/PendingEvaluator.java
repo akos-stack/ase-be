@@ -4,10 +4,7 @@ import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
 @EqualsAndHashCode(of = "token", callSuper = false)
@@ -21,5 +18,17 @@ public class PendingEvaluator extends BaseEntity {
 
     @Column(name = "token")
     private String token;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private PendingEvaluatorStatus status;
+
+    @Column(name = "cv_path")
+    private String cvPath;
+
+    public enum PendingEvaluatorStatus {
+        PENDING,
+        REQUESTED
+    }
 
 }

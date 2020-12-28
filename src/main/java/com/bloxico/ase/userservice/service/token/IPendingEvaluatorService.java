@@ -2,7 +2,7 @@ package com.bloxico.ase.userservice.service.token;
 
 public interface IPendingEvaluatorService {
 
-    String createPendingEvaluator(String email, long principalId);
+    String createPendingEvaluator(String email, String cvPath, boolean invited, long principalId);
 
     String getPendingEvaluatorToken(String email);
 

@@ -64,4 +64,11 @@ public class UserRegistrationController implements UserRegistrationApi {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<Void> requestEvaluatorRegistration(@Valid EvaluatorRegistrationRequest request, Principal principal) {
+        var id = extractId(principal);
+        userRegistrationFacade.requestEvaluatorRegistration(request, id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
