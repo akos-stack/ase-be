@@ -5,12 +5,14 @@ import com.bloxico.ase.userservice.web.api.UserRegistrationApi;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
+import com.bloxico.ase.userservice.web.model.user.ArrayUserProfileDataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.security.Principal;
 
 import static com.bloxico.ase.userservice.util.PrincipalUtil.extractId;
@@ -69,6 +71,12 @@ public class UserRegistrationController implements UserRegistrationApi {
         var id = extractId(principal);
         userRegistrationFacade.requestEvaluatorRegistration(request, id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<ArrayPendingEvaluatorDataResponse> searchPendingEvaluators(@Valid String email, @Valid int page, @Valid @Min(1) int size, @Valid String sort) {
+        var arrayPendingEvaluatorDataResponse = userRegistrationFacade.searchPendingEvaluators(email, page, size, sort);
+        return ResponseEntity.ok(arrayPendingEvaluatorDataResponse);
     }
 
 }

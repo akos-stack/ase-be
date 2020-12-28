@@ -1,14 +1,21 @@
 package com.bloxico.ase.userservice.service.token.impl;
 
+import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_EXISTS;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
@@ -80,6 +87,19 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
                 .orElseThrow(TOKEN_NOT_FOUND::newException);
         pendingEvaluatorRepository.delete(pendingEvaluator);
         log.debug("PendingEvaluatorServiceImpl.consumePendingEvaluator - end | email: {}, token: {}", email, token);
+    }
+
+    @Override
+    public List<PendingEvaluatorDto> searchPendingEvaluators(String email, int page, int size, String sort) {
+        log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - start | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
+        var pendingEvaluators = pendingEvaluatorRepository.findAllByEmailContaining(email, pageable);
+        var pendingEvaluatorDtos = pendingEvaluators
+                .stream()
+                .map(pendingEvaluator -> MAPPER.toDto(pendingEvaluator))
+                .collect(Collectors.toList());
+        log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - end | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
+        return pendingEvaluatorDtos;
     }
 
     private boolean evaluatorAlreadyPending(String email) {

@@ -1,11 +1,13 @@
 package com.bloxico.ase.userservice.util;
 
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
+import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
@@ -32,5 +34,7 @@ public interface AseMapper {
     @Mapping(target = "value", source = "tokenId")
     @Mapping(target = "expiryDate", source = "expiration")
     BlacklistedToken toBlacklistedToken(OAuthAccessTokenDto token);
+
+    PendingEvaluatorDto toDto(PendingEvaluator pendingEvaluator);
 
 }

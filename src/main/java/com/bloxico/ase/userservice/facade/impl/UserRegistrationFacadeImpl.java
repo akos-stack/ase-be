@@ -9,6 +9,7 @@ import com.bloxico.ase.userservice.service.user.IUserRegistrationService;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
+import com.bloxico.ase.userservice.web.model.user.ArrayUserProfileDataResponse;
 import com.bloxico.userservice.util.MailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +107,15 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - start | request: {}, principalId: {}", request, principalId);
         var token = pendingEvaluatorService.createPendingEvaluator(request.getEmail(), request.getCvPath(), false, principalId);
         log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - end | request: {}, principalId: {}", request, principalId);
+    }
+
+    @Override
+    public ArrayPendingEvaluatorDataResponse searchPendingEvaluators(String email, int page, int size, String sort) {
+        log.info("UserRegistrationFacadeImpl.searchPendingEvaluators - start | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
+        var pendingEvaluatorDtos = pendingEvaluatorService.searchPendingEvaluators(email, page, size, sort);
+        var response = new ArrayPendingEvaluatorDataResponse(pendingEvaluatorDtos);
+        log.info("UserRegistrationFacadeImpl.searchPendingEvaluators - end | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
+        return response;
     }
 
 }

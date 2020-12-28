@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.security.Principal;
 
 @Api(value = "registration")
@@ -122,5 +123,13 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 409, message = "Evaluator with given email is already pending evaluator.")
     })
     ResponseEntity<Void> requestEvaluatorRegistration(@Valid @RequestBody EvaluatorRegistrationRequest request, Principal principal);
+
+    @GetMapping(value = REGISTRATION_EVALUATOR_SEARCH)
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_users')")
+    @ApiOperation(value = "Search pending evaluators.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Paginated list of pending evaluators successfully retrieved.")
+    })
+    ResponseEntity<ArrayPendingEvaluatorDataResponse> searchPendingEvaluators(@Valid @RequestParam("email") String email, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "email") String sort);
 
 }
