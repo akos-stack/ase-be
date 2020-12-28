@@ -315,13 +315,25 @@ public class MockUtil {
         userProfileRepository.saveAndFlush(user);
     }
 
+    public SubmitEvaluatorRequest newSubmitUninvitedEvaluatorRequest() {
+        var email = genEmail();
+        var password = genEmail();
+        return new SubmitEvaluatorRequest(
+                uuid(), uuid(), password,
+                email, uuid(), uuid(),
+                uuid(), LocalDate.now(),
+                uuid(), uuid(), uuid(),
+                uuid(), uuid(), ONE, TEN);
+    }
+
     public SubmitEvaluatorRequest newSubmitInvitedEvaluatorRequest() {
-        var email = uuid();
+        var email = genEmail();
+        var password = genEmail();
         var principalId = savedAdmin().getId();
         userRegistrationFacade.sendEvaluatorInvitation(new EvaluatorInvitationRequest(email), principalId);
         var token = pendingEvaluatorRepository.findByEmailIgnoreCase(email).orElseThrow().getToken();
         return new SubmitEvaluatorRequest(
-                token, uuid(), uuid(),
+                token, uuid(), password,
                 email, uuid(), uuid(),
                 uuid(), LocalDate.now(),
                 uuid(), uuid(), uuid(),

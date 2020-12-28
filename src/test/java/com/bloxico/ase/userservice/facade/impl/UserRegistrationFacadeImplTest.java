@@ -10,18 +10,13 @@ import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
-import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.time.LocalDate;
-
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static java.math.BigDecimal.ONE;
-import static java.math.BigDecimal.TEN;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -161,12 +156,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void submitEvaluator_evaluatorNotPending() {
-        var request = new SubmitEvaluatorRequest(
-                uuid(), uuid(), uuid(),
-                uuid(), uuid(), uuid(),
-                uuid(), LocalDate.now(),
-                uuid(), uuid(), uuid(),
-                uuid(), uuid(), ONE, TEN);
+        var request = mockUtil.newSubmitUninvitedEvaluatorRequest();
         userRegistrationFacade.submitEvaluator(request);
     }
 

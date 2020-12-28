@@ -1,8 +1,10 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
+import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +26,7 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_INVITATION          = "/user/registration/evaluator/invitation";
     String REGISTRATION_EVALUATOR_INVITATION_RESEND   = "/user/registration/evaluator/invitation/resend";
     String REGISTRATION_EVALUATOR_INVITATION_WITHDRAW = "/user/registration/evaluator/invitation/withdraw";
+    String REGISTRATION_EVALUATOR_SUBMIT              = "/user/registration/evaluator/submit";
 
     String TOKEN_PARAM = "token";
 
@@ -108,5 +111,16 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "Evaluator with given email is not invited.")
     })
     ResponseEntity<Void> withdrawEvaluatorInvitation(@Valid @RequestBody EvaluatorInvitationWithdrawalRequest request);
+
+    @PostMapping(
+            value = REGISTRATION_EVALUATOR_SUBMIT,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @ApiOperation(value = "Creates new evaluator with given data. Evaluator must be invited first.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Evaluator is created successfully."),
+            @ApiResponse(code = 404, message = "Evaluator with given email is not invited.")
+    })
+    ResponseEntity<EvaluatorDto> submitEvaluator(@Valid @RequestBody SubmitEvaluatorRequest request);
 
 }

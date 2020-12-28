@@ -20,6 +20,7 @@ import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
@@ -193,6 +194,39 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
                 .body(new ResendTokenRequest(registration.getEmail()))
                 .when()
                 .post(API_URL + REGISTRATION_TOKEN_RESEND_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void submitEvaluator_200_ok() {
+        var request = mockUtil.newSubmitInvitedEvaluatorRequest();
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body(
+                        "id", notNullValue(),
+                        "user_profile.id", notNullValue(),
+                        "user_profile.name", is(request.getUsername()),
+                        "user_profile.password", is(request.getPassword()),
+                        "user_profile.email", is(request.getEmail()),
+                        "user_profile.enabled", is(true));
+    }
+
+    @Test
+    public void submitEvaluator_404_tokenNotFound() {
+        given()
+                .contentType(JSON)
+                .body(mockUtil.newSubmitUninvitedEvaluatorRequest())
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
                 .then()
                 .assertThat()
                 .statusCode(404)
