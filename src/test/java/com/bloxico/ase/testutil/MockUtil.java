@@ -1,5 +1,7 @@
 package com.bloxico.ase.testutil;
 
+import com.bloxico.ase.userservice.dto.entity.address.CityDto;
+import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
@@ -148,6 +150,10 @@ public class MockUtil {
         return countryRepository.saveAndFlush(country);
     }
 
+    public CountryDto savedCountryDto() {
+        return MAPPER.toDto(savedCountry());
+    }
+
     public City savedCity() {
         var country = savedCountry();
         var city = new City();
@@ -156,6 +162,10 @@ public class MockUtil {
         city.setZipCode(uuid());
         city.setCreatorId(country.getCreatorId());
         return cityRepository.saveAndFlush(city);
+    }
+
+    public CityDto savedCityDto() {
+        return MAPPER.toDto(savedCity());
     }
 
     public Token savedToken(Token.Type type) {
