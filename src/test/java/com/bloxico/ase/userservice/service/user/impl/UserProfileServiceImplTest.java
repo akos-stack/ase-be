@@ -2,20 +2,28 @@ package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
+import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.exception.UserProfileException;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
+import java.util.Set;
+
 import static com.bloxico.ase.testutil.MockUtil.uuid;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
+import static com.bloxico.ase.userservice.entity.user.Role.USER;
+import static org.junit.Assert.*;
 
 public class UserProfileServiceImplTest extends AbstractSpringTest {
 
     @Autowired
     private MockUtil mockUtil;
+
+    @Autowired
+    private RolePermissionServiceImpl rolePermissionService;
 
     @Autowired
     private UserProfileServiceImpl userProfileService;
@@ -69,6 +77,74 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
         var updated = userProfileService.updateUserProfile(id, request);
         assertEquals(request.getName(), updated.getName());
         assertEquals(request.getPhone(), updated.getPhone());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void saveEnabledUserProfile_nullDto() {
+        userProfileService.saveEnabledUserProfile(null, 1);
+    }
+
+    @Test
+    public void saveEnabledUserProfile() {
+        var principalId = mockUtil.savedAdmin().getId();
+        var userProfileDto = new UserProfileDto();
+        userProfileDto.setName(uuid());
+        userProfileDto.setEmail(uuid());
+        userProfileDto.setPassword(uuid());
+        userProfileDto.setFirstName(uuid());
+        userProfileDto.setLastName(uuid());
+        userProfileDto.setBirthday(LocalDate.now().minusYears(20));
+        userProfileDto.setGender(uuid());
+        userProfileDto.setPhone(uuid());
+        userProfileDto.setLocation(mockUtil.savedLocationDto());
+        userProfileDto = userProfileService.saveEnabledUserProfile(userProfileDto, principalId);
+        assertTrue(userProfileDto.getEnabled());
+        assertEquals(Set.of(), userProfileDto.getRoles());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void saveEvaluator_missingRole() {
+        var principalId = mockUtil.savedAdmin().getId();
+        var userProfileDto = new UserProfileDto();
+        {
+            userProfileDto.setName(uuid());
+            userProfileDto.setEmail(uuid());
+            userProfileDto.setPassword(uuid());
+            userProfileDto.setFirstName(uuid());
+            userProfileDto.setLastName(uuid());
+            userProfileDto.setBirthday(LocalDate.now().minusYears(20));
+            userProfileDto.setGender(uuid());
+            userProfileDto.setPhone(uuid());
+            userProfileDto.setLocation(mockUtil.savedLocationDto());
+            userProfileDto.addRole(rolePermissionService.findRoleByName(USER));
+            userProfileDto = userProfileService.saveEnabledUserProfile(userProfileDto, principalId);
+        }
+        var evaluatorDto = new EvaluatorDto();
+        evaluatorDto.setUserProfile(userProfileDto);
+        userProfileService.saveEvaluator(evaluatorDto, principalId);
+    }
+
+    @Test
+    public void saveEvaluator() {
+        var principalId = mockUtil.savedAdmin().getId();
+        var userProfileDto = new UserProfileDto();
+        {
+            userProfileDto.setName(uuid());
+            userProfileDto.setEmail(uuid());
+            userProfileDto.setPassword(uuid());
+            userProfileDto.setFirstName(uuid());
+            userProfileDto.setLastName(uuid());
+            userProfileDto.setBirthday(LocalDate.now().minusYears(20));
+            userProfileDto.setGender(uuid());
+            userProfileDto.setPhone(uuid());
+            userProfileDto.setLocation(mockUtil.savedLocationDto());
+            userProfileDto.addRole(rolePermissionService.findRoleByName(EVALUATOR));
+            userProfileDto = userProfileService.saveEnabledUserProfile(userProfileDto, principalId);
+        }
+        var evaluatorDto = new EvaluatorDto();
+        evaluatorDto.setUserProfile(userProfileDto);
+        evaluatorDto = userProfileService.saveEvaluator(evaluatorDto, principalId);
+        assertNotNull(evaluatorDto.getId());
     }
 
     @Test(expected = UserProfileException.class)

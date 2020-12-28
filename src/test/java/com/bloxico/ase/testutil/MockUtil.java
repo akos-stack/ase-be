@@ -2,12 +2,14 @@ package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.address.CityDto;
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
+import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.address.City;
 import com.bloxico.ase.userservice.entity.address.Country;
+import com.bloxico.ase.userservice.entity.address.Location;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.entity.token.Token;
@@ -16,6 +18,7 @@ import com.bloxico.ase.userservice.facade.impl.UserManagementFacadeImpl;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImpl;
 import com.bloxico.ase.userservice.repository.address.CityRepository;
 import com.bloxico.ase.userservice.repository.address.CountryRepository;
+import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
@@ -73,6 +76,7 @@ public class MockUtil {
     private final UserManagementFacadeImpl userManagementFacade;
     private final CountryRepository countryRepository;
     private final CityRepository cityRepository;
+    private final LocationRepository locationRepository;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
@@ -85,7 +89,8 @@ public class MockUtil {
                     BlacklistedTokenRepository blacklistedTokenRepository,
                     UserManagementFacadeImpl userManagementFacade,
                     CountryRepository countryRepository,
-                    CityRepository cityRepository)
+                    CityRepository cityRepository,
+                    LocationRepository locationRepository)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -98,6 +103,7 @@ public class MockUtil {
         this.userManagementFacade = userManagementFacade;
         this.countryRepository = countryRepository;
         this.cityRepository = cityRepository;
+        this.locationRepository = locationRepository;
     }
 
     public UserProfile savedAdmin() {
@@ -166,6 +172,19 @@ public class MockUtil {
 
     public CityDto savedCityDto() {
         return MAPPER.toDto(savedCity());
+    }
+
+    public Location savedLocation() {
+        var city = savedCity();
+        var location = new Location();
+        location.setCity(city);
+        location.setAddress(uuid());
+        location.setCreatorId(city.getCreatorId());
+        return locationRepository.saveAndFlush(location);
+    }
+
+    public LocationDto savedLocationDto() {
+        return MAPPER.toDto(savedLocation());
     }
 
     public Token savedToken(Token.Type type) {

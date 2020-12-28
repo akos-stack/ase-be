@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.service.user;
 
+import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 
@@ -13,7 +14,12 @@ public interface IUserProfileService {
 
     UserProfileDto updateUserProfile(long id, UpdateUserProfileRequest request);
 
+    UserProfileDto saveEnabledUserProfile(UserProfileDto userProfileDto, long principalId);
+
+    EvaluatorDto saveEvaluator(EvaluatorDto evaluatorDto, long principalId);
+
     void disableUser(long userId, long principalId);
 
     List<UserProfileDto> findUsersByEmail(String email, int page, int size, String sort);
+
 }

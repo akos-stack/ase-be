@@ -5,10 +5,11 @@ import com.bloxico.ase.testutil.MockUtil;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.EntityNotFoundException;
+
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.config.security.AsePrincipal.authorityOf;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class RolePermissionServiceImplTest extends AbstractSpringTest {
 
@@ -29,6 +30,21 @@ public class RolePermissionServiceImplTest extends AbstractSpringTest {
                         .getName())
                         .contains(authorityOf(role.getName()))));
         assertSame(map, rolePermissionService.permissionNameGrantedAuthoritiesMap());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void findRoleByName_nullName() {
+        rolePermissionService.findRoleByName(null);
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void findRoleByName_notFound() {
+        rolePermissionService.findRoleByName(uuid());
+    }
+
+    @Test
+    public void findRoleByName() {
+        assertNotNull(rolePermissionService.findRoleByName("uSeR"));
     }
 
 }

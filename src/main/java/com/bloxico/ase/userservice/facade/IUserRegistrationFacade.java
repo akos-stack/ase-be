@@ -1,8 +1,10 @@
 package com.bloxico.ase.userservice.facade;
 
+import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
+import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 
 public interface IUserRegistrationFacade {
 
@@ -19,5 +21,7 @@ public interface IUserRegistrationFacade {
     void resendEvaluatorInvitation(EvaluatorInvitationResendRequest request);
 
     void withdrawEvaluatorInvitation(EvaluatorInvitationWithdrawalRequest request);
+
+    EvaluatorDto submitEvaluator(SubmitEvaluatorRequest request, long principalId);
 
 }

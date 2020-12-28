@@ -17,8 +17,7 @@ public class UserProfileFacadeImpl implements IUserProfileFacade {
     private final IUserProfileService userProfileService;
 
     @Autowired
-    public UserProfileFacadeImpl(IUserProfileService userProfileService)
-    {
+    public UserProfileFacadeImpl(IUserProfileService userProfileService) {
         this.userProfileService = userProfileService;
     }
 

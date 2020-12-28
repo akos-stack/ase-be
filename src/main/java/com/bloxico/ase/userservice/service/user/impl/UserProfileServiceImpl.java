@@ -1,6 +1,9 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
+import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
+import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
@@ -23,10 +27,14 @@ import static java.util.Objects.requireNonNull;
 public class UserProfileServiceImpl implements IUserProfileService {
 
     private final UserProfileRepository userProfileRepository;
+    private final EvaluatorRepository evaluatorRepository;
 
     @Autowired
-    public UserProfileServiceImpl(UserProfileRepository userProfileRepository) {
+    public UserProfileServiceImpl(UserProfileRepository userProfileRepository,
+                                  EvaluatorRepository evaluatorRepository)
+    {
         this.userProfileRepository = userProfileRepository;
+        this.evaluatorRepository = evaluatorRepository;
     }
 
     @Override
@@ -69,6 +77,30 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     @Override
+    public UserProfileDto saveEnabledUserProfile(UserProfileDto dto, long principalId) {
+        log.debug("UserProfileServiceImpl.saveUserProfile - start | dto: {}, principalId: {}", dto, principalId);
+        requireNonNull(dto);
+        var userProfile = MAPPER.toEntity(dto);
+        userProfile.setEnabled(true);
+        userProfile.setCreatorId(principalId);
+        var userProfileDto = MAPPER.toDto(userProfileRepository.saveAndFlush(userProfile));
+        log.debug("UserProfileServiceImpl.saveUserProfile - end | dto: {}, principalId: {}", dto, principalId);
+        return userProfileDto;
+    }
+
+    @Override
+    public EvaluatorDto saveEvaluator(EvaluatorDto dto, long principalId) {
+        log.debug("UserProfileServiceImpl.saveEvaluator - start | dto: {}, principalId: {}", dto, principalId);
+        requireNonNull(dto);
+        requireHasRole(dto.getUserProfile(), EVALUATOR);
+        var evaluator = MAPPER.toEntity(dto);
+        evaluator.setCreatorId(principalId);
+        var evaluatorDto = MAPPER.toDto(evaluatorRepository.saveAndFlush(evaluator));
+        log.debug("UserProfileServiceImpl.saveEvaluator - end | dto: {}, principalId: {}", dto, principalId);
+        return evaluatorDto;
+    }
+
+    @Override
     public void disableUser(long userId, long principalId) {
         log.debug("UserProfileServiceImpl.disableUser - start | userId: {}, principalId: {}", userId, principalId);
         var userProfile = userProfileRepository
@@ -87,10 +119,20 @@ public class UserProfileServiceImpl implements IUserProfileService {
         var userProfiles = userProfileRepository.findAllByEmailContaining(email, pageable);
         var userProfileDtos = userProfiles
                 .stream()
-                .map(user -> MAPPER.toDto(user))
+                .map(MAPPER::toDto)
                 .collect(Collectors.toList());
         log.debug("UserProfileServiceImpl.findUsersByEmail - end | email: {}, page: {}, size: {}", email, page, size);
         return userProfileDtos;
+    }
+
+    private static void requireHasRole(UserProfileDto userProfileDto, String role) {
+        userProfileDto
+                .getRoles()
+                .stream()
+                .map(RoleDto::getName)
+                .filter(role::equals)
+                .findAny()
+                .orElseThrow(() -> new IllegalStateException("User: " + userProfileDto + " must have role: " + role));
     }
 
 }
