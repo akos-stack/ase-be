@@ -5,17 +5,23 @@ import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserProfileException;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
-import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
+import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
+import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
+import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.time.LocalDate;
+
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.TEN;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -31,7 +37,10 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     private TokenRepository tokenRepository;
 
     @Autowired
-    private UserProfileRepository userProfileRepository;
+    private UserProfileServiceImpl userProfileService;
+
+    @Autowired
+    private EvaluatorRepository evaluatorRepository;
 
     @Autowired
     private UserRegistrationFacadeImpl userRegistrationFacade;
@@ -91,7 +100,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         var tknRequest = new TokenValidationRequest(email, token);
         userRegistrationFacade.handleTokenValidation(tknRequest);
         assertTrue(tokenRepository.findByValue(token).isEmpty());
-        assertTrue(userProfileRepository.findByEmailIgnoreCase(email).orElseThrow().getEnabled());
+        assertTrue(userProfileService.findUserProfileByEmail(email).getEnabled());
     }
 
     @Test(expected = NullPointerException.class)
@@ -143,6 +152,31 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         userRegistrationFacade.registerUserWithVerificationToken(regRequest);
         var resRequest = new ResendTokenRequest(email);
         userRegistrationFacade.resendVerificationToken(resRequest);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void submitEvaluator_nullRequest() {
+        userRegistrationFacade.submitEvaluator(null);
+    }
+
+    @Test(expected = TokenException.class)
+    public void submitEvaluator_evaluatorNotPending() {
+        var request = new SubmitEvaluatorRequest(
+                uuid(), uuid(), uuid(),
+                uuid(), uuid(), uuid(),
+                uuid(), LocalDate.now(),
+                uuid(), uuid(), uuid(),
+                uuid(), uuid(), ONE, TEN);
+        userRegistrationFacade.submitEvaluator(request);
+    }
+
+    @Test
+    public void submitEvaluator_evaluatorPending() {
+        var request = mockUtil.newSubmitInvitedEvaluatorRequest();
+        assertTrue(evaluatorRepository.findAll().isEmpty());
+        userRegistrationFacade.submitEvaluator(request);
+        var userProfile = userProfileService.findUserProfileByEmail(request.getEmail());
+        assertEquals(userProfile, userProfileService.findUserProfileByEmail(userProfile.getEmail()));
     }
 
 }
