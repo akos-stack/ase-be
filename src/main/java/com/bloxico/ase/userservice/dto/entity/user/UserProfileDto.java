@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -28,7 +29,11 @@ public class UserProfileDto {
     private Boolean enabled = false;
     private String provider;
     private String providerId;
-    private Set<RoleDto> roles;
+    private Set<RoleDto> roles = new HashSet<>();
+
+    public void addRole(RoleDto role) {
+        roles.add(role);
+    }
 
     public Stream<String> streamRoleNames() {
         return roles

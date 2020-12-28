@@ -313,6 +313,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
+              - column:
+                  name: user_profile_id
+                  type: bigint
+                  constraints:
+                    nullable: false
                     foreignKeyName: fk_evaluator_user_profile
                     references: user_profiles(id)
               - column:
@@ -357,6 +362,13 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
+              - column:
+                  name: user_profile_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_owner_user_profile
+                    references: user_profiles(id)
               # METADATA
               - column:
                   name: creator_id
