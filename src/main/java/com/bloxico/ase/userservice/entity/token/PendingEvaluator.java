@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
+import static javax.persistence.EnumType.STRING;
+
 @Data
 @EqualsAndHashCode(of = "token", callSuper = false)
 @Entity
@@ -20,15 +22,17 @@ public class PendingEvaluator extends BaseEntity {
     private String token;
 
     @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private PendingEvaluatorStatus status;
+    @Enumerated(STRING)
+    private Status status;
 
     @Column(name = "cv_path")
     private String cvPath;
 
-    public enum PendingEvaluatorStatus {
-        PENDING,
+    public enum Status {
+
+        INVITED,
         REQUESTED
+
     }
 
 }
