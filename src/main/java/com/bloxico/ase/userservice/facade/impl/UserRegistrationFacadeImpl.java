@@ -9,7 +9,6 @@ import com.bloxico.ase.userservice.service.user.IUserRegistrationService;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
-import com.bloxico.ase.userservice.web.model.user.ArrayUserProfileDataResponse;
 import com.bloxico.userservice.util.MailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +81,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public void sendEvaluatorInvitation(EvaluatorInvitationRequest request, long principalId) {
         log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - start | request: {}, principalId: {}", request, principalId);
-        var token = pendingEvaluatorService.createPendingEvaluator(request.getEmail(), "", true, principalId);
+        var token = pendingEvaluatorService.createPendingEvaluator(request, principalId).getToken();
         mailUtil.sendEvaluatorInvitationEmail(request.getEmail(), token);
         log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - end | request: {}, principalId: {}", request, principalId);
     }
@@ -105,7 +104,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public void requestEvaluatorRegistration(EvaluatorRegistrationRequest request, long principalId) {
         log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - start | request: {}, principalId: {}", request, principalId);
-        var token = pendingEvaluatorService.createPendingEvaluator(request.getEmail(), request.getCvPath(), false, principalId);
+        pendingEvaluatorService.createPendingEvaluator(request, principalId);
         log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - end | request: {}, principalId: {}", request, principalId);
     }
 

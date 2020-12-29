@@ -12,6 +12,7 @@ import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
+import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -29,12 +30,14 @@ public interface AseMapper {
 
     OAuthAccessTokenDto toDto(OAuthAccessToken entity);
 
+    PendingEvaluatorDto toDto(PendingEvaluator entity);
+
     UserProfile toUserProfile(RegistrationRequest request);
 
     @Mapping(target = "value", source = "tokenId")
     @Mapping(target = "expiryDate", source = "expiration")
     BlacklistedToken toBlacklistedToken(OAuthAccessTokenDto token);
 
-    PendingEvaluatorDto toDto(PendingEvaluator pendingEvaluator);
+    PendingEvaluator toPendingEvaluator(IPendingEvaluatorRequest request);
 
 }

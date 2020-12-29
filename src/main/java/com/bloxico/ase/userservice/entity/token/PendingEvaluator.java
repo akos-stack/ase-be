@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_EXISTS;
 import static javax.persistence.EnumType.STRING;
 
 @Data
@@ -31,7 +32,13 @@ public class PendingEvaluator extends BaseEntity {
     public enum Status {
 
         INVITED,
-        REQUESTED
+        REQUESTED;
+
+        public PendingEvaluator requireDifferentStatus(PendingEvaluator check) {
+            if (check.getStatus() == this)
+                throw TOKEN_EXISTS.newException();
+            return check;
+        }
 
     }
 
