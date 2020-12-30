@@ -1,13 +1,20 @@
 package com.bloxico.ase.userservice.service.token;
 
+import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
+import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
+
+import java.util.List;
+
 public interface IPendingEvaluatorService {
 
-    String createPendingEvaluator(String email, long principalId);
+    PendingEvaluatorDto createPendingEvaluator(IPendingEvaluatorRequest request, long principalId);
 
     String getPendingEvaluatorToken(String email);
 
     void deletePendingEvaluator(String email);
 
     void consumePendingEvaluator(String email, String token);
+
+    List<PendingEvaluatorDto> searchPendingEvaluators(String email, int page, int size, String sort);
 
 }

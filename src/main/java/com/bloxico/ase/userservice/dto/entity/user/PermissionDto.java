@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.dto.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -7,7 +8,10 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(of = "name")
 public class PermissionDto {
 
+    @JsonProperty("id")
     private Short id;
+
+    @JsonProperty("name")
     private String name;
 
 }

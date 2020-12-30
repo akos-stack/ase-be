@@ -4,10 +4,10 @@ import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_EXISTS;
+import static javax.persistence.EnumType.STRING;
 
 @Data
 @EqualsAndHashCode(of = "token", callSuper = false)
@@ -21,5 +21,25 @@ public class PendingEvaluator extends BaseEntity {
 
     @Column(name = "token")
     private String token;
+
+    @Column(name = "status")
+    @Enumerated(STRING)
+    private Status status;
+
+    @Column(name = "cv_path")
+    private String cvPath;
+
+    public enum Status {
+
+        INVITED,
+        REQUESTED;
+
+        public PendingEvaluator requireDifferentStatus(PendingEvaluator check) {
+            if (check.getStatus() == this)
+                throw TOKEN_EXISTS.newException();
+            return check;
+        }
+
+    }
 
 }

@@ -4,6 +4,146 @@ databaseChangeLog:
       author: milos.sekuloski@bloxico.com
       changes:
         - createTable:
+            tableName: countries
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: cities
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: country_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_city_country
+                    references: countries(id)
+              - column:
+                  name: name
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: zip_code
+                  type: varchar(256)
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: locations
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: city_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_location_city
+                    references: cities(id)
+              - column:
+                  name: address
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: latitude
+                  type: numeric
+              - column:
+                  name: longitude
+                  type: numeric
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createTable:
             tableName: roles
             columns:
               - column:
@@ -79,15 +219,33 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
+                  name: first_name
+                  type: varchar(256)
+              - column:
+                  name: last_name
+                  type: varchar(256)
+              - column:
                   name: phone
                   type: varchar(256)
               - column:
-                  name: enabled
+                  name: birthday
+                  type: date
+              - column:
+                  name: gender
+                  type: varchar(256)
+              - column:
+                  name: location_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_user_profile_location
+                    references: locations(id)
+              - column:
+                  name: locked
                   type: boolean
                   constraints:
                     nullable: false
               - column:
-                  name: locked
+                  name: enabled
                   type: boolean
                   constraints:
                     nullable: false
@@ -155,15 +313,16 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    foreignKeyName: fk_evaluator_user_profile
-                    references: user_profiles(id)
               - column:
-                  name: verifier_id
+                  name: user_profile_id
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_evaluator_verifier
+                    foreignKeyName: fk_evaluator_user_profile
                     references: user_profiles(id)
+              - column:
+                  name: verified_at
+                  type: timestamp
               # METADATA
               - column:
                   name: creator_id
@@ -204,10 +363,12 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
               - column:
-                  name: birthday
-                  type: date
+                  name: user_profile_id
+                  type: bigint
                   constraints:
                     nullable: false
+                    foreignKeyName: fk_owner_user_profile
+                    references: user_profiles(id)
               # METADATA
               - column:
                   name: creator_id
@@ -359,6 +520,16 @@ databaseChangeLog:
                   type: varchar(256)
                   constraints:
                     nullable: false
+              - column:
+                  name: status
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cv_path
+                  type: varchar(256)
+                  constraints:
+                    nullable: true
               # METADATA
               - column:
                   name: creator_id
@@ -388,3 +559,39 @@ databaseChangeLog:
                   defaultValueNumeric: 0
                   constraints:
                     nullable: false
+        - addForeignKeyConstraint:
+            constraintName: fk_country_creator
+            baseTableName: countries
+            baseColumnNames: creator_id
+            referencedTableName: user_profiles
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_city_creator
+            baseTableName: cities
+            baseColumnNames: creator_id
+            referencedTableName: user_profiles
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_location_creator
+            baseTableName: locations
+            baseColumnNames: creator_id
+            referencedTableName: user_profiles
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_country_updater
+            baseTableName: countries
+            baseColumnNames: updater_id
+            referencedTableName: user_profiles
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_city_updater
+            baseTableName: cities
+            baseColumnNames: updater_id
+            referencedTableName: user_profiles
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            constraintName: fk_location_updater
+            baseTableName: locations
+            baseColumnNames: updater_id
+            referencedTableName: user_profiles
+            referencedColumnNames: id

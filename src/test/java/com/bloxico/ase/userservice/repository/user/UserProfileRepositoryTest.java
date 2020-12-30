@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.bloxico.ase.testutil.MockUtil.uuid;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class UserProfileRepositoryTest extends AbstractSpringTest {
 

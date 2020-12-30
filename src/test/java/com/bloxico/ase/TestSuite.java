@@ -3,16 +3,17 @@ package com.bloxico.ase;
 import com.bloxico.ase.userservice.config.security.AseSecurityServiceTest;
 import com.bloxico.ase.userservice.config.security.PersistentJwtTokenStoreTest;
 import com.bloxico.ase.userservice.entity.BaseEntityTest;
-import com.bloxico.ase.userservice.facade.impl.QuartzOperationsFacadeImplTest;
-import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImplTest;
-import com.bloxico.ase.userservice.facade.impl.UserProfileFacadeImplTest;
-import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImplTest;
+import com.bloxico.ase.userservice.facade.impl.*;
+import com.bloxico.ase.userservice.repository.address.CityRepositoryTest;
+import com.bloxico.ase.userservice.repository.address.CountryRepositoryTest;
+import com.bloxico.ase.userservice.repository.address.LocationRepositoryTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepositoryTest;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.token.PasswordResetTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.token.RegistrationTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.user.*;
+import com.bloxico.ase.userservice.service.address.impl.LocationServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
 import com.bloxico.ase.userservice.service.token.impl.PasswordResetTokenServiceImplTest;
@@ -31,6 +32,9 @@ import org.junit.runners.Suite;
         BaseEntityTest.class,
 
         // repository
+        CountryRepositoryTest.class,
+        CityRepositoryTest.class,
+        LocationRepositoryTest.class,
         PermissionRepositoryTest.class,
         RoleRepositoryTest.class,
         UserProfileRepositoryTest.class,
@@ -56,12 +60,15 @@ import org.junit.runners.Suite;
         OAuthClientDetailsServiceImplTest.class,
         RegistrationTokenServiceImplTest.class,
         PasswordResetTokenServiceImplTest.class,
+        LocationServiceImplTest.class,
 
         // facade
         QuartzOperationsFacadeImplTest.class,
         UserRegistrationFacadeImplTest.class,
         UserPasswordFacadeImplTest.class,
         UserProfileFacadeImplTest.class,
+        LocationFacadeImplTest.class,
+        UserManagementFacadeImplTest.class,
 
         // Run these individually for now
         // They stuck for some reason
@@ -73,6 +80,8 @@ import org.junit.runners.Suite;
         // UserRegistrationApiTest.class,
         // UserPasswordApiTest.class,
         // UserProfileApiTest.class,
+        // LocationApiTest.class,
+        // UserManagementApiTest.class,
 })
 public class TestSuite {
 }

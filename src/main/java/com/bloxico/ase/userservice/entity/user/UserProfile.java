@@ -1,16 +1,19 @@
 package com.bloxico.ase.userservice.entity.user;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
+import com.bloxico.ase.userservice.entity.address.Location;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.FetchType.EAGER;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
@@ -33,8 +36,24 @@ public class UserProfile extends BaseEntity {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
     @Column(name = "phone")
     private String phone;
+
+    @Column(name = "birthday")
+    private LocalDate birthday;
+
+    @Column(name = "gender")
+    private String gender;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "location_id")
+    private Location location;
 
     @Column(name = "locked")
     private Boolean locked = false;

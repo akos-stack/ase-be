@@ -35,7 +35,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .contentType(JSON)
                 .param("email", "user1")
                 .when()
-                .get(API_URL + USER_MANAGEMENT_ENDPOINT)
+                .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()
                 .assertThat()
                 .statusCode(403);
@@ -49,7 +49,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .contentType(JSON)
                 .param("email", "user1")
                 .when()
-                .get(API_URL + USER_MANAGEMENT_ENDPOINT)
+                .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()
                 .assertThat()
                 .statusCode(200)
