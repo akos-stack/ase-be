@@ -36,6 +36,9 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     @Value("${oauth2.client.id}")
     private String clientId;
 
+    @Value("${base.url}")
+    private String baseUrl;
+
     private final Gson gson;
     private final ClientDetailsService clientDetailsService;
     private final UserProfileRepository userProfileRepository;
@@ -71,7 +74,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         OAuth2AccessToken token = authenticateSsoUser(authentication.getName());
         var redirectUri = Cookies
                 .getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map(OAuthSuccessHandler::getAndValidateRedirectUri)
+                .map(this::getAndValidateRedirectUri)
                 .orElse(super.getDefaultTargetUrl());
         return UriComponentsBuilder
                 .fromUriString(redirectUri) // TODO !!!!!
@@ -138,7 +141,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         removeAuthorizationRequestCookies(request, response);
     }
 
-    private static String getAndValidateRedirectUri(Cookie cookie) {
+    private String getAndValidateRedirectUri(Cookie cookie) {
         var value = cookie.getValue();
         if (!isAuthorizedRedirectUri(value))
             // TODO BadRequestException
@@ -146,10 +149,10 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         return value;
     }
 
-    private static boolean isAuthorizedRedirectUri(String uri) {
+    private boolean isAuthorizedRedirectUri(String uri) {
         var clientRedirectUri = URI.create(uri);
         // TODO fetch authorizedRedirectUris from database
-        return List.of("http://localhost:8089/api/")
+        return List.of(baseUrl)
                 .stream()
                 .anyMatch(authorizedRedirectUri -> {
                     // Only validate host and port. Let the clients use different paths if they want to
