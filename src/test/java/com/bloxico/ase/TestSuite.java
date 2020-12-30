@@ -68,6 +68,7 @@ import org.junit.runners.Suite;
         UserPasswordFacadeImplTest.class,
         UserProfileFacadeImplTest.class,
         LocationFacadeImplTest.class,
+        UserManagementFacadeImplTest.class,
 
         // Run these individually for now
         // They stuck for some reason
@@ -80,6 +81,7 @@ import org.junit.runners.Suite;
         // UserPasswordApiTest.class,
         // UserProfileApiTest.class,
         // LocationApiTest.class,
+        // UserManagementApiTest.class,
 })
 public class TestSuite {
 }

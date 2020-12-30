@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.security.Principal;
 
 @Api(value = "registration")
@@ -27,6 +28,8 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_INVITATION_RESEND   = "/user/registration/evaluator/invitation/resend";
     String REGISTRATION_EVALUATOR_INVITATION_WITHDRAW = "/user/registration/evaluator/invitation/withdraw";
     String REGISTRATION_EVALUATOR_SUBMIT              = "/user/registration/evaluator/submit";
+    String REGISTRATION_EVALUATOR_REQUEST             = "/user/registration/evaluator/request";
+    String REGISTRATION_EVALUATOR_SEARCH              = "/user/registration/evaluator/search";
 
     String TOKEN_PARAM = "token";
 
@@ -122,5 +125,25 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "Evaluator with given email is not invited.")
     })
     ResponseEntity<EvaluatorDto> submitEvaluator(@Valid @RequestBody SubmitEvaluatorRequest request);
+
+    @PostMapping(
+            value = REGISTRATION_EVALUATOR_REQUEST,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'register_as_evaluator')")
+    @ApiOperation(value = "Registers user as a pending evaluator in status REQUESTED.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Invitation is sent successfully."),
+            @ApiResponse(code = 409, message = "Evaluator with given email is already pending evaluator.")
+    })
+    ResponseEntity<Void> requestEvaluatorRegistration(@Valid @RequestBody EvaluatorRegistrationRequest request, Principal principal);
+
+    @GetMapping(value = REGISTRATION_EVALUATOR_SEARCH)
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_users')")
+    @ApiOperation(value = "Search pending evaluators.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Paginated list of pending evaluators successfully retrieved.")
+    })
+    ResponseEntity<ArrayPendingEvaluatorDataResponse> searchPendingEvaluators(@Valid @RequestParam("email") String email, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "email") String sort);
 
 }

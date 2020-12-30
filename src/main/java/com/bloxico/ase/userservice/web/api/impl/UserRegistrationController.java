@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.security.Principal;
 
 import static com.bloxico.ase.userservice.util.PrincipalUtil.extractId;
@@ -48,28 +47,41 @@ public class UserRegistrationController implements UserRegistrationApi {
     }
 
     @Override
-    public ResponseEntity<Void> sendEvaluatorInvitation(@Valid EvaluatorInvitationRequest request, Principal principal) {
+    public ResponseEntity<Void> sendEvaluatorInvitation(EvaluatorInvitationRequest request, Principal principal) {
         var id = extractId(principal);
         userRegistrationFacade.sendEvaluatorInvitation(request, id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Void> resendEvaluatorInvitation(@Valid EvaluatorInvitationResendRequest request) {
+    public ResponseEntity<Void> resendEvaluatorInvitation(EvaluatorInvitationResendRequest request) {
         userRegistrationFacade.resendEvaluatorInvitation(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Void> withdrawEvaluatorInvitation(@Valid EvaluatorInvitationWithdrawalRequest request) {
+    public ResponseEntity<Void> withdrawEvaluatorInvitation(EvaluatorInvitationWithdrawalRequest request) {
         userRegistrationFacade.withdrawEvaluatorInvitation(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<EvaluatorDto> submitEvaluator(@Valid SubmitEvaluatorRequest request) {
+    public ResponseEntity<EvaluatorDto> submitEvaluator(SubmitEvaluatorRequest request) {
         var response = userRegistrationFacade.submitEvaluator(request);
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> requestEvaluatorRegistration(EvaluatorRegistrationRequest request, Principal principal) {
+        var id = extractId(principal);
+        userRegistrationFacade.requestEvaluatorRegistration(request, id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<ArrayPendingEvaluatorDataResponse> searchPendingEvaluators(String email, int page, int size, String sort) {
+        var arrayPendingEvaluatorDataResponse = userRegistrationFacade.searchPendingEvaluators(email, page, size, sort);
+        return ResponseEntity.ok(arrayPendingEvaluatorDataResponse);
     }
 
 }

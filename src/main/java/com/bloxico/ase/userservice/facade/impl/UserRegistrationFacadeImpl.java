@@ -96,7 +96,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public void sendEvaluatorInvitation(EvaluatorInvitationRequest request, long principalId) {
         log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - start | request: {}, principalId: {}", request, principalId);
-        var token = pendingEvaluatorService.createPendingEvaluator(request.getEmail(), principalId);
+        var token = pendingEvaluatorService.createPendingEvaluator(request, principalId).getToken();
         mailUtil.sendEvaluatorInvitationEmail(request.getEmail(), token);
         log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - end | request: {}, principalId: {}", request, principalId);
     }
@@ -146,6 +146,21 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var locationDto = MAPPER.toLocationDto(request);
         locationDto.setCity(cityDto);
         return locationService.saveLocation(locationDto, principalId);
+    }
+
+    public void requestEvaluatorRegistration(EvaluatorRegistrationRequest request, long principalId) {
+        log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - start | request: {}, principalId: {}", request, principalId);
+        pendingEvaluatorService.createPendingEvaluator(request, principalId);
+        log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - end | request: {}, principalId: {}", request, principalId);
+    }
+
+    @Override
+    public ArrayPendingEvaluatorDataResponse searchPendingEvaluators(String email, int page, int size, String sort) {
+        log.info("UserRegistrationFacadeImpl.searchPendingEvaluators - start | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
+        var pendingEvaluatorDtos = pendingEvaluatorService.searchPendingEvaluators(email, page, size, sort);
+        var response = new ArrayPendingEvaluatorDataResponse(pendingEvaluatorDtos);
+        log.info("UserRegistrationFacadeImpl.searchPendingEvaluators - end | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
+        return response;
     }
 
 }

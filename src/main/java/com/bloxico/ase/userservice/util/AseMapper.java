@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.address.CityDto;
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
+import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
@@ -13,12 +14,14 @@ import com.bloxico.ase.userservice.entity.address.Country;
 import com.bloxico.ase.userservice.entity.address.Location;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.entity.user.Evaluator;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
+import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -54,6 +57,8 @@ public interface AseMapper {
 
     Evaluator toEntity(EvaluatorDto dto);
 
+    PendingEvaluatorDto toDto(PendingEvaluator entity);
+
     UserProfile toUserProfile(RegistrationRequest request);
 
     @Mapping(target = "value", source = "tokenId")
@@ -74,5 +79,7 @@ public interface AseMapper {
     UserProfileDto toUserProfileDto(SubmitEvaluatorRequest request);
 
     EvaluatorDto toEvaluatorDto(SubmitEvaluatorRequest request);
+
+    PendingEvaluator toPendingEvaluator(IPendingEvaluatorRequest request);
 
 }

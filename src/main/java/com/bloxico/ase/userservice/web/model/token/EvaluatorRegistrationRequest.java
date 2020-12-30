@@ -12,13 +12,13 @@ import lombok.Value;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
+import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
 import static lombok.AccessLevel.PRIVATE;
 
 @Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
-public class EvaluatorInvitationRequest implements IPendingEvaluatorRequest {
+public class EvaluatorRegistrationRequest implements IPendingEvaluatorRequest {
 
     @NotNull
     @NotEmpty
@@ -27,16 +27,16 @@ public class EvaluatorInvitationRequest implements IPendingEvaluatorRequest {
     @ApiModelProperty(required = true)
     String email;
 
-    @JsonIgnore
-    @Override
-    public Status getStatus() {
-        return INVITED;
-    }
+    @NotNull
+    @NotEmpty
+    @JsonProperty("cvPath")
+    @ApiModelProperty(required = true)
+    String cvPath;
 
     @JsonIgnore
     @Override
-    public String getCvPath() {
-        return null;
+    public Status getStatus() {
+        return REQUESTED;
     }
 
 }

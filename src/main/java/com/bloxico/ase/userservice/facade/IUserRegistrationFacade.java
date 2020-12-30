@@ -24,4 +24,8 @@ public interface IUserRegistrationFacade {
 
     EvaluatorDto submitEvaluator(SubmitEvaluatorRequest request);
 
+    void requestEvaluatorRegistration(EvaluatorRegistrationRequest request, long principalId);
+
+    ArrayPendingEvaluatorDataResponse searchPendingEvaluators(String email, int page, int size, String sort);
+
 }
