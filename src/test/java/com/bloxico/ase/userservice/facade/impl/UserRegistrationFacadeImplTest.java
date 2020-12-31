@@ -2,14 +2,15 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserProfileException;
+import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
-import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
-import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
+import com.bloxico.ase.userservice.web.model.token.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -17,9 +18,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.annotation.DirtiesContext.MethodMode.BEFORE_METHOD;
 
@@ -36,6 +35,9 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Autowired
     private EvaluatorRepository evaluatorRepository;
+
+    @Autowired
+    private PendingEvaluatorRepository pendingEvaluatorRepository;
 
     @Autowired
     private UserRegistrationFacadeImpl userRegistrationFacade;
@@ -167,6 +169,115 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         userRegistrationFacade.submitEvaluator(request);
         var userProfile = userProfileService.findUserProfileByEmail(request.getEmail());
         assertEquals(userProfile, userProfileService.findUserProfileByEmail(userProfile.getEmail()));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void sendEvaluatorInvitation_requestIsNull() {
+        var admin = mockUtil.savedAdmin();
+
+        userRegistrationFacade.sendEvaluatorInvitation(null, admin.getId());
+    }
+
+    @Test(expected = TokenException.class)
+    public void sendEvaluatorInvitation_evaluatorAlreadyPending() {
+        var user = mockUtil.savedUserProfile();
+        var admin = mockUtil.savedAdmin();
+
+        var request = new EvaluatorInvitationRequest(user.getEmail());
+        userRegistrationFacade.sendEvaluatorInvitation(request, admin.getId());
+
+        assertTrue(mockUtil.evaluatorAlreadyPending(user.getEmail()));
+
+        // send invitation to already invited user
+        userRegistrationFacade.sendEvaluatorInvitation(request, admin.getId());
+    }
+
+    @Test
+    public void sendEvaluatorInvitation() {
+        var user = mockUtil.savedUserProfile();
+        var admin = mockUtil.savedAdmin();
+
+        var request = new EvaluatorInvitationRequest(user.getEmail());
+        userRegistrationFacade.sendEvaluatorInvitation(request, admin.getId());
+
+        var newlyCreatedPendingEvaluator = pendingEvaluatorRepository
+                .findByEmailIgnoreCase(user.getEmail())
+                .orElse(null);
+
+        assertNotNull(newlyCreatedPendingEvaluator);
+        assertNotNull(newlyCreatedPendingEvaluator.getToken());
+        assertNull(newlyCreatedPendingEvaluator.getCvPath());
+        assertEquals(user.getEmail(), newlyCreatedPendingEvaluator.getEmail());
+        assertEquals(admin.getId(), newlyCreatedPendingEvaluator.getCreatorId());
+        assertSame(PendingEvaluator.Status.INVITED, newlyCreatedPendingEvaluator.getStatus());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void resendEvaluatorInvitation_requestIsNull() {
+        userRegistrationFacade.resendEvaluatorInvitation(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void resendEvaluatorInvitation_emailIsNull() {
+        var request = new EvaluatorInvitationResendRequest(null);
+        userRegistrationFacade.resendEvaluatorInvitation(request);
+    }
+
+    @Test(expected = TokenException.class)
+    public void resendEvaluatorInvitation_evaluatorIsNotAlreadyInvited() {
+        var request = new EvaluatorInvitationResendRequest("userNotFound@mail.com");
+        userRegistrationFacade.resendEvaluatorInvitation(request);
+    }
+
+    @Test
+    public void resendEvaluatorInvitation() {
+        var user = mockUtil.savedUserProfile();
+        var admin = mockUtil.savedAdmin();
+
+        // send invitation to user
+        var sendInvitationRequest = new EvaluatorInvitationRequest(user.getEmail());
+        userRegistrationFacade.sendEvaluatorInvitation(sendInvitationRequest, admin.getId());
+
+        assertTrue(mockUtil.evaluatorAlreadyPending(user.getEmail()));
+
+        // now resend invitation
+        var resendInvitationRequest = new EvaluatorInvitationResendRequest(user.getEmail());
+        userRegistrationFacade.resendEvaluatorInvitation(resendInvitationRequest);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void withdrawEvaluatorInvitation_requestIsNull() {
+        userRegistrationFacade.withdrawEvaluatorInvitation(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void withdrawEvaluatorInvitation_emailIsNull() {
+        var request = new EvaluatorInvitationWithdrawalRequest(null);
+        userRegistrationFacade.withdrawEvaluatorInvitation(request);
+    }
+
+    @Test(expected = TokenException.class)
+    public void withdrawEvaluatorInvitation_evaluatorIsNotAlreadyInvited() {
+        var request = new EvaluatorInvitationWithdrawalRequest("userNotFound@mail.com");
+        userRegistrationFacade.withdrawEvaluatorInvitation(request);
+    }
+
+    @Test
+    public void withdrawEvaluatorInvitation() {
+        var user = mockUtil.savedUserProfile();
+        var admin = mockUtil.savedAdmin();
+
+        // send invitation to user
+        var sendInvitationRequest = new EvaluatorInvitationRequest(user.getEmail());
+        userRegistrationFacade.sendEvaluatorInvitation(sendInvitationRequest, admin.getId());
+
+        assertTrue(mockUtil.evaluatorAlreadyPending(user.getEmail()));
+
+        // now withdraw invitation
+        var withdrawInvitationRequest = new EvaluatorInvitationWithdrawalRequest(user.getEmail());
+        userRegistrationFacade.withdrawEvaluatorInvitation(withdrawInvitationRequest);
+
+        assertFalse(mockUtil.evaluatorAlreadyPending(user.getEmail()));
     }
 
 }

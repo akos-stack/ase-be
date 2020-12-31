@@ -442,6 +442,12 @@ public class MockUtil {
         savedUserProfile("user3@gmail.com", "123!");
     }
 
+    public boolean evaluatorAlreadyPending(String email) {
+        return pendingEvaluatorRepository
+                .findByEmailIgnoreCase(email)
+                .isPresent();
+    }
+
     private static final AtomicLong along = new AtomicLong(0);
 
     public static String genEmail() {
