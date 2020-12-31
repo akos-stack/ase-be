@@ -5,8 +5,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.FetchType.EAGER;
@@ -42,4 +41,23 @@ public class Role implements Serializable {
         permissions.add(permission);
     }
 
+    public enum UserRole {
+        ADMIN("admin"),
+        USER("user"),
+        EVALUATOR("evaluator");
+
+        private String name;
+
+        UserRole(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public ArrayList<Enum> getAllUserRoles() {
+            return new ArrayList<Enum>(EnumSet.allOf(UserRole.class));
+        }
+    }
 }

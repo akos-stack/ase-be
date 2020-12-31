@@ -18,6 +18,5 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
     @Query("SELECT u FROM UserProfile u WHERE u.enabled = FALSE AND id IN ?1")
     List<UserProfile> findAllDisabledByIds(Collection<Long> ids);
 
-    List<UserProfile> findAllByEmailContaining(String email, Pageable pageable);
-
+    List<UserProfile> findDistinctByEmailContainingAndRoles_NameContaining(String email, String role, Pageable pageable);
 }

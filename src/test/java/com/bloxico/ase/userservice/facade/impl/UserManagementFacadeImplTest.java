@@ -32,7 +32,7 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
     @Test
     public void searchUsers() {
         mockUtil.saveUserProfiles();
-        assertTrue(userManagementFacade.searchUsers("user1", 0, 10, "name").getUserProfiles().size() == 1);
+        assertTrue(userManagementFacade.searchUsers("user1", null, 0, 10, "name").getUserProfiles().size() == 1);
     }
 
     @Test(expected = UserProfileException.class)

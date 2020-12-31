@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.model.user.ArrayUserProfileDataResponse;
 import com.bloxico.ase.userservice.web.model.user.BlacklistTokensRequest;
 import com.bloxico.ase.userservice.web.model.user.DisableUserRequest;
@@ -27,11 +28,11 @@ public interface UserManagementApi {
 
     @GetMapping(value = USER_SEARCH_ENDPOINT)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_users')")
-    @ApiOperation(value = "Search users by email.")
+    @ApiOperation(value = "Search users by email or role.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Paginated list of users successfully retrieved.")
     })
-    ResponseEntity<ArrayUserProfileDataResponse> searchUsers(@Valid @RequestParam("email") String email, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "name") String sort);
+    ResponseEntity<ArrayUserProfileDataResponse> searchUsers(@Valid @RequestParam("email") String email, @Valid @RequestParam("role") Role.UserRole role, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "name") String sort);
 
     @PostMapping(
             value = USER_DISABLE,

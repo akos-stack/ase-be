@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.facade.IUserManagementFacade;
 import com.bloxico.ase.userservice.service.oauth.IOAuthAccessTokenService;
 import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
@@ -27,10 +28,10 @@ public class UserManagementFacadeImpl implements IUserManagementFacade {
     }
 
     @Override
-    public ArrayUserProfileDataResponse searchUsers(String email, int page, int size, String sort) {
+    public ArrayUserProfileDataResponse searchUsers(String email, Role.UserRole role, int page, int size, String sort) {
         log.info("UserSearchFacadeImpl.searchUsers - start | email: {}", email);
-        var userProfileDtos = userProfileService.findUsersByEmail(email, page, size, sort);
-        var response = new ArrayUserProfileDataResponse(userProfileDtos);
+        var userProfileDtos = userProfileService.findUsersByEmailOrRole(email, role, page, size, sort);
+        var response = new ArrayUserProfileDataResponse(userProfileDtos, userProfileDtos.size());
         log.info("UserSearchFacadeImpl.searchUsers - end | email: {}", email);
         return response;
     }

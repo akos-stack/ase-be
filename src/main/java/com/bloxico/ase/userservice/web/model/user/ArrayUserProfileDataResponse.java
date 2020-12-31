@@ -14,4 +14,8 @@ public class ArrayUserProfileDataResponse {
     @ApiModelProperty(required = true)
     List<UserProfileDto> userProfiles;
 
+    @JsonProperty("count")
+    @ApiModelProperty(required = true)
+    int count;
+
 }

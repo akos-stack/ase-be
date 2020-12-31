@@ -4,8 +4,10 @@ import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
+import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
@@ -16,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
@@ -31,15 +33,18 @@ public class UserProfileServiceImpl implements IUserProfileService {
     private final UserProfileRepository userProfileRepository;
     private final EvaluatorRepository evaluatorRepository;
     private final LocationRepository locationRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
     public UserProfileServiceImpl(UserProfileRepository userProfileRepository,
                                   EvaluatorRepository evaluatorRepository,
-                                  LocationRepository locationRepository)
+                                  LocationRepository locationRepository,
+                                  RoleRepository roleRepository)
     {
         this.userProfileRepository = userProfileRepository;
         this.evaluatorRepository = evaluatorRepository;
         this.locationRepository = locationRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -132,10 +137,11 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     @Override
-    public List<UserProfileDto> findUsersByEmail(String email, int page, int size, String sort) {
+    public List<UserProfileDto> findUsersByEmailOrRole(String email, Role.UserRole role, int page, int size, String sort) {
         log.debug("UserProfileServiceImpl.findUsersByEmail - start | email: {}, page: {}, size: {}", email, page, size);
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-        var userProfiles = userProfileRepository.findAllByEmailContaining(email, pageable);
+        List<Role> roles = new ArrayList<>();
+        var userProfiles = userProfileRepository.findDistinctByEmailContainingAndRoles_NameContaining(email, role != null ? role.getName() : "", pageable);
         var userProfileDtos = userProfiles
                 .stream()
                 .map(MAPPER::toDto)
