@@ -5,6 +5,7 @@ import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.exception.UserProfileException;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;
@@ -191,4 +192,15 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
         assertTrue(userProfileService.findUsersByEmailOrRole("user1", null, 0, 100, "name").size() == 1);
     }
 
+    @Test
+    public void findUsersByRole() {
+        mockUtil.saveUserProfiles();
+        assertTrue(userProfileService.findUsersByEmailOrRole("", Role.UserRole.ADMIN, 0, 100, "name").size() == 1);
+    }
+
+    @Test
+    public void findUsersByRoleAndEmail() {
+        mockUtil.saveUserProfiles();
+        assertTrue(userProfileService.findUsersByEmailOrRole("user", Role.UserRole.USER, 0, 100, "name").size() == 3);
+    }
 }
