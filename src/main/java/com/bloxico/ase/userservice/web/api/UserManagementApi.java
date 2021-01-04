@@ -32,7 +32,7 @@ public interface UserManagementApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Paginated list of users successfully retrieved.")
     })
-    ResponseEntity<ArrayUserProfileDataResponse> searchUsers(@Valid @RequestParam("email") String email, @Valid @RequestParam("role") Role.UserRole role, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "name") String sort);
+    ResponseEntity<ArrayUserProfileDataResponse> searchUsers(@Valid @RequestParam(value = "email") String email, @Valid @RequestParam(value = "role", required = false) Role.UserRole role, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "name") String sort);
 
     @PostMapping(
             value = USER_DISABLE,

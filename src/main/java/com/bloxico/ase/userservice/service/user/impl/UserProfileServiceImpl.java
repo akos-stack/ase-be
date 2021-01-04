@@ -138,15 +138,14 @@ public class UserProfileServiceImpl implements IUserProfileService {
 
     @Override
     public List<UserProfileDto> findUsersByEmailOrRole(String email, Role.UserRole role, int page, int size, String sort) {
-        log.debug("UserProfileServiceImpl.findUsersByEmail - start | email: {}, page: {}, size: {}", email, page, size);
+        log.debug("UserProfileServiceImpl.findUsersByEmailOrRole - start | email: {}, role {}, page: {}, size: {}", email, role, page, size);
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-        List<Role> roles = new ArrayList<>();
-        var userProfiles = userProfileRepository.findDistinctByEmailContainingAndRoles_NameContaining(email, role != null ? role.getName() : "", pageable);
+        var userProfiles = userProfileRepository.findDistinctByEmailContainingAndRoles_NameContaining(email != null ? email : "", role != null ? role.getName() : "", pageable);
         var userProfileDtos = userProfiles
                 .stream()
                 .map(MAPPER::toDto)
                 .collect(Collectors.toList());
-        log.debug("UserProfileServiceImpl.findUsersByEmail - end | email: {}, page: {}, size: {}", email, page, size);
+        log.debug("UserProfileServiceImpl.findUsersByEmailOrRole - end | email: {}, role {}, page: {}, size: {}", email, role, page, size);
         return userProfileDtos;
     }
 
