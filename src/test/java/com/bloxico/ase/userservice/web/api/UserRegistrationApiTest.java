@@ -200,39 +200,6 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void submitEvaluator_200_ok() {
-        var request = mockUtil.newSubmitInvitedEvaluatorRequest();
-        given()
-                .contentType(JSON)
-                .body(request)
-                .when()
-                .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
-                .then()
-                .assertThat()
-                .statusCode(200)
-                .body(
-                        "id", notNullValue(),
-                        "user_profile.id", notNullValue(),
-                        "user_profile.name", is(request.getUsername()),
-                        "user_profile.password", is(request.getPassword()),
-                        "user_profile.email", is(request.getEmail()),
-                        "user_profile.enabled", is(true));
-    }
-
-    @Test
-    public void submitEvaluator_404_tokenNotFound() {
-        given()
-                .contentType(JSON)
-                .body(mockUtil.newSubmitUninvitedEvaluatorRequest())
-                .when()
-                .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
-                .then()
-                .assertThat()
-                .statusCode(404)
-                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
-    }
-
-    @Test
     public void sendEvaluatorInvitation_200_invitationSuccessfullySent() {
         var registration = mockUtil.doConfirmedRegistration();
 
@@ -369,5 +336,42 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
                 .statusCode(404)
                 .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
     }
+
+    // TODO REGISTRATION_EVALUATOR_REQUEST
+
+    @Test
+    public void submitEvaluator_200_ok() {
+        var request = mockUtil.newSubmitInvitedEvaluatorRequest();
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body(
+                        "id", notNullValue(),
+                        "user_profile.id", notNullValue(),
+                        "user_profile.name", is(request.getUsername()),
+                        "user_profile.password", is(request.getPassword()),
+                        "user_profile.email", is(request.getEmail()),
+                        "user_profile.enabled", is(true));
+    }
+
+    @Test
+    public void submitEvaluator_404_tokenNotFound() {
+        given()
+                .contentType(JSON)
+                .body(mockUtil.newSubmitUninvitedEvaluatorRequest())
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
+    }
+
+    // TODO REGISTRATION_EVALUATOR_SEARCH
 
 }
