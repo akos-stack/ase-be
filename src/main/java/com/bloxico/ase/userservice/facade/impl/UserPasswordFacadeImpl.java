@@ -10,7 +10,7 @@ import com.bloxico.ase.userservice.web.model.password.ForgottenPasswordUpdateReq
 import com.bloxico.ase.userservice.web.model.password.KnownPasswordUpdateRequest;
 import com.bloxico.ase.userservice.web.model.password.SetPasswordRequest;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
-import com.bloxico.userservice.util.MailUtil;
+import com.bloxico.ase.userservice.util.MailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

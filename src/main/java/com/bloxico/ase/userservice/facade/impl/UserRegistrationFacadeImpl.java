@@ -15,7 +15,7 @@ import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
-import com.bloxico.userservice.util.MailUtil;
+import com.bloxico.ase.userservice.util.MailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

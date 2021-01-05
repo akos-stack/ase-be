@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.exception;
 
-import com.bloxico.userservice.web.model.ApiError;
+import com.bloxico.ase.userservice.web.model.ApiError;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -17,7 +17,10 @@ public abstract class AseRuntimeException extends RuntimeException {
     }
 
     public ApiError toApiError() {
-        return new ApiError(httpStatus, getMessage());
+        return ApiError.builder()
+                .status(httpStatus)
+                .message(getMessage())
+                .build();
     }
 
 }

@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.web.model.token;
 
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status;
-import com.bloxico.userservice.util.validator.email.ValidEmail;
+import com.bloxico.ase.userservice.validator.ValidEmail;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;

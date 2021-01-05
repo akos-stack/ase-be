@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.security.Principal;
 
-import static com.bloxico.ase.userservice.util.PrincipalUtil.extractId;
+import static com.bloxico.ase.userservice.util.Principals.extractId;
 
 @RestController
 public class UserManagementController implements UserManagementApi {

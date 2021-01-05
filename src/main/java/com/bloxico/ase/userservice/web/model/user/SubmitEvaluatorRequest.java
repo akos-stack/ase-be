@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.web.model.user;
 
-import com.bloxico.userservice.util.validator.email.ValidEmail;
-import com.bloxico.userservice.util.validator.password.RegularPassword;
+import com.bloxico.ase.userservice.validator.ValidEmail;
+import com.bloxico.ase.userservice.validator.RegularPassword;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
