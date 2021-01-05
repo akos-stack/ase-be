@@ -138,7 +138,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void deletePendingEvaluator_tokenNotFound() {
-        service.deletePendingEvaluator("userNotFound@mail.com");
+        service.deletePendingEvaluator(uuid());
     }
 
     @Test
