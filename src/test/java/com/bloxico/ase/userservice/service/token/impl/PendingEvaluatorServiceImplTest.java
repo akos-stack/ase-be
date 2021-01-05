@@ -2,7 +2,6 @@ package com.bloxico.ase.userservice.service.token.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
@@ -10,6 +9,9 @@ import com.bloxico.ase.userservice.web.model.token.EvaluatorRegistrationRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
+import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
 import static org.junit.Assert.*;
 
 public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
@@ -38,7 +40,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
         var request = new EvaluatorInvitationRequest(user.getEmail());
         service.createPendingEvaluator(request, admin.getId());
 
-        assertTrue(mockUtil.evaluatorAlreadyPending(user.getEmail()));
+        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
 
         service.createPendingEvaluator(request, admin.getId());
     }
@@ -50,7 +52,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
         var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
         service.createPendingEvaluator(request, user.getId());
 
-        assertTrue(mockUtil.evaluatorAlreadyPending(user.getEmail()));
+        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
 
         service.createPendingEvaluator(request, user.getId());
     }
@@ -65,7 +67,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
         assertNotNull(pendingEvaluatorDto);
 
-        var newlyCreatedPendingEvaluator= repository
+        var newlyCreatedPendingEvaluator = repository
                 .findByEmailIgnoreCaseAndToken(user.getEmail(), pendingEvaluatorDto.getToken())
                 .orElse(null);
 
@@ -76,11 +78,11 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
         assertEquals(pendingEvaluatorDto.getStatus(), newlyCreatedPendingEvaluator.getStatus());
 
         assertNull(newlyCreatedPendingEvaluator.getCvPath());
-        assertSame(PendingEvaluator.Status.INVITED, newlyCreatedPendingEvaluator.getStatus());
+        assertSame(INVITED, newlyCreatedPendingEvaluator.getStatus());
     }
 
     @Test
-    public void createPendingEvaluator_evaluatorRegistered() {
+    public void createPendingEvaluator_evaluatorIsRequested() {
         var user = mockUtil.savedUserProfile();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
@@ -88,7 +90,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
         assertNotNull(pendingEvaluatorDto);
 
-        var newlyCreatedPendingEvaluator= repository
+        var newlyCreatedPendingEvaluator = repository
                 .findByEmailIgnoreCaseAndToken(user.getEmail(), pendingEvaluatorDto.getToken())
                 .orElse(null);
 
@@ -99,7 +101,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
         assertEquals(pendingEvaluatorDto.getStatus(), newlyCreatedPendingEvaluator.getStatus());
 
         assertNotNull(newlyCreatedPendingEvaluator.getCvPath());
-        assertSame(PendingEvaluator.Status.REQUESTED, newlyCreatedPendingEvaluator.getStatus());
+        assertSame(REQUESTED, newlyCreatedPendingEvaluator.getStatus());
     }
 
     @Test(expected = NullPointerException.class)
@@ -109,7 +111,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void getPendingEvaluatorToken_tokenNotFound() {
-        service.getPendingEvaluatorToken("userNotFound@mail.com");
+        service.getPendingEvaluatorToken(uuid());
     }
 
     @Test
@@ -121,9 +123,9 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
         var pendingEvaluator = service.createPendingEvaluator(request, admin.getId());
 
         assertNotNull(pendingEvaluator);
-        assertTrue(mockUtil.evaluatorAlreadyPending(user.getEmail()));
+        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
 
-        var newlyCreatedPendingEvaluatorToken= service.getPendingEvaluatorToken(user.getEmail());
+        var newlyCreatedPendingEvaluatorToken = service.getPendingEvaluatorToken(user.getEmail());
 
         assertNotNull(newlyCreatedPendingEvaluatorToken);
         assertEquals(pendingEvaluator.getToken(), newlyCreatedPendingEvaluatorToken);
@@ -147,10 +149,11 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
         var request = new EvaluatorInvitationRequest(user.getEmail());
         service.createPendingEvaluator(request, admin.getId());
 
-        assertTrue(mockUtil.evaluatorAlreadyPending(user.getEmail()));
+        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
 
         service.deletePendingEvaluator(user.getEmail());
 
-        assertFalse(mockUtil.evaluatorAlreadyPending(user.getEmail()));
+        assertFalse(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
     }
+
 }

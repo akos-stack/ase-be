@@ -186,7 +186,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         var request = new EvaluatorInvitationRequest(user.getEmail());
         userRegistrationFacade.sendEvaluatorInvitation(request, admin.getId());
 
-        assertTrue(mockUtil.evaluatorAlreadyPending(user.getEmail()));
+        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
 
         // send invitation to already invited user
         userRegistrationFacade.sendEvaluatorInvitation(request, admin.getId());
@@ -238,7 +238,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         var sendInvitationRequest = new EvaluatorInvitationRequest(user.getEmail());
         userRegistrationFacade.sendEvaluatorInvitation(sendInvitationRequest, admin.getId());
 
-        assertTrue(mockUtil.evaluatorAlreadyPending(user.getEmail()));
+        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
 
         // now resend invitation
         var resendInvitationRequest = new EvaluatorInvitationResendRequest(user.getEmail());
@@ -271,13 +271,13 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         var sendInvitationRequest = new EvaluatorInvitationRequest(user.getEmail());
         userRegistrationFacade.sendEvaluatorInvitation(sendInvitationRequest, admin.getId());
 
-        assertTrue(mockUtil.evaluatorAlreadyPending(user.getEmail()));
+        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
 
         // now withdraw invitation
         var withdrawInvitationRequest = new EvaluatorInvitationWithdrawalRequest(user.getEmail());
         userRegistrationFacade.withdrawEvaluatorInvitation(withdrawInvitationRequest);
 
-        assertFalse(mockUtil.evaluatorAlreadyPending(user.getEmail()));
+        assertFalse(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
     }
 
 }
