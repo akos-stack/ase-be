@@ -127,6 +127,8 @@ dependencies {
     compile ('org.quartz-scheduler:quartz:2.3.0')
     compile ('com.mchange:c3p0:0.9.5.2')
 
+    compile ('com.amazonaws:aws-java-sdk:1.11.930')
+
     // junit 5
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
