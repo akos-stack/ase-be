@@ -5,6 +5,9 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,12 +55,21 @@ public class AWSConfig {
         file.delete();
         return fileName;
     }
+    public byte[] downloadFile(String fileName) throws IOException {
+        S3ObjectInputStream inputStream = downloadFileFromS3Bucket(fileName);
+        byte[] content = IOUtils.toByteArray(inputStream);
+        return content;
+    }
     public boolean deleteFileFromS3Bucket(String fileName) {
         s3client.deleteObject(bucketName, fileName);
         return true;
     }
     private void uploadFileToS3Bucket(String fileName, File file) {
         s3client.putObject(bucketName, fileName, file);
+    }
+    private S3ObjectInputStream downloadFileFromS3Bucket(String fileName) {
+        S3Object s3Object = s3client.getObject(bucketName, fileName);
+        return s3Object.getObjectContent();
     }
     private File convertMultiPartToFile(MultipartFile file)
             throws IOException {
