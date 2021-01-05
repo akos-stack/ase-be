@@ -116,17 +116,6 @@ public interface UserRegistrationApi {
     ResponseEntity<Void> withdrawEvaluatorInvitation(@Valid @RequestBody EvaluatorInvitationWithdrawalRequest request);
 
     @PostMapping(
-            value = REGISTRATION_EVALUATOR_SUBMIT,
-            produces = {"application/json"},
-            consumes = {"application/json"})
-    @ApiOperation(value = "Creates new evaluator with given data. Evaluator must be invited first.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Evaluator is created successfully."),
-            @ApiResponse(code = 404, message = "Evaluator with given email is not invited.")
-    })
-    ResponseEntity<EvaluatorDto> submitEvaluator(@Valid @RequestBody SubmitEvaluatorRequest request);
-
-    @PostMapping(
             value = REGISTRATION_EVALUATOR_REQUEST,
             produces = {"application/json"},
             consumes = {"application/json"})
@@ -137,6 +126,17 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 409, message = "Evaluator with given email is already pending evaluator.")
     })
     ResponseEntity<Void> requestEvaluatorRegistration(@Valid @RequestBody EvaluatorRegistrationRequest request, Principal principal);
+
+    @PostMapping(
+            value = REGISTRATION_EVALUATOR_SUBMIT,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @ApiOperation(value = "Creates new evaluator with given data. Evaluator must be invited first.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Evaluator is created successfully."),
+            @ApiResponse(code = 404, message = "Evaluator with given email is not invited.")
+    })
+    ResponseEntity<EvaluatorDto> submitEvaluator(@Valid @RequestBody SubmitEvaluatorRequest request);
 
     @GetMapping(value = REGISTRATION_EVALUATOR_SEARCH)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_users')")
