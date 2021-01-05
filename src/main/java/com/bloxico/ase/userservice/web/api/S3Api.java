@@ -22,7 +22,7 @@ public interface S3Api {
             value = S3_UPLOAD,
             produces = {"application/json"},
             consumes = {"multipart/form-data"})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_users')")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'upload_file')")
     @ApiOperation(value = "Uploads file to S3 bucket.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "File successfully uploaded.")
@@ -33,7 +33,7 @@ public interface S3Api {
             value = S3_DELETE,
             produces = {"application/json"}
     )
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_users')")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'upload_file')")
     @ApiOperation(value = "Deletes file from S3 bucket.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "File successfully deleted.")
