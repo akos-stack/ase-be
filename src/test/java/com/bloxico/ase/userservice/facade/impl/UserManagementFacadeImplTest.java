@@ -2,7 +2,6 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.exception.UserProfileException;
 import com.bloxico.ase.userservice.service.token.impl.TokenBlacklistServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
@@ -33,19 +32,19 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
     @Test
     public void searchUsersByEmail() {
         mockUtil.saveUserProfiles();
-        assertTrue(userManagementFacade.searchUsers("user1", null, 0, 10, "name").getUserProfiles().size() == 1);
+        assertEquals(1, userManagementFacade.searchUsers("user1", null, 0, 10, "name").getUserProfiles().size());
     }
 
     @Test
     public void searchUsersByRole() {
         mockUtil.saveUserProfiles();
-        assertTrue(userManagementFacade.searchUsers("", Role.UserRole.ADMIN, 0, 10, "name").getUserProfiles().size() == 1);
+        assertEquals(1, userManagementFacade.searchUsers("", "admin", 0, 10, "name").getUserProfiles().size());
     }
 
     @Test
     public void searchUsersByRoleAndEmail() {
         mockUtil.saveUserProfiles();
-        assertTrue(userManagementFacade.searchUsers("user", Role.UserRole.USER, 0, 10, "name").getUserProfiles().size() == 3);
+        assertEquals(3, userManagementFacade.searchUsers("user", "admin", 0, 10, "name").getUserProfiles().size());
     }
 
     @Test(expected = UserProfileException.class)

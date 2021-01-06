@@ -43,6 +43,20 @@ public class UserManagementApiTest extends AbstractSpringTest {
     }
 
     @Test
+    public void searchUsers_badRequest() {
+        given()
+                .header("Authorization", mockUtil.doAdminAuthentication())
+                .contentType(JSON)
+                .param("email", "user1")
+                .param("role", "nonExistingRole")
+                .when()
+                .get(API_URL + USER_SEARCH_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(400);
+    }
+
+    @Test
     public void searchUsers_200_ok() {
         mockUtil.saveUserProfiles();
         given()

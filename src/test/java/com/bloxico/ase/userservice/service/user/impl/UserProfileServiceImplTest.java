@@ -5,7 +5,6 @@ import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
-import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.exception.UserProfileException;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;
@@ -17,10 +16,7 @@ import java.util.Set;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.entity.user.Role.USER;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class UserProfileServiceImplTest extends AbstractSpringTest {
 
@@ -189,18 +185,18 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
     @Test
     public void findUsersByEmail() {
         mockUtil.saveUserProfiles();
-        assertTrue(userProfileService.findUsersByEmailOrRole("user1", null, 0, 100, "name").size() == 1);
+        assertEquals(1, userProfileService.findUsersByEmailOrRole("user1", null, 0, 100, "name").size());
     }
 
     @Test
     public void findUsersByRole() {
         mockUtil.saveUserProfiles();
-        assertTrue(userProfileService.findUsersByEmailOrRole("", Role.UserRole.ADMIN, 0, 100, "name").size() == 1);
+        assertEquals(1, userProfileService.findUsersByEmailOrRole("", "admin", 0, 100, "name").size());
     }
 
     @Test
     public void findUsersByRoleAndEmail() {
         mockUtil.saveUserProfiles();
-        assertTrue(userProfileService.findUsersByEmailOrRole("user", Role.UserRole.USER, 0, 100, "name").size() == 3);
+        assertEquals(3, userProfileService.findUsersByEmailOrRole("user", "user", 0, 100, "name").size());
     }
 }

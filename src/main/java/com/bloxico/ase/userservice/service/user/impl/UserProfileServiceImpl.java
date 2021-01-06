@@ -4,7 +4,6 @@ import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
-import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
@@ -17,13 +16,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.*;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -137,10 +137,11 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     @Override
-    public List<UserProfileDto> findUsersByEmailOrRole(String email, Role.UserRole role, int page, int size, String sort) {
+    public List<UserProfileDto> findUsersByEmailOrRole(String email, String role, int page, int size, String sort) {
         log.debug("UserProfileServiceImpl.findUsersByEmailOrRole - start | email: {}, role {}, page: {}, size: {}", email, role, page, size);
+        role = validateRole(role);
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-        var userProfiles = userProfileRepository.findDistinctByEmailContainingAndRoles_NameContaining(email != null ? email : "", role != null ? role.getName() : "", pageable);
+        var userProfiles = userProfileRepository.findDistinctByEmailContainingAndRoles_NameContaining(email, role, pageable);
         var userProfileDtos = userProfiles
                 .stream()
                 .map(MAPPER::toDto)
@@ -157,6 +158,13 @@ public class UserProfileServiceImpl implements IUserProfileService {
                 .filter(role::equals)
                 .findAny()
                 .orElseThrow(() -> new IllegalStateException("User: " + userProfileDto + " must have role: " + role));
+    }
+
+    private String validateRole(String role) {
+        if(!StringUtils.isEmpty(role)) {
+            roleRepository.findByNameIgnoreCase(role).orElseThrow(ROLE_NOT_FOUND::newException);
+        }
+        return role != null ? role : "";
     }
 
 }

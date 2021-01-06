@@ -35,7 +35,12 @@ public interface ErrorCodes {
         MATCH_REGISTRATION_PASSWORD_ERROR(
                 HttpStatus.BAD_REQUEST,
                 "4",
-                "When registering user, if password and matchPassword values are not valid.");
+                "When registering user, if password and matchPassword values are not valid."),
+
+        ROLE_NOT_FOUND (
+                HttpStatus.BAD_REQUEST,
+                "5",
+                "When filtering users, if role parameter is non existing role.");
 
         private final HttpStatus httpStatus;
         private final String code, description;

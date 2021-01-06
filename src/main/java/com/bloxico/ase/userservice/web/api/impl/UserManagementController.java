@@ -1,6 +1,5 @@
 package com.bloxico.ase.userservice.web.api.impl;
 
-import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.facade.IUserManagementFacade;
 import com.bloxico.ase.userservice.web.api.UserManagementApi;
 import com.bloxico.ase.userservice.web.model.user.ArrayUserProfileDataResponse;
@@ -23,7 +22,7 @@ public class UserManagementController implements UserManagementApi {
     private IUserManagementFacade userManagementFacade;
 
     @Override
-    public ResponseEntity<ArrayUserProfileDataResponse> searchUsers(@Valid String email, @Valid Role.UserRole role, @Valid int page, @Valid int size, @Valid String sort) {
+    public ResponseEntity<ArrayUserProfileDataResponse> searchUsers(@Valid String email, @Valid String role, @Valid int page, @Valid int size, @Valid String sort) {
         var arrayUserProfileDataResponse = userManagementFacade.searchUsers(email, role, page, size, sort);
         return ResponseEntity.ok(arrayUserProfileDataResponse);
     }
