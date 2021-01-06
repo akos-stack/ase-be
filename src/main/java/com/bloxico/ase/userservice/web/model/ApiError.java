@@ -16,7 +16,7 @@ public class ApiError {
 
     HttpStatus status;
 
-    String message;
+    String errorCode;
 
     Map<String, Object> details;
 

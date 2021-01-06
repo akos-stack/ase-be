@@ -56,7 +56,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         var apiError = ApiError.builder()
                 .status(ErrorCodes.Token.INVALID_TOKEN.getHttpStatus())
-                .message(ErrorCodes.Token.INVALID_TOKEN.getCode())
+                .errorCode(ErrorCodes.Token.INVALID_TOKEN.getCode())
                 .build();
         byte[] body = new ObjectMapper().writeValueAsBytes(apiError);
         response.getOutputStream().write(body);

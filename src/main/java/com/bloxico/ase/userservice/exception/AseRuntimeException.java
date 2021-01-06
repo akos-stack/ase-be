@@ -19,7 +19,7 @@ public abstract class AseRuntimeException extends RuntimeException {
     public ApiError toApiError() {
         return ApiError.builder()
                 .status(httpStatus)
-                .message(getMessage())
+                .errorCode(getMessage())
                 .build();
     }
 

@@ -36,7 +36,7 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
     {
         var apiError = ApiError.builder()
                 .status(BAD_REQUEST)
-                .message("Method argument is not valid.")
+                .errorCode("Method argument is not valid.")
                 .details(returnBindingResultErrors(ex))
                 .build();
         log.info("Returning error response: " + apiError);
@@ -54,7 +54,7 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleRestOfExceptions(Exception ex, WebRequest __) {
         var apiError = ApiError.builder()
                 .status(INTERNAL_SERVER_ERROR)
-                .message("Unexpected error: " + ex.getMessage())
+                .errorCode("Unexpected error: " + ex.getMessage())
                 .build();
         log.error("Unexpected error occurred:", ex);
         return new ResponseEntity<>(apiError, apiError.getStatus());
@@ -64,7 +64,7 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleAccessDeniedException(Exception ex, WebRequest __) {
         var apiError = ApiError.builder()
                 .status(FORBIDDEN)
-                .message(ex.getMessage())
+                .errorCode(ex.getMessage())
                 .build();
         log.info("Returning error response: " + apiError.toString());
         return new ResponseEntity<>(apiError, apiError.getStatus());
