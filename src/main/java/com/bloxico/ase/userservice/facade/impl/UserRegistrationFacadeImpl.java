@@ -11,11 +11,11 @@ import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceIm
 import com.bloxico.ase.userservice.service.user.IRolePermissionService;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.service.user.IUserRegistrationService;
+import com.bloxico.ase.userservice.util.MailUtil;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
-import com.bloxico.ase.userservice.util.MailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.util.MailUtil.Template.EVALUATOR_INVITATION;
+import static com.bloxico.ase.userservice.util.MailUtil.Template.VERIFICATION;
 
 @Slf4j
 @Service
@@ -60,7 +62,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         log.info("UserRegistrationFacadeImpl.registerUserWithVerificationToken - start | request: {}", request);
         var userProfileDto = userRegistrationService.registerDisabledUser(request);
         var tokenDto = registrationTokenService.createTokenForUser(userProfileDto.getId());
-        mailUtil.sendVerificationTokenEmail(userProfileDto.getEmail(), tokenDto.getValue());
+        mailUtil.sendTokenEmail(VERIFICATION, userProfileDto.getEmail(), tokenDto.getValue());
         var response = new RegistrationResponse(tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.registerUserWithVerificationToken - end | request: {}", request);
         return response;
@@ -80,7 +82,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - start | expiredTokenValue: {}", expiredTokenValue);
         var tokenDto = registrationTokenService.refreshToken(expiredTokenValue);
         var userProfileDto = userProfileService.findUserProfileById(tokenDto.getId());
-        mailUtil.sendVerificationTokenEmail(userProfileDto.getEmail(), tokenDto.getValue());
+        mailUtil.sendTokenEmail(VERIFICATION, userProfileDto.getEmail(), tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - end | expiredTokenValue: {}", expiredTokenValue);
     }
 
@@ -89,7 +91,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - start | request: {}", request);
         var userProfileDto = userProfileService.findUserProfileByEmail(request.getEmail());
         var tokenDto = registrationTokenService.getTokenByUserId(userProfileDto.getId());
-        mailUtil.sendVerificationTokenEmail(request.getEmail(), tokenDto.getValue());
+        mailUtil.sendTokenEmail(VERIFICATION, request.getEmail(), tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - end | request: {}", request);
     }
 
@@ -97,7 +99,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public void sendEvaluatorInvitation(EvaluatorInvitationRequest request, long principalId) {
         log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - start | request: {}, principalId: {}", request, principalId);
         var token = pendingEvaluatorService.createPendingEvaluator(request, principalId).getToken();
-        mailUtil.sendEvaluatorInvitationEmail(request.getEmail(), token);
+        mailUtil.sendTokenEmail(EVALUATOR_INVITATION, request.getEmail(), token);
         log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - end | request: {}, principalId: {}", request, principalId);
     }
 
@@ -105,7 +107,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public void resendEvaluatorInvitation(EvaluatorInvitationResendRequest request) {
         log.info("UserRegistrationFacadeImpl.resendEvaluatorInvitation - start | request: {}", request);
         var token = pendingEvaluatorService.getPendingEvaluatorToken(request.getEmail());
-        mailUtil.sendEvaluatorInvitationEmail(request.getEmail(), token);
+        mailUtil.sendTokenEmail(EVALUATOR_INVITATION, request.getEmail(), token);
         log.info("UserRegistrationFacadeImpl.resendEvaluatorInvitation - end | request: {}", request);
     }
 

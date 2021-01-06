@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.util;
 
 import com.mitchellbosecke.pebble.PebbleEngine;
-import com.mitchellbosecke.pebble.template.PebbleTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,150 +11,85 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Component;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
-import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @Component
-//TODO Dzoni: Not sure if applied, inject mock MailUtil for local environment (to prevent spam)
 public class MailUtil {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    public enum Template {
+
+        VERIFICATION(
+                "verificationMailTemplate",
+                "Art Stock Exchange - Registration confirmation"),
+
+        RESET_PASSWORD(
+                "resetPasswordMailTemplate",
+                "Art Stock Exchange - Forgotten password retrieval"),
+
+        EVALUATOR_INVITATION(
+                "evaluatorInvitationMailTemplate",
+                "Art Stock Exchange - Evaluator invitation");
+
+        private final String name, subject;
+
+        Template(String name, String subject) {
+            this.name = name;
+            this.subject = subject;
+        }
+
+    }
+
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
 
     @Value("${spring.support.email}")
     private String supportEmail;
+
+    @Value("classpath:images/enrglogo.jpg")
+    private Resource logoImage;
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     @Autowired
     @Qualifier("htmlPebbleEngine")
     private PebbleEngine pebbleEngine;
 
-    @Value("classpath:images/enrglogo.jpg")
-    private Resource logoImage;
-
-    public void sendVerificationTokenEmail(String email, String verificationTokenValue) {
-        log.debug("Sending Verification Token mail to email: {}", email);
-        MimeMessagePreparator messagePreparator = createVerificationEmailAsPreparator(email, verificationTokenValue);
-        sendMail(messagePreparator);
+    public void sendTokenEmail(Template template, String email, String token) {
+        log.debug("Sending {} mail to: {} with token: {}", template, email, token);
+        requireNonNull(template);
+        requireNonNull(email);
+        requireNonNull(token);
+        var text = getTemplate(template.name, Map.of("token", token, "logo", logoImage));
+        sendMail(mimeMessage -> {
+            var message = new MimeMessageHelper(mimeMessage, true);
+            message.setTo(email);
+            message.setSubject(template.subject);
+            message.setText(text, true);
+        });
     }
 
-    private MimeMessagePreparator createVerificationEmailAsPreparator(String email, String verificationTokenValue) {
-
-        String tokenKey = "token";
-        String enrgLogoKey = "logo";
-
-        String subject = MailUtilConstants.SubjectConstants.VERIFICATION_EMAIL_SUBJECT;
-
-        Map<String, Object> emailModel;
-        emailModel = new HashMap<>();
-        emailModel.put(tokenKey, verificationTokenValue);
-        emailModel.put(enrgLogoKey, logoImage);
-
-        MimeMessagePreparator preparator = prepareMimeMail(email, subject, emailModel, MailUtilConstants.TemplateConstants.VERIFICATION_EMAIL_TEMPLATE);
-
-        return preparator;
-    }
-
-    public void sendResetPasswordTokenEmail(String email, String tokenValue) {
-        log.debug("Sending Password Reset Token mail to email: {}", email);
-
-        MimeMessagePreparator messagePreparator = createPasswordResetEmailAsPreparator(email, tokenValue);
-        sendMail(messagePreparator);
-    }
-
-    private MimeMessagePreparator createPasswordResetEmailAsPreparator(String email, String tokenValue) {
-
-        String tokenKey = "token";
-        String enrgLogoKey = "logo";
-
-        String subject = MailUtilConstants.SubjectConstants.RESET_PASSWORD_MAIL_SUBJECT;
-
-        Map<String, Object> emailModel;
-        emailModel = new HashMap<>();
-        emailModel.put(tokenKey, tokenValue);
-        emailModel.put(enrgLogoKey, logoImage);
-
-        MimeMessagePreparator preparator = prepareMimeMail(email, subject, emailModel, MailUtilConstants.TemplateConstants.RESET_PASSWORD_MAIL_TEMPLATE);
-
-        return preparator;
-    }
-
-    public void sendEvaluatorInvitationEmail(String email, String token) {
-        log.debug("Sending Evaluator Invitation Token mail to email: {}", email);
-        MimeMessagePreparator messagePreparator = createEvaluatorInvitationEmailAsPreparator(email, token);
-        sendMail(messagePreparator);
-    }
-
-    private MimeMessagePreparator createEvaluatorInvitationEmailAsPreparator(String email, String tokenValue) {
-
-        String tokenKey = "token";
-        String enrgLogoKey = "logo";
-
-        String subject = MailUtilConstants.SubjectConstants.EVALUATOR_INVITATION_MAIL_SUBJECT;
-
-        Map<String, Object> emailModel;
-        emailModel = new HashMap<>();
-        emailModel.put(tokenKey, tokenValue);
-        emailModel.put(enrgLogoKey, logoImage);
-
-        MimeMessagePreparator preparator = prepareMimeMail(email, subject, emailModel, MailUtilConstants.TemplateConstants.EVALUATOR_INVITATION_MAIL_TEMPLATE);
-
-        return preparator;
-    }
-
-    private MimeMessagePreparator prepareMimeMail(String recipientAddress, String subject, Map model, String pebbleTemplate) {
-
-        String templateString = getTemplate(pebbleTemplate, model);
-
-        MimeMessagePreparator preparator = new MimeMessagePreparator() {
-
-            public void prepare(MimeMessage mimeMessage) throws MessagingException {
-
-                MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true);
-                message.setTo(recipientAddress);
-                message.setSubject(subject);
-                message.setText(templateString, true);
-            }
-        };
-        return preparator;
-    }
-
-    private String getTemplate(String templateName, Map model) {
-        PebbleTemplate template = pebbleEngine.getTemplate(templateName);
-        Writer writer = new StringWriter();
-
-        try {
+    private String getTemplate(String name, Map<String, Object> model) {
+        var template = pebbleEngine.getTemplate(name);
+        try (var writer = new StringWriter()) {
             template.evaluate(writer, model);
-        } catch (IOException e) {
-            log.error("Count evaluate pebble template: {}", templateName);
-            throw new RuntimeException("Pebble template failed to evaluate.");
+            return writer.toString();
+        } catch (IOException ex) {
+            log.error("Pebble template failed to evaluate:", ex);
+            log.error("Failed for name: {}, model: {}", name, model);
+            throw new RuntimeException(ex);
         }
-
-        return writer.toString();
     }
 
-    private void sendMail(MimeMessagePreparator preparator) {
+    private void sendMail(MimeMessagePreparator message) {
         log.debug("Mail prepared, sending...");
-        //TODO Dzoni: Commented this out for now - this sends mail
-//        mailSender.send(preparator);
+        mailSender.send(message);
+        log.debug("Mail sent");
     }
 
-    private static class MailUtilConstants {
-        private static class TemplateConstants {
-            private static final String VERIFICATION_EMAIL_TEMPLATE = "verificationMailTemplate";
-            private static final String RESET_PASSWORD_MAIL_TEMPLATE = "resetPasswordMailTemplate";
-            private static final String EVALUATOR_INVITATION_MAIL_TEMPLATE = "evaluatorInvitationMailTemplate";
-        }
-
-        private static class SubjectConstants {
-            private static final String VERIFICATION_EMAIL_SUBJECT = "EnergyCoin Dashboard - Registration Confirmation";
-            private static final String RESET_PASSWORD_MAIL_SUBJECT = "EnergyCoin Dashboard - Forgotten password retrieval";
-            private static final String EVALUATOR_INVITATION_MAIL_SUBJECT = "Art Stock Exchange - Evaluator Invitation";
-        }
-    }
 }
