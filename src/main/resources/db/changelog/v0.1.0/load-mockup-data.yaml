@@ -28,4 +28,3 @@ databaseChangeLog:
         encoding: UTF-8
         file: db/changelog/v0.1.0/mockup_data/user_role.csv
         tableName: users_roles
-
