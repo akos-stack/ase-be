@@ -2,7 +2,6 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserProfileException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
@@ -15,11 +14,13 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.Arrays;
+
 import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.*;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.annotation.DirtiesContext.MethodMode.BEFORE_METHOD;
 
 public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
@@ -179,7 +180,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test(expected = TokenException.class)
-    public void sendEvaluatorInvitation_evaluatorAlreadyPending() {
+    public void sendEvaluatorInvitation_evaluatorAlreadyInvited() {
         var user = mockUtil.savedUserProfile();
         var admin = mockUtil.savedAdmin();
 
@@ -190,6 +191,30 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
         // send invitation to already invited user
         userRegistrationFacade.sendEvaluatorInvitation(request, admin.getId());
+    }
+
+    @Test
+    public void sendEvaluatorInvitation_evaluatorAlreadyRequested() {
+        var user = mockUtil.savedUserProfile();
+        var admin = mockUtil.savedAdmin();
+
+        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
+        userRegistrationFacade.requestEvaluatorRegistration(registrationRequest, user.getId());
+
+        var pendingEvaluator = pendingEvaluatorRepository
+                .findByEmailIgnoreCase(user.getEmail())
+                .orElse(null);
+
+        assertNotNull(pendingEvaluator);
+        assertNull(pendingEvaluator.getUpdaterId());
+        assertSame(REQUESTED, pendingEvaluator.getStatus());
+
+        var invitationRequest = new EvaluatorInvitationRequest(user.getEmail());
+        userRegistrationFacade.sendEvaluatorInvitation(invitationRequest, admin.getId());
+
+        assertNotNull(pendingEvaluator);
+        assertEquals(admin.getId(), pendingEvaluator.getUpdaterId());
+        assertSame(INVITED, pendingEvaluator.getStatus());
     }
 
     @Test
@@ -209,7 +234,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         assertNull(newlyCreatedPendingEvaluator.getCvPath());
         assertEquals(user.getEmail(), newlyCreatedPendingEvaluator.getEmail());
         assertEquals(admin.getId(), newlyCreatedPendingEvaluator.getCreatorId());
-        assertSame(PendingEvaluator.Status.INVITED, newlyCreatedPendingEvaluator.getStatus());
+        assertSame(INVITED, newlyCreatedPendingEvaluator.getStatus());
     }
 
     @Test(expected = NullPointerException.class)
@@ -278,6 +303,78 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         userRegistrationFacade.withdrawEvaluatorInvitation(withdrawInvitationRequest);
 
         assertFalse(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+    }
+
+    // TODO next
+    @Test(expected = NullPointerException.class)
+    public void requestEvaluatorRegistration_requestIsNull() {
+        var admin = mockUtil.savedAdmin();
+
+        userRegistrationFacade.requestEvaluatorRegistration(null, admin.getId());
+    }
+
+    @Test(expected = TokenException.class)
+    public void requestEvaluatorRegistration_evaluatorAlreadyRegistered() {
+        var user = mockUtil.savedUserProfile();
+
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
+        userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
+
+        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+
+        // request registration again
+        userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
+    }
+
+    @Test(expected = TokenException.class)
+    public void requestEvaluatorRegistration_evaluatorAlreadyInvited() {
+        var user = mockUtil.savedUserProfile();
+        var admin = mockUtil.savedAdmin();
+
+        var invitationRequest = new EvaluatorInvitationRequest(user.getEmail());
+        userRegistrationFacade.sendEvaluatorInvitation(invitationRequest, admin.getId());
+
+        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+
+        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
+        userRegistrationFacade.requestEvaluatorRegistration(registrationRequest, user.getId());
+    }
+
+    @Test
+    public void requestEvaluatorRegistration() {
+        var user = mockUtil.savedUserProfile();
+
+        var cvPath = "storage.com/cv-123.docx";
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), cvPath);
+        userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
+
+        var newlyCreatedPendingEvaluator = pendingEvaluatorRepository
+                .findByEmailIgnoreCase(user.getEmail())
+                .orElse(null);
+
+        assertNotNull(newlyCreatedPendingEvaluator);
+        assertNotNull(newlyCreatedPendingEvaluator.getToken());
+        assertEquals(user.getEmail(), newlyCreatedPendingEvaluator.getEmail());
+        assertEquals(user.getId(), newlyCreatedPendingEvaluator.getCreatorId());
+        assertEquals(cvPath, newlyCreatedPendingEvaluator.getCvPath());
+        assertSame(REQUESTED, newlyCreatedPendingEvaluator.getStatus());
+    }
+
+    @Test
+    public void searchPendingEvaluators() {
+        var emails = Arrays.asList("user2@mail.com", "user3@mail.com", "user1@mail.com");
+        mockUtil.createInvitedPendingEvaluators(emails);
+
+        var response = userRegistrationFacade
+                .searchPendingEvaluators("user", 0, 2, "email");
+
+        var pendingEvaluators = response.getPendingEvaluators();
+
+        assertNotNull(response);
+        assertNotNull(pendingEvaluators);
+        assertEquals(2, pendingEvaluators.size());
+        assertEquals("user1@mail.com", pendingEvaluators.get(0).getEmail());
+        assertEquals("user2@mail.com", pendingEvaluators.get(1).getEmail());
     }
 
 }
