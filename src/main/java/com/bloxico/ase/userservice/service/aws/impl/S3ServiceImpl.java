@@ -3,7 +3,9 @@ package com.bloxico.ase.userservice.service.aws.impl;
 import com.bloxico.ase.userservice.config.aws.AWSConfig;
 import com.bloxico.ase.userservice.exception.AmazonS3Exception;
 import com.bloxico.ase.userservice.service.aws.IS3Service;
+import com.bloxico.ase.userservice.util.SupportedFileTypes;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class S3ServiceImpl implements IS3Service {
     @Override
     public String uploadFile(MultipartFile file) {
         log.debug("S3ServiceImpl.uploadFile - start | file: {}", file.getName());
+        SupportedFileTypes.checkIsSupported(FilenameUtils.getExtension(file.getOriginalFilename()));
         String fileName;
         try {
             fileName = awsConfig.uploadFile(file);
