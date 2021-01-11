@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.address.CityDto;
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
+import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.entity.BaseEntity;
@@ -26,6 +27,7 @@ import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
+import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
@@ -40,9 +42,11 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
@@ -86,6 +90,7 @@ public class MockUtil {
     private final LocationRepository locationRepository;
     private final UserRegistrationFacadeImpl userRegistrationFacade;
     private final PendingEvaluatorRepository pendingEvaluatorRepository;
+    private final PendingEvaluatorServiceImpl pendingEvaluatorService;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
@@ -101,7 +106,8 @@ public class MockUtil {
                     CityRepository cityRepository,
                     LocationRepository locationRepository,
                     UserRegistrationFacadeImpl userRegistrationFacade,
-                    PendingEvaluatorRepository pendingEvaluatorRepository)
+                    PendingEvaluatorRepository pendingEvaluatorRepository,
+                    PendingEvaluatorServiceImpl pendingEvaluatorService)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -117,6 +123,7 @@ public class MockUtil {
         this.locationRepository = locationRepository;
         this.userRegistrationFacade = userRegistrationFacade;
         this.pendingEvaluatorRepository = pendingEvaluatorRepository;
+        this.pendingEvaluatorService = pendingEvaluatorService;
     }
 
     public UserProfile savedAdmin() {
@@ -440,6 +447,31 @@ public class MockUtil {
         savedUserProfile("user1@gmail.com", "123!");
         savedUserProfile("user2@gmail.com", "123!");
         savedUserProfile("user3@gmail.com", "123!");
+    }
+
+    public boolean isEvaluatorAlreadyPending(String email) {
+        return pendingEvaluatorRepository
+                .findByEmailIgnoreCase(email)
+                .isPresent();
+    }
+
+    public List<PendingEvaluatorDto> createInvitedPendingEvaluators() {
+        var emails = Stream
+                .generate(MockUtil::genEmail)
+                .limit(10)
+                .collect(Collectors.toList());
+
+        return createInvitedPendingEvaluators(emails);
+    }
+
+    public List<PendingEvaluatorDto> createInvitedPendingEvaluators(List<String> emails) {
+        var adminId = savedAdmin().getId();
+
+        return emails
+                .stream()
+                .map(EvaluatorInvitationRequest::new)
+                .map(request -> pendingEvaluatorService.createPendingEvaluator(request, adminId))
+                .collect(Collectors.toList());
     }
 
     private static final AtomicLong along = new AtomicLong(0);

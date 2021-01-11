@@ -2,15 +2,19 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
-import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
-import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
+import com.bloxico.ase.userservice.web.model.token.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
+
+
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import static com.bloxico.ase.testutil.MockUtil.ERROR_CODE;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
@@ -21,6 +25,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
@@ -201,6 +206,188 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     }
 
     @Test
+    public void sendEvaluatorInvitation_200_invitationSuccessfullySent() {
+        var registration = mockUtil.doConfirmedRegistration();
+
+        var request = new EvaluatorInvitationRequest(registration.getEmail());
+        given()
+                .header("Authorization", mockUtil.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    public void sendEvaluatorInvitation_409_evaluatorIsAlreadyInvited() {
+        var registration = mockUtil.doConfirmedRegistration();
+        var adminBearerToken = mockUtil.doAdminAuthentication();
+
+        var request = new EvaluatorInvitationRequest(registration.getEmail());
+        given()
+                .header("Authorization", adminBearerToken)
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+        // send invitation to already invited user
+        given()
+                .header("Authorization", adminBearerToken)
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(409)
+                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_EXISTS.getCode()));
+    }
+
+    @Test
+    public void resendEvaluatorInvitation_200_invitationSuccessfullyResent() {
+        var registration = mockUtil.doConfirmedRegistration();
+        var adminBearerToken = mockUtil.doAdminAuthentication();
+
+        // send invitation first
+        var sendInvitationRequest = new EvaluatorInvitationRequest(registration.getEmail());
+        given()
+                .header("Authorization", adminBearerToken)
+                .contentType(JSON)
+                .body(sendInvitationRequest)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+        // now resend invitation
+        var resendInvitationRequest = new EvaluatorInvitationResendRequest(registration.getEmail());
+        given()
+                .header("Authorization", adminBearerToken)
+                .contentType(JSON)
+                .body(resendInvitationRequest)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_INVITATION_RESEND)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    public void resendEvaluatorInvitation_404_evaluatorIsNotAlreadyInvited() {
+        var registration = mockUtil.doConfirmedRegistration();
+
+        var request = new EvaluatorInvitationResendRequest(registration.getEmail());
+        given()
+                .header("Authorization", mockUtil.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .post(API_URL + REGISTRATION_EVALUATOR_INVITATION_RESEND)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void withdrawEvaluatorInvitation_200_invitationSuccessfullyWithdrawn() {
+        var registration = mockUtil.doConfirmedRegistration();
+        var adminBearerToken = mockUtil.doAdminAuthentication();
+
+        // send invitation first
+        var sendInvitationRequest = new EvaluatorInvitationRequest(registration.getEmail());
+        given()
+                .header("Authorization", adminBearerToken)
+                .contentType(JSON)
+                .body(sendInvitationRequest)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+        // now withdraw invitation
+        var withdrawInvitationRequest = new EvaluatorInvitationWithdrawalRequest(registration.getEmail());
+        given()
+                .header("Authorization", adminBearerToken)
+                .contentType(JSON)
+                .body(withdrawInvitationRequest)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_INVITATION_WITHDRAW)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    public void withdrawEvaluatorInvitation_404_evaluatorIsNotAlreadyInvited() {
+        var registration = mockUtil.doConfirmedRegistration();
+
+        var request = new EvaluatorInvitationRequest(registration.getEmail());
+        given()
+                .header("Authorization", mockUtil.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_INVITATION_WITHDRAW)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void requestEvaluatorRegistration_200_pendingEvaluatorSuccessfullyRegistered() {
+        var registration = mockUtil.doConfirmedRegistration();
+
+        var request = new EvaluatorRegistrationRequest(registration.getEmail(), "storage.com/cv-123.docx");
+        given()
+                .header("Authorization", mockUtil.doAuthentication(registration))
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    public void requestEvaluatorRegistration_409_evaluatorIsAlreadyPending() {
+        var registration = mockUtil.doConfirmedRegistration();
+        var bearerToken = mockUtil.doAuthentication(registration);
+
+        var request = new EvaluatorRegistrationRequest(registration.getEmail(), "storage.com/cv-123.docx");
+        given()
+                .header("Authorization", bearerToken)
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+        given()
+                .header("Authorization", bearerToken)
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
+                .then()
+                .assertThat()
+                .statusCode(409)
+                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_EXISTS.getCode()));
+    }
+
+    @Test
     public void submitEvaluator_200_ok() {
         var request = mockUtil.newSubmitInvitedEvaluatorRequest();
         given()
@@ -231,6 +418,54 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
                 .assertThat()
                 .statusCode(404)
                 .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void searchPendingEvaluators_200_paginatedListSuccessfullyRetrieved() {
+        var pendingEvaluators = mockUtil.createInvitedPendingEvaluators();
+
+        var emailSearch = "aseUser";
+        var pageIndex = 1;
+        var pageSize = 4;
+
+        var expectedList = pendingEvaluators
+                .stream()
+                .filter(p -> p.getEmail().contains(emailSearch))
+                .sorted(Comparator.comparing(PendingEvaluatorDto::getEmail))
+                .skip(pageIndex * pageSize)
+                .limit(pageSize)
+                .collect(Collectors.toList());
+
+        var actualList = given()
+                .header("Authorization", mockUtil.doAdminAuthentication())
+                .contentType(JSON)
+                .param("email", emailSearch)
+                .param("page", pageIndex)
+                .param("size", pageSize)
+                .when()
+                .get(API_URL + REGISTRATION_EVALUATOR_SEARCH)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList("pending_evaluators", PendingEvaluatorDto.class);
+
+        assertEquals(expectedList, actualList);
+    }
+
+    @Test
+    public void searchPendingEvaluators_403_unauthorizedUser() {
+        given()
+                .header("Authorization", mockUtil.doAuthentication())
+                .contentType(JSON)
+                .param("email", "aseUser")
+                .when()
+                .get(API_URL + REGISTRATION_EVALUATOR_SEARCH)
+                .then()
+                .assertThat()
+                .statusCode(403);
     }
 
 }

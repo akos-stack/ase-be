@@ -35,7 +35,7 @@ public class PendingEvaluator extends BaseEntity {
         REQUESTED;
 
         public PendingEvaluator requireDifferentStatus(PendingEvaluator check) {
-            if (check.getStatus() == this)
+            if (check.getStatus() == this || (this == REQUESTED && check.getStatus() == INVITED))
                 throw TOKEN_EXISTS.newException();
             return check;
         }
