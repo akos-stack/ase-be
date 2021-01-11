@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.web.error;
 
+import com.bloxico.ase.userservice.exception.AmazonS3Exception;
 import com.bloxico.ase.userservice.exception.AseRuntimeException;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserProfileException;
@@ -91,4 +92,27 @@ public interface ErrorCodes {
 
     }
 
+    @Getter
+    enum AmazonS3 implements ErrorCodes {
+
+        FILE_TYPE_NOT_SUPPORTED(
+                HttpStatus.BAD_REQUEST,
+                "20",
+                "File type is not supported.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        AmazonS3(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new AmazonS3Exception(httpStatus, code, cause);
+        }
+
+    }
 }
