@@ -14,8 +14,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 import static com.bloxico.ase.testutil.MockUtil.uuid;
-import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
-import static com.bloxico.ase.userservice.entity.user.Role.USER;
+import static com.bloxico.ase.userservice.entity.user.Role.*;
 import static org.junit.Assert.*;
 
 public class UserProfileServiceImplTest extends AbstractSpringTest {
@@ -191,12 +190,13 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
     @Test
     public void findUsersByRole() {
         mockUtil.saveUserProfiles();
-        assertEquals(1, userProfileService.findUsersByEmailOrRole("", "admin", 0, 100, "name").size());
+        assertEquals(4, userProfileService.findUsersByEmailOrRole("", ADMIN, 0, 100, "name").size());
     }
 
     @Test
     public void findUsersByRoleAndEmail() {
         mockUtil.saveUserProfiles();
-        assertEquals(3, userProfileService.findUsersByEmailOrRole("user", "user", 0, 100, "name").size());
+        assertEquals(3, userProfileService.findUsersByEmailOrRole("user", ADMIN, 0, 100, "name").size());
     }
+
 }

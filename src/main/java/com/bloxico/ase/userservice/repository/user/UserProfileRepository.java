@@ -6,9 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
@@ -19,4 +17,5 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
     List<UserProfile> findAllDisabledByIds(Collection<Long> ids);
 
     List<UserProfile> findDistinctByEmailContainingAndRoles_NameContaining(String email, String role, Pageable pageable);
+
 }

@@ -2,17 +2,17 @@ package com.bloxico.ase.userservice.repository.user;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 
 import java.util.List;
 import java.util.Set;
 
 import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.userservice.entity.user.Role.ADMIN;
 import static org.junit.Assert.*;
 
 public class UserProfileRepositoryTest extends AbstractSpringTest {
@@ -57,7 +57,7 @@ public class UserProfileRepositoryTest extends AbstractSpringTest {
     public void findByEmailAndRole() {
         mockUtil.saveUserProfiles();
         Pageable pageable = PageRequest.of(0, 10, Sort.by("name").ascending());
-        assertTrue(repository.findDistinctByEmailContainingAndRoles_NameContaining("", "user", pageable).size() == 4);
+        assertEquals(4, repository.findDistinctByEmailContainingAndRoles_NameContaining("", ADMIN, pageable).size());
     }
 
 }
