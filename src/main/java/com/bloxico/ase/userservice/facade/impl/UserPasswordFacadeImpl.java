@@ -5,16 +5,18 @@ import com.bloxico.ase.userservice.service.token.ITokenService;
 import com.bloxico.ase.userservice.service.token.impl.PasswordResetTokenServiceImpl;
 import com.bloxico.ase.userservice.service.user.IUserPasswordService;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
+import com.bloxico.ase.userservice.util.MailUtil;
 import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
 import com.bloxico.ase.userservice.web.model.password.ForgottenPasswordUpdateRequest;
 import com.bloxico.ase.userservice.web.model.password.KnownPasswordUpdateRequest;
 import com.bloxico.ase.userservice.web.model.password.SetPasswordRequest;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
-import com.bloxico.userservice.util.MailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.bloxico.ase.userservice.util.MailUtil.Template.RESET_PASSWORD;
 
 @Slf4j
 @Service
@@ -44,7 +46,7 @@ public class UserPasswordFacadeImpl implements IUserPasswordFacade {
         var email = request.getEmail();
         var userId = userProfileService.findUserProfileByEmail(email).getId();
         var token = passwordResetTokenService.getOrCreateTokenForUser(userId);
-        mailUtil.sendResetPasswordTokenEmail(email, token.getValue());
+        mailUtil.sendTokenEmail(RESET_PASSWORD, email, token.getValue());
         log.info("UserPasswordFacadeImpl.handleForgotPasswordRequest - end | request: {}", request);
     }
 
@@ -54,7 +56,7 @@ public class UserPasswordFacadeImpl implements IUserPasswordFacade {
         var email = request.getEmail();
         var userId = userProfileService.findUserProfileByEmail(email).getId();
         var token = passwordResetTokenService.getTokenByUserId(userId);
-        mailUtil.sendResetPasswordTokenEmail(email, token.getValue());
+        mailUtil.sendTokenEmail(RESET_PASSWORD, email, token.getValue());
         log.info("UserPasswordFacadeImpl.resendPasswordToken - end | request: {}", request);
     }
 

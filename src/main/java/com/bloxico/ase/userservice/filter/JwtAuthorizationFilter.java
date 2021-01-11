@@ -2,7 +2,7 @@ package com.bloxico.ase.userservice.filter;
 
 import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
-import com.bloxico.userservice.web.model.ApiError;
+import com.bloxico.ase.userservice.web.model.ApiError;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,9 +54,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private static void raiseException(HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        var status = ErrorCodes.Token.INVALID_TOKEN.getHttpStatus();
-        var code = ErrorCodes.Token.INVALID_TOKEN.getCode();
-        ApiError apiError = new ApiError(status, code);
+        var apiError = ApiError.builder()
+                .status(ErrorCodes.Token.INVALID_TOKEN.getHttpStatus())
+                .errorCode(ErrorCodes.Token.INVALID_TOKEN.getCode())
+                .build();
         byte[] body = new ObjectMapper().writeValueAsBytes(apiError);
         response.getOutputStream().write(body);
     }
