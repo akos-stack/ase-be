@@ -38,7 +38,7 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
     @Test
     public void searchUsersByRole() {
         mockUtil.saveUserProfiles();
-        assertEquals(1, userManagementFacade.searchUsers("", "admin", 0, 10, "name").getUserProfiles().size());
+        assertEquals(4, userManagementFacade.searchUsers("", "admin", 0, 10, "name").getUserProfiles().size());
     }
 
     @Test

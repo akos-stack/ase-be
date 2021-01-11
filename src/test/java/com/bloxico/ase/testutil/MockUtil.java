@@ -444,9 +444,9 @@ public class MockUtil {
     }
 
     public void saveUserProfiles() {
-        savedUserProfile("user1@gmail.com", "123!");
-        savedUserProfile("user2@gmail.com", "123!");
-        savedUserProfile("user3@gmail.com", "123!");
+        savedAdmin("user1@gmail.com", "123!");
+        savedAdmin("user2@gmail.com", "123!");
+        savedAdmin("user3@gmail.com", "123!");
     }
 
     public boolean isEvaluatorAlreadyPending(String email) {
