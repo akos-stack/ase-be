@@ -19,9 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.EntityNotFoundException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
@@ -150,19 +148,19 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     }
 
     private boolean isAuthorizedRedirectUri(String uri) {
-        var clientRedirectUri = URI.create(uri);
-        // TODO fetch authorizedRedirectUris from database
-        return List.of(baseUrl)
-                .stream()
-                .anyMatch(authorizedRedirectUri -> {
-                    // Only validate host and port. Let the clients use different paths if they want to
-                    var authorizedURI = URI.create(authorizedRedirectUri);
-                    return authorizedURI
-                            .getHost()
-                            .equalsIgnoreCase(clientRedirectUri.getHost())
-                            && authorizedURI
-                            .getPort() == clientRedirectUri.getPort();
-                });
+        return uri.contains("/landing-page");
+//        var clientRedirectUri = URI.create(uri);
+//        return List.of(baseUrl)
+//                .stream()
+//                .anyMatch(authorizedRedirectUri -> {
+//                    // Only validate host and port. Let the clients use different paths if they want to
+//                    var authorizedURI = URI.create(authorizedRedirectUri);
+//                    return authorizedURI
+//                            .getHost()
+//                            .equalsIgnoreCase(clientRedirectUri.getHost())
+//                        && authorizedURI
+//                            .getPort() == clientRedirectUri.getPort();
+//                });
     }
 
 }
