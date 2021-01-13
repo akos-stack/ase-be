@@ -14,6 +14,7 @@ import com.bloxico.ase.userservice.repository.token.PasswordResetTokenRepository
 import com.bloxico.ase.userservice.repository.token.RegistrationTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.user.*;
 import com.bloxico.ase.userservice.service.address.impl.LocationServiceImplTest;
+import com.bloxico.ase.userservice.service.aws.impl.S3ServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
 import com.bloxico.ase.userservice.service.token.impl.PasswordResetTokenServiceImplTest;
@@ -63,6 +64,7 @@ import org.junit.runners.Suite;
         PasswordResetTokenServiceImplTest.class,
         LocationServiceImplTest.class,
         PendingEvaluatorServiceImplTest.class,
+        S3ServiceImplTest.class,
 
         // facade
         QuartzOperationsFacadeImplTest.class,
