@@ -15,6 +15,7 @@ import org.springframework.data.mapping.PropertyReferenceException;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+import static com.bloxico.ase.testutil.MockUtil.genEmail;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
@@ -189,6 +190,32 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
         assertNotNull(newlyCreatedPendingEvaluatorToken);
         assertEquals(pendingEvaluator.getToken(), newlyCreatedPendingEvaluatorToken);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void checkInvitationToken_nullToken() {
+        service.checkInvitationToken(null);
+    }
+
+    @Test(expected = TokenException.class)
+    public void checkInvitationToken_tokenNotFound() {
+        service.checkInvitationToken(uuid());
+    }
+
+    @Test(expected = TokenException.class)
+    public void checkInvitationToken_invitationTokenNotFound() {
+        var principalId = mockUtil.savedAdmin().getId();
+        var request = new EvaluatorRegistrationRequest(genEmail(), uuid());
+        var pending = service.createPendingEvaluator(request, principalId);
+        service.checkInvitationToken(pending.getToken());
+    }
+
+    @Test
+    public void checkInvitationToken() {
+        var principalId = mockUtil.savedAdmin().getId();
+        var request = new EvaluatorInvitationRequest(genEmail());
+        var pending = service.createPendingEvaluator(request, principalId);
+        service.checkInvitationToken(pending.getToken());
     }
 
     @Test(expected = NullPointerException.class)

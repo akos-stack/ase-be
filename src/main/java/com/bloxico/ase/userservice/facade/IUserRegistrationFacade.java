@@ -18,6 +18,8 @@ public interface IUserRegistrationFacade {
 
     void sendEvaluatorInvitation(EvaluatorInvitationRequest request, long principalId);
 
+    void checkEvaluatorInvitation(String token);
+
     void resendEvaluatorInvitation(EvaluatorInvitationResendRequest request);
 
     void withdrawEvaluatorInvitation(EvaluatorInvitationWithdrawalRequest request);

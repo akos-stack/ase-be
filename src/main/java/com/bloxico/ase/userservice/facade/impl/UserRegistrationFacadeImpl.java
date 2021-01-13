@@ -8,9 +8,7 @@ import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
 import com.bloxico.ase.userservice.service.token.ITokenService;
 import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImpl;
-import com.bloxico.ase.userservice.service.user.IRolePermissionService;
-import com.bloxico.ase.userservice.service.user.IUserProfileService;
-import com.bloxico.ase.userservice.service.user.IUserRegistrationService;
+import com.bloxico.ase.userservice.service.user.*;
 import com.bloxico.ase.userservice.util.MailUtil;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
@@ -101,6 +99,13 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var token = pendingEvaluatorService.createPendingEvaluator(request, principalId).getToken();
         mailUtil.sendTokenEmail(EVALUATOR_INVITATION, request.getEmail(), token);
         log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - end | request: {}, principalId: {}", request, principalId);
+    }
+
+    @Override
+    public void checkEvaluatorInvitation(String token) {
+        log.info("UserRegistrationFacadeImpl.checkEvaluatorInvitation - start | token: {}", token);
+        pendingEvaluatorService.checkInvitationToken(token);
+        log.info("UserRegistrationFacadeImpl.checkEvaluatorInvitation - end | token: {}", token);
     }
 
     @Override

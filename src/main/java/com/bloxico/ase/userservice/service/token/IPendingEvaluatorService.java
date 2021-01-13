@@ -11,6 +11,8 @@ public interface IPendingEvaluatorService {
 
     String getPendingEvaluatorToken(String email);
 
+    void checkInvitationToken(String token);
+
     void deletePendingEvaluator(String email);
 
     void consumePendingEvaluator(String email, String token);

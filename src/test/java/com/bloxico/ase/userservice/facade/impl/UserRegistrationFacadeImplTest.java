@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.exception.UserProfileException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
+import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.*;
@@ -16,8 +17,10 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Arrays;
 
+import static com.bloxico.ase.testutil.MockUtil.genEmail;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
-import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.*;
+import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
+import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static org.junit.Assert.*;
@@ -33,6 +36,9 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Autowired
     private UserProfileServiceImpl userProfileService;
+
+    @Autowired
+    private PendingEvaluatorServiceImpl pendingEvaluatorService;
 
     @Autowired
     private EvaluatorRepository evaluatorRepository;
@@ -235,6 +241,32 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         assertEquals(user.getEmail(), newlyCreatedPendingEvaluator.getEmail());
         assertEquals(admin.getId(), newlyCreatedPendingEvaluator.getCreatorId());
         assertSame(INVITED, newlyCreatedPendingEvaluator.getStatus());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void checkEvaluatorInvitation_nullToken() {
+        userRegistrationFacade.checkEvaluatorInvitation(null);
+    }
+
+    @Test(expected = TokenException.class)
+    public void checkEvaluatorInvitation_tokenNotFound() {
+        userRegistrationFacade.checkEvaluatorInvitation(uuid());
+    }
+
+    @Test(expected = TokenException.class)
+    public void checkEvaluatorInvitation_invitationTokenNotFound() {
+        var principalId = mockUtil.savedAdmin().getId();
+        var request = new EvaluatorRegistrationRequest(genEmail(), uuid());
+        var pending = pendingEvaluatorService.createPendingEvaluator(request, principalId);
+        userRegistrationFacade.checkEvaluatorInvitation(pending.getToken());
+    }
+
+    @Test
+    public void checkEvaluatorInvitation() {
+        var principalId = mockUtil.savedAdmin().getId();
+        var request = new EvaluatorInvitationRequest(genEmail());
+        var pending = pendingEvaluatorService.createPendingEvaluator(request, principalId);
+        userRegistrationFacade.checkEvaluatorInvitation(pending.getToken());
     }
 
     @Test(expected = NullPointerException.class)

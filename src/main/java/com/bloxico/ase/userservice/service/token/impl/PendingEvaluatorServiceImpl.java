@@ -8,14 +8,13 @@ import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
@@ -57,6 +56,18 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
                 .getToken();
         log.debug("PendingEvaluatorServiceImpl.getPendingEvaluatorToken - end | email: {}", email);
         return token;
+    }
+
+    @Override
+    public void checkInvitationToken(String token) {
+        log.debug("PendingEvaluatorServiceImpl.checkInvitationToken - start | token: {}", token);
+        requireNonNull(token);
+        pendingEvaluatorRepository
+                .findByToken(token)
+                .map(PendingEvaluator::getStatus)
+                .filter(INVITED::equals)
+                .orElseThrow(TOKEN_NOT_FOUND::newException);
+        log.debug("PendingEvaluatorServiceImpl.checkInvitationToken - end | token: {}", token);
     }
 
     @Override
