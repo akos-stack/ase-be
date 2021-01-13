@@ -1,8 +1,8 @@
 package com.bloxico.ase.userservice.service.aws.impl;
 
-import com.bloxico.ase.userservice.config.aws.AWSConfig;
 import com.bloxico.ase.userservice.exception.AmazonS3Exception;
 import com.bloxico.ase.userservice.service.aws.IS3Service;
+import com.bloxico.ase.userservice.util.AWSUtil;
 import com.bloxico.ase.userservice.util.SupportedFileTypes;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -17,10 +17,10 @@ import java.io.IOException;
 @Service
 public class S3ServiceImpl implements IS3Service {
 
-    private final AWSConfig awsConfig;
+    private final AWSUtil awsUtil;
 
-    public S3ServiceImpl(AWSConfig awsConfig) {
-        this.awsConfig = awsConfig;
+    public S3ServiceImpl(AWSUtil awsUtil) {
+        this.awsUtil = awsUtil;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class S3ServiceImpl implements IS3Service {
         SupportedFileTypes.checkIsSupported(FilenameUtils.getExtension(file.getOriginalFilename()));
         String fileName;
         try {
-            fileName = awsConfig.uploadFile(file);
+            fileName = awsUtil.uploadFile(file);
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new AmazonS3Exception(HttpStatus.BAD_REQUEST, e.getMessage(), e.getCause());
@@ -43,7 +43,7 @@ public class S3ServiceImpl implements IS3Service {
         log.debug("S3ServiceImpl.downloadFile - start | fileName: {}", fileName);
         ByteArrayResource byteArrayResource;
         try {
-            byteArrayResource = new ByteArrayResource(awsConfig.downloadFile(fileName));
+            byteArrayResource = new ByteArrayResource(awsUtil.downloadFile(fileName));
         } catch (IOException e) {
             log.error(e.getMessage());
             throw new AmazonS3Exception(HttpStatus.BAD_REQUEST, e.getMessage(), e.getCause());
@@ -55,7 +55,7 @@ public class S3ServiceImpl implements IS3Service {
     @Override
     public boolean deleteFile(String fileName) {
         log.debug("S3ServiceImpl.deleteFile - start | fileName: {}", fileName);
-        awsConfig.deleteFileFromS3Bucket(fileName);
+        awsUtil.deleteFileFromS3Bucket(fileName);
         log.debug("S3ServiceImpl.deleteFile - end | fileName: {}", fileName);
         return true;
     }

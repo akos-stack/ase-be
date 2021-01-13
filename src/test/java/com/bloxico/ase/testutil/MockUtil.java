@@ -1,5 +1,6 @@
 package com.bloxico.ase.testutil;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.bloxico.ase.userservice.dto.entity.address.CityDto;
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
@@ -34,15 +35,17 @@ import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
+import io.findify.s3mock.S3Mock;
 import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -76,6 +79,11 @@ public class MockUtil {
     @Value("${oauth2.secret}")
     private String OAUTH2_SECRET;
 
+    @Value("${s3.bucketName}")
+    private String bucketName;
+
+    private S3Mock api;
+
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final UserProfileRepository userProfileRepository;
@@ -91,6 +99,7 @@ public class MockUtil {
     private final UserRegistrationFacadeImpl userRegistrationFacade;
     private final PendingEvaluatorRepository pendingEvaluatorRepository;
     private final PendingEvaluatorServiceImpl pendingEvaluatorService;
+    private final AmazonS3 amazonS3;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
@@ -107,7 +116,7 @@ public class MockUtil {
                     LocationRepository locationRepository,
                     UserRegistrationFacadeImpl userRegistrationFacade,
                     PendingEvaluatorRepository pendingEvaluatorRepository,
-                    PendingEvaluatorServiceImpl pendingEvaluatorService)
+                    PendingEvaluatorServiceImpl pendingEvaluatorService, AmazonS3 amazonS3)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -124,6 +133,19 @@ public class MockUtil {
         this.userRegistrationFacade = userRegistrationFacade;
         this.pendingEvaluatorRepository = pendingEvaluatorRepository;
         this.pendingEvaluatorService = pendingEvaluatorService;
+        this.amazonS3 = amazonS3;
+    }
+
+    @PostConstruct
+    private void setUpAmazonS3Mock() {
+        api = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
+        api.start();
+        amazonS3.createBucket(bucketName);
+    }
+
+    @PreDestroy
+    private void teardownAmazonS3Mock() {
+        api.shutdown();
     }
 
     public UserProfile savedAdmin() {
