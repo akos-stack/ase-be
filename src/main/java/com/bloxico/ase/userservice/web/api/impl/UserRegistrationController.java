@@ -54,6 +54,12 @@ public class UserRegistrationController implements UserRegistrationApi {
     }
 
     @Override
+    public ResponseEntity<Void> checkEvaluatorInvitation(String token) {
+        userRegistrationFacade.checkEvaluatorInvitation(token);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<Void> resendEvaluatorInvitation(EvaluatorInvitationResendRequest request) {
         userRegistrationFacade.resendEvaluatorInvitation(request);
         return new ResponseEntity<>(HttpStatus.OK);

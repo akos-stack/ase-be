@@ -3,6 +3,8 @@ package com.bloxico.ase.userservice.web.api;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
+import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
@@ -12,19 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-import static com.bloxico.ase.testutil.MockUtil.ERROR_CODE;
-import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.testutil.MockUtil.*;
+import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
@@ -39,6 +37,9 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
 
     @Autowired
     private TokenRepository tokenRepository;
+
+    @Autowired
+    private PendingEvaluatorRepository pendingEvaluatorRepository;
 
     @Test
     public void registration_200_ok() {
@@ -248,6 +249,35 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
                 .assertThat()
                 .statusCode(409)
                 .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_EXISTS.getCode()));
+    }
+
+    @Test
+    public void checkEvaluatorInvitation_200_invitationExists() {
+        var principalId = mockUtil.savedAdmin().getId();
+        var invitation = new PendingEvaluator();
+        invitation.setEmail(genEmail());
+        invitation.setStatus(INVITED);
+        invitation.setToken(uuid());
+        invitation.setCreatorId(principalId);
+        pendingEvaluatorRepository.saveAndFlush(invitation);
+        given()
+                .param("token", invitation.getToken())
+                .when()
+                .get(API_URL + REGISTRATION_EVALUATOR_INVITATION_CHECK)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    public void checkEvaluatorInvitation_404_invitationNotFound() {
+        given()
+                .param("token", uuid())
+                .when()
+                .get(API_URL + REGISTRATION_EVALUATOR_INVITATION_CHECK)
+                .then()
+                .assertThat()
+                .statusCode(404);
     }
 
     @Test

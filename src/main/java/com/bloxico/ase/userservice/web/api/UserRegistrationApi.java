@@ -25,6 +25,7 @@ public interface UserRegistrationApi {
     String REGISTRATION_TOKEN_REFRESH_ENDPOINT        = "/user/registration/token/refresh";
     String REGISTRATION_TOKEN_RESEND_ENDPOINT         = "/user/registration/token/resend";
     String REGISTRATION_EVALUATOR_INVITATION          = "/user/registration/evaluator/invitation";
+    String REGISTRATION_EVALUATOR_INVITATION_CHECK    = "/user/registration/evaluator/invitation/check";
     String REGISTRATION_EVALUATOR_INVITATION_RESEND   = "/user/registration/evaluator/invitation/resend";
     String REGISTRATION_EVALUATOR_INVITATION_WITHDRAW = "/user/registration/evaluator/invitation/withdraw";
     String REGISTRATION_EVALUATOR_SUBMIT              = "/user/registration/evaluator/submit";
@@ -90,6 +91,14 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 409, message = "Evaluator with given email is already invited.")
     })
     ResponseEntity<Void> sendEvaluatorInvitation(@Valid @RequestBody EvaluatorInvitationRequest request, Principal principal);
+
+    @GetMapping(value = REGISTRATION_EVALUATOR_INVITATION_CHECK)
+    @ApiOperation(value = "Checks if evaluator is invited with given token.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Invitation exists."),
+            @ApiResponse(code = 404, message = "Invitation is not found.")
+    })
+    ResponseEntity<Void> checkEvaluatorInvitation(@Valid @RequestParam("token") String token);
 
     @PostMapping(
             value = REGISTRATION_EVALUATOR_INVITATION_RESEND,

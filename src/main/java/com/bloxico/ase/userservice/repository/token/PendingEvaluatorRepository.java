@@ -11,6 +11,8 @@ import java.util.Optional;
 @Repository
 public interface PendingEvaluatorRepository extends JpaRepository<PendingEvaluator, String> {
 
+    Optional<PendingEvaluator> findByToken(String token);
+
     Optional<PendingEvaluator> findByEmailIgnoreCase(String email);
 
     Optional<PendingEvaluator> findByEmailIgnoreCaseAndToken(String email, String token);

@@ -8,9 +8,7 @@ import com.bloxico.ase.userservice.web.api.UserRegistrationApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -20,9 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
-import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
-import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.endpoint.*;
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
@@ -125,6 +121,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 UserRegistrationApi.REGISTRATION_TOKEN_REFRESH_ENDPOINT,
                 UserRegistrationApi.REGISTRATION_TOKEN_RESEND_ENDPOINT,
                 UserRegistrationApi.REGISTRATION_EVALUATOR_SUBMIT,
+                UserRegistrationApi.REGISTRATION_EVALUATOR_INVITATION_CHECK,
 
                 UserPasswordApi.PASSWORD_FORGOT_ENDPOINT,
                 UserPasswordApi.PASSWORD_UPDATE_FORGOTTEN_ENDPOINT,
