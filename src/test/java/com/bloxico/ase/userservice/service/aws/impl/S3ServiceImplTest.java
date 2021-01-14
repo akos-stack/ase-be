@@ -1,27 +1,19 @@
 package com.bloxico.ase.userservice.service.aws.impl;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.bloxico.ase.testutil.AbstractSpringTest;
+import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import static org.junit.Assert.assertTrue;
 
-public class S3ServiceImplTest extends AbstractSpringTest {
+public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Autowired
     private S3ServiceImpl s3Service;
-
-    @Autowired
-    private AmazonS3 amazonS3;
-
-    @Value("${s3.bucketName}")
-    private String bucketName;
 
     @Test
     public void upload_success() {
