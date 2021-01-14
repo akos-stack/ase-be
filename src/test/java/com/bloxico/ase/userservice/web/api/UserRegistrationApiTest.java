@@ -261,7 +261,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
         invitation.setCreatorId(principalId);
         pendingEvaluatorRepository.saveAndFlush(invitation);
         given()
-                .param("token", invitation.getToken())
+                .pathParam("token", invitation.getToken())
                 .when()
                 .get(API_URL + REGISTRATION_EVALUATOR_INVITATION_CHECK)
                 .then()
@@ -272,7 +272,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     @Test
     public void checkEvaluatorInvitation_404_invitationNotFound() {
         given()
-                .param("token", uuid())
+                .pathParam("token", uuid())
                 .when()
                 .get(API_URL + REGISTRATION_EVALUATOR_INVITATION_CHECK)
                 .then()

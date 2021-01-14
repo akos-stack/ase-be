@@ -8,10 +8,7 @@ import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -25,7 +22,7 @@ public interface UserRegistrationApi {
     String REGISTRATION_TOKEN_REFRESH_ENDPOINT        = "/user/registration/token/refresh";
     String REGISTRATION_TOKEN_RESEND_ENDPOINT         = "/user/registration/token/resend";
     String REGISTRATION_EVALUATOR_INVITATION          = "/user/registration/evaluator/invitation";
-    String REGISTRATION_EVALUATOR_INVITATION_CHECK    = "/user/registration/evaluator/invitation/check";
+    String REGISTRATION_EVALUATOR_INVITATION_CHECK    = "/user/registration/evaluator/invitation/check/{token}";
     String REGISTRATION_EVALUATOR_INVITATION_RESEND   = "/user/registration/evaluator/invitation/resend";
     String REGISTRATION_EVALUATOR_INVITATION_WITHDRAW = "/user/registration/evaluator/invitation/withdraw";
     String REGISTRATION_EVALUATOR_SUBMIT              = "/user/registration/evaluator/submit";
@@ -98,7 +95,7 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 200, message = "Invitation exists."),
             @ApiResponse(code = 404, message = "Invitation is not found.")
     })
-    ResponseEntity<Void> checkEvaluatorInvitation(@Valid @RequestParam("token") String token);
+    ResponseEntity<Void> checkEvaluatorInvitation(@Valid @PathVariable("token") String token);
 
     @PostMapping(
             value = REGISTRATION_EVALUATOR_INVITATION_RESEND,
