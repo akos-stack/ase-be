@@ -56,7 +56,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
     public void createPendingEvaluator_evaluatorAlreadyPendingAfterRegistration() {
         var user = mockUtil.savedUserProfile();
 
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         service.createPendingEvaluator(request, user.getId());
 
         assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
@@ -92,7 +92,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
     public void createPendingEvaluator_evaluatorIsRequested() {
         var user = mockUtil.savedUserProfile();
 
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         var pendingEvaluatorDto = service.createPendingEvaluator(request, user.getId());
 
         assertNotNull(pendingEvaluatorDto);
@@ -116,7 +116,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
         var user = mockUtil.savedUserProfile();
         var admin = mockUtil.savedAdmin();
 
-        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
+        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         service.createPendingEvaluator(registrationRequest, user.getId());
 
         var pendingEvaluator = repository
@@ -145,7 +145,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
         assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
 
-        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
+        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         service.createPendingEvaluator(registrationRequest, user.getId());
     }
 
@@ -180,7 +180,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
     public void getPendingEvaluatorToken_whenInRequestedStatus() {
         var user = mockUtil.savedUserProfile();
 
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         var pendingEvaluator = service.createPendingEvaluator(request, user.getId());
 
         assertNotNull(pendingEvaluator);
@@ -205,7 +205,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
     @Test(expected = TokenException.class)
     public void checkInvitationToken_invitationTokenNotFound() {
         var principalId = mockUtil.savedAdmin().getId();
-        var request = new EvaluatorRegistrationRequest(genEmail(), uuid());
+        var request = new EvaluatorRegistrationRequest(genEmail(), MockUtil.createMultipartFile());
         var pending = service.createPendingEvaluator(request, principalId);
         service.checkInvitationToken(pending.getToken());
     }
@@ -247,7 +247,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
     public void deletePendingEvaluator_whenInRequestedStatus() {
         var user = mockUtil.savedUserProfile();
 
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         service.createPendingEvaluator(request, user.getId());
 
         assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));

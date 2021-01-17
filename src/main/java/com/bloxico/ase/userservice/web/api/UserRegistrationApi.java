@@ -6,6 +6,7 @@ import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import io.swagger.annotations.*;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_SUBMIT              = "/user/registration/evaluator/submit";
     String REGISTRATION_EVALUATOR_REQUEST             = "/user/registration/evaluator/request";
     String REGISTRATION_EVALUATOR_SEARCH              = "/user/registration/evaluator/search";
+    String REGISTRATION_EVALUATOR_RESUME_DOWNLOAD     = "/user/registration/evaluator/resume";
 
     String TOKEN_PARAM = "token";
 
@@ -124,14 +126,14 @@ public interface UserRegistrationApi {
     @PostMapping(
             value = REGISTRATION_EVALUATOR_REQUEST,
             produces = {"application/json"},
-            consumes = {"application/json"})
+            consumes = {"multipart/form-data"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'register_as_evaluator')")
     @ApiOperation(value = "Registers user as a pending evaluator in status REQUESTED.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Invitation is sent successfully."),
             @ApiResponse(code = 409, message = "Evaluator with given email is already pending evaluator.")
     })
-    ResponseEntity<Void> requestEvaluatorRegistration(@Valid @RequestBody EvaluatorRegistrationRequest request, Principal principal);
+    ResponseEntity<Void> requestEvaluatorRegistration(EvaluatorRegistrationRequest request, Principal principal);
 
     @PostMapping(
             value = REGISTRATION_EVALUATOR_SUBMIT,
@@ -151,5 +153,13 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 200, message = "Paginated list of pending evaluators successfully retrieved.")
     })
     ResponseEntity<ArrayPendingEvaluatorDataResponse> searchPendingEvaluators(@Valid @RequestParam("email") String email, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "email") String sort);
+
+    @GetMapping(value = REGISTRATION_EVALUATOR_RESUME_DOWNLOAD)
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'download_user_resume')")
+    @ApiOperation(value = "Download pending evaluator cv.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "CV successfully downloaded.")
+    })
+    ResponseEntity<Resource> downloadEvaluatorResume(@Valid @RequestParam("email") String email, Principal principal);
 
 }

@@ -4,12 +4,17 @@ import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
+import com.bloxico.ase.userservice.service.aws.IS3Service;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +22,7 @@ import java.util.UUID;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.RESUME_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -26,9 +32,12 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
 
     private final PendingEvaluatorRepository pendingEvaluatorRepository;
 
+    private final IS3Service s3Service;
+
     @Autowired
-    public PendingEvaluatorServiceImpl(PendingEvaluatorRepository pendingEvaluatorRepository) {
+    public PendingEvaluatorServiceImpl(PendingEvaluatorRepository pendingEvaluatorRepository, IS3Service s3Service) {
         this.pendingEvaluatorRepository = pendingEvaluatorRepository;
+        this.s3Service = s3Service;
     }
 
     @Override
@@ -106,6 +115,18 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
         return pendingEvaluators;
     }
 
+    @Override
+    public ByteArrayResource getEvaluatorResume(String email, long principalId) {
+        requireNonNull(email);
+        var cvPath = pendingEvaluatorRepository
+                .findByEmailIgnoreCase(email)
+                .orElseThrow(TOKEN_NOT_FOUND::newException)
+                .getCvPath();
+        if(StringUtils.isEmpty(cvPath))
+            throw RESUME_NOT_FOUND.newException();
+        return s3Service.downloadFile(cvPath);
+    }
+
     private PendingEvaluator updateStatus(PendingEvaluator pendingEvaluator, Status status, long principalId) {
         pendingEvaluator.setStatus(status);
         pendingEvaluator.setUpdaterId(principalId);
@@ -116,6 +137,10 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
         var pendingEvaluator = MAPPER.toPendingEvaluator(request);
         pendingEvaluator.setToken(UUID.randomUUID().toString());
         pendingEvaluator.setCreatorId(principalId);
+        if(request.getCv() != null) {
+            var filePath = s3Service.uploadFile(request.getCv());
+            pendingEvaluator.setCvPath(filePath);
+        }
         return pendingEvaluatorRepository.saveAndFlush(pendingEvaluator);
     }
 

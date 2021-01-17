@@ -41,7 +41,13 @@ public interface ErrorCodes {
         ROLE_NOT_FOUND (
                 HttpStatus.BAD_REQUEST,
                 "5",
-                "When filtering users, if role parameter is non existing role.");
+                "When filtering users, if role parameter is non existing role."),
+
+        RESUME_NOT_FOUND (
+                HttpStatus.BAD_REQUEST,
+                "6",
+                "When downloading user resume, if resume path is null or empty."
+        );
 
         private final HttpStatus httpStatus;
         private final String code, description;

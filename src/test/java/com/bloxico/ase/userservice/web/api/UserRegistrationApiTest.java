@@ -377,7 +377,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     public void requestEvaluatorRegistration_200_pendingEvaluatorSuccessfullyRegistered() {
         var registration = mockUtil.doConfirmedRegistration();
 
-        var request = new EvaluatorRegistrationRequest(registration.getEmail(), "storage.com/cv-123.docx");
+        var request = new EvaluatorRegistrationRequest(registration.getEmail(), MockUtil.createMultipartFile());
         given()
                 .header("Authorization", mockUtil.doAuthentication(registration))
                 .contentType(JSON)
@@ -394,7 +394,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
         var registration = mockUtil.doConfirmedRegistration();
         var bearerToken = mockUtil.doAuthentication(registration);
 
-        var request = new EvaluatorRegistrationRequest(registration.getEmail(), "storage.com/cv-123.docx");
+        var request = new EvaluatorRegistrationRequest(registration.getEmail(), MockUtil.createMultipartFile());
         given()
                 .header("Authorization", bearerToken)
                 .contentType(JSON)

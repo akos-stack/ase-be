@@ -203,8 +203,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     public void sendEvaluatorInvitation_evaluatorAlreadyRequested() {
         var user = mockUtil.savedUserProfile();
         var admin = mockUtil.savedAdmin();
-
-        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
+        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         userRegistrationFacade.requestEvaluatorRegistration(registrationRequest, user.getId());
 
         var pendingEvaluator = pendingEvaluatorRepository
@@ -256,7 +255,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     @Test(expected = TokenException.class)
     public void checkEvaluatorInvitation_invitationTokenNotFound() {
         var principalId = mockUtil.savedAdmin().getId();
-        var request = new EvaluatorRegistrationRequest(genEmail(), uuid());
+        var request = new EvaluatorRegistrationRequest(genEmail(), MockUtil.createMultipartFile());
         var pending = pendingEvaluatorService.createPendingEvaluator(request, principalId);
         userRegistrationFacade.checkEvaluatorInvitation(pending.getToken());
     }
@@ -349,7 +348,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     public void requestEvaluatorRegistration_evaluatorAlreadyRegistered() {
         var user = mockUtil.savedUserProfile();
 
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
 
         assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
@@ -368,7 +367,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
         assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
 
-        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
+        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         userRegistrationFacade.requestEvaluatorRegistration(registrationRequest, user.getId());
     }
 
@@ -377,7 +376,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         var user = mockUtil.savedUserProfile();
 
         var cvPath = "storage.com/cv-123.docx";
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), cvPath);
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
 
         var newlyCreatedPendingEvaluator = pendingEvaluatorRepository

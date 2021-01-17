@@ -80,6 +80,7 @@ public interface AseMapper {
 
     EvaluatorDto toEvaluatorDto(SubmitEvaluatorRequest request);
 
+    @Mapping(ignore = true, target = "cvPath")
     PendingEvaluator toPendingEvaluator(IPendingEvaluatorRequest request);
 
 }

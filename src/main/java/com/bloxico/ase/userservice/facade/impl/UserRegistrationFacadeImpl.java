@@ -16,6 +16,7 @@ import com.bloxico.ase.userservice.web.model.token.*;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -167,6 +168,14 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var pendingEvaluatorDtos = pendingEvaluatorService.searchPendingEvaluators(email, page, size, sort);
         var response = new ArrayPendingEvaluatorDataResponse(pendingEvaluatorDtos);
         log.info("UserRegistrationFacadeImpl.searchPendingEvaluators - end | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
+        return response;
+    }
+
+    @Override
+    public ByteArrayResource downloadEvaluatorResume(String email, long principalId) {
+        log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - start | email: {}, principalId: {}", email, principalId);
+        var response = pendingEvaluatorService.getEvaluatorResume(email, principalId);
+        log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - end | email: {}, principalId: {}", email, principalId);
         return response;
     }
 

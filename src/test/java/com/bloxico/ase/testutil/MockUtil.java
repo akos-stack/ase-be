@@ -37,8 +37,10 @@ import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -471,6 +473,10 @@ public class MockUtil {
                 .map(EvaluatorInvitationRequest::new)
                 .map(request -> pendingEvaluatorService.createPendingEvaluator(request, adminId))
                 .collect(Collectors.toList());
+    }
+
+    public static MultipartFile createMultipartFile() {
+        return new MockMultipartFile("file.txt", "file.txt", "text/plain", "Some file".getBytes());
     }
 
     private static final AtomicLong along = new AtomicLong(0);

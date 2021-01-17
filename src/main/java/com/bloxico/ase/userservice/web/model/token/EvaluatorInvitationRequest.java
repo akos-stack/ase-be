@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Value;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -35,7 +36,7 @@ public class EvaluatorInvitationRequest implements IPendingEvaluatorRequest {
 
     @JsonIgnore
     @Override
-    public String getCvPath() {
+    public MultipartFile getCv() {
         return null;
     }
 
