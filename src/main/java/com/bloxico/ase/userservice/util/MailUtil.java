@@ -2,13 +2,9 @@ package com.bloxico.ase.userservice.util;
 
 import com.mitchellbosecke.pebble.PebbleEngine;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.core.io.Resource;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.mail.javamail.*;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -43,12 +39,6 @@ public class MailUtil {
         }
 
     }
-
-    @Value("${spring.profiles.active}")
-    private String activeProfile;
-
-    @Value("${spring.support.email}")
-    private String supportEmail;
 
     @Value("classpath:images/enrglogo.jpg")
     private Resource logoImage;

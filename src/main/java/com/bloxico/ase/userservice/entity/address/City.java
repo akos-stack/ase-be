@@ -1,8 +1,7 @@
 package com.bloxico.ase.userservice.entity.address;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -11,6 +10,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = {"country", "name", "zipCode"}, callSuper = false)
+@ToString(exclude = "country")
 @Entity
 @Table(name = "cities")
 public class City extends BaseEntity {

@@ -1,8 +1,7 @@
 package com.bloxico.ase.userservice.entity.address;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -12,6 +11,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = {"city", "address"}, callSuper = false)
+@ToString(exclude = "city")
 @Entity
 @Table(name = "locations")
 public class Location extends BaseEntity {

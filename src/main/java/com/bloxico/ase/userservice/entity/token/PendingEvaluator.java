@@ -15,6 +15,19 @@ import static javax.persistence.EnumType.STRING;
 @Table(name = "pending_evaluators")
 public class PendingEvaluator extends BaseEntity {
 
+    public enum Status {
+
+        INVITED,
+        REQUESTED;
+
+        public PendingEvaluator requireDifferentStatus(PendingEvaluator check) {
+            if (check.getStatus() == this || (this == REQUESTED && check.getStatus() == INVITED))
+                throw TOKEN_EXISTS.newException();
+            return check;
+        }
+
+    }
+
     @Id
     @Column(name = "email")
     private String email;
@@ -28,18 +41,5 @@ public class PendingEvaluator extends BaseEntity {
 
     @Column(name = "cv_path")
     private String cvPath;
-
-    public enum Status {
-
-        INVITED,
-        REQUESTED;
-
-        public PendingEvaluator requireDifferentStatus(PendingEvaluator check) {
-            if (check.getStatus() == this || (this == REQUESTED && check.getStatus() == INVITED))
-                throw TOKEN_EXISTS.newException();
-            return check;
-        }
-
-    }
 
 }

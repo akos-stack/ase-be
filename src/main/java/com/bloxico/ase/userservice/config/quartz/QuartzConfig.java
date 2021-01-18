@@ -11,10 +11,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 import javax.sql.DataSource;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -67,7 +64,7 @@ public class QuartzConfig {
         var jobsAndTriggers = pairJobsAndTriggers(jobDetails, triggers);
         scheduler.scheduleJobs(jobsAndTriggers, false);
         scheduler.start();
-        log.info("QuartzConfig.scheduler - started with scheduled jobs: {}",
+        log.info("QuartzConfig.scheduler - started with scheduled jobs: " +
                 jobsAndTriggers.keySet().stream()
                         .map(JobDetail::getKey)
                         .sorted()

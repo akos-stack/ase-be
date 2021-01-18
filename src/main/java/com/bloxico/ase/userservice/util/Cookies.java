@@ -2,9 +2,7 @@ package com.bloxico.ase.userservice.util;
 
 import org.springframework.util.SerializationUtils;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -51,8 +49,7 @@ public class Cookies {
     }
 
     public static <T> T deserialize(Cookie cookie, Class<T> type) {
-        return type.cast(SerializationUtils
-                .deserialize(Base64.getUrlDecoder().decode(cookie.getValue())));
+        return type.cast(SerializationUtils.deserialize(Base64.getUrlDecoder().decode(cookie.getValue())));
     }
 
 }
