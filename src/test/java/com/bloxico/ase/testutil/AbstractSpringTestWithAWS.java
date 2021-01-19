@@ -23,7 +23,7 @@ public abstract class AbstractSpringTestWithAWS extends AbstractSpringTest {
 
     @Before
     public void setUpAmazonS3Mock() {
-        api = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
+        api = new S3Mock.Builder().withPort(8005).withInMemoryBackend().build();
         api.start();
         amazonS3.createBucket(bucketName);
     }
