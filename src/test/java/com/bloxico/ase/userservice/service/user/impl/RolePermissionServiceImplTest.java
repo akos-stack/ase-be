@@ -21,7 +21,7 @@ public class RolePermissionServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void permissionNameGrantedAuthoritiesMap() {
-        var role = mockUtil.savedUserProfile().getRoles().iterator().next();
+        var role = mockUtil.savedUser().getRoles().iterator().next();
         assertFalse(role.getPermissions().isEmpty());
         var map = rolePermissionService.permissionNameGrantedAuthoritiesMap();
         assertFalse(map.isEmpty());

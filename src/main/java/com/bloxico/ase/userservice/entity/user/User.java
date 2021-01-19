@@ -1,27 +1,22 @@
 package com.bloxico.ase.userservice.entity.user;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
-import com.bloxico.ase.userservice.entity.address.Location;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.FetchType.EAGER;
-import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = "email", callSuper = false)
 @ToString(exclude = "roles")
 @Entity
-@Table(name = "user_profiles")
-public class UserProfile extends BaseEntity {
+@Table(name = "users")
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -35,25 +30,6 @@ public class UserProfile extends BaseEntity {
 
     @Column(name = "email")
     private String email;
-
-    @Column(name = "first_name")
-    private String firstName;
-
-    @Column(name = "last_name")
-    private String lastName;
-
-    @Column(name = "phone")
-    private String phone;
-
-    @Column(name = "birthday")
-    private LocalDate birthday;
-
-    @Column(name = "gender")
-    private String gender;
-
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "location_id")
-    private Location location;
 
     @Column(name = "locked")
     private Boolean locked = false;
@@ -69,8 +45,8 @@ public class UserProfile extends BaseEntity {
 
     @ManyToMany(fetch = EAGER, cascade = MERGE)
     @JoinTable(
-            name = "user_profiles_roles",
-            joinColumns = @JoinColumn(name = "user_profile_id"),
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 

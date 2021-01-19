@@ -2,9 +2,7 @@ package com.bloxico.ase.userservice.service.address.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
+import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

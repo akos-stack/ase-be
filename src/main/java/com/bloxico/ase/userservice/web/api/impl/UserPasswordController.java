@@ -2,10 +2,7 @@ package com.bloxico.ase.userservice.web.api.impl;
 
 import com.bloxico.ase.userservice.facade.IUserPasswordFacade;
 import com.bloxico.ase.userservice.web.api.UserPasswordApi;
-import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
-import com.bloxico.ase.userservice.web.model.password.ForgottenPasswordUpdateRequest;
-import com.bloxico.ase.userservice.web.model.password.KnownPasswordUpdateRequest;
-import com.bloxico.ase.userservice.web.model.password.SetPasswordRequest;
+import com.bloxico.ase.userservice.web.model.password.*;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

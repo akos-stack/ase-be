@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.entity.user;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -23,6 +22,25 @@ public class Role implements Serializable {
     public static final String USER = "user";
     public static final String EVALUATOR = "evaluator";
 
+    @Getter // Note: Currently not used
+    public enum Value {
+
+        ADMIN("admin"),
+        USER("user"),
+        EVALUATOR("evaluator");
+
+        private final String name;
+
+        Value(String name) {
+            this.name = name;
+        }
+
+        public List<Value> allRoles() {
+            return List.of(values());
+        }
+
+    }
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Short id;
@@ -41,23 +59,4 @@ public class Role implements Serializable {
         permissions.add(permission);
     }
 
-    public enum UserRole {
-        ADMIN("admin"),
-        USER("user"),
-        EVALUATOR("evaluator");
-
-        private String name;
-
-        UserRole(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public ArrayList<Enum> getAllUserRoles() {
-            return new ArrayList<Enum>(EnumSet.allOf(UserRole.class));
-        }
-    }
 }

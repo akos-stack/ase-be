@@ -1,4 +1,4 @@
-package com.bloxico.ase.userservice.dto.entity.user;
+package com.bloxico.ase.userservice.dto.entity.user.profile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

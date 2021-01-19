@@ -1,7 +1,5 @@
 package com.bloxico.ase.userservice.config.security;
 
-import com.bloxico.ase.userservice.config.security.AsePrincipal;
-import com.bloxico.ase.userservice.config.security.PersistentJwtTokenStore;
 import com.bloxico.ase.userservice.entity.user.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -65,11 +63,11 @@ public class TokenStoreConfig {
     private static class CustomTokenEnhancer extends JwtAccessTokenConverter {
         @Override
         public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-            var userDetails = (AsePrincipal) authentication.getPrincipal();
+            var principal = (AsePrincipal) authentication.getPrincipal();
 
             var info = new LinkedHashMap<>(accessToken.getAdditionalInformation());
-            info.put("id", userDetails.getUserProfile().getId());
-            info.put("roles", userDetails.getUserProfile().getRoles().stream().map(Role::getName).collect(toList()));
+            info.put("id", principal.getUser().getId());
+            info.put("roles", principal.getUser().getRoles().stream().map(Role::getName).collect(toList()));
 
             var customAccessToken = new DefaultOAuth2AccessToken(accessToken);
             customAccessToken.setAdditionalInformation(info);

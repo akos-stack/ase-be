@@ -3,12 +3,12 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.exception.TokenException;
-import com.bloxico.ase.userservice.exception.UserProfileException;
+import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
-import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
+import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
-import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
+import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.*;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     private TokenRepository tokenRepository;
 
     @Autowired
-    private UserProfileServiceImpl userProfileService;
+    private UserServiceImpl userService;
 
     @Autowired
     private PendingEvaluatorServiceImpl pendingEvaluatorService;
@@ -54,13 +54,13 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         userRegistrationFacade.registerUserWithVerificationToken(null);
     }
 
-    @Test(expected = UserProfileException.class)
+    @Test(expected = UserException.class)
     public void registerUserWithVerificationToken_passwordMismatch() {
         var request = new RegistrationRequest("passwordMismatch@mail.com", "Password1!", "Password2!");
         userRegistrationFacade.registerUserWithVerificationToken(request);
     }
 
-    @Test(expected = UserProfileException.class)
+    @Test(expected = UserException.class)
     public void registerUserWithVerificationToken_userAlreadyExists() {
         var request1 = new RegistrationRequest("temp@mail.com", "Password1!", "Password1!");
         var request2 = new RegistrationRequest("temp@mail.com", "Password1!", "Password1!");
@@ -80,7 +80,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         userRegistrationFacade.handleTokenValidation(null);
     }
 
-    @Test(expected = UserProfileException.class)
+    @Test(expected = UserException.class)
     public void handleTokenValidation_userNotFound() {
         var invalid = uuid();
         var request = new TokenValidationRequest(invalid, invalid);
@@ -104,7 +104,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         var tknRequest = new TokenValidationRequest(email, token);
         userRegistrationFacade.handleTokenValidation(tknRequest);
         assertTrue(tokenRepository.findByValue(token).isEmpty());
-        assertTrue(userProfileService.findUserProfileByEmail(email).getEnabled());
+        assertTrue(userService.findUserByEmail(email).getEnabled());
     }
 
     @Test(expected = NullPointerException.class)
@@ -143,7 +143,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         userRegistrationFacade.resendVerificationToken(null);
     }
 
-    @Test(expected = UserProfileException.class)
+    @Test(expected = UserException.class)
     public void resendVerificationToken_userNotFound() {
         var request = new ResendTokenRequest(uuid());
         userRegistrationFacade.resendVerificationToken(request);
@@ -174,8 +174,8 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         var request = mockUtil.newSubmitInvitedEvaluatorRequest();
         assertTrue(evaluatorRepository.findAll().isEmpty());
         userRegistrationFacade.submitEvaluator(request);
-        var userProfile = userProfileService.findUserProfileByEmail(request.getEmail());
-        assertEquals(userProfile, userProfileService.findUserProfileByEmail(userProfile.getEmail()));
+        var user = userService.findUserByEmail(request.getEmail());
+        assertEquals(user, userService.findUserByEmail(user.getEmail()));
     }
 
     @Test(expected = NullPointerException.class)
@@ -187,7 +187,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void sendEvaluatorInvitation_evaluatorAlreadyInvited() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -201,7 +201,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void sendEvaluatorInvitation_evaluatorAlreadyRequested() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
@@ -225,7 +225,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void sendEvaluatorInvitation() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -288,7 +288,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void resendEvaluatorInvitation() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         // send invitation to user
@@ -321,7 +321,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void withdrawEvaluatorInvitation() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         // send invitation to user
@@ -347,7 +347,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void requestEvaluatorRegistration_evaluatorAlreadyRegistered() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
         userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
@@ -360,7 +360,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void requestEvaluatorRegistration_evaluatorAlreadyInvited() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var invitationRequest = new EvaluatorInvitationRequest(user.getEmail());
@@ -374,7 +374,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void requestEvaluatorRegistration() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
 
         var cvPath = "storage.com/cv-123.docx";
         var request = new EvaluatorRegistrationRequest(user.getEmail(), cvPath);

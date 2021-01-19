@@ -417,6 +417,8 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
                 .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_EXISTS.getCode()));
     }
 
+    // TODO fix assertion
+
     @Test
     public void submitEvaluator_200_ok() {
         var request = mockUtil.newSubmitInvitedEvaluatorRequest();

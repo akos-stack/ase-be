@@ -1,34 +1,27 @@
 package com.bloxico.ase.testutil;
 
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
+import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
-import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.dto.entity.user.UserDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
 import com.bloxico.ase.userservice.entity.BaseEntity;
-import com.bloxico.ase.userservice.entity.address.City;
-import com.bloxico.ase.userservice.entity.address.Country;
-import com.bloxico.ase.userservice.entity.address.Location;
+import com.bloxico.ase.userservice.entity.address.*;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.entity.token.Token;
-import com.bloxico.ase.userservice.entity.user.UserProfile;
-import com.bloxico.ase.userservice.facade.impl.UserManagementFacadeImpl;
-import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImpl;
-import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
-import com.bloxico.ase.userservice.repository.address.CityRepository;
-import com.bloxico.ase.userservice.repository.address.CountryRepository;
-import com.bloxico.ase.userservice.repository.address.LocationRepository;
+import com.bloxico.ase.userservice.entity.user.User;
+import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
+import com.bloxico.ase.userservice.facade.impl.*;
+import com.bloxico.ase.userservice.repository.address.*;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
-import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
-import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
-import com.bloxico.ase.userservice.repository.token.TokenRepository;
+import com.bloxico.ase.userservice.repository.token.*;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
-import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
+import com.bloxico.ase.userservice.repository.user.UserRepository;
+import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
-import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
+import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
@@ -57,6 +50,7 @@ import static io.restassured.http.ContentType.JSON;
 import static io.restassured.http.ContentType.URLENC;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
+import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.ThreadLocalRandom.current;
 import static java.util.function.Predicate.not;
 import static org.junit.Assert.assertTrue;
@@ -77,8 +71,8 @@ public class MockUtil {
 
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-    private final UserProfileRepository userProfileRepository;
-    private final UserProfileServiceImpl userProfileService;
+    private final UserRepository userRepository;
+    private final UserServiceImpl userService;
     private final UserPasswordFacadeImpl userPasswordFacade;
     private final OAuthAccessTokenRepository oAuthAccessTokenRepository;
     private final TokenRepository tokenRepository;
@@ -90,12 +84,13 @@ public class MockUtil {
     private final UserRegistrationFacadeImpl userRegistrationFacade;
     private final PendingEvaluatorRepository pendingEvaluatorRepository;
     private final PendingEvaluatorServiceImpl pendingEvaluatorService;
+    private final UserProfileRepository userProfileRepository;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
                     RoleRepository roleRepository,
-                    UserProfileRepository userProfileRepository,
-                    UserProfileServiceImpl userProfileService,
+                    UserRepository userRepository,
+                    UserServiceImpl userService,
                     UserPasswordFacadeImpl userPasswordFacade,
                     OAuthAccessTokenRepository oAuthAccessTokenRepository,
                     TokenRepository tokenRepository,
@@ -106,12 +101,13 @@ public class MockUtil {
                     LocationRepository locationRepository,
                     UserRegistrationFacadeImpl userRegistrationFacade,
                     PendingEvaluatorRepository pendingEvaluatorRepository,
-                    PendingEvaluatorServiceImpl pendingEvaluatorService)
+                    PendingEvaluatorServiceImpl pendingEvaluatorService,
+                    UserProfileRepository userProfileRepository)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
-        this.userProfileRepository = userProfileRepository;
-        this.userProfileService = userProfileService;
+        this.userRepository = userRepository;
+        this.userService = userService;
         this.userPasswordFacade = userPasswordFacade;
         this.oAuthAccessTokenRepository = oAuthAccessTokenRepository;
         this.tokenRepository = tokenRepository;
@@ -123,48 +119,74 @@ public class MockUtil {
         this.userRegistrationFacade = userRegistrationFacade;
         this.pendingEvaluatorRepository = pendingEvaluatorRepository;
         this.pendingEvaluatorService = pendingEvaluatorService;
+        this.userProfileRepository = userProfileRepository;
     }
 
-    public UserProfile savedAdmin() {
+    public User savedAdmin() {
         return savedAdmin(genEmail());
     }
 
-    public UserProfile savedAdmin(String password) {
+    public User savedAdmin(String password) {
         return savedAdmin(genEmail(), password);
     }
 
-    public UserProfile savedAdmin(String email, String password) {
-        var user = new UserProfile();
+    public User savedAdmin(String email, String password) {
+        var user = new User();
         user.setName(email.split("@")[0]);
         user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
         user.setLocked(false);
         user.setEnabled(true);
         user.addRole(roleRepository.getAdminRole());
-        return userProfileRepository.saveAndFlush(user);
+        return userRepository.saveAndFlush(user);
     }
 
-    public UserProfile savedUserProfile() {
-        return savedUserProfile(genEmail());
+    public User savedUser() {
+        return savedUser(genEmail());
     }
 
-    public UserProfile savedUserProfile(String password) {
-        return savedUserProfile(genEmail(), password);
+    public User savedUser(String password) {
+        return savedUser(genEmail(), password);
     }
 
-    public UserProfile savedUserProfile(String email, String password) {
-        var user = new UserProfile();
+    public User savedUser(String email, String password) {
+        var user = new User();
         user.setName(email.split("@")[0]);
         user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
         user.setLocked(false);
         user.setEnabled(true);
         user.addRole(roleRepository.getUserRole());
-        return userProfileRepository.saveAndFlush(user);
+        return userRepository.saveAndFlush(user);
+    }
+
+    public UserDto savedUserDto() {
+        return MAPPER.toDto(savedUser());
+    }
+
+    public UserProfile savedUserProfile(long userId) {
+        var userProfile = new UserProfile();
+        userProfile.setUserId(userId);
+        userProfile.setFirstName(uuid());
+        userProfile.setLastName(uuid());
+        userProfile.setBirthday(LocalDate.now().minusYears(20));
+        userProfile.setGender(uuid());
+        userProfile.setPhone(uuid());
+        userProfile.setLocation(savedLocation());
+        userProfile.setCreatorId(userId);
+        return userProfileRepository.saveAndFlush(userProfile);
+    }
+
+    public UserProfile savedUserProfile() {
+        return savedUserProfile(savedUser().getId());
+    }
+
+    public UserProfileDto savedUserProfileDto(long userId) {
+        return MAPPER.toDto(savedUserProfile(userId));
     }
 
     public UserProfileDto savedUserProfileDto() {
-        return MAPPER.toDto(savedUserProfile());
+        return savedUserProfileDto(savedUser().getId());
     }
 
     public Country savedCountry() {
@@ -226,7 +248,7 @@ public class MockUtil {
     }
 
     public Token savedExpiredToken(Token.Type type, String value) {
-        var userId = savedUserProfile().getId();
+        var userId = savedUser().getId();
         var token = new Token();
         token.setUserId(userId);
         token.setValue(value);
@@ -275,7 +297,7 @@ public class MockUtil {
 
     public BlacklistedToken savedBlacklistedToken() {
         var adminId = savedAdmin().getId();
-        var user = savedUserProfile();
+        var user = savedUser();
         var token = savedOauthTokenDto(user.getEmail());
         userManagementFacade.blacklistTokens(user.getId(), adminId);
         return getBlacklistedToken(token.getTokenId());
@@ -283,7 +305,7 @@ public class MockUtil {
 
     public BlacklistedToken savedExpiredBlacklistedToken() {
         var adminId = savedAdmin().getId();
-        var user = savedUserProfile();
+        var user = savedUser();
         var token = savedExpiredOauthTokenDto(user.getEmail());
         userManagementFacade.blacklistTokens(user.getId(), adminId);
         return getBlacklistedToken(token.getTokenId());
@@ -296,8 +318,8 @@ public class MockUtil {
         to.setUpdatedAt(from.getUpdatedAt());
     }
 
-    public OAuthAccessTokenDto toOAuthAccessTokenDto(UserProfile userProfile, String token) {
-        return toOAuthAccessTokenDto(userProfile.getEmail(), token);
+    public OAuthAccessTokenDto toOAuthAccessTokenDto(User user, String token) {
+        return toOAuthAccessTokenDto(user.getEmail(), token);
     }
 
     public OAuthAccessTokenDto toOAuthAccessTokenDto(String email, String token) {
@@ -312,13 +334,13 @@ public class MockUtil {
     }
 
     public void disableUser(Long userId) {
-        var user = userProfileRepository
+        var user = userRepository
                 .findById(userId)
                 .orElseThrow();
         assertTrue(user.getEnabled());
         user.setEnabled(false);
         user.setUpdaterId(user.getId());
-        userProfileRepository.saveAndFlush(user);
+        userRepository.saveAndFlush(user);
     }
 
     public SubmitEvaluatorRequest newSubmitUninvitedEvaluatorRequest() {
@@ -360,7 +382,7 @@ public class MockUtil {
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .getBody()
                 .path("token_value");
-        long id = userProfileService.findUserProfileByEmail(email).getId();
+        long id = userService.findUserByEmail(email).getId();
         return new Registration(id, email, pass, token);
     }
 
@@ -384,7 +406,7 @@ public class MockUtil {
     }
 
     public String doAuthentication(String password) {
-        var email = savedUserProfile(password).getEmail();
+        var email = savedUser(password).getEmail();
         return doAuthentication(email, password);
     }
 
@@ -400,8 +422,12 @@ public class MockUtil {
         return doAuthentication(email, password);
     }
 
+    public String doAuthentication(User user) {
+        return doAuthentication(user.getEmail(), user.getPassword());
+    }
+
     public String doAuthentication(String email, String password) {
-        return "Bearer " + given()
+        return "Bearer " + requireNonNull(given()
                 .contentType(URLENC)
                 .accept(JSON)
                 .formParams(
@@ -416,7 +442,7 @@ public class MockUtil {
                 .post(API_URL + "/oauth/token")
                 .body()
                 .jsonPath()
-                .getString("access_token");
+                .getString("access_token"));
     }
 
     public Response doAuthenticationRequest(Registration registration) {
@@ -438,11 +464,14 @@ public class MockUtil {
     public String doForgotPasswordRequest(String email) {
         var request = new ForgotPasswordRequest(email);
         userPasswordFacade.handleForgotPasswordRequest(request);
-        var userId = userProfileService.findUserProfileByEmail(email).getId();
-        return tokenRepository.findByTypeAndUserId(PASSWORD_RESET, userId).orElseThrow().getValue();
+        var userId = userService.findUserByEmail(email).getId();
+        return tokenRepository
+                .findByTypeAndUserId(PASSWORD_RESET, userId)
+                .orElseThrow()
+                .getValue();
     }
 
-    public void saveUserProfiles() {
+    public void saveUsers() {
         savedAdmin("user1@gmail.com", "123!");
         savedAdmin("user2@gmail.com", "123!");
         savedAdmin("user3@gmail.com", "123!");

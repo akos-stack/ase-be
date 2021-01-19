@@ -10,4 +10,5 @@ public interface IS3Service {
     ByteArrayResource downloadFile(String fileName);
 
     boolean deleteFile(String fileName);
+
 }

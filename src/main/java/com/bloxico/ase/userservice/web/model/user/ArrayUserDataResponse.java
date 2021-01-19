@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.web.model.user;
 
-import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.dto.entity.user.UserDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Value;
@@ -8,11 +8,11 @@ import lombok.Value;
 import java.util.List;
 
 @Value
-public class ArrayUserProfileDataResponse {
+public class ArrayUserDataResponse {
 
-    @JsonProperty("user_profiles")
+    @JsonProperty("users")
     @ApiModelProperty(required = true)
-    List<UserProfileDto> userProfiles;
+    List<UserDto> users;
 
     @JsonProperty("count")
     @ApiModelProperty(required = true)

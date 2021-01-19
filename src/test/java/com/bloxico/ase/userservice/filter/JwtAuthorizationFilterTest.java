@@ -34,7 +34,7 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
         given()
                 .header("Authorization", uuid())
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest("updated_name", "updated_phone"))
+                .body(new UpdateUserProfileRequest(uuid(), uuid(), uuid()))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()
@@ -52,7 +52,7 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
         given()
                 .header("Authorization", refreshToken)
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest("updated_name", "updated_phone"))
+                .body(new UpdateUserProfileRequest(uuid(), uuid(), uuid()))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()
@@ -63,14 +63,14 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
     @Test
     public void doFilterInternal_403_blacklistedAccessToken() {
         var admin = mockUtil.savedAdmin();
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var accessToken = mockUtil.doAuthentication(user.getEmail(), user.getPassword());
         var oauthToken = mockUtil.toOAuthAccessTokenDto(user, accessToken);
         blacklistService.blacklistTokens(List.of(oauthToken), admin.getId());
         given()
                 .header("Authorization", accessToken)
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest("updated_name", "updated_phone"))
+                .body(new UpdateUserProfileRequest(uuid(), uuid(), uuid()))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()
@@ -80,11 +80,13 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
 
     @Test
     public void doFilterInternal_200_ok() {
-        var accessToken = mockUtil.doAuthentication();
+        var user = mockUtil.savedAdmin();
+        mockUtil.savedUserProfile(user.getId());
+        var accessToken = mockUtil.doAuthentication(user);
         given()
                 .header("Authorization", accessToken)
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest("updated_name", "updated_phone"))
+                .body(new UpdateUserProfileRequest(uuid(), uuid(), uuid()))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()

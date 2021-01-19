@@ -2,10 +2,7 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.userservice.dto.entity.address.CityDto;
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 

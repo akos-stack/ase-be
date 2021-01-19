@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.facade;
 
-import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;

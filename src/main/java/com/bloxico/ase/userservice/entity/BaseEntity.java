@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.entity;
 
-import com.bloxico.ase.userservice.entity.user.UserProfile;
+import com.bloxico.ase.userservice.entity.user.User;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -32,7 +32,7 @@ public abstract class BaseEntity implements Serializable {
 
     @PrePersist
     void prePersist() {
-        if (!(this instanceof UserProfile))
+        if (!(this instanceof User))
             requireNonNull(getCreatorId());
         setCreatedAt(LocalDateTime.now());
     }

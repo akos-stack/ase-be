@@ -1,14 +1,8 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.web.model.password.ForgottenPasswordUpdateRequest;
-import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
-import com.bloxico.ase.userservice.web.model.password.KnownPasswordUpdateRequest;
-import com.bloxico.ase.userservice.web.model.password.SetPasswordRequest;
+import com.bloxico.ase.userservice.web.model.password.*;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;

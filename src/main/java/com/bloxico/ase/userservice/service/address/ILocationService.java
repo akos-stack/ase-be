@@ -1,8 +1,6 @@
 package com.bloxico.ase.userservice.service.address;
 
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
+import com.bloxico.ase.userservice.dto.entity.address.*;
 
 import java.util.List;
 

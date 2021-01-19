@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_ENDPOINT;
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_UPDATE_ENDPOINT;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
@@ -27,32 +27,38 @@ public class UserProfileApiTest extends AbstractSpringTest {
 
     @Test
     public void accessMyProfile_200_ok() {
+        var user = mockUtil.savedUser();
+        var userProfile = mockUtil.savedUserProfile(user.getId());
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", mockUtil.doAuthentication(user))
                 .when()
                 .get(API_URL + MY_PROFILE_ENDPOINT)
                 .then()
                 .assertThat()
                 .statusCode(200)
                 .body(
-                        "user_profile.id", notNullValue(),
-                        "user_profile.locked", is(false),
-                        "user_profile.enabled", is(true));
+                        "user_profile.first_name", is(userProfile.getFirstName()),
+                        "user_profile.last_name", is(userProfile.getLastName()),
+                        "user_profile.phone", is(userProfile.getPhone()));
     }
 
     @Test
     public void updateMyProfile_200_ok() {
+        var firstName = uuid();
+        var lastName = uuid();
+        var phone = uuid();
         given()
                 .header("Authorization", mockUtil.doAuthentication())
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest("updated_name", "updated_phone"))
+                .body(new UpdateUserProfileRequest(firstName, lastName, phone))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()
                 .assertThat()
                 .statusCode(200)
                 .body(
-                        "user_profile.name", is("updated_name"),
-                        "user_profile.phone", is("updated_phone"));
+                        "user_profile.first_name", is(firstName),
+                        "user_profile.last_name", is(firstName),
+                        "user_profile.phone", is(phone));
     }
 }

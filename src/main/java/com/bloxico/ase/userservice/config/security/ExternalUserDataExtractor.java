@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.config.security;
 
-import com.bloxico.ase.userservice.entity.user.UserProfile;
+import com.bloxico.ase.userservice.entity.user.User;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 
 import java.util.List;
@@ -91,7 +91,7 @@ public enum ExternalUserDataExtractor {
 
     public abstract String getName(Map<String, Object> attributes);
 
-    public UserProfile validateUserProfile(UserProfile user) {
+    public User validateUser(User user) {
         if (!user.getProvider().equalsIgnoreCase(name()))
             throw new InternalAuthenticationServiceException(
                     "Use " + user.getProvider() + " provider");
@@ -101,14 +101,14 @@ public enum ExternalUserDataExtractor {
         return user;
     }
 
-    public UserProfile updatedUserProfile(UserProfile user, Map<String, Object> attributes) {
+    public User updatedUser(User user, Map<String, Object> attributes) {
         user.setName(getName(attributes));
         user.setUpdaterId(user.getId());
         return user;
     }
 
-    public UserProfile newUserProfile(Map<String, Object> attributes) {
-        var user = new UserProfile();
+    public User newUser(Map<String, Object> attributes) {
+        var user = new User();
         user.setProvider(name());
         user.setProviderId(getId(attributes));
         user.setEmail(getEmail(attributes));

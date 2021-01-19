@@ -5,7 +5,7 @@ import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
-import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
+import com.bloxico.ase.userservice.repository.user.UserRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,7 +34,7 @@ public class QuartzOperationsFacadeImplTest extends AbstractSpringTest {
     private BlacklistedTokenRepository blacklistedTokenRepository;
 
     @Autowired
-    private UserProfileRepository userProfileRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private QuartzOperationsFacadeImpl quartzOperationsFacade;
@@ -67,7 +67,7 @@ public class QuartzOperationsFacadeImplTest extends AbstractSpringTest {
         assertEquals(
                 Set.of(validBlacklistedToken, expiredBlacklistedToken),
                 Set.copyOf(blacklistedTokenRepository.findAll()));
-        assertTrue(userProfileRepository.findById(expiredRegistrationToken.getUserId()).isPresent());
+        assertTrue(userRepository.findById(expiredRegistrationToken.getUserId()).isPresent());
 
         quartzOperationsFacade.deleteExpiredTokens();
 
@@ -81,7 +81,7 @@ public class QuartzOperationsFacadeImplTest extends AbstractSpringTest {
                 List.of(validBlacklistedToken),
                 blacklistedTokenRepository.findAll());
         entityManager.clear(); // needs to be cleared because of deleteInBatch
-        assertTrue(userProfileRepository.findById(expiredRegistrationToken.getUserId()).isEmpty());
+        assertTrue(userRepository.findById(expiredRegistrationToken.getUserId()).isEmpty());
     }
 
 }

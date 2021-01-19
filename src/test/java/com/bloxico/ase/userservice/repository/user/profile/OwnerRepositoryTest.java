@@ -1,8 +1,8 @@
-package com.bloxico.ase.userservice.repository.user;
+package com.bloxico.ase.userservice.repository.user.profile;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.entity.user.Owner;
+import com.bloxico.ase.userservice.entity.user.profile.Owner;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,9 +20,9 @@ public class OwnerRepositoryTest extends AbstractSpringTest {
     public void saveAndFindById() {
         assertTrue(repository.findById(-1L).isEmpty());
         var owner = new Owner();
-        var creator = mockUtil.savedUserProfile();
-        owner.setUserProfile(creator);
-        owner.setCreatorId(creator.getId());
+        var userProfile = mockUtil.savedUserProfile();
+        owner.setUserProfile(userProfile);
+        owner.setCreatorId(userProfile.getUserId());
         var id = repository.saveAndFlush(owner).getId();
         assertTrue(repository.findById(id).isPresent());
     }

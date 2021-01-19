@@ -1,9 +1,6 @@
 package com.bloxico.ase.userservice.facade;
 
-import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
-import com.bloxico.ase.userservice.web.model.password.ForgottenPasswordUpdateRequest;
-import com.bloxico.ase.userservice.web.model.password.KnownPasswordUpdateRequest;
-import com.bloxico.ase.userservice.web.model.password.SetPasswordRequest;
+import com.bloxico.ase.userservice.web.model.password.*;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
 
 public interface IUserPasswordFacade {

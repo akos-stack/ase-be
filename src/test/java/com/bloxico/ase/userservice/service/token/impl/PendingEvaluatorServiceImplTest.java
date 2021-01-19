@@ -41,7 +41,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void createPendingEvaluator_evaluatorAlreadyPendingAfterInvitation() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -54,7 +54,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void createPendingEvaluator_evaluatorAlreadyPendingAfterRegistration() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
         service.createPendingEvaluator(request, user.getId());
@@ -66,7 +66,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void createPendingEvaluator_evaluatorIsInvited() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -90,7 +90,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void createPendingEvaluator_evaluatorIsRequested() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
         var pendingEvaluatorDto = service.createPendingEvaluator(request, user.getId());
@@ -113,7 +113,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void createPendingEvaluator_updateFromRequestedToInvited() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
@@ -137,7 +137,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void createPendingEvaluator_updateFromInvitedToRequested() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var invitationRequest = new EvaluatorInvitationRequest(user.getEmail());
@@ -161,7 +161,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void getPendingEvaluatorToken_whenInInvitedStatus() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -178,7 +178,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void getPendingEvaluatorToken_whenInRequestedStatus() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
         var pendingEvaluator = service.createPendingEvaluator(request, user.getId());
@@ -230,7 +230,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void deletePendingEvaluator_whenInInvitedStatus() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -245,7 +245,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void deletePendingEvaluator_whenInRequestedStatus() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), "storage.com/cv-123.docx");
         service.createPendingEvaluator(request, user.getId());
@@ -274,7 +274,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void consumePendingEvaluator() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());

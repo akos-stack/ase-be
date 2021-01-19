@@ -58,7 +58,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void searchUsers_200_ok() {
-        mockUtil.saveUserProfiles();
+        mockUtil.saveUsers();
         given()
                 .header("Authorization", mockUtil.doAdminAuthentication())
                 .contentType(JSON)
@@ -69,7 +69,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("user_profiles", notNullValue());
+                .body("users", notNullValue());
     }
 
     @Test

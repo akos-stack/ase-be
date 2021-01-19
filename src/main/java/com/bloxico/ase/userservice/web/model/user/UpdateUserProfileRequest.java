@@ -15,8 +15,13 @@ public class UpdateUserProfileRequest {
 
     @NotNull
     @NotEmpty
-    @JsonProperty("name")
-    String name;
+    @JsonProperty("first_name")
+    String firstName;
+
+    @NotNull
+    @NotEmpty
+    @JsonProperty("last_name")
+    String lastName;
 
     @JsonProperty("phone")
     String phone;

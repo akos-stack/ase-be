@@ -1,18 +1,10 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.web.model.user.ArrayUserProfileDataResponse;
-import com.bloxico.ase.userservice.web.model.user.BlacklistTokensRequest;
-import com.bloxico.ase.userservice.web.model.user.DisableUserRequest;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import com.bloxico.ase.userservice.web.model.user.*;
+import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -31,7 +23,7 @@ public interface UserManagementApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Paginated list of users successfully retrieved.")
     })
-    ResponseEntity<ArrayUserProfileDataResponse> searchUsers(
+    ResponseEntity<ArrayUserDataResponse> searchUsers(
             @Valid @RequestParam(value = "email") String email,
             @Valid @RequestParam(value = "role", required = false) String role,
             @Valid @RequestParam(required = false, defaultValue = "0") int page,

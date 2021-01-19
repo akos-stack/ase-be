@@ -5,9 +5,7 @@ import org.springframework.jdbc.core.support.SqlLobValue;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.token.AuthenticationKeyGenerator;
-import org.springframework.security.oauth2.provider.token.DefaultAuthenticationKeyGenerator;
-import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.*;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.stereotype.Component;
@@ -15,9 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 import java.util.Collection;
 
-import static java.sql.Types.BLOB;
-import static java.sql.Types.TIMESTAMP;
-import static java.sql.Types.VARCHAR;
+import static java.sql.Types.*;
 import static org.springframework.security.oauth2.common.util.SerializationUtils.serialize;
 
 @Component

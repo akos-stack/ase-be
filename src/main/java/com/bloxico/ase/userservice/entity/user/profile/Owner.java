@@ -1,9 +1,7 @@
-package com.bloxico.ase.userservice.entity.user;
+package com.bloxico.ase.userservice.entity.user.profile;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 

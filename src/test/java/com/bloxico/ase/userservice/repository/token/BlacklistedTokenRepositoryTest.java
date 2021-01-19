@@ -29,7 +29,7 @@ public class BlacklistedTokenRepositoryTest extends AbstractSpringTest {
         var token = new BlacklistedToken();
         token.setValue(uuid());
         token.setExpiryDate(LocalDateTime.now());
-        token.setCreatorId(mockUtil.savedUserProfile().getId());
+        token.setCreatorId(mockUtil.savedUser().getId());
         var id = repository.saveAndFlush(token).getId();
         assertTrue(repository.findById(id).isPresent());
     }
@@ -37,7 +37,7 @@ public class BlacklistedTokenRepositoryTest extends AbstractSpringTest {
     @Test
     public void findDistinctTokenValues() {
         assertTrue(repository.findDistinctTokenValues().isEmpty());
-        var creatorId = mockUtil.savedUserProfile().getId();
+        var creatorId = mockUtil.savedUser().getId();
         var size = 5;
         var tokens = Stream
                 .generate(BlacklistedToken::new)

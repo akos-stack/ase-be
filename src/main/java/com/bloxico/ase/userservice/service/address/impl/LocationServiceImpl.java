@@ -1,11 +1,7 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
-import com.bloxico.ase.userservice.repository.address.CityRepository;
-import com.bloxico.ase.userservice.repository.address.CountryRepository;
-import com.bloxico.ase.userservice.repository.address.LocationRepository;
+import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.repository.address.*;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
