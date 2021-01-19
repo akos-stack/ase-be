@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.service.token.impl;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
+import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.exception.TokenException;
@@ -21,7 +21,7 @@ import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.I
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
 import static org.junit.Assert.*;
 
-public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
+public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Autowired
     private MockUtil mockUtil;
@@ -347,6 +347,16 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
         var actualList = service.searchPendingEvaluators(emailFilter, pageIndex, pageSize, "email");
 
         assertEquals(expectedList, actualList);
+    }
+
+    @Test
+    public void getEvaluatorResume_success() {
+        var user = mockUtil.savedUserProfile();
+        var admin = mockUtil.savedAdmin();
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
+        service.createPendingEvaluator(request, user.getId());
+        var response = service.getEvaluatorResume(user.getEmail(), admin.getId());
+        assertNotNull(response);
     }
 
 }

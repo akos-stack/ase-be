@@ -4,17 +4,18 @@ import com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status;
 import com.bloxico.ase.userservice.validator.ValidEmail;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
-import static lombok.AccessLevel.PRIVATE;
 
 @AllArgsConstructor
-@NoArgsConstructor(force = true, access = PRIVATE)
+@NoArgsConstructor
 @Setter
 public class EvaluatorRegistrationRequest implements IPendingEvaluatorRequest {
 

@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
+import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
@@ -30,7 +31,7 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
-public class UserRegistrationApiTest extends AbstractSpringTest {
+public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Autowired
     private MockUtil mockUtil;
@@ -374,14 +375,13 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void requestEvaluatorRegistration_200_pendingEvaluatorSuccessfullyRegistered() {
+    public void requestEvaluatorRegistration_200_pendingEvaluatorSuccessfullyRegistered() throws IOException {
         var registration = mockUtil.doConfirmedRegistration();
-
-        var request = new EvaluatorRegistrationRequest(registration.getEmail(), MockUtil.createMultipartFile());
+        var cvBytes = MockUtil.getTestCVBytes();
         given()
                 .header("Authorization", mockUtil.doAuthentication(registration))
-                .contentType(JSON)
-                .body(request)
+                .formParam("email", registration.getEmail())
+                .multiPart("cv", "cv.txt", cvBytes)
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
                 .then()
@@ -390,15 +390,15 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void requestEvaluatorRegistration_409_evaluatorIsAlreadyPending() {
+    public void requestEvaluatorRegistration_409_evaluatorIsAlreadyPending() throws IOException {
         var registration = mockUtil.doConfirmedRegistration();
         var bearerToken = mockUtil.doAuthentication(registration);
 
-        var request = new EvaluatorRegistrationRequest(registration.getEmail(), MockUtil.createMultipartFile());
+        var cvBytes = MockUtil.getTestCVBytes();
         given()
                 .header("Authorization", bearerToken)
-                .contentType(JSON)
-                .body(request)
+                .formParam("email", registration.getEmail())
+                .multiPart("cv", "cv.txt", cvBytes)
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
                 .then()
@@ -407,8 +407,8 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
 
         given()
                 .header("Authorization", bearerToken)
-                .contentType(JSON)
-                .body(request)
+                .formParam("email", registration.getEmail())
+                .multiPart("cv", "cv.txt", cvBytes)
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
                 .then()
@@ -496,6 +496,30 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
                 .then()
                 .assertThat()
                 .statusCode(403);
+    }
+
+    @Test
+    public void downloadEvaluatorResume_success() throws IOException {
+        var registration = mockUtil.doConfirmedRegistration();
+        var cvBytes = MockUtil.getTestCVBytes();
+        given()
+                .header("Authorization", mockUtil.doAuthentication(registration))
+                .formParam("email", registration.getEmail())
+                .multiPart("cv", "cv.txt", cvBytes)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+        given()
+                .header("Authorization", mockUtil.doAdminAuthentication())
+                .queryParam("email", registration.getEmail())
+                .when()
+                .get(API_URL + REGISTRATION_EVALUATOR_RESUME_DOWNLOAD)
+                .then()
+                .assertThat()
+                .statusCode(200).body(notNullValue());
     }
 
 }
