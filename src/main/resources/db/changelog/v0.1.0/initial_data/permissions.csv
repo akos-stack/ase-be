@@ -7,4 +7,6 @@ invite_evaluator
 search_users
 register_as_evaluator
 upload_file
+download_file
+delete_file
 download_user_resume

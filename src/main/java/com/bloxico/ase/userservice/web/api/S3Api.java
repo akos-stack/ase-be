@@ -32,7 +32,7 @@ public interface S3Api {
     @GetMapping(
             value = S3_DOWNLOAD,
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'upload_file')")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'download_file')")
     @ApiOperation(value = "Downloads file from S3 bucket.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "File successfully downloaded.")
@@ -43,7 +43,7 @@ public interface S3Api {
             value = S3_DELETE,
             produces = {"application/json"}
     )
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'upload_file')")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'delete_file')")
     @ApiOperation(value = "Deletes file in S3 bucket.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "File successfully deleted.")
