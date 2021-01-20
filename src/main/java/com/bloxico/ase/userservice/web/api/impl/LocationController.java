@@ -1,14 +1,12 @@
 package com.bloxico.ase.userservice.web.api.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.facade.ILocationFacade;
 import com.bloxico.ase.userservice.web.api.LocationApi;
+import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
+import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 public class LocationController implements LocationApi {
@@ -17,12 +15,12 @@ public class LocationController implements LocationApi {
     private ILocationFacade locationFacade;
 
     @Override
-    public ResponseEntity<List<CountryDto>> allCountries() {
+    public ResponseEntity<SearchCountriesResponse> findAllCountries() {
         return ResponseEntity.ok(locationFacade.findAllCountries());
     }
 
     @Override
-    public ResponseEntity<List<CityDto>> allCities() {
+    public ResponseEntity<SearchCitiesResponse> findAllCities() {
         return ResponseEntity.ok(locationFacade.findAllCities());
     }
 
