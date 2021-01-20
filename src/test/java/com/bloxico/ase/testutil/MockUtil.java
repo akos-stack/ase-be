@@ -324,7 +324,7 @@ public class MockUtil {
 
     public OAuthAccessTokenDto toOAuthAccessTokenDto(String email, String token) {
         return new OAuthAccessTokenDto(
-                token,
+                token.contains("Bearer ") ? token.replace("Bearer ", "") : token,
                 null, null,
                 email,
                 "appId",
@@ -420,10 +420,6 @@ public class MockUtil {
         var password = "admin";
         var email = savedAdmin(password).getEmail();
         return doAuthentication(email, password);
-    }
-
-    public String doAuthentication(User user) {
-        return doAuthentication(user.getEmail(), user.getPassword());
     }
 
     public String doAuthentication(String email, String password) {

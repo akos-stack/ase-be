@@ -90,6 +90,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
     public void disableUser_200_ok() {
         var registration = mockUtil.doConfirmedRegistration();
         var userToken = mockUtil.doAuthentication(registration);
+        mockUtil.savedUserProfile(registration.getId());
         // User can access secured endpoints
         given()
                 .header("Authorization", userToken)
@@ -144,6 +145,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
     public void blacklistTokens_200_ok() {
         var registration = mockUtil.doConfirmedRegistration();
         var userToken = mockUtil.doAuthentication(registration);
+        mockUtil.savedUserProfile(registration.getId());
         // User can access secured endpoints
         given()
                 .header("Authorization", userToken)

@@ -417,8 +417,6 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
                 .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_EXISTS.getCode()));
     }
 
-    // TODO fix assertion
-
     @Test
     public void submitEvaluator_200_ok() {
         var request = mockUtil.newSubmitInvitedEvaluatorRequest();
@@ -430,13 +428,13 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body(
+                .body( // TODO TEST better assertion
                         "id", notNullValue(),
                         "user_profile.id", notNullValue(),
-                        "user_profile.name", is(request.getUsername()),
-                        "user_profile.password", is(request.getPassword()),
-                        "user_profile.email", is(request.getEmail()),
-                        "user_profile.enabled", is(true));
+                        "user_profile.user_id", notNullValue(),
+                        "user_profile.first_name", is(request.getFirstName()),
+                        "user_profile.last_name", is(request.getLastName()),
+                        "user_profile.phone", is(request.getPhone()));
     }
 
     @Test

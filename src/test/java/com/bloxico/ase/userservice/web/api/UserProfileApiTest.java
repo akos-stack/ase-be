@@ -27,10 +27,10 @@ public class UserProfileApiTest extends AbstractSpringTest {
 
     @Test
     public void accessMyProfile_200_ok() {
-        var user = mockUtil.savedUser();
-        var userProfile = mockUtil.savedUserProfile(user.getId());
+        var registration = mockUtil.doConfirmedRegistration();
+        var userProfile = mockUtil.savedUserProfile(registration.getId());
         given()
-                .header("Authorization", mockUtil.doAuthentication(user))
+                .header("Authorization", mockUtil.doAuthentication(registration))
                 .when()
                 .get(API_URL + MY_PROFILE_ENDPOINT)
                 .then()
@@ -44,11 +44,13 @@ public class UserProfileApiTest extends AbstractSpringTest {
 
     @Test
     public void updateMyProfile_200_ok() {
+        var registration = mockUtil.doConfirmedRegistration();
+        mockUtil.savedUserProfile(registration.getId());
         var firstName = uuid();
         var lastName = uuid();
         var phone = uuid();
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", mockUtil.doAuthentication(registration))
                 .contentType(JSON)
                 .body(new UpdateUserProfileRequest(firstName, lastName, phone))
                 .when()
@@ -58,7 +60,8 @@ public class UserProfileApiTest extends AbstractSpringTest {
                 .statusCode(200)
                 .body(
                         "user_profile.first_name", is(firstName),
-                        "user_profile.last_name", is(firstName),
+                        "user_profile.last_name", is(lastName),
                         "user_profile.phone", is(phone));
     }
+
 }
