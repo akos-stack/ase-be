@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.address.CityDto;
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
+import com.bloxico.ase.userservice.dto.entity.quotationpackage.QuotationPackageDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
@@ -13,12 +14,15 @@ import com.bloxico.ase.userservice.entity.address.City;
 import com.bloxico.ase.userservice.entity.address.Country;
 import com.bloxico.ase.userservice.entity.address.Location;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
+import com.bloxico.ase.userservice.entity.quotationpackage.QuotationPackage;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.entity.user.Evaluator;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
+import com.bloxico.ase.userservice.web.model.quotationpackage.CreateQuotationPackageRequest;
+import com.bloxico.ase.userservice.web.model.quotationpackage.CreateQuotationPackageResponse;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
@@ -81,5 +85,11 @@ public interface AseMapper {
     EvaluatorDto toEvaluatorDto(SubmitEvaluatorRequest request);
 
     PendingEvaluator toPendingEvaluator(IPendingEvaluatorRequest request);
+
+    QuotationPackage toQuotationPackage(CreateQuotationPackageRequest request);
+
+    QuotationPackageDto toDto(QuotationPackage quotationPackage);
+
+    CreateQuotationPackageResponse toResponse(QuotationPackageDto dto);
 
 }

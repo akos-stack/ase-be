@@ -1,9 +1,6 @@
 package com.bloxico.ase.userservice.web.error;
 
-import com.bloxico.ase.userservice.exception.AmazonS3Exception;
-import com.bloxico.ase.userservice.exception.AseRuntimeException;
-import com.bloxico.ase.userservice.exception.TokenException;
-import com.bloxico.ase.userservice.exception.UserProfileException;
+import com.bloxico.ase.userservice.exception.*;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -115,4 +112,28 @@ public interface ErrorCodes {
         }
 
     }
+
+    @Getter
+    enum QuotationPackage implements ErrorCodes {
+
+        QUOTATION_PACKAGE_EXISTS(
+                HttpStatus.CONFLICT,
+                "30",
+                "Quotation package with given name already exists.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        QuotationPackage(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new QuotationPackageException(httpStatus, code, cause);
+        }
+    }
+
 }
