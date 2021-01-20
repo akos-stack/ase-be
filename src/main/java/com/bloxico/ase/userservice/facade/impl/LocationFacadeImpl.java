@@ -24,18 +24,18 @@ public class LocationFacadeImpl implements ILocationFacade {
     }
 
     @Override
-    public List<CountryDto> allCountries() {
-        log.info("LocationFacadeImpl.allCountries - start");
-        var countries = locationService.allCountries();
-        log.info("LocationFacadeImpl.allCountries - end");
+    public List<CountryDto> findAllCountries() {
+        log.info("LocationFacadeImpl.findAllCountries - start");
+        var countries = locationService.findAllCountries();
+        log.info("LocationFacadeImpl.findAllCountries - end");
         return countries;
     }
 
     @Override
-    public List<CityDto> allCities() {
-        log.info("LocationFacadeImpl.allCities - start");
-        var cities = locationService.allCities();
-        log.info("LocationFacadeImpl.allCities - end");
+    public List<CityDto> findAllCities() {
+        log.info("LocationFacadeImpl.findAllCities - start");
+        var cities = locationService.findAllCities();
+        log.info("LocationFacadeImpl.findAllCities - end");
         return cities;
     }
 

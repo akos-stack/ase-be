@@ -32,26 +32,26 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public List<CountryDto> allCountries() {
-        log.debug("CountryServiceImpl.allCountries - start");
+    public List<CountryDto> findAllCountries() {
+        log.debug("CountryServiceImpl.findAllCountries - start");
         var countries = countryRepository
                 .findAll()
                 .stream()
                 .map(MAPPER::toDto)
                 .collect(toUnmodifiableList());
-        log.debug("CountryServiceImpl.allCountries - end");
+        log.debug("CountryServiceImpl.findAllCountries - end");
         return countries;
     }
 
     @Override
-    public List<CityDto> allCities() {
-        log.debug("LocationServiceImpl.allCities - start");
+    public List<CityDto> findAllCities() {
+        log.debug("LocationServiceImpl.findAllCities - start");
         var cities = cityRepository
                 .findAll()
                 .stream()
                 .map(MAPPER::toDto)
                 .collect(toUnmodifiableList());
-        log.debug("LocationServiceImpl.allCities - end");
+        log.debug("LocationServiceImpl.findAllCities - end");
         return cities;
     }
 

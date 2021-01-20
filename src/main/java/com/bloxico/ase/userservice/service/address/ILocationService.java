@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface ILocationService {
 
-    List<CountryDto> allCountries();
+    List<CountryDto> findAllCountries();
 
-    List<CityDto> allCities();
+    List<CityDto> findAllCities();
 
     CountryDto findOrSaveCountry(CountryDto countryDto, long principalId);
 

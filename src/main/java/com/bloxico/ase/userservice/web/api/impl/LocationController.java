@@ -18,12 +18,12 @@ public class LocationController implements LocationApi {
 
     @Override
     public ResponseEntity<List<CountryDto>> allCountries() {
-        return ResponseEntity.ok(locationFacade.allCountries());
+        return ResponseEntity.ok(locationFacade.findAllCountries());
     }
 
     @Override
     public ResponseEntity<List<CityDto>> allCities() {
-        return ResponseEntity.ok(locationFacade.allCities());
+        return ResponseEntity.ok(locationFacade.findAllCities());
     }
 
 }

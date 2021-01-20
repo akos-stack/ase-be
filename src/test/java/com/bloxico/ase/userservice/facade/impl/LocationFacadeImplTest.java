@@ -18,33 +18,33 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     private LocationFacadeImpl facade;
 
     @Test
-    public void allCountries() {
+    public void findAllCountries() {
         assertEquals(
                 List.of(),
-                facade.allCountries());
+                facade.findAllCountries());
         var country1 = mockUtil.savedCountryDto();
         assertEquals(
                 List.of(country1),
-                facade.allCountries());
+                facade.findAllCountries());
         var country2 = mockUtil.savedCountryDto();
         assertEquals(
                 List.of(country1, country2),
-                facade.allCountries());
+                facade.findAllCountries());
     }
 
     @Test
-    public void allCities() {
+    public void findAllCities() {
         assertEquals(
                 List.of(),
-                facade.allCities());
+                facade.findAllCities());
         var city1 = mockUtil.savedCityDto();
         assertEquals(
                 List.of(city1),
-                facade.allCities());
+                facade.findAllCities());
         var city2 = mockUtil.savedCityDto();
         assertEquals(
                 List.of(city1, city2),
-                facade.allCities());
+                facade.findAllCities());
     }
 
 }

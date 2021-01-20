@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface ILocationFacade {
 
-    List<CountryDto> allCountries();
+    List<CountryDto> findAllCountries();
 
-    List<CityDto> allCities();
+    List<CityDto> findAllCities();
 
 }
