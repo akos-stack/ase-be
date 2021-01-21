@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
@@ -375,7 +374,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void requestEvaluatorRegistration_200_pendingEvaluatorSuccessfullyRegistered() throws IOException {
+    public void requestEvaluatorRegistration_200_pendingEvaluatorSuccessfullyRegistered() {
         var registration = mockUtil.doConfirmedRegistration();
         var cvBytes = MockUtil.getTestCVBytes();
         given()
@@ -390,7 +389,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void requestEvaluatorRegistration_409_evaluatorIsAlreadyPending() throws IOException {
+    public void requestEvaluatorRegistration_409_evaluatorIsAlreadyPending() {
         var registration = mockUtil.doConfirmedRegistration();
         var bearerToken = mockUtil.doAuthentication(registration);
 
@@ -499,7 +498,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void downloadEvaluatorResume_success() throws IOException {
+    public void downloadEvaluatorResume_success() {
         var registration = mockUtil.doConfirmedRegistration();
         var cvBytes = MockUtil.getTestCVBytes();
         given()

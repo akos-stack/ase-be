@@ -481,8 +481,12 @@ public class MockUtil {
         return new MockMultipartFile("file.txt", "file.txt", "text/plain", "Some file".getBytes());
     }
 
-    public static byte[] getTestCVBytes() throws IOException {
-        return IOUtils.toByteArray(MockUtil.class.getResourceAsStream("/testFiles/testCv.txt"));
+    public static byte[] getTestCVBytes() {
+        try {
+            return IOUtils.toByteArray(MockUtil.class.getResourceAsStream("/testFiles/testCv.txt"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static final AtomicLong along = new AtomicLong(0);
