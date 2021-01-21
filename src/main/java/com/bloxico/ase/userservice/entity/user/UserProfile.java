@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.entity.user;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.address.Location;
+import com.bloxico.ase.userservice.entity.aspiration.Aspiration;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,13 +13,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = "email", callSuper = false)
-@ToString(exclude = "roles")
+@ToString(exclude = { "roles", "aspirations" })
 @Entity
 @Table(name = "user_profiles")
 public class UserProfile extends BaseEntity {
@@ -76,6 +78,17 @@ public class UserProfile extends BaseEntity {
 
     public void addRole(Role role) {
         roles.add(role);
+    }
+
+    @ManyToMany(fetch = EAGER, cascade = MERGE)
+    @JoinTable(
+            name = "user_profiles_aspirations",
+            joinColumns = @JoinColumn(name = "user_profile_id"),
+            inverseJoinColumns = @JoinColumn(name = "aspiration_id"))
+    private Set<Aspiration> aspirations = new HashSet<>();
+
+    public void addAspiration(Aspiration aspiration) {
+        aspirations.add(aspiration);
     }
 
 }
