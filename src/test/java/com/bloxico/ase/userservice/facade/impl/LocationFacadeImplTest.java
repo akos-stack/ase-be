@@ -2,6 +2,8 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
+import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,30 +22,30 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     @Test
     public void findAllCountries() {
         assertEquals(
-                List.of(),
+                new SearchCountriesResponse(List.of()),
                 facade.findAllCountries());
         var country1 = mockUtil.savedCountryDto();
         assertEquals(
-                List.of(country1),
+                new SearchCountriesResponse(List.of(country1)),
                 facade.findAllCountries());
         var country2 = mockUtil.savedCountryDto();
         assertEquals(
-                List.of(country1, country2),
+                new SearchCountriesResponse(List.of(country1, country2)),
                 facade.findAllCountries());
     }
 
     @Test
     public void findAllCities() {
         assertEquals(
-                List.of(),
+                new SearchCitiesResponse(List.of()),
                 facade.findAllCities());
         var city1 = mockUtil.savedCityDto();
         assertEquals(
-                List.of(city1),
+                new SearchCitiesResponse(List.of(city1)),
                 facade.findAllCities());
         var city2 = mockUtil.savedCityDto();
         assertEquals(
-                List.of(city1, city2),
+                new SearchCitiesResponse(List.of(city1, city2)),
                 facade.findAllCities());
     }
 
