@@ -98,11 +98,10 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     @Test
     public void registrationConfirm_200_ok() {
         var registration = mockUtil.doRegistration();
-        var email = registration.getEmail();
         var token = registration.getToken();
         given()
                 .contentType(JSON)
-                .body(new TokenValidationRequest(email, token))
+                .body(new TokenValidationRequest(token))
                 .when()
                 .post(API_URL + REGISTRATION_CONFIRM_ENDPOINT)
                 .then()
@@ -111,25 +110,12 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void registrationConfirm_404_userNotFound() {
-        given()
-                .contentType(JSON)
-                .body(new TokenValidationRequest("userNotFound@mail.com", uuid()))
-                .when()
-                .post(API_URL + REGISTRATION_CONFIRM_ENDPOINT)
-                .then()
-                .assertThat()
-                .statusCode(404)
-                .body(ERROR_CODE, is(ErrorCodes.User.USER_NOT_FOUND.getCode()));
-    }
-
-    @Test
     public void registrationConfirm_404_tokenNotFound() {
-        var email = mockUtil.doRegistration().getEmail();
+        mockUtil.doRegistration();
         var token = uuid();
         given()
                 .contentType(JSON)
-                .body(new TokenValidationRequest(email, token))
+                .body(new TokenValidationRequest(token))
                 .when()
                 .post(API_URL + REGISTRATION_CONFIRM_ENDPOINT)
                 .then()

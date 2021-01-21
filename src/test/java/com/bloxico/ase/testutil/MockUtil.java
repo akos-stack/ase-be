@@ -386,18 +386,17 @@ public class MockUtil {
         return new Registration(id, email, pass, token);
     }
 
-    public void doConfirmation(String email, String token) {
+    public void doConfirmation(String token) {
         given()
                 .contentType(JSON)
-                .body(new TokenValidationRequest(email, token))
+                .body(new TokenValidationRequest(token))
                 .post(API_URL + REGISTRATION_CONFIRM_ENDPOINT);
     }
 
     public Registration doConfirmedRegistration() {
         var registration = doRegistration();
-        var email = registration.getEmail();
         var token = registration.getToken();
-        doConfirmation(email, token);
+        doConfirmation(token);
         return registration;
     }
 

@@ -58,7 +58,7 @@ public class UserPasswordFacadeImpl implements IUserPasswordFacade {
         log.info("UserPasswordFacadeImpl.updateForgottenPassword - start | request: {}", request);
         var email = request.getEmail();
         var userId = userService.findUserByEmail(email).getId();
-        passwordResetTokenService.consumeTokenForUser(request.getTokenValue(), userId);
+        passwordResetTokenService.consumeToken(request.getTokenValue());
         userService.setNewPassword(userId, request.getNewPassword());
         log.info("UserPasswordFacadeImpl.updateForgottenPassword - end | request: {}", request);
     }

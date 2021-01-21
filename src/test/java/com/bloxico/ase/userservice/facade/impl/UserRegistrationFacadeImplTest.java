@@ -80,19 +80,11 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         userRegistrationFacade.handleTokenValidation(null);
     }
 
-    @Test(expected = UserException.class)
-    public void handleTokenValidation_userNotFound() {
-        var invalid = uuid();
-        var request = new TokenValidationRequest(invalid, invalid);
-        userRegistrationFacade.handleTokenValidation(request);
-    }
-
     @Test(expected = TokenException.class)
     public void handleTokenValidation_tokenNotFound() {
         var regRequest = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");
         userRegistrationFacade.registerUserWithVerificationToken(regRequest);
-        var invalid = uuid();
-        var tknRequest = new TokenValidationRequest(regRequest.getEmail(), invalid);
+        var tknRequest = new TokenValidationRequest(regRequest.getEmail());
         userRegistrationFacade.handleTokenValidation(tknRequest);
     }
 
@@ -101,7 +93,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         var email = "passwordMatches@mail.com";
         var regRequest = new RegistrationRequest(email, "Password1!", "Password1!");
         var token = userRegistrationFacade.registerUserWithVerificationToken(regRequest).getTokenValue();
-        var tknRequest = new TokenValidationRequest(email, token);
+        var tknRequest = new TokenValidationRequest(token);
         userRegistrationFacade.handleTokenValidation(tknRequest);
         assertTrue(tokenRepository.findByValue(token).isEmpty());
         assertTrue(userService.findUserByEmail(email).getEnabled());

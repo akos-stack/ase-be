@@ -70,9 +70,8 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public void handleTokenValidation(TokenValidationRequest request) {
         log.info("UserRegistrationFacadeImpl.handleTokenValidation - start | request: {}", request);
-        var userDto = userService.findUserByEmail(request.getEmail());
-        registrationTokenService.consumeTokenForUser(request.getTokenValue(), userDto.getId());
-        userService.enableUser(userDto.getId());
+        var token = registrationTokenService.consumeToken(request.getTokenValue());
+        userService.enableUser(token.getUserId());
         log.info("UserRegistrationFacadeImpl.handleTokenValidation - end | request: {}", request);
     }
 

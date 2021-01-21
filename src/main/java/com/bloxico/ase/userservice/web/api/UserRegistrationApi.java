@@ -50,7 +50,6 @@ public interface UserRegistrationApi {
     @ApiOperation(value = "Accepts verification token provided by email and, if correct, enables user.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Validation successful - user is now able to log in."),
-            @ApiResponse(code = 404, message = "Could not find user associated with the given email."),
             @ApiResponse(code = 404, message = "Provided token is either not found or expired.")
     })
     ResponseEntity<Void> confirmRegistration(@Valid @RequestBody TokenValidationRequest request);
