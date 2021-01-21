@@ -17,6 +17,7 @@ import com.bloxico.ase.userservice.service.address.impl.LocationServiceImplTest;
 import com.bloxico.ase.userservice.service.aws.impl.S3ServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
+import com.bloxico.ase.userservice.service.quotationpackage.impl.QuotationPackageServiceImplTest;
 import com.bloxico.ase.userservice.service.token.impl.PasswordResetTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImplTest;
 import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImplTest;
@@ -65,6 +66,7 @@ import org.junit.runners.Suite;
         LocationServiceImplTest.class,
         PendingEvaluatorServiceImplTest.class,
         S3ServiceImplTest.class,
+        QuotationPackageServiceImplTest.class,
 
         // facade
         QuartzOperationsFacadeImplTest.class,
@@ -73,6 +75,7 @@ import org.junit.runners.Suite;
         UserProfileFacadeImplTest.class,
         LocationFacadeImplTest.class,
         UserManagementFacadeImplTest.class,
+        QuotationPackageFacadeImplTest.class
 
         // Run these individually for now
         // They stuck for some reason

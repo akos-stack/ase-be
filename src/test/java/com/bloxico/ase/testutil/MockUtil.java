@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.address.CityDto;
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
+import com.bloxico.ase.userservice.dto.entity.quotationpackage.QuotationPackageDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
@@ -27,9 +28,11 @@ import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
+import com.bloxico.ase.userservice.service.quotationpackage.impl.QuotationPackageServiceImpl;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
+import com.bloxico.ase.userservice.web.model.quotationpackage.CreateQuotationPackageRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
@@ -40,9 +43,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -57,6 +64,7 @@ import static io.restassured.http.ContentType.JSON;
 import static io.restassured.http.ContentType.URLENC;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
+import static java.util.Comparator.comparing;
 import static java.util.concurrent.ThreadLocalRandom.current;
 import static java.util.function.Predicate.not;
 import static org.junit.Assert.assertTrue;
@@ -90,6 +98,7 @@ public class MockUtil {
     private final UserRegistrationFacadeImpl userRegistrationFacade;
     private final PendingEvaluatorRepository pendingEvaluatorRepository;
     private final PendingEvaluatorServiceImpl pendingEvaluatorService;
+    private final QuotationPackageServiceImpl quotationPackageService;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
@@ -106,7 +115,7 @@ public class MockUtil {
                     LocationRepository locationRepository,
                     UserRegistrationFacadeImpl userRegistrationFacade,
                     PendingEvaluatorRepository pendingEvaluatorRepository,
-                    PendingEvaluatorServiceImpl pendingEvaluatorService)
+                    PendingEvaluatorServiceImpl pendingEvaluatorService, QuotationPackageServiceImpl quotationPackageService)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -123,6 +132,7 @@ public class MockUtil {
         this.userRegistrationFacade = userRegistrationFacade;
         this.pendingEvaluatorRepository = pendingEvaluatorRepository;
         this.pendingEvaluatorService = pendingEvaluatorService;
+        this.quotationPackageService = quotationPackageService;
     }
 
     public UserProfile savedAdmin() {
@@ -471,6 +481,50 @@ public class MockUtil {
                 .map(EvaluatorInvitationRequest::new)
                 .map(request -> pendingEvaluatorService.createPendingEvaluator(request, adminId))
                 .collect(Collectors.toList());
+    }
+
+    public CreateQuotationPackageRequest doCreateQuotationPackageRequest() {
+        return doCreateQuotationPackageRequest(uuid());
+    }
+
+    public CreateQuotationPackageRequest doCreateQuotationPackageRequest(String name) {
+        return new CreateQuotationPackageRequest(
+                name, uuid(), uuid(),
+                generatePrice(),
+                generateNumberOfEvaluations(),
+                new Random().nextBoolean()
+        );
+    }
+
+    public QuotationPackageDto createQuotationPackageDto(String name) {
+        var request =
+                doCreateQuotationPackageRequest(name);
+
+        return quotationPackageService
+                .createQuotationPackage(request, savedAdmin().getId());
+    }
+
+    public List<QuotationPackageDto> savedQuotationPackageDtos() {
+        var names = Arrays.asList("Basic", "Advanced", "Pro");
+
+        return savedQuotationPackageDtos(names);
+    }
+
+    public List<QuotationPackageDto> savedQuotationPackageDtos(List<String> names) {
+        return names
+                .stream()
+                .map(this::createQuotationPackageDto)
+                .sorted(comparing(QuotationPackageDto::getPrice))
+                .collect(Collectors.toList());
+    }
+
+    private BigDecimal generatePrice() {
+        return new BigDecimal(
+                BigInteger.valueOf(new Random().nextInt(100001)), 2);
+    }
+
+    private Integer generateNumberOfEvaluations() {
+        return new Random().nextInt(101);
     }
 
     private static final AtomicLong along = new AtomicLong(0);
