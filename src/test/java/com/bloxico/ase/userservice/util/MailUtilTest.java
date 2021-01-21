@@ -6,9 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.bloxico.ase.testutil.MockUtil.randEnumConst;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
-import static com.bloxico.ase.userservice.util.MailUtil.Template.*;
 
 @Slf4j
 public class MailUtilTest extends AbstractSpringTest {
@@ -23,12 +21,14 @@ public class MailUtilTest extends AbstractSpringTest {
 
     @Test(expected = NullPointerException.class)
     public void sendTokenEmail_nullEmail() {
-        mailUtil.sendTokenEmail(randEnumConst(Template.class), null, uuid());
+        for (var template : Template.values())
+            mailUtil.sendTokenEmail(template, null, uuid());
     }
 
     @Test(expected = NullPointerException.class)
     public void sendTokenEmail_nullToken() {
-        mailUtil.sendTokenEmail(randEnumConst(Template.class), uuid(), null);
+        for (var template : Template.values())
+            mailUtil.sendTokenEmail(template, uuid(), null);
     }
 
     @Test
@@ -36,9 +36,8 @@ public class MailUtilTest extends AbstractSpringTest {
         var email = uuid() + "@mailinator.com";
         var token = uuid();
         log.info("Generated email: " + email);
-        mailUtil.sendTokenEmail(VERIFICATION, email, token);
-        mailUtil.sendTokenEmail(RESET_PASSWORD, email, token);
-        mailUtil.sendTokenEmail(EVALUATOR_INVITATION, email, token);
+        for (var template : Template.values())
+            mailUtil.sendTokenEmail(template, email, token);
     }
 
 }
