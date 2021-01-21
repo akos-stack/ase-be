@@ -21,24 +21,35 @@ public class MailUtil {
 
         VERIFICATION(
                 "verificationMailTemplate",
+                "verify",
                 "Art Stock Exchange - Registration confirmation"),
 
         RESET_PASSWORD(
                 "resetPasswordMailTemplate",
+                "reset",
                 "Art Stock Exchange - Forgotten password retrieval"),
 
         EVALUATOR_INVITATION(
                 "evaluatorInvitationMailTemplate",
+                "register",
                 "Art Stock Exchange - Evaluator invitation");
 
-        private final String name, subject;
+        private final String name, relUri, subject;
 
-        Template(String name, String subject) {
+        Template(String name, String relUri, String subject) {
             this.name = name;
+            this.relUri = relUri;
             this.subject = subject;
         }
 
+        public String uri(String contextPath) {
+            return contextPath + "/" + relUri;
+        }
+
     }
+
+    @Value("${redirect.token.context-path}")
+    private String contextPath;
 
     @Value("classpath:images/enrglogo.jpg")
     private Resource logoImage;
@@ -55,7 +66,11 @@ public class MailUtil {
         requireNonNull(template);
         requireNonNull(email);
         requireNonNull(token);
-        var text = getTemplate(template.name, Map.of("token", token, "logo", logoImage));
+        var model = Map.of(
+                "path", template.uri(contextPath),
+                "token", token,
+                "logo", logoImage);
+        var text = getTemplate(template.name, model);
         sendMail(mimeMessage -> {
             var message = new MimeMessageHelper(mimeMessage, true);
             message.setTo(email);
