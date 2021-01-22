@@ -43,11 +43,14 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
 
     @Test
     public void registration_200_ok() {
+        var request = new RegistrationRequest(
+                "passwordMatches@mail.com",
+                "Password1!", "Password1!");
+        request.addAspirationName("evaluator");
+
         given()
                 .contentType(JSON)
-                .body(new RegistrationRequest(
-                        "passwordMatches@mail.com",
-                        "Password1!", "Password1!"))
+                .body(request)
                 .when()
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .then()
@@ -93,6 +96,24 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
                 .assertThat()
                 .statusCode(409)
                 .body(ERROR_CODE, is(ErrorCodes.User.USER_EXISTS.getCode()));
+    }
+
+    @Test
+    public void registration_400_invalidAspirationName() {
+        var request = new RegistrationRequest(
+                "passwordMatches@mail.com",
+                "Password1!", "Password1!");
+        request.addAspirationName(uuid());
+
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(400)
+                .body(ERROR_CODE, is(ErrorCodes.User.ASPIRATION_NOT_VALID.getCode()));
     }
 
     @Test

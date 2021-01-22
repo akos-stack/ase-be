@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Set;
 
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.*;
 
 public class UserRegistrationServiceImplTest extends AbstractSpringTest {
@@ -38,6 +39,13 @@ public class UserRegistrationServiceImplTest extends AbstractSpringTest {
         var request2 = new RegistrationRequest("temp@mail.com", "Password1!", "Password1!");
         userRegistrationService.registerDisabledUser(request1);
         userRegistrationService.registerDisabledUser(request2);
+    }
+
+    @Test(expected = UserProfileException.class)
+    public void registerDisabledUser_invalidAspirationName() {
+        var request = new RegistrationRequest("temp@mail.com", "Password1!", "Password1!");
+        request.addAspirationName(uuid());
+        userRegistrationService.registerDisabledUser(request);
     }
 
     @Test

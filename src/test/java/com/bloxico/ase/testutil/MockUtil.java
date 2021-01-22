@@ -21,6 +21,7 @@ import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
 import com.bloxico.ase.userservice.repository.address.CityRepository;
 import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
+import com.bloxico.ase.userservice.repository.aspiration.AspirationRepository;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
@@ -90,6 +91,7 @@ public class MockUtil {
     private final UserRegistrationFacadeImpl userRegistrationFacade;
     private final PendingEvaluatorRepository pendingEvaluatorRepository;
     private final PendingEvaluatorServiceImpl pendingEvaluatorService;
+    private final AspirationRepository aspirationRepository;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
@@ -106,7 +108,8 @@ public class MockUtil {
                     LocationRepository locationRepository,
                     UserRegistrationFacadeImpl userRegistrationFacade,
                     PendingEvaluatorRepository pendingEvaluatorRepository,
-                    PendingEvaluatorServiceImpl pendingEvaluatorService)
+                    PendingEvaluatorServiceImpl pendingEvaluatorService,
+                    AspirationRepository aspirationRepository)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -123,6 +126,7 @@ public class MockUtil {
         this.userRegistrationFacade = userRegistrationFacade;
         this.pendingEvaluatorRepository = pendingEvaluatorRepository;
         this.pendingEvaluatorService = pendingEvaluatorService;
+        this.aspirationRepository = aspirationRepository;
     }
 
     public UserProfile savedAdmin() {
@@ -160,6 +164,7 @@ public class MockUtil {
         user.setLocked(false);
         user.setEnabled(true);
         user.addRole(roleRepository.getUserRole());
+        user.addAspiration(aspirationRepository.getEvaluatorAspiration());
         return userProfileRepository.saveAndFlush(user);
     }
 

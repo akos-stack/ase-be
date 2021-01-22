@@ -68,6 +68,13 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         userRegistrationFacade.registerUserWithVerificationToken(request2);
     }
 
+    @Test(expected = UserProfileException.class)
+    public void registerUserWithVerificationToken_invalidAspirationName() {
+        var request = new RegistrationRequest("temp@mail.com", "Password1!", "Password1!");
+        request.addAspirationName(uuid());
+        userRegistrationFacade.registerUserWithVerificationToken(request);
+    }
+
     @Test
     public void registerDisabledUser() {
         var request = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");

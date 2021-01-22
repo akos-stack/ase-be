@@ -59,4 +59,9 @@ public class RegistrationRequest {
         return email.split("@")[0];
     }
 
+    @JsonIgnore
+    public void addAspirationName(String aspirationName) {
+        aspirationNames.add(aspirationName);
+    }
+
 }
