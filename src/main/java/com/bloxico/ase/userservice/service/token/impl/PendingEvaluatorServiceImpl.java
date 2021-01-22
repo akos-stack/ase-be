@@ -6,6 +6,7 @@ import com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.service.aws.IS3Service;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
+import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,7 +139,7 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
         pendingEvaluator.setToken(UUID.randomUUID().toString());
         pendingEvaluator.setCreatorId(principalId);
         if(request.getCv() != null) {
-            var filePath = s3Service.uploadFile(request.getCv());
+            var filePath = s3Service.uploadFile(FileCategory.CV, request.getCv());
             pendingEvaluator.setCvPath(filePath);
         }
         return pendingEvaluatorRepository.saveAndFlush(pendingEvaluator);

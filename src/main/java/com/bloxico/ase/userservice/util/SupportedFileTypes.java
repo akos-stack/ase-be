@@ -1,30 +1,23 @@
 package com.bloxico.ase.userservice.util;
 
-import java.util.Arrays;
+import java.util.EnumSet;
 
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED;
 
 public enum SupportedFileTypes {
-    JPG("jpg"),
-    PNG("png"),
-    TXT("txt"),
-    PDF("pdf"),
-    DOC("doc");
+    jpg, png, txt, pdf, doc;
 
-    private String name;
+    public static final EnumSet<SupportedFileTypes> CV_SUPPORTED = EnumSet.of(pdf, doc, txt);
+    public static final EnumSet<SupportedFileTypes> IMAGE_SUPPORTED = EnumSet.of(jpg, png);
 
-    SupportedFileTypes(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public static void checkIsSupported(String extension) {
-        boolean supported = Arrays.stream(SupportedFileTypes.values()).anyMatch(fileType -> fileType.getName().equals(extension));
-        if(!supported) {
+    public static SupportedFileTypes getByExtension(String extension) {
+        SupportedFileTypes fileType;
+        try {
+            fileType = SupportedFileTypes.valueOf(extension);
+        } catch (Throwable throwable) {
             throw FILE_TYPE_NOT_SUPPORTED.newException();
         }
+        return fileType;
     }
+
 }

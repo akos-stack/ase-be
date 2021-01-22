@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.userservice.util.FileCategory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -14,12 +15,12 @@ import org.springframework.web.multipart.MultipartFile;
 @Api(value = "s3")
 public interface S3Api {
 
-    String S3_UPLOAD   = "/s3/upload";
+    String S3_VALIDATE = "/s3/validate";
     String S3_DOWNLOAD = "/s3/download";
     String S3_DELETE   = "/s3/delete";
 
     @PostMapping(
-            value = S3_UPLOAD,
+            value = S3_VALIDATE,
             produces = {"application/json"},
             consumes = {"multipart/form-data"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'upload_file')")
@@ -27,7 +28,7 @@ public interface S3Api {
     @ApiResponses({
             @ApiResponse(code = 200, message = "File successfully uploaded.")
     })
-    ResponseEntity<Void> uploadFile(@RequestPart(value = "file") MultipartFile file);
+    ResponseEntity<Void> validateFile(@RequestParam(name = "fileCategory") FileCategory fileCategory, @RequestPart(value = "file") MultipartFile file);
 
     @GetMapping(
             value = S3_DOWNLOAD,

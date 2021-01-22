@@ -104,7 +104,17 @@ public interface ErrorCodes {
         FILE_TYPE_NOT_SUPPORTED(
                 HttpStatus.BAD_REQUEST,
                 "20",
-                "File type is not supported.");
+                "File type is not supported."),
+
+        FILE_SIZE_EXCEEDED(
+                HttpStatus.BAD_REQUEST,
+                "21",
+                "File size exceeded limit."),
+
+        FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY(
+                HttpStatus.BAD_REQUEST,
+                "22",
+                "File type is not supported for the category.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
