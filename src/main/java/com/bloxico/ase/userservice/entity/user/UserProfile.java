@@ -9,6 +9,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -89,6 +90,10 @@ public class UserProfile extends BaseEntity {
 
     public void addAspiration(Aspiration aspiration) {
         aspirations.add(aspiration);
+    }
+
+    public void addAllAspirations(Collection<Aspiration> aspirations) {
+        this.aspirations.addAll(aspirations);
     }
 
 }

@@ -1,7 +1,9 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.entity.aspiration.Aspiration;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
+import com.bloxico.ase.userservice.repository.aspiration.AspirationRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserRegistrationService;
@@ -15,10 +17,9 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_EXISTS;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.*;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Slf4j
@@ -28,15 +29,18 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
     private final UserProfileRepository userProfileRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AspirationRepository aspirationRepository;
 
     @Autowired
     public UserRegistrationServiceImpl(UserProfileRepository userProfileRepository,
                                        RoleRepository roleRepository,
-                                       PasswordEncoder passwordEncoder)
+                                       PasswordEncoder passwordEncoder,
+                                       AspirationRepository aspirationRepository)
     {
         this.userProfileRepository = userProfileRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.aspirationRepository = aspirationRepository;
     }
 
     @Override
@@ -51,6 +55,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         userProfile.setName(request.extractNameFromEmail());
         userProfile.setPassword(passwordEncoder.encode(request.getPassword()));
         userProfile.addRole(roleRepository.getUserRole());
+        userProfile.addAllAspirations(getAspirationsByNames(request.getAspirationNames()));
         userProfile = userProfileRepository.saveAndFlush(userProfile);
         var userProfileDto = MAPPER.toDto(userProfile);
         log.debug("UserRegistrationServiceImpl.registerDisabledUser - end | request: {}", request);
@@ -86,6 +91,32 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 
     private boolean userAlreadyExists(String email) {
         return userProfileRepository.findByEmailIgnoreCase(email).isPresent();
+    }
+
+    private boolean containsInvalidAspirationName(Collection<String> aspirationNames) {
+        var validAspirationNames =
+                aspirationRepository
+                        .findAll()
+                        .stream()
+                        .map(a -> a.getRole().getName())
+                        .collect(toList());
+
+        return !validAspirationNames.containsAll(aspirationNames);
+    }
+
+    public List<Aspiration> getAspirationsByNames(Collection<String> names) {
+        var aspirations= aspirationRepository.findAllByRoleNameIn(names);
+        var numberOfRequestedAspirations = names.size();
+
+        // CAUTION!
+        // Even if request contains invalid aspiration names nothing would happen
+        // Invalid aspiration names would simply be filtered out by findAllByRoleNameIn method
+        // Exception is thrown just to inform the client that request contains bad data
+        if (aspirations.size() != numberOfRequestedAspirations) {
+            throw ASPIRATION_NOT_VALID.newException();
+        }
+
+        return aspirations;
     }
 
 }
