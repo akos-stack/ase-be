@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
@@ -50,10 +52,11 @@ public class UserProfileServiceImpl implements IUserProfileService {
     @Override
     public UserProfileDto findUserProfileById(long id) {
         log.debug("UserProfileServiceImpl.findUserProfileById - start | id: {}", id);
-        var userProfileDto = userProfileRepository
+        var userProfile = userProfileRepository
                 .findById(id)
-                .map(MAPPER::toDto)
                 .orElseThrow(USER_NOT_FOUND::newException);
+        var userProfileDto = MAPPER.toDto(userProfile);
+        userProfileDto.setAspirationNames(getAspirationNamesFromUserProfile(userProfile));
         log.debug("UserProfileServiceImpl.findUserProfileById - end | id: {}", id);
         return userProfileDto;
     }
@@ -165,6 +168,14 @@ public class UserProfileServiceImpl implements IUserProfileService {
             roleRepository.findByNameIgnoreCase(role).orElseThrow(ROLE_NOT_FOUND::newException);
         }
         return role != null ? role : "";
+    }
+
+    private Set<String> getAspirationNamesFromUserProfile(UserProfile u) {
+        return u
+                .getAspirations()
+                .stream()
+                .map(a -> a.getRole().getName())
+                .collect(Collectors.toSet());
     }
 
 }
