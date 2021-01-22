@@ -162,10 +162,9 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     }
 
     @Override
-    public ArrayPendingEvaluatorDataResponse searchPendingEvaluators(String email, int page, int size, String sort) {
+    public PagedPendingEvaluatorDataResponse searchPendingEvaluators(String email, int page, int size, String sort) {
         log.info("UserRegistrationFacadeImpl.searchPendingEvaluators - start | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
-        var pendingEvaluatorDtos = pendingEvaluatorService.searchPendingEvaluators(email, page, size, sort);
-        var response = new ArrayPendingEvaluatorDataResponse(pendingEvaluatorDtos);
+        var response = pendingEvaluatorService.searchPendingEvaluators(email, page, size, sort);
         log.info("UserRegistrationFacadeImpl.searchPendingEvaluators - end | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
         return response;
     }

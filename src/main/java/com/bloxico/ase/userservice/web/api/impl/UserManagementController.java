@@ -2,7 +2,7 @@ package com.bloxico.ase.userservice.web.api.impl;
 
 import com.bloxico.ase.userservice.facade.IUserManagementFacade;
 import com.bloxico.ase.userservice.web.api.UserManagementApi;
-import com.bloxico.ase.userservice.web.model.user.ArrayUserProfileDataResponse;
+import com.bloxico.ase.userservice.web.model.user.PagedUserProfileDataResponse;
 import com.bloxico.ase.userservice.web.model.user.BlacklistTokensRequest;
 import com.bloxico.ase.userservice.web.model.user.DisableUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class UserManagementController implements UserManagementApi {
     private IUserManagementFacade userManagementFacade;
 
     @Override
-    public ResponseEntity<ArrayUserProfileDataResponse> searchUsers(@Valid String email, @Valid String role, @Valid int page, @Valid int size, @Valid String sort) {
+    public ResponseEntity<PagedUserProfileDataResponse> searchUsers(@Valid String email, @Valid String role, @Valid int page, @Valid int size, @Valid String sort) {
         var arrayUserProfileDataResponse = userManagementFacade.searchUsers(email, role, page, size, sort);
         return ResponseEntity.ok(arrayUserProfileDataResponse);
     }

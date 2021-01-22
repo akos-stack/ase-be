@@ -8,14 +8,22 @@ import lombok.Value;
 import java.util.List;
 
 @Value
-public class ArrayUserProfileDataResponse {
+public class PagedUserProfileDataResponse {
 
     @JsonProperty("user_profiles")
     @ApiModelProperty(required = true)
     List<UserProfileDto> userProfiles;
 
-    @JsonProperty("count")
+    @JsonProperty("pageSize")
     @ApiModelProperty(required = true)
-    int count;
+    long pageElements;
+
+    @JsonProperty("totalElements")
+    @ApiModelProperty(required = true)
+    long totalElements;
+
+    @JsonProperty("totalPages")
+    @ApiModelProperty(required = true)
+    long totalPages;
 
 }
