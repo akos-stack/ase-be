@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "b553274f-41a1-4799-918f-a88281276b19",
+		"_postman_id": "5d3d0c95-eff7-4402-b899-e5ceb06d4fb7",
 		"name": "Art Stock Exchange",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -199,7 +199,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"sekuloskimilos@gmail.com\",\n    \"password\": \"Sekula123!\",\n    \"match_password\": \"Sekula123!\",\n    \"regionName\": \"Serbia\"\n}"
+							"raw": "{\n    \"email\": \"sekuloskimilos@gmail.com\",\n    \"password\": \"Sekula123!\",\n    \"match_password\": \"Sekula123!\",\n    \"regionName\": \"Serbia\",\n    \"aspirations\": [\n        \"evaluator\"\n    ]\n}"
 						},
 						"url": {
 							"raw": "{{endpoint_ase}}/api/user/registration",

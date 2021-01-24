@@ -29,6 +29,9 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface AseMapper {
 
+    String aspirationSetToAspirationNamesSetExpression
+            = "java(entity.getAspirations().stream().map(a -> a.getRole().getName()).collect(java.util.stream.Collectors.toSet()))";
+
     AseMapper MAPPER = Mappers.getMapper(AseMapper.class);
 
     CityDto toDto(City entity);
@@ -37,6 +40,7 @@ public interface AseMapper {
 
     LocationDto toDto(Location entity);
 
+    @Mapping(target = "aspirationNames", expression = aspirationSetToAspirationNamesSetExpression)
     UserProfileDto toDto(UserProfile entity);
 
     EvaluatorDto toDto(Evaluator entity);

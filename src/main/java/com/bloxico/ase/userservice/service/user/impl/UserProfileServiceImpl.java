@@ -56,7 +56,6 @@ public class UserProfileServiceImpl implements IUserProfileService {
                 .findById(id)
                 .orElseThrow(USER_NOT_FOUND::newException);
         var userProfileDto = MAPPER.toDto(userProfile);
-        userProfileDto.setAspirationNames(getAspirationNamesFromUserProfile(userProfile));
         log.debug("UserProfileServiceImpl.findUserProfileById - end | id: {}", id);
         return userProfileDto;
     }
@@ -168,14 +167,6 @@ public class UserProfileServiceImpl implements IUserProfileService {
             roleRepository.findByNameIgnoreCase(role).orElseThrow(ROLE_NOT_FOUND::newException);
         }
         return role != null ? role : "";
-    }
-
-    private Set<String> getAspirationNamesFromUserProfile(UserProfile u) {
-        return u
-                .getAspirations()
-                .stream()
-                .map(a -> a.getRole().getName())
-                .collect(Collectors.toSet());
     }
 
 }
