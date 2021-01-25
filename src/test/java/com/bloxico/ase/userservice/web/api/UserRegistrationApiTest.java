@@ -437,6 +437,47 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     }
 
     @Test
+    public void submitOwner_200_ok() {
+        var request = mockUtil.newSubmitOwnerRequest();
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_OWNER_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body( // TODO TEST better assertion
+                        "id", notNullValue(),
+                        "user_profile.id", notNullValue(),
+                        "user_profile.user_id", notNullValue(),
+                        "user_profile.first_name", is(request.getFirstName()),
+                        "user_profile.last_name", is(request.getLastName()),
+                        "user_profile.phone", is(request.getPhone()));
+    }
+
+    @Test
+    public void submitOwner_409_userAlreadyExists() {
+        var request = mockUtil.newSubmitOwnerRequest();
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_OWNER_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_OWNER_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(409);
+    }
+
+    @Test
     public void searchPendingEvaluators_200_paginatedListSuccessfullyRetrieved() {
         var pendingEvaluators = mockUtil.createInvitedPendingEvaluators();
 

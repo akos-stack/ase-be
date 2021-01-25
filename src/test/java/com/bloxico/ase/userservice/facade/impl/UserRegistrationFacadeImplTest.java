@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
+import com.bloxico.ase.userservice.repository.user.profile.OwnerRepository;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
@@ -42,6 +43,9 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Autowired
     private EvaluatorRepository evaluatorRepository;
+
+    @Autowired
+    private OwnerRepository ownerRepository;
 
     @Autowired
     private PendingEvaluatorRepository pendingEvaluatorRepository;
@@ -165,9 +169,28 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     public void submitEvaluator_evaluatorPending() {
         var request = mockUtil.newSubmitInvitedEvaluatorRequest();
         assertTrue(evaluatorRepository.findAll().isEmpty());
-        userRegistrationFacade.submitEvaluator(request);
-        var user = userService.findUserByEmail(request.getEmail());
-        assertEquals(user, userService.findUserByEmail(user.getEmail()));
+        var evaluatorId = userRegistrationFacade.submitEvaluator(request).getId();
+        assertTrue(evaluatorRepository.findById(evaluatorId).isPresent());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void submitOwner_nullRequest() {
+        userRegistrationFacade.submitOwner(null);
+    }
+
+    @Test(expected = UserException.class)
+    public void submitOwner_userAlreadyExists() {
+        var request = mockUtil.newSubmitOwnerRequest();
+        userRegistrationFacade.submitOwner(request);
+        userRegistrationFacade.submitOwner(request);
+    }
+
+    @Test
+    public void submitOwner() {
+        var request = mockUtil.newSubmitOwnerRequest();
+        assertTrue(ownerRepository.findAll().isEmpty());
+        var ownerId = userRegistrationFacade.submitOwner(request).getId();
+        assertTrue(ownerRepository.findById(ownerId).isPresent());
     }
 
     @Test(expected = NullPointerException.class)

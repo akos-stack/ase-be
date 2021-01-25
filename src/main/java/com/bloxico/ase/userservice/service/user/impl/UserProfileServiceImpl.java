@@ -1,9 +1,7 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
-import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
-import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
-import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
+import com.bloxico.ase.userservice.dto.entity.user.profile.*;
+import com.bloxico.ase.userservice.repository.user.profile.*;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +18,16 @@ public class UserProfileServiceImpl implements IUserProfileService {
 
     private final UserProfileRepository userProfileRepository;
     private final EvaluatorRepository evaluatorRepository;
+    private final OwnerRepository ownerRepository;
 
     @Autowired
     public UserProfileServiceImpl(UserProfileRepository userProfileRepository,
-                                  EvaluatorRepository evaluatorRepository)
+                                  EvaluatorRepository evaluatorRepository,
+                                  OwnerRepository ownerRepository)
     {
         this.userProfileRepository = userProfileRepository;
         this.evaluatorRepository = evaluatorRepository;
+        this.ownerRepository = ownerRepository;
     }
 
     @Override
@@ -76,6 +77,17 @@ public class UserProfileServiceImpl implements IUserProfileService {
         evaluator.setCreatorId(principalId);
         var dto = MAPPER.toDto(evaluatorRepository.saveAndFlush(evaluator));
         log.debug("UserProfileServiceImpl.saveEvaluator - end | evaluatorDto: {}, principalId: {}", evaluatorDto, principalId);
+        return dto;
+    }
+
+    @Override
+    public OwnerDto saveOwner(OwnerDto ownerDto, long principalId) {
+        log.debug("UserProfileServiceImpl.saveOwner - start | ownerDto: {}, principalId: {}", ownerDto, principalId);
+        requireNonNull(ownerDto);
+        var owner = MAPPER.toEntity(ownerDto);
+        owner.setCreatorId(principalId);
+        var dto = MAPPER.toDto(ownerRepository.saveAndFlush(owner));
+        log.debug("UserProfileServiceImpl.saveOwner - start | ownerDto: {}, principalId: {}", ownerDto, principalId);
         return dto;
     }
 

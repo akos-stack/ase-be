@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.service.user.impl;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.OwnerDto;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;
@@ -57,6 +58,12 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
         assertEquals(request.getPhone(), updated.getPhone());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void saveEvaluator_nullEvaluatorDto() {
+        var principalId = mockUtil.savedUserProfileDto().getUserId();
+        userProfileService.saveEvaluator(null, principalId);
+    }
+
     @Test
     public void saveEvaluator() {
         var userProfileDto = mockUtil.savedUserProfileDto();
@@ -65,6 +72,22 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
         evaluatorDto.setUserProfile(userProfileDto);
         evaluatorDto = userProfileService.saveEvaluator(evaluatorDto, principalId);
         assertNotNull(evaluatorDto.getId());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void saveOwner_nullOwnerDto() {
+        var principalId = mockUtil.savedUserProfileDto().getUserId();
+        userProfileService.saveOwner(null, principalId);
+    }
+
+    @Test
+    public void saveOwner() {
+        var userProfileDto = mockUtil.savedUserProfileDto();
+        var principalId = userProfileDto.getUserId();
+        var ownerDto = new OwnerDto();
+        ownerDto.setUserProfile(userProfileDto);
+        ownerDto = userProfileService.saveOwner(ownerDto, principalId);
+        assertNotNull(ownerDto.getId());
     }
 
 }

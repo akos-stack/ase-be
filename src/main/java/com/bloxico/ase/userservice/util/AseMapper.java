@@ -6,18 +6,16 @@ import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.entity.address.*;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.*;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
-import com.bloxico.ase.userservice.entity.user.profile.Evaluator;
-import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
+import com.bloxico.ase.userservice.entity.user.profile.*;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
-import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
+import com.bloxico.ase.userservice.web.model.user.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -43,6 +41,8 @@ public interface AseMapper {
 
     EvaluatorDto toDto(Evaluator entity);
 
+    OwnerDto toDto(Owner entity);
+
     TokenDto toDto(Token entity);
 
     OAuthAccessTokenDto toDto(OAuthAccessToken entity);
@@ -63,30 +63,34 @@ public interface AseMapper {
 
     Evaluator toEntity(EvaluatorDto dto);
 
+    Owner toEntity(OwnerDto dto);
+
     // OTHER
 
     User toUser(RegistrationRequest request);
 
     @Mapping(target = "name", source = "username")
-    UserDto toUserDto(SubmitEvaluatorRequest request);
+    UserDto toUserDto(ISubmitUserProfileRequest request);
 
     @Mapping(target = "value", source = "tokenId")
     @Mapping(target = "expiryDate", source = "expiration")
     BlacklistedToken toBlacklistedToken(OAuthAccessTokenDto token);
 
     @Mapping(target = "name", source = "country")
-    CountryDto toCountryDto(SubmitEvaluatorRequest request);
+    CountryDto toCountryDto(ISubmitUserProfileRequest request);
 
     @Mapping(ignore = true, target = "country")
     @Mapping(target = "name", source = "city")
-    CityDto toCityDto(SubmitEvaluatorRequest request);
+    CityDto toCityDto(ISubmitUserProfileRequest request);
 
     @Mapping(ignore = true, target = "city")
-    LocationDto toLocationDto(SubmitEvaluatorRequest request);
+    LocationDto toLocationDto(ISubmitUserProfileRequest request);
 
-    UserProfileDto toUserProfileDto(SubmitEvaluatorRequest request);
+    UserProfileDto toUserProfileDto(ISubmitUserProfileRequest request);
 
     EvaluatorDto toEvaluatorDto(SubmitEvaluatorRequest request);
+
+    OwnerDto toOwnerDto(SubmitOwnerRequest request);
 
     PendingEvaluator toPendingEvaluator(IPendingEvaluatorRequest request);
 

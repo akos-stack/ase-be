@@ -21,6 +21,7 @@ public class Role implements Serializable {
     public static final String ADMIN = "admin";
     public static final String USER = "user";
     public static final String EVALUATOR = "evaluator";
+    public static final String OWNER = "owner";
 
     @Getter // Note: Currently not used
     public enum Value {

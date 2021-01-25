@@ -2,8 +2,7 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
@@ -14,13 +13,12 @@ import com.bloxico.ase.userservice.util.MailUtil;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
-import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
+import com.bloxico.ase.userservice.web.model.user.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.EVALUATOR_INVITATION;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.VERIFICATION;
@@ -133,6 +131,14 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     }
 
     @Override
+    public OwnerDto submitOwner(SubmitOwnerRequest request) {
+        log.info("UserRegistrationFacadeImpl.submitOwner - start | request: {}", request);
+        var ownerDto = doSaveOwner(request);
+        log.info("UserRegistrationFacadeImpl.submitOwner - end | request: {}", request);
+        return ownerDto;
+    }
+
+    @Override
     public void requestEvaluatorRegistration(EvaluatorRegistrationRequest request, long principalId) {
         log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - start | request: {}, principalId: {}", request, principalId);
         pendingEvaluatorService.createPendingEvaluator(request, principalId);
@@ -150,22 +156,18 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
 
     // HELPER METHODS
 
-    private EvaluatorDto doSaveEvaluator(SubmitEvaluatorRequest request) {
-        var principalId = doSaveUser(request, EVALUATOR).getId();
-        var locationDto = doSaveLocation(request, principalId);
-        var userProfileDto = doSaveUserProfile(locationDto, request, principalId);
-        var evaluatorDto = MAPPER.toEvaluatorDto(request);
-        evaluatorDto.setUserProfile(userProfileDto);
-        return userProfileService.saveEvaluator(evaluatorDto, principalId);
+    private CountryDto doSaveCountry(ISubmitUserProfileRequest request, long principalId) {
+        var countryDto = MAPPER.toCountryDto(request);
+        return locationService.findOrSaveCountry(countryDto, principalId);
     }
 
-    private UserDto doSaveUser(SubmitEvaluatorRequest request, String role) {
-        var userDto = MAPPER.toUserDto(request);
-        userDto.addRole(rolePermissionService.findRoleByName(role));
-        return userService.saveEnabledUser(userDto);
+    private CityDto doSaveCity(CountryDto countryDto, ISubmitUserProfileRequest request, long principalId) {
+        var cityDto = MAPPER.toCityDto(request);
+        cityDto.setCountry(countryDto);
+        return locationService.findOrSaveCity(cityDto, principalId);
     }
 
-    private LocationDto doSaveLocation(SubmitEvaluatorRequest request, long principalId) {
+    private LocationDto doSaveLocation(ISubmitUserProfileRequest request, long principalId) {
         var countryDto = doSaveCountry(request, principalId);
         var cityDto = doSaveCity(countryDto, request, principalId);
         var locationDto = MAPPER.toLocationDto(request);
@@ -173,22 +175,33 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         return locationService.saveLocation(locationDto, principalId);
     }
 
-    private CountryDto doSaveCountry(SubmitEvaluatorRequest request, long principalId) {
-        var countryDto = MAPPER.toCountryDto(request);
-        return locationService.findOrSaveCountry(countryDto, principalId);
+    private UserDto doSaveUser(ISubmitUserProfileRequest request) {
+        var userDto = MAPPER.toUserDto(request);
+        userDto.addRole(rolePermissionService.findRoleByName(request.getRole()));
+        return userService.saveEnabledUser(userDto);
     }
 
-    private CityDto doSaveCity(CountryDto countryDto, SubmitEvaluatorRequest request, long principalId) {
-        var cityDto = MAPPER.toCityDto(request);
-        cityDto.setCountry(countryDto);
-        return locationService.findOrSaveCity(cityDto, principalId);
-    }
-
-    private UserProfileDto doSaveUserProfile(LocationDto locationDto, SubmitEvaluatorRequest request, long principalId) {
+    private UserProfileDto doSaveUserProfile(ISubmitUserProfileRequest request) {
+        var principalId = doSaveUser(request).getId();
+        var locationDto = doSaveLocation(request, principalId);
         var userProfileDto = MAPPER.toUserProfileDto(request);
         userProfileDto.setUserId(principalId);
         userProfileDto.setLocation(locationDto);
         return userProfileService.saveUserProfile(userProfileDto, principalId);
+    }
+
+    private OwnerDto doSaveOwner(SubmitOwnerRequest request) {
+        var userProfileDto = doSaveUserProfile(request);
+        var ownerDto = MAPPER.toOwnerDto(request);
+        ownerDto.setUserProfile(userProfileDto);
+        return userProfileService.saveOwner(ownerDto, userProfileDto.getUserId());
+    }
+
+    private EvaluatorDto doSaveEvaluator(SubmitEvaluatorRequest request) {
+        var userProfileDto = doSaveUserProfile(request);
+        var evaluatorDto = MAPPER.toEvaluatorDto(request);
+        evaluatorDto.setUserProfile(userProfileDto);
+        return userProfileService.saveEvaluator(evaluatorDto, userProfileDto.getUserId());
     }
 
 }

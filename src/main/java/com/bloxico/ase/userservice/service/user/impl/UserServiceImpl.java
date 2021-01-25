@@ -9,9 +9,7 @@ import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -109,6 +107,8 @@ public class UserServiceImpl implements IUserService {
     public UserDto saveEnabledUser(UserDto userDto) {
         log.debug("UserServiceImpl.saveEnabledUser - start | userDto: {}", userDto);
         requireNonNull(userDto);
+        if (userAlreadyExists(userDto.getEmail()))
+            throw USER_EXISTS.newException();
         var user = MAPPER.toEntity(userDto);
         user.setEnabled(true);
         var dto = MAPPER.toDto(userRepository.saveAndFlush(user));

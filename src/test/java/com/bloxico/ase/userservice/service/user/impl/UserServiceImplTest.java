@@ -116,6 +116,16 @@ public class UserServiceImplTest extends AbstractSpringTest {
         userService.saveEnabledUser(null);
     }
 
+    @Test(expected = UserException.class)
+    public void saveEnabledUser_userAlreadyExists() {
+        var userDto = new UserDto();
+        userDto.setName(uuid());
+        userDto.setEmail(uuid());
+        userDto.setPassword(uuid());
+        userService.saveEnabledUser(userDto);
+        userService.saveEnabledUser(userDto);
+    }
+
     @Test
     public void saveEnabledUser() {
         var userDto = new UserDto();

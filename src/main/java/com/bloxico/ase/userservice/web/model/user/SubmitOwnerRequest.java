@@ -23,19 +23,13 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
 @ToString(exclude = "password")
-public class SubmitEvaluatorRequest implements ISubmitUserProfileRequest {
+public class SubmitOwnerRequest implements ISubmitUserProfileRequest {
 
     @JsonIgnore
     @Override
     public String getRole() {
-        return Role.EVALUATOR;
+        return Role.OWNER;
     }
-
-    @NotNull
-    @NotEmpty
-    @JsonProperty("token")
-    @ApiModelProperty(required = true)
-    String token;
 
     @NotNull
     @NotEmpty

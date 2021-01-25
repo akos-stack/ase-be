@@ -27,6 +27,7 @@ import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
+import com.bloxico.ase.userservice.web.model.user.SubmitOwnerRequest;
 import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -349,6 +350,15 @@ public class MockUtil {
         return new SubmitEvaluatorRequest(
                 uuid(), uuid(), password,
                 email, uuid(), uuid(),
+                uuid(), LocalDate.now(),
+                uuid(), uuid(), uuid(),
+                uuid(), uuid(), ONE, TEN);
+    }
+
+    public SubmitOwnerRequest newSubmitOwnerRequest() {
+        return new SubmitOwnerRequest(
+                uuid(), genEmail(),
+                genEmail(), uuid(), uuid(),
                 uuid(), LocalDate.now(),
                 uuid(), uuid(), uuid(),
                 uuid(), uuid(), ONE, TEN);
