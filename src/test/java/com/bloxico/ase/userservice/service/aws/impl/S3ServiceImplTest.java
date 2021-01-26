@@ -10,7 +10,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
 
@@ -29,30 +29,31 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void upload_success() {
-        MultipartFile multipartFile = new MockMultipartFile("some.txt","some.txt", "text/plain", "Hello".getBytes());
+        MultipartFile multipartFile = new MockMultipartFile("some.txt", "some.txt", "text/plain", "Hello".getBytes());
         String fileName = s3Service.uploadFile(FileCategory.CV, multipartFile);
-        assertTrue(amazonS3.getObject(bucketName, fileName) != null);
+        assertNotNull(amazonS3.getObject(bucketName, fileName));
     }
 
     @Test(expected = com.bloxico.ase.userservice.exception.AmazonS3Exception.class)
     public void upload_failOnTypeNotSupported() {
-        MultipartFile multipartFile = new MockMultipartFile("some.zip","some.zip", "application/zip", "Hello".getBytes());
+        MultipartFile multipartFile = new MockMultipartFile("some.zip", "some.zip", "application/zip", "Hello".getBytes());
         s3Service.uploadFile(FileCategory.CV, multipartFile);
     }
 
     @Test
     public void download_success() {
-        MultipartFile multipartFile = new MockMultipartFile("some.txt","some.txt", "text/plain", "Hello".getBytes());
+        MultipartFile multipartFile = new MockMultipartFile("some.txt", "some.txt", "text/plain", "Hello".getBytes());
         String fileName = s3Service.uploadFile(FileCategory.CV, multipartFile);
         ByteArrayResource resource = s3Service.downloadFile(fileName);
-        assertTrue(resource != null);
+        assertNotNull(resource);
     }
 
     @Test(expected = AmazonS3Exception.class)
     public void delete_success() {
-        MultipartFile multipartFile = new MockMultipartFile("some.txt","some.txt", "text/plain", "Hello".getBytes());
+        MultipartFile multipartFile = new MockMultipartFile("some.txt", "some.txt", "text/plain", "Hello".getBytes());
         String fileName = s3Service.uploadFile(FileCategory.CV, multipartFile);
         s3Service.deleteFile(fileName);
         amazonS3.getObject(bucketName, fileName);
     }
+
 }
