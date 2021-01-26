@@ -8,17 +8,18 @@ import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
@@ -94,16 +95,13 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     }
 
     @Override
-    public List<PendingEvaluatorDto> searchPendingEvaluators(String email, int page, int size, String sort) {
+    public Page<PendingEvaluatorDto> searchPendingEvaluators(String email, int page, int size, String sort) {
         log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - start | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-        var pendingEvaluators = pendingEvaluatorRepository
-                .findAllByEmailContaining(email, pageable)
-                .stream()
-                .map(MAPPER::toDto)
-                .collect(toList());
+        var pendingEvaluatorsDto = pendingEvaluatorRepository.findAllByEmailContaining(email, pageable)
+                .map(MAPPER::toDto);
         log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - end | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
-        return pendingEvaluators;
+        return pendingEvaluatorsDto;
     }
 
     private PendingEvaluator updateStatus(PendingEvaluator pendingEvaluator, Status status, long principalId) {

@@ -85,7 +85,7 @@ public class UserRegistrationController implements UserRegistrationApi {
     }
 
     @Override
-    public ResponseEntity<ArrayPendingEvaluatorDataResponse> searchPendingEvaluators(String email, int page, int size, String sort) {
+    public ResponseEntity<PagedPendingEvaluatorDataResponse> searchPendingEvaluators(String email, int page, int size, String sort) {
         var arrayPendingEvaluatorDataResponse = userRegistrationFacade.searchPendingEvaluators(email, page, size, sort);
         return ResponseEntity.ok(arrayPendingEvaluatorDataResponse);
     }

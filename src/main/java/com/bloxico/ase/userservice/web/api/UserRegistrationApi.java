@@ -150,6 +150,6 @@ public interface UserRegistrationApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Paginated list of pending evaluators successfully retrieved.")
     })
-    ResponseEntity<ArrayPendingEvaluatorDataResponse> searchPendingEvaluators(@Valid @RequestParam("email") String email, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "email") String sort);
+    ResponseEntity<PagedPendingEvaluatorDataResponse> searchPendingEvaluators(@Valid @RequestParam("email") String email, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "email") String sort);
 
 }

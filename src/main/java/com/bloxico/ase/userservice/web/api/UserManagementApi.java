@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.web.model.user.ArrayUserProfileDataResponse;
+import com.bloxico.ase.userservice.web.model.user.PagedUserProfileDataResponse;
 import com.bloxico.ase.userservice.web.model.user.BlacklistTokensRequest;
 import com.bloxico.ase.userservice.web.model.user.DisableUserRequest;
 import io.swagger.annotations.Api;
@@ -31,7 +31,7 @@ public interface UserManagementApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Paginated list of users successfully retrieved.")
     })
-    ResponseEntity<ArrayUserProfileDataResponse> searchUsers(@Valid @RequestParam(value = "email") String email, @Valid @RequestParam(value = "role", required = false) String role, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "name") String sort);
+    ResponseEntity<PagedUserProfileDataResponse> searchUsers(@Valid @RequestParam(value = "email") String email, @Valid @RequestParam(value = "role", required = false) String role, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "name") String sort);
 
     @PostMapping(
             value = USER_DISABLE,

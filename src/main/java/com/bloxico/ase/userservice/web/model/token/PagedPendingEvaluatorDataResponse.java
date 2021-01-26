@@ -8,10 +8,21 @@ import lombok.Value;
 import java.util.List;
 
 @Value
-public class ArrayPendingEvaluatorDataResponse {
+public class PagedPendingEvaluatorDataResponse {
 
     @JsonProperty("pending_evaluators")
     @ApiModelProperty(required = true)
     List<PendingEvaluatorDto> pendingEvaluators;
 
+    @JsonProperty("pageSize")
+    @ApiModelProperty(required = true)
+    long pageElements;
+
+    @JsonProperty("totalElements")
+    @ApiModelProperty(required = true)
+    long totalElements;
+
+    @JsonProperty("totalPages")
+    @ApiModelProperty(required = true)
+    long totalPages;
 }

@@ -4,8 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface IUserProfileService {
 
@@ -23,6 +22,6 @@ public interface IUserProfileService {
 
     void disableUser(long userId, long principalId);
 
-    List<UserProfileDto> findUsersByEmailOrRole(String email, String role, int page, int size, String sort);
+    Page<UserProfileDto> findUsersByEmailOrRole(String email, String role, int page, int size, String sort);
 
 }

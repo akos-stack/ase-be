@@ -28,6 +28,6 @@ public interface IUserRegistrationFacade {
 
     void requestEvaluatorRegistration(EvaluatorRegistrationRequest request, long principalId);
 
-    ArrayPendingEvaluatorDataResponse searchPendingEvaluators(String email, int page, int size, String sort);
+    PagedPendingEvaluatorDataResponse searchPendingEvaluators(String email, int page, int size, String sort);
 
 }
