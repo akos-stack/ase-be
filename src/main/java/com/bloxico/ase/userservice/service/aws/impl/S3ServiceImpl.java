@@ -26,26 +26,24 @@ public class S3ServiceImpl implements IS3Service {
     }
 
     @Override
-    public boolean validateFile(FileCategory fileCategory, MultipartFile file) {
+    public void validateFile(FileCategory fileCategory, MultipartFile file) {
         log.debug("S3ServiceImpl.validateFile - start | fileCategory: {}, file: {}",fileCategory, file.getName());
-        var valid = fileUtil.validate(fileCategory, file);
+        fileUtil.validate(fileCategory, file);
         log.debug("S3ServiceImpl.validateFile - end | fileCategory: {}, file: {}", fileCategory, file.getName());
-        return valid;
     }
 
     @Override
     public String uploadFile(FileCategory fileCategory, MultipartFile file) {
         log.debug("S3ServiceImpl.uploadFile - start | file: {}", file.getName());
         fileUtil.validate(fileCategory, file);
-        String fileUploadPath;
         try {
-            fileUploadPath = awsUtil.uploadFile(fileCategory, file);
+            String fileUploadPath = awsUtil.uploadFile(fileCategory, file);
+            log.debug("S3ServiceImpl.uploadFile - end | file: {}", file.getName());
+            return fileUploadPath;
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new AmazonS3Exception(HttpStatus.BAD_REQUEST, e.getMessage(), e.getCause());
         }
-        log.debug("S3ServiceImpl.uploadFile - end | file: {}", file.getName());
-        return fileUploadPath;
     }
 
     @Override

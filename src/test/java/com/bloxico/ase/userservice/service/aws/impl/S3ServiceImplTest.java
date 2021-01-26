@@ -19,8 +19,7 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void validate_success() {
-        var validation = s3Service.validateFile(FileCategory.CV, MockUtil.createMultipartFile());
-        assertTrue(validation);
+        s3Service.validateFile(FileCategory.CV, MockUtil.createMultipartFile());
     }
 
     @Test(expected = com.bloxico.ase.userservice.exception.AmazonS3Exception.class)

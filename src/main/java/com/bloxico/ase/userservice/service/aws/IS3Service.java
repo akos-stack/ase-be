@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IS3Service {
 
-    boolean validateFile(FileCategory fileCategory, MultipartFile file);
+    void validateFile(FileCategory fileCategory, MultipartFile file);
 
     String uploadFile(FileCategory fileCategory, MultipartFile file);
 

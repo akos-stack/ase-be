@@ -21,11 +21,10 @@ public class S3FacadeImpl implements IS3Facade {
     }
 
     @Override
-    public boolean validateFile(FileCategory fileCategory, MultipartFile file) {
+    public void validateFile(FileCategory fileCategory, MultipartFile file) {
         log.info("S3FacadeImpl.validateFile - start | fileCategory: {}, file: {} ", fileCategory, file.getName());
-        var response = s3Service.validateFile(fileCategory, file);
+        s3Service.validateFile(fileCategory, file);
         log.info("S3FacadeImpl.validateFile - end | fileCategory: {}, file: {} ", fileCategory, file.getName());
-        return response;
     }
 
     @Override

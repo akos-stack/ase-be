@@ -7,6 +7,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,9 +15,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 @Component
 public class AWSUtil {
@@ -27,15 +29,12 @@ public class AWSUtil {
     @Value("${s3.bucketName}")
     private String bucketName;
     
-    @Value("${upload.cv.file-path}")
-    private String cvUploadPath;
-    
-    @Value("${upload.image.file-path}")
-    private String imageUploadPath;
+    @Autowired
+    private Environment environment;
 
     public String uploadFile(FileCategory fileCategory, MultipartFile multipartFile) {
         var file = convertMultiPartToFile(multipartFile);
-        var rootPath = generateFilePath(fileCategory);
+        var rootPath = fileCategory.generateFilePath(environment);
         var filePath = rootPath + generateFileName(multipartFile);
         uploadFileToS3Bucket(filePath, file);
         file.delete();
@@ -44,7 +43,7 @@ public class AWSUtil {
     
     public String uploadFiles(FileCategory fileCategory, List<MultipartFile> multipartFileList) {
         var files = convertMultipartToFiles(multipartFileList);
-        var rootPath = generateFilePath(fileCategory);
+        var rootPath = fileCategory.generateFilePath(environment);
         files.forEach(file -> {
             String filePath = rootPath + generateFileName(file);
             uploadFileToS3Bucket(filePath, file);
@@ -72,13 +71,9 @@ public class AWSUtil {
     }
 
     private File convertMultiPartToFile(MultipartFile file) {
-        File convFile;
-        try {
-            convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
-            FileOutputStream fos = new FileOutputStream(convFile);
+        var convFile = new File(requireNonNull(file.getOriginalFilename()));
+        try (var fos = new FileOutputStream(convFile)) {
             fos.write(file.getBytes());
-            fos.close();
-            
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -87,17 +82,6 @@ public class AWSUtil {
 
     private List<File> convertMultipartToFiles(List<MultipartFile> multipartFiles) {
         return multipartFiles.stream().map(this::convertMultiPartToFile).collect(Collectors.toList());
-    }
-
-    private String generateFilePath(FileCategory fileCategory) {
-        switch (fileCategory) {
-            case CV: 
-                return cvUploadPath;
-            case IMAGE:
-                return imageUploadPath + UUID.randomUUID() + "/";
-            default:
-                return "";
-        }
     }
 
     private String generateFileName(MultipartFile multipartFile) {

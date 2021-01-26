@@ -10,16 +10,15 @@ import static java.util.Objects.requireNonNull;
 public class FileUtil {
 
     @Autowired
-    FileCategorySizeValidatorImpl fileCategorySizeValidator;
+    FileCategorySizeValidatorImpl validator;
 
-    public boolean validate(FileCategory fileCategory, MultipartFile file) {
+    public void validate(FileCategory fileCategory, MultipartFile file) {
         requireNonNull(file);
         requireNonNull(fileCategory);
-        fileCategory.validate(file, fileCategorySizeValidator);
-        return true;
+        fileCategory.validate(file, validator);
     }
 
     public static long toKiloBytes(long bytes) {
-        return bytes/1024l;
+        return bytes/1024;
     }
 }
