@@ -16,7 +16,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -33,23 +32,22 @@ public class AWSUtil {
     private Environment environment;
 
     public String uploadFile(FileCategory fileCategory, MultipartFile multipartFile) {
-        var file = convertMultiPartToFile(multipartFile);
         var rootPath = fileCategory.generateFilePath(environment);
+        return upload(multipartFile, rootPath);
+    }
+    
+    public String uploadFiles(FileCategory fileCategory, List<MultipartFile> multipartFileList) {
+        var rootPath = fileCategory.generateFilePath(environment);
+        multipartFileList.forEach(file -> upload(file, rootPath));
+        return rootPath;
+    }
+
+    private String upload(MultipartFile multipartFile, String rootPath) {
+        var file = convertMultiPartToFile(multipartFile);
         var filePath = rootPath + generateFileName(multipartFile);
         uploadFileToS3Bucket(filePath, file);
         file.delete();
         return filePath;
-    }
-    
-    public String uploadFiles(FileCategory fileCategory, List<MultipartFile> multipartFileList) {
-        var files = convertMultipartToFiles(multipartFileList);
-        var rootPath = fileCategory.generateFilePath(environment);
-        files.forEach(file -> {
-            String filePath = rootPath + generateFileName(file);
-            uploadFileToS3Bucket(filePath, file);
-            file.delete();
-        });
-        return rootPath;
     }
 
     public byte[] downloadFile(String filePath) throws IOException {
@@ -80,16 +78,8 @@ public class AWSUtil {
         return convFile;
     }
 
-    private List<File> convertMultipartToFiles(List<MultipartFile> multipartFiles) {
-        return multipartFiles.stream().map(this::convertMultiPartToFile).collect(Collectors.toList());
-    }
-
     private String generateFileName(MultipartFile multipartFile) {
         return UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(multipartFile.getOriginalFilename());
-    }
-
-    private String generateFileName(File file) {
-        return UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(file.getName());
     }
 
 }

@@ -49,8 +49,8 @@ public enum FileCategory {
     public void validate(MultipartFile file, Environment environment) {
         if (!supportedTypes.contains(getByExtension(getExtension(file.getOriginalFilename()))))
             throw FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY.newException();
-        long maxFileSize = Long.parseLong(requireNonNull(environment.getProperty(maxSizeProperty)));
-        if ((file.getSize() / 1024) > maxFileSize)
+        long maxFileSizeKb = Long.parseLong(requireNonNull(environment.getProperty(maxSizeProperty)));
+        if ((file.getSize() / 1024) > maxFileSizeKb)
             throw FILE_SIZE_EXCEEDED.newException();
     }
 

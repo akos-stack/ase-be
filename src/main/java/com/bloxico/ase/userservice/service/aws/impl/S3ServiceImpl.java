@@ -37,7 +37,7 @@ public class S3ServiceImpl implements IS3Service {
     @Override
     public String uploadFile(FileCategory fileCategory, MultipartFile file) {
         log.debug("S3ServiceImpl.uploadFile - start | file: {}", file.getName());
-        fileCategory.validate(file, environment);
+        validateFile(fileCategory, file);
         try {
             String fileUploadPath = awsUtil.uploadFile(fileCategory, file);
             log.debug("S3ServiceImpl.uploadFile - end | file: {}", file.getName());

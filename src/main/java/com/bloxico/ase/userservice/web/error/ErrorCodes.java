@@ -39,12 +39,12 @@ public interface ErrorCodes {
                 "When registering user, if password and matchPassword values are not valid."),
 
         ROLE_NOT_FOUND (
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.NOT_FOUND,
                 "5",
                 "When filtering users, if role parameter is non existing role."),
 
         RESUME_NOT_FOUND (
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.NOT_FOUND,
                 "6",
                 "When downloading user resume, if resume path is null or empty."
         );
