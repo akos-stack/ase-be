@@ -29,7 +29,8 @@ public class UserManagementFacadeImpl implements IUserManagementFacade {
     @Override
     public PagedUserProfileDataResponse searchUsers(String email, String role, int page, int size, String sort) {
         log.info("UserSearchFacadeImpl.searchUsers - start | email: {}, role: {}, page: {}, size: {}, sort: {}", email, role, page, size, sort);
-        var response = userProfileService.findUsersByEmailOrRole(email, role, page, size, sort);
+        var userProfileDtos = userProfileService.findUsersByEmailOrRole(email, role, page, size, sort);
+        var response = new PagedUserProfileDataResponse(userProfileDtos.getContent(), userProfileDtos.getContent().size(), userProfileDtos.getTotalElements(), userProfileDtos.getTotalPages());
         log.info("UserSearchFacadeImpl.searchUsers - end | email: {}, role: {}, page: {}, size: {}, sort: {}", email, role, page, size, sort);
         return response;
     }

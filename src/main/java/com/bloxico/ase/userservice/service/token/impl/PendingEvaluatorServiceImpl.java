@@ -6,9 +6,9 @@ import com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
-import com.bloxico.ase.userservice.web.model.token.PagedPendingEvaluatorDataResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,7 +20,6 @@ import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.I
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
@@ -96,17 +95,13 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     }
 
     @Override
-    public PagedPendingEvaluatorDataResponse searchPendingEvaluators(String email, int page, int size, String sort) {
+    public Page<PendingEvaluatorDto> searchPendingEvaluators(String email, int page, int size, String sort) {
         log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - start | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-        var pagedPendingEvaluators = pendingEvaluatorRepository.findAllByEmailContaining(email, pageable);
-        var pendingEvaluatorsDto = pagedPendingEvaluators.getContent()
-                .stream()
-                .map(MAPPER::toDto)
-                .collect(toList());
+        var pendingEvaluatorsDto = pendingEvaluatorRepository.findAllByEmailContaining(email, pageable)
+                .map(MAPPER::toDto);
         log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - end | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
-        return new PagedPendingEvaluatorDataResponse(pendingEvaluatorsDto, pendingEvaluatorsDto.size(), pagedPendingEvaluators.getTotalElements(), pagedPendingEvaluators.getTotalPages());
-
+        return pendingEvaluatorsDto;
     }
 
     private PendingEvaluator updateStatus(PendingEvaluator pendingEvaluator, Status status, long principalId) {

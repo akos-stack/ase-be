@@ -325,7 +325,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTest {
 
         var list = service.searchPendingEvaluators(uuid(), 0, 10, "email");
 
-        assertEquals(0, list.getPendingEvaluators().size());
+        assertEquals(0, list.getContent().size());
     }
 
     @Test

@@ -9,17 +9,15 @@ import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
-import com.bloxico.ase.userservice.web.model.user.PagedUserProfileDataResponse;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.stream.Collectors;
 
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -138,18 +136,14 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     @Override
-    public PagedUserProfileDataResponse findUsersByEmailOrRole(String email, String role, int page, int size, String sort) {
+    public Page<UserProfileDto> findUsersByEmailOrRole(String email, String role, int page, int size, String sort) {
         log.debug("UserProfileServiceImpl.findUsersByEmailOrRole - start | email: {}, role {}, page: {}, size: {}", email, role, page, size);
         role = validateRole(role);
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-        var pagedUserProfiles = userProfileRepository.findDistinctByEmailContainingAndRoles_NameContaining(email, role, pageable);
-        var userProfileDtos = pagedUserProfiles.getContent()
-                .stream()
-                .map(MAPPER::toDto)
-                .collect(Collectors.toList());
+        var userProfileDtos = userProfileRepository.findDistinctByEmailContainingAndRoles_NameContaining(email, role, pageable)
+                .map(MAPPER::toDto);
         log.debug("UserProfileServiceImpl.findUsersByEmailOrRole - end | email: {}, role {}, page: {}, size: {}", email, role, page, size);
-        var response = new PagedUserProfileDataResponse(userProfileDtos, userProfileDtos.size(), pagedUserProfiles.getTotalElements(), pagedUserProfiles.getTotalPages());
-        return response;
+        return userProfileDtos;
     }
 
     private static void requireHasRole(UserProfileDto userProfileDto, String role) {

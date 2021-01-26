@@ -184,19 +184,19 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
     @Test
     public void findUsersByEmail() {
         mockUtil.saveUserProfiles();
-        assertEquals(1, userProfileService.findUsersByEmailOrRole("user1", null, 0, 100, "name").getUserProfiles().size());
+        assertEquals(1, userProfileService.findUsersByEmailOrRole("user1", null, 0, 100, "name").getContent().size());
     }
 
     @Test
     public void findUsersByRole() {
         mockUtil.saveUserProfiles();
-        assertEquals(4, userProfileService.findUsersByEmailOrRole("", ADMIN, 0, 100, "name").getUserProfiles().size());
+        assertEquals(4, userProfileService.findUsersByEmailOrRole("", ADMIN, 0, 100, "name").getContent().size());
     }
 
     @Test
     public void findUsersByRoleAndEmail() {
         mockUtil.saveUserProfiles();
-        assertEquals(3, userProfileService.findUsersByEmailOrRole("user", ADMIN, 0, 100, "name").getUserProfiles().size());
+        assertEquals(3, userProfileService.findUsersByEmailOrRole("user", ADMIN, 0, 100, "name").getContent().size());
     }
 
 }
