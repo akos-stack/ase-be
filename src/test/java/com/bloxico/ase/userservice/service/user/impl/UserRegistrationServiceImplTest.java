@@ -68,17 +68,19 @@ public class UserRegistrationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void registerDisabledUser_withAspirations() {
-        var aspirationName = mockUtil.savedUserAspiration().getRole().getName();
+        var userAspirationName = mockUtil.getUserAspiration().getName();
+        var evaluatorAspirationName = mockUtil.getEvaluatorAspiration().getName();
         var request = new RegistrationRequest(
                 "passwordMatches@mail.com", "Password1!", "Password1!",
-                Set.of(aspirationName));
+                Set.of(userAspirationName, evaluatorAspirationName));
         var user = userRegistrationService.registerDisabledUser(request);
         assertNotNull(user.getId());
         assertEquals(request.getEmail(), user.getEmail());
         assertTrue(request.getEmail().contains(user.getName()));
         assertNotEquals(request.getPassword(), user.getPassword());
         assertTrue(user.streamRoleNames().anyMatch(Role.USER::equals));
-        assertTrue(user.getAspirationNames().stream().anyMatch(aspirationName::equals));
+        assertTrue(user.getAspirationNames().stream().anyMatch(userAspirationName::equals));
+        assertTrue(user.getAspirationNames().stream().anyMatch(evaluatorAspirationName::equals));
     }
 
     @Test(expected = UserProfileException.class)

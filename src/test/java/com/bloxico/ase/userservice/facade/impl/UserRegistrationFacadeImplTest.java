@@ -89,6 +89,17 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
         assertNotNull(response.getTokenValue());
     }
 
+    @Test
+    public void registerDisabledUser_withAspirations() {
+        var userAspirationName = mockUtil.getUserAspiration().getName();
+        var evaluatorAspirationName = mockUtil.getEvaluatorAspiration().getName();
+        var request = new RegistrationRequest(
+                "passwordMatches@mail.com","Password1!", "Password1!",
+                Set.of(userAspirationName, evaluatorAspirationName));
+        var response = userRegistrationFacade.registerUserWithVerificationToken(request);
+        assertNotNull(response.getTokenValue());
+    }
+
     @Test(expected = NullPointerException.class)
     public void handleTokenValidation_nullRequest() {
         userRegistrationFacade.handleTokenValidation(null);

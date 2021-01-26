@@ -7,7 +7,6 @@ import com.bloxico.ase.userservice.facade.impl.*;
 import com.bloxico.ase.userservice.repository.address.CityRepositoryTest;
 import com.bloxico.ase.userservice.repository.address.CountryRepositoryTest;
 import com.bloxico.ase.userservice.repository.address.LocationRepositoryTest;
-import com.bloxico.ase.userservice.repository.aspiration.AspirationRepositoryTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepositoryTest;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepositoryTest;
@@ -48,7 +47,6 @@ import org.junit.runners.Suite;
         OAuthClientDetailsRepositoryTest.class,
         RegistrationTokenRepositoryTest.class,
         PasswordResetTokenRepositoryTest.class,
-        AspirationRepositoryTest.class,
 
         // config
         PersistentJwtTokenStoreTest.class,

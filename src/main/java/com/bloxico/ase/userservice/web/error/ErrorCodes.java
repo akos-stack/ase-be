@@ -41,12 +41,7 @@ public interface ErrorCodes {
         ROLE_NOT_FOUND (
                 HttpStatus.BAD_REQUEST,
                 "5",
-                "When filtering users, if role parameter is non existing role."),
-
-        ASPIRATION_NOT_VALID (
-                HttpStatus.BAD_REQUEST,
-                "6",
-                "When registering user, if provided aspiration is not valid.");
+                "When filtering users, if role parameter is non existing role.");
 
         private final HttpStatus httpStatus;
         private final String code, description;

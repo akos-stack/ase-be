@@ -1,9 +1,8 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
-import com.bloxico.ase.userservice.entity.aspiration.Aspiration;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
-import com.bloxico.ase.userservice.repository.aspiration.AspirationRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserRegistrationService;
@@ -19,7 +18,6 @@ import java.util.List;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.*;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Slf4j
@@ -29,18 +27,15 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
     private final UserProfileRepository userProfileRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AspirationRepository aspirationRepository;
 
     @Autowired
     public UserRegistrationServiceImpl(UserProfileRepository userProfileRepository,
                                        RoleRepository roleRepository,
-                                       PasswordEncoder passwordEncoder,
-                                       AspirationRepository aspirationRepository)
+                                       PasswordEncoder passwordEncoder)
     {
         this.userProfileRepository = userProfileRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.aspirationRepository = aspirationRepository;
     }
 
     @Override
@@ -55,7 +50,9 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         userProfile.setName(request.extractNameFromEmail());
         userProfile.setPassword(passwordEncoder.encode(request.getPassword()));
         userProfile.addRole(roleRepository.getUserRole());
-        userProfile.addAllAspirations(getAspirationsByNames(request.getAspirationNames()));
+        if (hasAnyAspiredRolesByNames(request.getAspirationNames())) {
+            userProfile.addAllAspirations(getAspiredRolesByNames(request.getAspirationNames()));
+        }
         userProfile = userProfileRepository.saveAndFlush(userProfile);
         var userProfileDto = MAPPER.toDto(userProfile);
         log.debug("UserRegistrationServiceImpl.registerDisabledUser - end | request: {}", request);
@@ -93,19 +90,23 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         return userProfileRepository.findByEmailIgnoreCase(email).isPresent();
     }
 
-    public List<Aspiration> getAspirationsByNames(Collection<String> names) {
-        var aspirations= aspirationRepository.findAllByRoleNameIn(names);
+    private List<Role> getAspiredRolesByNames(Collection<String> names) {
+        var aspiredRoles= roleRepository.findAllByNameIgnoreCaseIn(names);
         var numberOfRequestedAspirations = names.size();
 
         // CAUTION!
-        // Even if request contains invalid aspiration names nothing would happen
-        // Invalid aspiration names would simply be filtered out by findAllByRoleNameIn method
+        // Even if request contains invalid role names nothing would happen
+        // Invalid role names would simply be filtered out by findAllByNameIgnoreCaseIn method
         // Exception is thrown just to inform the client that request contains bad data
-        if (aspirations.size() != numberOfRequestedAspirations) {
-            throw ASPIRATION_NOT_VALID.newException();
+        if (aspiredRoles.size() != numberOfRequestedAspirations) {
+            throw ROLE_NOT_FOUND.newException();
         }
 
-        return aspirations;
+        return aspiredRoles;
+    }
+
+    private boolean hasAnyAspiredRolesByNames(Collection<String> names) {
+        return names != null && names.size() > 0;
     }
 
 }

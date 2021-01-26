@@ -61,11 +61,12 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
 
     @Test
     public void registration_200_withAspirations() {
-        var aspirationName = mockUtil.savedUserAspiration().getRole().getName();
+        var userAspirationName = mockUtil.getUserAspiration().getName();
+        var evaluatorAspirationName = mockUtil.getEvaluatorAspiration().getName();
         var request = new RegistrationRequest(
                 "passwordMatches@mail.com",
                 "Password1!", "Password1!",
-                Set.of(aspirationName));
+                Set.of(userAspirationName, evaluatorAspirationName));
 
         given()
                 .contentType(JSON)
@@ -131,7 +132,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body(ERROR_CODE, is(ErrorCodes.User.ASPIRATION_NOT_VALID.getCode()));
+                .body(ERROR_CODE, is(ErrorCodes.User.ROLE_NOT_FOUND.getCode()));
     }
 
     @Test

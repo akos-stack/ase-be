@@ -11,10 +11,10 @@ import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.address.City;
 import com.bloxico.ase.userservice.entity.address.Country;
 import com.bloxico.ase.userservice.entity.address.Location;
-import com.bloxico.ase.userservice.entity.aspiration.Aspiration;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.entity.token.Token;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.facade.impl.UserManagementFacadeImpl;
 import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImpl;
@@ -22,7 +22,6 @@ import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
 import com.bloxico.ase.userservice.repository.address.CityRepository;
 import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
-import com.bloxico.ase.userservice.repository.aspiration.AspirationRepository;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
@@ -93,7 +92,6 @@ public class MockUtil {
     private final UserRegistrationFacadeImpl userRegistrationFacade;
     private final PendingEvaluatorRepository pendingEvaluatorRepository;
     private final PendingEvaluatorServiceImpl pendingEvaluatorService;
-    private final AspirationRepository aspirationRepository;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
@@ -110,8 +108,7 @@ public class MockUtil {
                     LocationRepository locationRepository,
                     UserRegistrationFacadeImpl userRegistrationFacade,
                     PendingEvaluatorRepository pendingEvaluatorRepository,
-                    PendingEvaluatorServiceImpl pendingEvaluatorService,
-                    AspirationRepository aspirationRepository)
+                    PendingEvaluatorServiceImpl pendingEvaluatorService)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -128,7 +125,6 @@ public class MockUtil {
         this.userRegistrationFacade = userRegistrationFacade;
         this.pendingEvaluatorRepository = pendingEvaluatorRepository;
         this.pendingEvaluatorService = pendingEvaluatorService;
-        this.aspirationRepository = aspirationRepository;
     }
 
     public UserProfile savedAdmin() {
@@ -166,7 +162,7 @@ public class MockUtil {
         user.setLocked(false);
         user.setEnabled(true);
         user.addRole(roleRepository.getUserRole());
-        user.addAspiration(savedUserAspiration());
+        user.addAspiration(getUserAspiration());
         return userProfileRepository.saveAndFlush(user);
     }
 
@@ -480,11 +476,12 @@ public class MockUtil {
                 .collect(Collectors.toList());
     }
 
-    public Aspiration savedUserAspiration() {
-        var role = roleRepository.getUserRole();
-        var aspiration = new Aspiration();
-        aspiration.setRole(role);
-        return aspirationRepository.saveAndFlush(aspiration);
+    public Role getUserAspiration() {
+        return roleRepository.getUserRole();
+    }
+
+    public Role getEvaluatorAspiration() {
+        return roleRepository.getEvaluatorRole();
     }
 
     private static final AtomicLong along = new AtomicLong(0);

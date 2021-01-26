@@ -560,23 +560,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - createTable:
-            tableName: aspirations
-            columns:
-              - column:
-                  name: id
-                  type: smallint
-                  autoIncrement: true
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-              - column:
-                  name: role_id
-                  type: smallint
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_aspiration_role
-                    references: roles(id)
-        - createTable:
             tableName: user_profiles_aspirations
             columns:
               - column:
@@ -588,13 +571,13 @@ databaseChangeLog:
                     foreignKeyName: fk_user_profile_aspiration
                     references: user_profiles(id)
               - column:
-                  name: aspiration_id
+                  name: role_id
                   type: smallint
                   constraints:
                     nullable: false
                     primaryKey: true
                     foreignKeyName: fk_aspiration_user_profile
-                    references: aspirations(id)
+                    references: roles(id)
         - addForeignKeyConstraint:
             constraintName: fk_country_creator
             baseTableName: countries

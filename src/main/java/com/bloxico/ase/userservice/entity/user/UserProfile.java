@@ -2,7 +2,6 @@ package com.bloxico.ase.userservice.entity.user;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.address.Location;
-import com.bloxico.ase.userservice.entity.aspiration.Aspiration;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -14,7 +13,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static javax.persistence.CascadeType.MERGE;
-import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -85,14 +83,14 @@ public class UserProfile extends BaseEntity {
     @JoinTable(
             name = "user_profiles_aspirations",
             joinColumns = @JoinColumn(name = "user_profile_id"),
-            inverseJoinColumns = @JoinColumn(name = "aspiration_id"))
-    private Set<Aspiration> aspirations = new HashSet<>();
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> aspirations = new HashSet<>();
 
-    public void addAspiration(Aspiration aspiration) {
+    public void addAspiration(Role aspiration) {
         aspirations.add(aspiration);
     }
 
-    public void addAllAspirations(Collection<Aspiration> aspirations) {
+    public void addAllAspirations(Collection<Role> aspirations) {
         this.aspirations.addAll(aspirations);
     }
 
