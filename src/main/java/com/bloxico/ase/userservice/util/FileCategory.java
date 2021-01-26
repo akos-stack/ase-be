@@ -7,18 +7,18 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY;
+import static java.util.Objects.requireNonNull;
 
 public enum FileCategory {
     CV (SupportedFileExtension.pdf, SupportedFileExtension.doc, SupportedFileExtension.txt) {
 
         @Override
-        public void validate(MultipartFile file, FileCategorySizeValidatorImpl validator) {
+        public void validate(MultipartFile file, Environment environment) {
             if(!CV.supportedTypes.contains(SupportedFileExtension.getByExtension(FilenameUtils.getExtension(file.getOriginalFilename()))))
                 throw FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY.newException();
-            if(validator.validateCV(FileUtil.toKiloBytes(file.getSize())))
-                throw FILE_SIZE_EXCEEDED.newException();
+            long maxFileSize = Long.parseLong(requireNonNull(environment.getProperty("upload.file.max-cv-size")));
+            FileUtil.validateFileSize(file.getSize(), maxFileSize);
         }
 
         @Override
@@ -29,11 +29,11 @@ public enum FileCategory {
     IMAGE (SupportedFileExtension.jpg, SupportedFileExtension.png) {
 
         @Override
-        public void validate(MultipartFile file, FileCategorySizeValidatorImpl validator) {
+        public void validate(MultipartFile file, Environment environment) {
             if(!IMAGE.supportedTypes.contains(SupportedFileExtension.getByExtension(FilenameUtils.getExtension(file.getOriginalFilename()))))
                 throw FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY.newException();
-            if(validator.validateImage(FileUtil.toKiloBytes(file.getSize())))
-                throw FILE_SIZE_EXCEEDED.newException();
+            long maxFileSize = Long.parseLong(requireNonNull(environment.getProperty("upload.file.max-image-size")));
+            FileUtil.validateFileSize(file.getSize(), maxFileSize);
         }
 
         @Override
@@ -42,7 +42,7 @@ public enum FileCategory {
         }
     };
 
-    public abstract void validate(MultipartFile file, FileCategorySizeValidatorImpl validator);
+    public abstract void validate(MultipartFile file, Environment environment);
 
     public abstract String generateFilePath(Environment environment);
 
