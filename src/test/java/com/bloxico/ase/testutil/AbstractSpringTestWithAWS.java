@@ -19,11 +19,14 @@ public abstract class AbstractSpringTestWithAWS extends AbstractSpringTest {
     @Value("${s3.bucketName}")
     protected String bucketName;
 
+    @Value("${s3.port}")
+    protected int port;
+
     private S3Mock api;
 
     @Before
     public void setUpAmazonS3Mock() {
-        api = new S3Mock.Builder().withPort(8001).withInMemoryBackend().build();
+        api = new S3Mock.Builder().withPort(port).withInMemoryBackend().build();
         api.start();
         amazonS3.createBucket(bucketName);
     }

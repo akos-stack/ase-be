@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.web.api.impl;
 
 import com.bloxico.ase.userservice.facade.IS3Facade;
+import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.api.S3Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -17,8 +18,8 @@ public class S3Controller implements S3Api {
     private IS3Facade s3Facade;
 
     @Override
-    public ResponseEntity<Void> uploadFile(MultipartFile file) {
-        s3Facade.uploadFile(file);
+    public ResponseEntity<Void> validateFile(FileCategory fileCategory, MultipartFile file) {
+        s3Facade.validateFile(fileCategory, file);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

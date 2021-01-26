@@ -5,6 +5,7 @@ import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
+import org.springframework.core.io.ByteArrayResource;
 
 public interface IUserRegistrationFacade {
 
@@ -30,4 +31,5 @@ public interface IUserRegistrationFacade {
 
     PagedPendingEvaluatorDataResponse searchPendingEvaluators(String email, int page, int size, String sort);
 
+    ByteArrayResource downloadEvaluatorResume(String email, long principalId);
 }

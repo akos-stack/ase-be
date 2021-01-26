@@ -2,22 +2,21 @@ package com.bloxico.ase.userservice.web.model.token;
 
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status;
 import com.bloxico.ase.userservice.validator.ValidEmail;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
-import static lombok.AccessLevel.PRIVATE;
 
-@Value
 @AllArgsConstructor
-@NoArgsConstructor(force = true, access = PRIVATE)
+@NoArgsConstructor
+@Setter
 public class EvaluatorRegistrationRequest implements IPendingEvaluatorRequest {
 
     @NotNull
@@ -29,14 +28,23 @@ public class EvaluatorRegistrationRequest implements IPendingEvaluatorRequest {
 
     @NotNull
     @NotEmpty
-    @JsonProperty("cvPath")
+    @JsonProperty("cv")
     @ApiModelProperty(required = true)
-    String cvPath;
+    MultipartFile cv;
 
-    @JsonIgnore
     @Override
     public Status getStatus() {
         return REQUESTED;
+    }
+
+    @Override
+    public String getEmail() {
+        return this.email;
+    }
+
+    @Override
+    public MultipartFile getCv() {
+        return this.cv;
     }
 
 }

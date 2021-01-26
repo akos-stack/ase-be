@@ -35,11 +35,15 @@ import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import io.restassured.response.Response;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -471,6 +475,18 @@ public class MockUtil {
                 .map(EvaluatorInvitationRequest::new)
                 .map(request -> pendingEvaluatorService.createPendingEvaluator(request, adminId))
                 .collect(Collectors.toList());
+    }
+
+    public static MultipartFile createMultipartFile() {
+        return new MockMultipartFile("file.txt", "file.txt", "text/plain", "Some file".getBytes());
+    }
+
+    public static byte[] getTestCVBytes() {
+        try {
+            return IOUtils.toByteArray(MockUtil.class.getResourceAsStream("/testFiles/testCv.txt"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static final AtomicLong along = new AtomicLong(0);

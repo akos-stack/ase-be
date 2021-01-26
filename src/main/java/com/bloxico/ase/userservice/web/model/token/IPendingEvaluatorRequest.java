@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.web.model.token;
 
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface IPendingEvaluatorRequest {
 
@@ -8,6 +9,6 @@ public interface IPendingEvaluatorRequest {
 
     String getEmail();
 
-    String getCvPath();
+    MultipartFile getCv();
 
 }

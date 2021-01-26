@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.facade.IS3Facade;
 import com.bloxico.ase.userservice.service.aws.IS3Service;
+import com.bloxico.ase.userservice.util.FileCategory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
@@ -20,10 +21,10 @@ public class S3FacadeImpl implements IS3Facade {
     }
 
     @Override
-    public void uploadFile(MultipartFile file) {
-        log.info("S3FacadeImpl.uploadFile - start | file: {} ", file.getName());
-        s3Service.uploadFile(file);
-        log.info("S3FacadeImpl.uploadFile - end | file: {} ", file.getName());
+    public void validateFile(FileCategory fileCategory, MultipartFile file) {
+        log.info("S3FacadeImpl.validateFile - start | fileCategory: {}, file: {} ", fileCategory, file.getName());
+        s3Service.validateFile(fileCategory, file);
+        log.info("S3FacadeImpl.validateFile - end | fileCategory: {}, file: {} ", fileCategory, file.getName());
     }
 
     @Override
