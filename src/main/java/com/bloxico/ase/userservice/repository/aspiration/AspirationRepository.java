@@ -20,8 +20,4 @@ public interface AspirationRepository extends JpaRepository<Aspiration, Short> {
         return findByRoleName(Role.USER).orElseThrow();
     }
 
-    default Aspiration getEvaluatorAspiration() {
-        return findByRoleName(Role.EVALUATOR).orElseThrow();
-    }
-
 }

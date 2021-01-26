@@ -46,7 +46,7 @@ public class RegistrationRequest {
 
     @JsonProperty("aspirations")
     @ApiModelProperty(required = false)
-    Set<String> aspirationNames = new HashSet<>();
+    Set<String> aspirationNames;
 
     @JsonIgnore
     public boolean isPasswordMatching() {
@@ -57,11 +57,6 @@ public class RegistrationRequest {
     public String extractNameFromEmail() {
         //noinspection ConstantConditions
         return email.split("@")[0];
-    }
-
-    @JsonIgnore
-    public void addAspirationName(String aspirationName) {
-        aspirationNames.add(aspirationName);
     }
 
 }

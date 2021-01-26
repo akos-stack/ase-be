@@ -93,17 +93,6 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         return userProfileRepository.findByEmailIgnoreCase(email).isPresent();
     }
 
-    private boolean containsInvalidAspirationName(Collection<String> aspirationNames) {
-        var validAspirationNames =
-                aspirationRepository
-                        .findAll()
-                        .stream()
-                        .map(a -> a.getRole().getName())
-                        .collect(toList());
-
-        return !validAspirationNames.containsAll(aspirationNames);
-    }
-
     public List<Aspiration> getAspirationsByNames(Collection<String> names) {
         var aspirations= aspirationRepository.findAllByRoleNameIn(names);
         var numberOfRequestedAspirations = names.size();

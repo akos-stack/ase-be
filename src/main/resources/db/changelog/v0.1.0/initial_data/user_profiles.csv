@@ -1,3 +1,2 @@
 name,password,email,enabled,locked
 ase.admin,$2a$10$zw2nWI1XwgYkX5.GuCBgMej.eNInAGuYx87PtTs60jTOdEtjsByN6,ase.admin@mailinator.com,true,false
-IWannaBeEvaluatorOneDay,$2y$12$rnDIuFFH0Os8ZZJTNDUGsedmGD/zjpE1x0etfSOfH56WZczuPQOBm,user@email.com,true,false

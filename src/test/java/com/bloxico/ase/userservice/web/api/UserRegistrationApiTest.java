@@ -15,6 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.bloxico.ase.testutil.MockUtil.*;
@@ -45,8 +46,26 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     public void registration_200_ok() {
         var request = new RegistrationRequest(
                 "passwordMatches@mail.com",
-                "Password1!", "Password1!");
-        request.addAspirationName("evaluator");
+                "Password1!", "Password1!", Set.of());
+
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body("token_value", not(isEmptyOrNullString()));
+    }
+
+    @Test
+    public void registration_200_withAspirations() {
+        var aspirationName = mockUtil.savedUserAspiration().getRole().getName();
+        var request = new RegistrationRequest(
+                "passwordMatches@mail.com",
+                "Password1!", "Password1!",
+                Set.of(aspirationName));
 
         given()
                 .contentType(JSON)
@@ -65,7 +84,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
                 .contentType(JSON)
                 .body(new RegistrationRequest(
                         "passwordMismatch@mail.com",
-                        "Password1!", "Password2!"))
+                        "Password1!", "Password2!", Set.of()))
                 .when()
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .then()
@@ -78,7 +97,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     public void registration_409_userAlreadyExists() {
         var request = new RegistrationRequest(
                 "passwordMatches@mail.com",
-                "Password1!", "Password1!");
+                "Password1!", "Password1!", Set.of());
         given()
                 .contentType(JSON)
                 .body(request)
@@ -102,8 +121,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     public void registration_400_invalidAspirationName() {
         var request = new RegistrationRequest(
                 "passwordMatches@mail.com",
-                "Password1!", "Password1!");
-        request.addAspirationName(uuid());
+                "Password1!", "Password1!", Set.of(uuid()));
 
         given()
                 .contentType(JSON)

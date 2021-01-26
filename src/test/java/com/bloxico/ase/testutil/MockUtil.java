@@ -11,6 +11,7 @@ import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.address.City;
 import com.bloxico.ase.userservice.entity.address.Country;
 import com.bloxico.ase.userservice.entity.address.Location;
+import com.bloxico.ase.userservice.entity.aspiration.Aspiration;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.entity.token.Token;
@@ -44,6 +45,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -164,7 +166,7 @@ public class MockUtil {
         user.setLocked(false);
         user.setEnabled(true);
         user.addRole(roleRepository.getUserRole());
-        user.addAspiration(aspirationRepository.getEvaluatorAspiration());
+        user.addAspiration(savedUserAspiration());
         return userProfileRepository.saveAndFlush(user);
     }
 
@@ -361,7 +363,7 @@ public class MockUtil {
         String email = genEmail(), pass = genEmail();
         String token = given()
                 .contentType(JSON)
-                .body(new RegistrationRequest(email, pass, pass))
+                .body(new RegistrationRequest(email, pass, pass, Set.of()))
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .getBody()
                 .path("token_value");
@@ -476,6 +478,13 @@ public class MockUtil {
                 .map(EvaluatorInvitationRequest::new)
                 .map(request -> pendingEvaluatorService.createPendingEvaluator(request, adminId))
                 .collect(Collectors.toList());
+    }
+
+    public Aspiration savedUserAspiration() {
+        var role = roleRepository.getUserRole();
+        var aspiration = new Aspiration();
+        aspiration.setRole(role);
+        return aspirationRepository.saveAndFlush(aspiration);
     }
 
     private static final AtomicLong along = new AtomicLong(0);

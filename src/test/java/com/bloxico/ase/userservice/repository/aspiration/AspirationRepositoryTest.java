@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.repository.aspiration;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
+import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.entity.aspiration.Aspiration;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
@@ -15,26 +16,23 @@ import static org.junit.Assert.*;
 public class AspirationRepositoryTest extends AbstractSpringTest {
 
     @Autowired
-    private AspirationRepository aspirationRepository;
+    private MockUtil mockUtil;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private AspirationRepository aspirationRepository;
 
     @Test
     public void saveAndFindById() {
         assertTrue(aspirationRepository.findById((short) -1).isEmpty());
-
-        var aspiration = new Aspiration();
-        aspiration.setRole(roleRepository.getUserRole());
-        var id = aspirationRepository.saveAndFlush(aspiration).getId();
-
-        assertTrue(aspirationRepository.findById(id).isPresent());
+        var aspiration = mockUtil.savedUserAspiration();
+        assertTrue(aspirationRepository.findById(aspiration.getId()).isPresent());
     }
 
     @Test
     public void findByRoleName() {
         assertFalse(aspirationRepository.findByRoleName(uuid()).isPresent());
-        assertTrue(aspirationRepository.findByRoleName("evaluator").isPresent());
+        var aspiration = mockUtil.savedUserAspiration();
+        assertTrue(aspirationRepository.findByRoleName(aspiration.getRole().getName()).isPresent());
     }
 
     @Test
@@ -42,13 +40,11 @@ public class AspirationRepositoryTest extends AbstractSpringTest {
         var shouldFindZero = aspirationRepository.findAllByRoleNameIn(Arrays.asList(uuid(), uuid()));
         assertEquals(0, shouldFindZero.size());
 
-        var shouldFindOne = aspirationRepository.findAllByRoleNameIn(Arrays.asList("evaluator", uuid()));
-        assertEquals(1, shouldFindOne.size());
-    }
+        var aspiration = mockUtil.savedUserAspiration();
 
-    @Test
-    public void getEvaluatorAspiration() {
-        assertEquals(Role.EVALUATOR, aspirationRepository.getEvaluatorAspiration().getRole().getName());
+        var shouldFindOne = aspirationRepository
+                .findAllByRoleNameIn(Arrays.asList(aspiration.getRole().getName(), uuid()));
+        assertEquals(1, shouldFindOne.size());
     }
 
 }
