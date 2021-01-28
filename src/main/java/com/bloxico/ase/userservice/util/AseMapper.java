@@ -29,9 +29,6 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface AseMapper {
 
-    String aspirationSetToAspirationNamesSetExpression
-            = "java(entity.getAspirations().stream().map(a -> a.getName()).collect(java.util.stream.Collectors.toSet()))";
-
     AseMapper MAPPER = Mappers.getMapper(AseMapper.class);
 
     CityDto toDto(City entity);

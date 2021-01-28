@@ -51,7 +51,7 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         userProfile.setPassword(passwordEncoder.encode(request.getPassword()));
         userProfile.addRole(roleRepository.getUserRole());
         if (hasAnyAspiredRolesByNames(request.getAspirationNames())) {
-            userProfile.addAllAspirations(getAspiredRolesByNames(request.getAspirationNames()));
+            userProfile.addAllAspirations(requireAllAspirationsFound(request.getAspirationNames()));
         }
         userProfile = userProfileRepository.saveAndFlush(userProfile);
         var userProfileDto = MAPPER.toDto(userProfile);
@@ -90,14 +90,10 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         return userProfileRepository.findByEmailIgnoreCase(email).isPresent();
     }
 
-    private List<Role> getAspiredRolesByNames(Collection<String> names) {
+    private List<Role> requireAllAspirationsFound(Collection<String> names) {
         var aspiredRoles= roleRepository.findAllByNameIgnoreCaseIn(names);
         var numberOfRequestedAspirations = names.size();
 
-        // CAUTION!
-        // Even if request contains invalid role names nothing would happen
-        // Invalid role names would simply be filtered out by findAllByNameIgnoreCaseIn method
-        // Exception is thrown just to inform the client that request contains bad data
         if (aspiredRoles.size() != numberOfRequestedAspirations) {
             throw ROLE_NOT_FOUND.newException();
         }
