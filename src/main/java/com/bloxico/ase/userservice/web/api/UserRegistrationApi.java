@@ -1,9 +1,11 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
+import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import io.swagger.annotations.*;
 import org.springframework.core.io.Resource;
@@ -27,6 +29,7 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_INVITATION_RESEND   = "/user/registration/evaluator/invitation/resend";
     String REGISTRATION_EVALUATOR_INVITATION_WITHDRAW = "/user/registration/evaluator/invitation/withdraw";
     String REGISTRATION_EVALUATOR_SUBMIT              = "/user/registration/evaluator/submit";
+    String REGISTRATION_ART_OWNER_SUBMIT              = "/user/registration/art-owner/submit";
     String REGISTRATION_EVALUATOR_REQUEST             = "/user/registration/evaluator/request";
     String REGISTRATION_EVALUATOR_SEARCH              = "/user/registration/evaluator/search";
     String REGISTRATION_EVALUATOR_RESUME_DOWNLOAD     = "/user/registration/evaluator/resume";
@@ -52,7 +55,6 @@ public interface UserRegistrationApi {
     @ApiOperation(value = "Accepts verification token provided by email and, if correct, enables user.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Validation successful - user is now able to log in."),
-            @ApiResponse(code = 404, message = "Could not find user associated with the given email."),
             @ApiResponse(code = 404, message = "Provided token is either not found or expired.")
     })
     ResponseEntity<Void> confirmRegistration(@Valid @RequestBody TokenValidationRequest request);
@@ -142,9 +144,21 @@ public interface UserRegistrationApi {
     @ApiOperation(value = "Creates new evaluator with given data. Evaluator must be invited first.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Evaluator is created successfully."),
-            @ApiResponse(code = 404, message = "Evaluator with given email is not invited.")
+            @ApiResponse(code = 404, message = "Evaluator with given email is not invited."),
+            @ApiResponse(code = 409, message = "User with given email already exists.")
     })
     ResponseEntity<EvaluatorDto> submitEvaluator(@Valid @RequestBody SubmitEvaluatorRequest request);
+
+    @PostMapping(
+            value = REGISTRATION_ART_OWNER_SUBMIT,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @ApiOperation(value = "Creates new art owner with given data.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Art owner is created successfully."),
+            @ApiResponse(code = 409, message = "User with given email already exists.")
+    })
+    ResponseEntity<ArtOwnerDto> submitArtOwner(@Valid @RequestBody SubmitArtOwnerRequest request);
 
     @GetMapping(value = REGISTRATION_EVALUATOR_SEARCH)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_users')")
@@ -152,7 +166,11 @@ public interface UserRegistrationApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Paginated list of pending evaluators successfully retrieved.")
     })
-    ResponseEntity<PagedPendingEvaluatorDataResponse> searchPendingEvaluators(@Valid @RequestParam("email") String email, @Valid @RequestParam(required = false, defaultValue = "0") int page, @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size, @Valid @RequestParam(required = false, defaultValue = "email") String sort);
+    ResponseEntity<PagedPendingEvaluatorDataResponse> searchPendingEvaluators(
+            @Valid @RequestParam("email") String email,
+            @Valid @RequestParam(required = false, defaultValue = "0") int page,
+            @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size,
+            @Valid @RequestParam(required = false, defaultValue = "email") String sort);
 
     @GetMapping(value = REGISTRATION_EVALUATOR_RESUME_DOWNLOAD)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'download_user_resume')")

@@ -13,9 +13,7 @@ import java.util.Set;
 
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
 
@@ -33,9 +31,9 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
         assertTrue(service.blacklistedTokens().isEmpty());
         assertTrue(service.blacklistedTokens().isEmpty());
         var principalId = mockUtil.savedAdmin().getId();
-        var userProfile = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var token = uuid();
-        var oToken = mockUtil.toOAuthAccessTokenDto(userProfile, token);
+        var oToken = mockUtil.toOAuthAccessTokenDto(user, token);
         service.blacklistTokens(List.of(oToken), principalId); // evicts cache
         assertFalse(service.blacklistedTokens().isEmpty());
         assertFalse(service.blacklistedTokens().isEmpty());
@@ -57,9 +55,9 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
     @Test
     public void blacklistTokens_generatedTokens() {
         var principalId = mockUtil.savedAdmin().getId();
-        var userProfile = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var token = uuid();
-        var oToken = mockUtil.toOAuthAccessTokenDto(userProfile, token);
+        var oToken = mockUtil.toOAuthAccessTokenDto(user, token);
         service.blacklistTokens(List.of(oToken), principalId);
         assertTrue(service.blacklistedTokens().contains(token));
         var tokens = repository.findDistinctTokenValues();
@@ -69,9 +67,9 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
     @Test
     public void blacklistTokens_sameTokenMultipleTimes() {
         var principalId = mockUtil.savedAdmin().getId();
-        var userProfile = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var token = uuid();
-        var oToken = mockUtil.toOAuthAccessTokenDto(userProfile, token);
+        var oToken = mockUtil.toOAuthAccessTokenDto(user, token);
         service.blacklistTokens(List.of(oToken), principalId);
         assertTrue(service.blacklistedTokens().contains(token));
         assertEquals(

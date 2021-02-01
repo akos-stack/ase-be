@@ -30,7 +30,7 @@ public class BaseEntityTest extends AbstractSpringTest {
     @Test
     public void prePersist_creator_isNotNull() {
         var country = new Country();
-        var creator = mockUtil.savedUserProfile();
+        var creator = mockUtil.savedUser();
         country.setName(uuid());
         country.setCreatorId(creator.getId());
         assertNull(country.getCreatedAt());
@@ -42,7 +42,7 @@ public class BaseEntityTest extends AbstractSpringTest {
     public void preUpdate_updater_isNull() {
         var oldCountry = new Country();
         {
-            var creator = mockUtil.savedUserProfile();
+            var creator = mockUtil.savedUser();
             oldCountry.setName(uuid());
             oldCountry.setCreatorId(creator.getId());
             countryRepository.saveAndFlush(oldCountry);
@@ -60,7 +60,7 @@ public class BaseEntityTest extends AbstractSpringTest {
     public void preUpdate_updater_isNotNull() {
         var oldCountry = new Country();
         {
-            var creator = mockUtil.savedUserProfile();
+            var creator = mockUtil.savedUser();
             oldCountry.setName(uuid());
             oldCountry.setCreatorId(creator.getId());
             countryRepository.saveAndFlush(oldCountry);

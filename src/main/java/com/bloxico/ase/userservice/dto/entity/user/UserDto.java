@@ -1,20 +1,15 @@
 package com.bloxico.ase.userservice.dto.entity.user;
 
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Stream;
 
 @Data
 @EqualsAndHashCode(of = "email")
 @ToString(exclude = "password")
-public class UserProfileDto {
+public class UserDto {
 
     @JsonProperty("id")
     private Long id;
@@ -27,24 +22,6 @@ public class UserProfileDto {
 
     @JsonProperty("email")
     private String email;
-
-    @JsonProperty("first_name")
-    private String firstName;
-
-    @JsonProperty("last_name")
-    private String lastName;
-
-    @JsonProperty("phone")
-    private String phone;
-
-    @JsonProperty("birthday")
-    private LocalDate birthday;
-
-    @JsonProperty("gender")
-    private String gender;
-
-    @JsonProperty("location")
-    private LocationDto location;
 
     @JsonProperty("locked")
     private Boolean locked = false;
@@ -66,12 +43,6 @@ public class UserProfileDto {
 
     public void addRole(RoleDto role) {
         roles.add(role);
-    }
-
-    public Stream<String> streamRoleNames() {
-        return roles
-                .stream()
-                .map(RoleDto::getName);
     }
 
 }

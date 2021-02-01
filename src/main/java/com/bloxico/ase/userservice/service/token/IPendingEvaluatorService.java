@@ -2,10 +2,8 @@ package com.bloxico.ase.userservice.service.token;
 
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
-import org.springframework.data.domain.Page;
 import org.springframework.core.io.ByteArrayResource;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface IPendingEvaluatorService {
 
@@ -22,4 +20,5 @@ public interface IPendingEvaluatorService {
     Page<PendingEvaluatorDto> searchPendingEvaluators(String email, int page, int size, String sort);
 
     ByteArrayResource getEvaluatorResume(String email, long principalId);
+
 }

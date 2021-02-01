@@ -1,16 +1,14 @@
 package com.bloxico.ase.userservice.service.address;
 
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
+import com.bloxico.ase.userservice.dto.entity.address.*;
 
 import java.util.List;
 
 public interface ILocationService {
 
-    List<CountryDto> allCountries();
+    List<CountryDto> findAllCountries();
 
-    List<CityDto> allCities();
+    List<CityDto> findAllCities();
 
     CountryDto findOrSaveCountry(CountryDto countryDto, long principalId);
 

@@ -1,20 +1,14 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
-import com.bloxico.ase.userservice.dto.entity.user.*;
-import com.bloxico.ase.userservice.repository.address.LocationRepository;
-import com.bloxico.ase.userservice.repository.user.*;
+import com.bloxico.ase.userservice.dto.entity.user.profile.*;
+import com.bloxico.ase.userservice.repository.user.profile.*;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.ROLE_NOT_FOUND;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 
@@ -24,41 +18,26 @@ public class UserProfileServiceImpl implements IUserProfileService {
 
     private final UserProfileRepository userProfileRepository;
     private final EvaluatorRepository evaluatorRepository;
-    private final LocationRepository locationRepository;
-    private final RoleRepository roleRepository;
+    private final ArtOwnerRepository artOwnerRepository;
 
     @Autowired
     public UserProfileServiceImpl(UserProfileRepository userProfileRepository,
                                   EvaluatorRepository evaluatorRepository,
-                                  LocationRepository locationRepository,
-                                  RoleRepository roleRepository)
+                                  ArtOwnerRepository artOwnerRepository)
     {
         this.userProfileRepository = userProfileRepository;
         this.evaluatorRepository = evaluatorRepository;
-        this.locationRepository = locationRepository;
-        this.roleRepository = roleRepository;
+        this.artOwnerRepository = artOwnerRepository;
     }
 
     @Override
-    public UserProfileDto findUserProfileById(long id) {
-        log.debug("UserProfileServiceImpl.findUserProfileById - start | id: {}", id);
+    public UserProfileDto findUserProfileByUserId(long id) {
+        log.debug("UserProfileServiceImpl.findUserProfileByUserId - start | id: {}", id);
         var userProfileDto = userProfileRepository
-                .findById(id)
+                .findByUserId(id)
                 .map(MAPPER::toDto)
                 .orElseThrow(USER_NOT_FOUND::newException);
-        log.debug("UserProfileServiceImpl.findUserProfileById - end | id: {}", id);
-        return userProfileDto;
-    }
-
-    @Override
-    public UserProfileDto findUserProfileByEmail(String email) {
-        log.debug("UserProfileServiceImpl.findUserByEmail - start | email: {}", email);
-        requireNonNull(email);
-        var userProfileDto = userProfileRepository
-                .findByEmailIgnoreCase(email)
-                .map(MAPPER::toDto)
-                .orElseThrow(USER_NOT_FOUND::newException);
-        log.debug("UserProfileServiceImpl.findUserByEmail - end | email: {}", email);
+        log.debug("UserProfileServiceImpl.findUserProfileByUserId - end | id: {}", id);
         return userProfileDto;
     }
 
@@ -67,9 +46,10 @@ public class UserProfileServiceImpl implements IUserProfileService {
         log.debug("UserProfileServiceImpl.updateUserProfile - start | id: {}, request: {}", id, request);
         requireNonNull(request);
         var userProfile = userProfileRepository
-                .findById(id)
+                .findByUserId(id)
                 .orElseThrow(USER_NOT_FOUND::newException);
-        userProfile.setName(request.getName());
+        userProfile.setFirstName(request.getFirstName());
+        userProfile.setLastName(request.getLastName());
         userProfile.setPhone(request.getPhone());
         userProfile.setUpdaterId(id);
         userProfile = userProfileRepository.saveAndFlush(userProfile);
@@ -79,81 +59,35 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     @Override
-    public UserProfileDto saveEnabledUserProfile(UserProfileDto dto) {
-        log.debug("UserProfileServiceImpl.saveUserProfile - start | dto: {}", dto);
-        requireNonNull(dto);
-        var userProfile = MAPPER.toEntity(dto);
-        userProfile.setEnabled(true);
-        var userProfileDto = MAPPER.toDto(userProfileRepository.saveAndFlush(userProfile));
-        log.debug("UserProfileServiceImpl.saveUserProfile - end | dto: {}", dto);
-        return userProfileDto;
-    }
-
-    @Override
-    public UserProfileDto updateLocation(UserProfileDto userProfileDto, LocationDto locationDto) {
-        log.debug("UserProfileServiceImpl.updateLocation - start | userProfileDto: {}, locationDto: {}", userProfileDto, locationDto);
+    public UserProfileDto saveUserProfile(UserProfileDto userProfileDto, long principalId) {
+        log.debug("UserProfileServiceImpl.saveUserProfile - start | userProfileDto: {}, principalId: {}", userProfileDto, principalId);
         requireNonNull(userProfileDto);
-        requireNonNull(locationDto);
-        var userProfile = userProfileRepository
-                .findById(userProfileDto.getId())
-                .orElseThrow(USER_NOT_FOUND::newException);
-        userProfile.setLocation(locationRepository.fetchById(locationDto.getId()));
-        userProfile.setUpdaterId(userProfile.getId());
-        var updatedUserProfileDto = MAPPER.toDto(userProfileRepository.saveAndFlush(userProfile));
-        log.debug("UserProfileServiceImpl.updateLocation - end | userProfileDto: {}, locationDto: {}", userProfileDto, locationDto);
-        return updatedUserProfileDto;
+        var userProfile = MAPPER.toEntity(userProfileDto);
+        userProfile.setCreatorId(principalId);
+        var dto = MAPPER.toDto(userProfileRepository.saveAndFlush(userProfile));
+        log.debug("UserProfileServiceImpl.saveUserProfile - end | userProfileDto: {}, principalId: {}", userProfileDto, principalId);
+        return dto;
     }
 
     @Override
-    public EvaluatorDto saveEvaluator(EvaluatorDto dto, long principalId) {
-        log.debug("UserProfileServiceImpl.saveEvaluator - start | dto: {}, principalId: {}", dto, principalId);
-        requireNonNull(dto);
-        requireHasRole(dto.getUserProfile(), EVALUATOR);
-        var evaluator = MAPPER.toEntity(dto);
+    public EvaluatorDto saveEvaluator(EvaluatorDto evaluatorDto, long principalId) {
+        log.debug("UserProfileServiceImpl.saveEvaluator - start | evaluatorDto: {}, principalId: {}", evaluatorDto, principalId);
+        requireNonNull(evaluatorDto);
+        var evaluator = MAPPER.toEntity(evaluatorDto);
         evaluator.setCreatorId(principalId);
-        var evaluatorDto = MAPPER.toDto(evaluatorRepository.saveAndFlush(evaluator));
-        log.debug("UserProfileServiceImpl.saveEvaluator - end | dto: {}, principalId: {}", dto, principalId);
-        return evaluatorDto;
+        var dto = MAPPER.toDto(evaluatorRepository.saveAndFlush(evaluator));
+        log.debug("UserProfileServiceImpl.saveEvaluator - end | evaluatorDto: {}, principalId: {}", evaluatorDto, principalId);
+        return dto;
     }
 
-    @Override
-    public void disableUser(long userId, long principalId) {
-        log.debug("UserProfileServiceImpl.disableUser - start | userId: {}, principalId: {}", userId, principalId);
-        var userProfile = userProfileRepository
-                .findById(userId)
-                .orElseThrow(USER_NOT_FOUND::newException);
-        userProfile.setEnabled(false);
-        userProfile.setUpdaterId(principalId);
-        userProfileRepository.saveAndFlush(userProfile);
-        log.debug("UserProfileServiceImpl.disableUser - end | userId: {}, principalId: {}", userId, principalId);
-    }
-
-    @Override
-    public Page<UserProfileDto> findUsersByEmailOrRole(String email, String role, int page, int size, String sort) {
-        log.debug("UserProfileServiceImpl.findUsersByEmailOrRole - start | email: {}, role {}, page: {}, size: {}", email, role, page, size);
-        role = validateRole(role);
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-        var userProfileDtos = userProfileRepository.findDistinctByEmailContainingAndRoles_NameContaining(email, role, pageable)
-                .map(MAPPER::toDto);
-        log.debug("UserProfileServiceImpl.findUsersByEmailOrRole - end | email: {}, role {}, page: {}, size: {}", email, role, page, size);
-        return userProfileDtos;
-    }
-
-    private static void requireHasRole(UserProfileDto userProfileDto, String role) {
-        userProfileDto
-                .getRoles()
-                .stream()
-                .map(RoleDto::getName)
-                .filter(role::equals)
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException("User: " + userProfileDto + " must have role: " + role));
-    }
-
-    private String validateRole(String role) {
-        if (!StringUtils.isEmpty(role)) {
-            roleRepository.findByNameIgnoreCase(role).orElseThrow(ROLE_NOT_FOUND::newException);
-        }
-        return role != null ? role : "";
+    public ArtOwnerDto saveArtOwner(ArtOwnerDto artOwnerDto, long principalId) {
+        log.debug("UserProfileServiceImpl.saveArtOwner - start | artOwnerDto: {}, principalId: {}", artOwnerDto, principalId);
+        requireNonNull(artOwnerDto);
+        var artOwner = MAPPER.toEntity(artOwnerDto);
+        artOwner.setCreatorId(principalId);
+        var dto = MAPPER.toDto(artOwnerRepository.saveAndFlush(artOwner));
+        log.debug("UserProfileServiceImpl.saveArtOwner - start | artOwnerDto: {}, principalId: {}", artOwnerDto, principalId);
+        return dto;
     }
 
 }

@@ -61,35 +61,27 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void consumeTokenForUser_nullTokenValue() {
-        tokenService().consumeTokenForUser(null, -5);
+    public void consumeToken_nullTokenValue() {
+        tokenService().consumeToken(null);
     }
 
     @Test(expected = TokenException.class)
-    public void consumeTokenForUser_tokenNotFound() {
-        var token = uuid();
-        tokenService().consumeTokenForUser(token, -5);
+    public void consumeToken_tokenNotFound() {
+        tokenService().consumeToken(uuid());
     }
 
     @Test(expected = TokenException.class)
-    public void consumeTokenForUser_tokenOfAnotherUser() {
-        var userId = mockUtil.savedAdmin().getId();
-        var token = tokenService().createTokenForUser(userId).getValue();
-        tokenService().consumeTokenForUser(token, -5);
-    }
-
-    @Test(expected = TokenException.class)
-    public void consumeTokenForUser_expiredToken() {
+    public void consumeToken_expiredToken() {
         var token = mockUtil.savedExpiredToken(tokenType()).getValue();
-        tokenService().consumeTokenForUser(token, -5);
+        tokenService().consumeToken(token);
     }
 
     @Test
-    public void consumeTokenForUser() {
+    public void consumeToken() {
         var userId = mockUtil.savedAdmin().getId();
         var token = tokenService().createTokenForUser(userId).getValue();
         assertTrue(tokenRepository.findByValue(token).isPresent());
-        tokenService().consumeTokenForUser(token, userId);
+        tokenService().consumeToken(token);
         assertTrue(tokenRepository.findByValue(token).isEmpty());
     }
 

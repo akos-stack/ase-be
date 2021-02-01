@@ -44,13 +44,9 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registration_200_ok() {
-        var request = new RegistrationRequest(
-                "passwordMatches@mail.com",
-                "Password1!", "Password1!", Set.of());
-
         given()
                 .contentType(JSON)
-                .body(request)
+                .body(mockUtil.genRegistrationRequest())
                 .when()
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .then()
@@ -61,13 +57,11 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registration_200_withAspirations() {
-        var userAspirationName = mockUtil.getUserAspiration().getName();
-        var evaluatorAspirationName = mockUtil.getEvaluatorAspiration().getName();
-        var request = new RegistrationRequest(
-                "passwordMatches@mail.com",
-                "Password1!", "Password1!",
-                Set.of(userAspirationName, evaluatorAspirationName));
-
+        var email = genEmail();
+        var aspirations = Set.of(
+                mockUtil.getUserAspiration().getName(),
+                mockUtil.getEvaluatorAspiration().getName());
+        var request = new RegistrationRequest(email, email, email, email, aspirations);
         given()
                 .contentType(JSON)
                 .body(request)
@@ -81,11 +75,10 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registration_400_passwordMismatch() {
+        var email = genEmail();
         given()
                 .contentType(JSON)
-                .body(new RegistrationRequest(
-                        "passwordMismatch@mail.com",
-                        "Password1!", "Password2!", Set.of()))
+                .body(new RegistrationRequest(email, email, email, genEmail(), Set.of()))
                 .when()
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .then()
@@ -96,9 +89,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registration_409_userAlreadyExists() {
-        var request = new RegistrationRequest(
-                "passwordMatches@mail.com",
-                "Password1!", "Password1!", Set.of());
+        var request = mockUtil.genRegistrationRequest();
         given()
                 .contentType(JSON)
                 .body(request)
@@ -120,10 +111,8 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registration_400_invalidAspirationName() {
-        var request = new RegistrationRequest(
-                "passwordMatches@mail.com",
-                "Password1!", "Password1!", Set.of(uuid()));
-
+        var email = genEmail();
+        var request = new RegistrationRequest(email, email, email, email, Set.of(uuid()));
         given()
                 .contentType(JSON)
                 .body(request)
@@ -131,18 +120,17 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .then()
                 .assertThat()
-                .statusCode(400)
+                .statusCode(404)
                 .body(ERROR_CODE, is(ErrorCodes.User.ROLE_NOT_FOUND.getCode()));
     }
 
     @Test
     public void registrationConfirm_200_ok() {
         var registration = mockUtil.doRegistration();
-        var email = registration.getEmail();
         var token = registration.getToken();
         given()
                 .contentType(JSON)
-                .body(new TokenValidationRequest(email, token))
+                .body(new TokenValidationRequest(token))
                 .when()
                 .post(API_URL + REGISTRATION_CONFIRM_ENDPOINT)
                 .then()
@@ -151,25 +139,12 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void registrationConfirm_404_userNotFound() {
-        given()
-                .contentType(JSON)
-                .body(new TokenValidationRequest("userNotFound@mail.com", uuid()))
-                .when()
-                .post(API_URL + REGISTRATION_CONFIRM_ENDPOINT)
-                .then()
-                .assertThat()
-                .statusCode(404)
-                .body(ERROR_CODE, is(ErrorCodes.User.USER_NOT_FOUND.getCode()));
-    }
-
-    @Test
     public void registrationConfirm_404_tokenNotFound() {
-        var email = mockUtil.doRegistration().getEmail();
+        mockUtil.doRegistration();
         var token = uuid();
         given()
                 .contentType(JSON)
-                .body(new TokenValidationRequest(email, token))
+                .body(new TokenValidationRequest(token))
                 .when()
                 .post(API_URL + REGISTRATION_CONFIRM_ENDPOINT)
                 .then()
@@ -467,13 +442,13 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body(
+                .body( // TODO TEST better assertion
                         "id", notNullValue(),
                         "user_profile.id", notNullValue(),
-                        "user_profile.name", is(request.getUsername()),
-                        "user_profile.password", is(request.getPassword()),
-                        "user_profile.email", is(request.getEmail()),
-                        "user_profile.enabled", is(true));
+                        "user_profile.user_id", notNullValue(),
+                        "user_profile.first_name", is(request.getFirstName()),
+                        "user_profile.last_name", is(request.getLastName()),
+                        "user_profile.phone", is(request.getPhone()));
     }
 
     @Test
@@ -487,6 +462,47 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .assertThat()
                 .statusCode(404)
                 .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void submitArtOwner_200_ok() {
+        var request = mockUtil.newSubmitArtOwnerRequest();
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body( // TODO TEST better assertion
+                        "id", notNullValue(),
+                        "user_profile.id", notNullValue(),
+                        "user_profile.user_id", notNullValue(),
+                        "user_profile.first_name", is(request.getFirstName()),
+                        "user_profile.last_name", is(request.getLastName()),
+                        "user_profile.phone", is(request.getPhone()));
+    }
+
+    @Test
+    public void submitArtOwner_409_userAlreadyExists() {
+        var request = mockUtil.newSubmitArtOwnerRequest();
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(409);
     }
 
     @Test

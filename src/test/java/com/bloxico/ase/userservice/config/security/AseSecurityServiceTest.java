@@ -36,10 +36,10 @@ public class AseSecurityServiceTest extends AbstractSpringTest {
 
     @Test
     public void loadUserByUsername_found() {
-        var userProfile = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         assertEquals(
-                newUserDetails(userProfile),
-                service.loadUserByUsername(userProfile.getEmail()));
+                newUserDetails(user),
+                service.loadUserByUsername(user.getEmail()));
     }
 
     @Test(expected = NullPointerException.class)

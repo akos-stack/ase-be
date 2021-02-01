@@ -1,9 +1,7 @@
-package com.bloxico.ase.userservice.entity.user;
+package com.bloxico.ase.userservice.entity.user.profile;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -13,9 +11,9 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Data
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(exclude = "userProfile")
-@Table(name = "owners")
+@Table(name = "art_owners")
 @Entity
-public class Owner extends BaseEntity {
+public class ArtOwner extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

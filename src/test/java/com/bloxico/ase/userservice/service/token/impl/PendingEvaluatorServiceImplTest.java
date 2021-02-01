@@ -2,7 +2,6 @@ package com.bloxico.ase.userservice.service.token.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
@@ -12,13 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.mapping.PropertyReferenceException;
 
-import java.util.Comparator;
-import java.util.stream.Collectors;
-
 import static com.bloxico.ase.testutil.MockUtil.genEmail;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
+import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.*;
 
 public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
@@ -41,7 +38,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test(expected = TokenException.class)
     public void createPendingEvaluator_evaluatorAlreadyPendingAfterInvitation() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -54,7 +51,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test(expected = TokenException.class)
     public void createPendingEvaluator_evaluatorAlreadyPendingAfterRegistration() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         service.createPendingEvaluator(request, user.getId());
@@ -66,7 +63,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void createPendingEvaluator_evaluatorIsInvited() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -90,7 +87,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void createPendingEvaluator_evaluatorIsRequested() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         var pendingEvaluatorDto = service.createPendingEvaluator(request, user.getId());
@@ -113,7 +110,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void createPendingEvaluator_updateFromRequestedToInvited() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
@@ -137,7 +134,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test(expected = TokenException.class)
     public void createPendingEvaluator_updateFromInvitedToRequested() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var invitationRequest = new EvaluatorInvitationRequest(user.getEmail());
@@ -161,7 +158,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void getPendingEvaluatorToken_whenInInvitedStatus() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -178,7 +175,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void getPendingEvaluatorToken_whenInRequestedStatus() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         var pendingEvaluator = service.createPendingEvaluator(request, user.getId());
@@ -230,7 +227,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void deletePendingEvaluator_whenInInvitedStatus() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -245,7 +242,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void deletePendingEvaluator_whenInRequestedStatus() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         service.createPendingEvaluator(request, user.getId());
@@ -274,7 +271,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void consumePendingEvaluator() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -330,28 +327,29 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void searchPendingEvaluators() {
-        var pendingEvaluators = mockUtil.createInvitedPendingEvaluators();
-
         var emailFilter = "aseUser";
         var pageIndex = 1;
         var pageSize = 4;
 
-        var expectedList = pendingEvaluators
+        var expected = mockUtil
+                .createInvitedPendingEvaluators()
                 .stream()
                 .filter(p -> p.getEmail().contains(emailFilter))
-                .sorted(Comparator.comparing(PendingEvaluatorDto::getEmail))
                 .skip(pageIndex * pageSize)
                 .limit(pageSize)
-                .collect(Collectors.toList());
+                .collect(toSet());
 
-        var actualList = service.searchPendingEvaluators(emailFilter, pageIndex, pageSize, "email");
+        var actual = service
+                .searchPendingEvaluators(emailFilter, pageIndex, pageSize, "email")
+                .get()
+                .collect(toSet());
 
-        assertEquals(expectedList, actualList);
+        assertEquals(expected, actual);
     }
 
     @Test
     public void getEvaluatorResume_success() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
         var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         service.createPendingEvaluator(request, user.getId());

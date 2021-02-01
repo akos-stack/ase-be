@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.config.security;
 
-import com.bloxico.ase.userservice.entity.user.UserProfile;
-import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
+import com.bloxico.ase.userservice.entity.user.User;
+import com.bloxico.ase.userservice.repository.user.UserRepository;
 import com.bloxico.ase.userservice.util.Cookies;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.net.URI;
 import java.util.*;
 
 import static com.bloxico.ase.userservice.config.security.CookieOAuthRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
@@ -39,17 +38,20 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final Gson gson;
     private final ClientDetailsService clientDetailsService;
-    private final UserProfileRepository userProfileRepository;
-    private final CookieOAuthRequestRepository requestRepository;
+    private final UserRepository userRepository;
     private final PersistentJwtTokenStore persistentJwtTokenStore;
     private final JwtAccessTokenConverter tokenEnhancer;
 
     @Autowired
-    public OAuthSuccessHandler(Gson gson, ClientDetailsService clientDetailsService, UserProfileRepository userProfileRepository, CookieOAuthRequestRepository requestRepository, PersistentJwtTokenStore persistentJwtTokenStore, JwtAccessTokenConverter tokenEnhancer) {
+    public OAuthSuccessHandler(Gson gson,
+                               ClientDetailsService clientDetailsService,
+                               UserRepository userRepository,
+                               PersistentJwtTokenStore persistentJwtTokenStore,
+                               JwtAccessTokenConverter tokenEnhancer)
+    {
         this.gson = gson;
         this.clientDetailsService = clientDetailsService;
-        this.userProfileRepository = userProfileRepository;
-        this.requestRepository = requestRepository;
+        this.userRepository = userRepository;
         this.persistentJwtTokenStore = persistentJwtTokenStore;
         this.tokenEnhancer = tokenEnhancer;
     }
@@ -58,7 +60,8 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication)
-            throws IOException {
+            throws IOException
+    {
         var targetUrl = determineTargetUrl(request, authentication);
         if (response.isCommitted()) {
             log.debug("Response has already been committed. Unable to redirect to: " + targetUrl);
@@ -75,9 +78,8 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                 .map(this::getAndValidateRedirectUri)
                 .orElse(super.getDefaultTargetUrl());
         return UriComponentsBuilder
-                .fromUriString(redirectUri) // TODO !!!!!
-                .queryParam("token", gson.toJson(token)
-                        /*tokenStore. tokenProvider.createToken(authentication)*/)
+                .fromUriString(redirectUri)
+                .queryParam("token", gson.toJson(token))
                 .build()
                 .toUriString();
     }
@@ -85,11 +87,11 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     public OAuth2AccessToken authenticateSsoUser(String email) {
         log.debug("Authenticating integrated user - start, email: {}", email);
 
-        UserProfile coinUser = getUserProfile(email);
-        ClientDetails clientDetails = clientDetailsService.loadClientByClientId(clientId);
-        TokenRequest tokenRequest = generateImplicitTokenRequest(coinUser.getEmail());
+        var user = getUser(email);
+        var clientDetails = clientDetailsService.loadClientByClientId(clientId);
+        var tokenRequest = generateImplicitTokenRequest(user.getEmail());
 
-        OAuth2AccessToken token = getImplicitAccessToken(coinUser, clientDetails, tokenRequest);
+        var token = getImplicitAccessToken(user, clientDetails, tokenRequest);
 
         log.debug("Authenticating integrated user - end , token created");
         return token;
@@ -110,28 +112,28 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         return new TokenRequest(requestParameters, clientId, scope, grantType);
     }
 
-    private OAuth2AccessToken getImplicitAccessToken(UserProfile userProfile, ClientDetails clientDetails, TokenRequest tokenRequest) {
+    private OAuth2AccessToken getImplicitAccessToken(User user, ClientDetails clientDetails, TokenRequest tokenRequest) {
         DefaultTokenServices tokenServices = new DefaultTokenServices();
         tokenServices.setTokenStore(persistentJwtTokenStore);
         tokenServices.setClientDetailsService(clientDetailsService);
         tokenServices.setTokenEnhancer(tokenEnhancer);
 
-        OAuth2Authentication oAuth2Authentication = getOAuth2Authentication(userProfile, clientDetails, tokenRequest);
+        OAuth2Authentication oAuth2Authentication = getOAuth2Authentication(user, clientDetails, tokenRequest);
         return tokenServices.createAccessToken(oAuth2Authentication);
     }
 
-    private OAuth2Authentication getOAuth2Authentication(UserProfile userProfile, ClientDetails clientDetails, TokenRequest tokenRequest) {
+    private OAuth2Authentication getOAuth2Authentication(User user, ClientDetails clientDetails, TokenRequest tokenRequest) {
         DefaultOAuth2RequestFactory requestFactory = new DefaultOAuth2RequestFactory(clientDetailsService);
         OAuth2Request storedOAuth2Request = requestFactory.createOAuth2Request(clientDetails, tokenRequest);
 
         return new OAuth2Authentication(storedOAuth2Request,
-                new UsernamePasswordAuthenticationToken(AsePrincipal.newUserDetails(userProfile), null));
+                new UsernamePasswordAuthenticationToken(AsePrincipal.newUserDetails(user), null));
     }
 
-    private UserProfile getUserProfile(String email) {
-        Optional<UserProfile> op = userProfileRepository.findByEmailIgnoreCase(email);
-
-        return op.orElseThrow(EntityNotFoundException::new);
+    private User getUser(String email) {
+        return userRepository
+                .findByEmailIgnoreCase(email)
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {

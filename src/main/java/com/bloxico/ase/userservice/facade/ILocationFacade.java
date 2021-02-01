@@ -1,14 +1,12 @@
 package com.bloxico.ase.userservice.facade;
 
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-
-import java.util.List;
+import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
+import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
 
 public interface ILocationFacade {
 
-    List<CountryDto> allCountries();
+    SearchCountriesResponse findAllCountries();
 
-    List<CityDto> allCities();
+    SearchCitiesResponse findAllCities();
 
 }

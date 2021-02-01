@@ -1,16 +1,14 @@
 package com.bloxico.ase.userservice.config.security;
 
 import com.bloxico.ase.userservice.entity.user.Role;
-import com.bloxico.ase.userservice.entity.user.UserProfile;
+import com.bloxico.ase.userservice.entity.user.User;
 import lombok.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
@@ -21,11 +19,11 @@ public class AsePrincipal implements UserDetails, OAuth2User {
 
     private static final long serialVersionUID = 1L;
 
-    UserProfile userProfile;
+    User user;
     Map<String, Object> attributes;
 
-    private AsePrincipal(UserProfile userProfile, Map<String, Object> attributes) {
-        this.userProfile = requireNonNull(userProfile);
+    private AsePrincipal(User user, Map<String, Object> attributes) {
+        this.user = requireNonNull(user);
         //noinspection Java9CollectionFactory
         this.attributes = attributes == null
                 ? Map.of()
@@ -33,17 +31,17 @@ public class AsePrincipal implements UserDetails, OAuth2User {
                 : unmodifiableMap(new HashMap<>(attributes));
     }
 
-    public static AsePrincipal newUserDetails(UserProfile userProfile) {
-        return new AsePrincipal(userProfile, null);
+    public static AsePrincipal newUserDetails(User user) {
+        return new AsePrincipal(user, null);
     }
 
-    public static AsePrincipal newOAuth2User(UserProfile userProfile, Map<String, Object> attributes) {
-        return new AsePrincipal(userProfile, attributes);
+    public static AsePrincipal newOAuth2User(User user, Map<String, Object> attributes) {
+        return new AsePrincipal(user, attributes);
     }
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
-        return userProfile
+        return user
                 .getRoles()
                 .stream()
                 .map(Role::getName)
@@ -58,27 +56,27 @@ public class AsePrincipal implements UserDetails, OAuth2User {
 
     @Override
     public String getPassword() {
-        return userProfile.getPassword();
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return userProfile.getEmail();
+        return user.getEmail();
     }
 
     @Override
     public String getName() {
-        return userProfile.getEmail();
+        return user.getEmail();
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return !userProfile.getLocked();
+        return !user.getLocked();
     }
 
     @Override
     public boolean isEnabled() {
-        return userProfile.getEnabled();
+        return user.getEnabled();
     }
 
     @Override

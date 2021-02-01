@@ -4,9 +4,7 @@ import com.bloxico.ase.userservice.exception.AseRuntimeException;
 import com.bloxico.ase.userservice.web.model.ApiError;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,9 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
 @ControllerAdvice
@@ -66,7 +62,7 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
                 .status(FORBIDDEN)
                 .errorCode(ex.getMessage())
                 .build();
-        log.info("Returning error response: " + apiError.toString());
+        log.info("Returning AccessDeniedException error response: " + apiError);
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
 
@@ -74,7 +70,7 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleAseRuntimeException(Exception exception, WebRequest __) {
         var aseError = (AseRuntimeException) exception;
         var apiError = aseError.toApiError();
-        log.info("Returning error response: " + apiError.toString());
+        log.info("Returning AseRuntimeException error response: " + apiError);
         if (aseError.getCause() != null)
             log.error("Error cause:", aseError.getCause());
         return new ResponseEntity<>(apiError, apiError.getStatus());

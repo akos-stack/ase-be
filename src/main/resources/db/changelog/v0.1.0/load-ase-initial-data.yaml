@@ -17,12 +17,12 @@ databaseChangeLog:
         tableName: roles_permissions
     - loadData:
         encoding: UTF-8
-        file: db/changelog/v0.1.0/initial_data/user_profiles.csv
-        tableName: user_profiles
+        file: db/changelog/v0.1.0/initial_data/users.csv
+        tableName: users
     - loadData:
         encoding: UTF-8
-        file: db/changelog/v0.1.0/initial_data/user_profiles_roles.csv
-        tableName: user_profiles_roles
+        file: db/changelog/v0.1.0/initial_data/users_roles.csv
+        tableName: users_roles
     - loadData:
         encoding: UTF-8
         file: db/changelog/v0.1.0/initial_data/service_client_details.csv

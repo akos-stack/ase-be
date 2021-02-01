@@ -1,28 +1,23 @@
 package com.bloxico.ase.userservice.entity.user;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
-import com.bloxico.ase.userservice.entity.address.Location;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
+import static java.util.stream.Collectors.toSet;
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.FetchType.EAGER;
-import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = "email", callSuper = false)
-@ToString(exclude = { "roles", "aspirations" })
+@ToString(exclude = {"roles", "aspirations"})
 @Entity
-@Table(name = "user_profiles")
-public class UserProfile extends BaseEntity {
+@Table(name = "users")
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -36,25 +31,6 @@ public class UserProfile extends BaseEntity {
 
     @Column(name = "email")
     private String email;
-
-    @Column(name = "first_name")
-    private String firstName;
-
-    @Column(name = "last_name")
-    private String lastName;
-
-    @Column(name = "phone")
-    private String phone;
-
-    @Column(name = "birthday")
-    private LocalDate birthday;
-
-    @Column(name = "gender")
-    private String gender;
-
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "location_id")
-    private Location location;
 
     @Column(name = "locked")
     private Boolean locked = false;
@@ -70,8 +46,8 @@ public class UserProfile extends BaseEntity {
 
     @ManyToMany(fetch = EAGER, cascade = MERGE)
     @JoinTable(
-            name = "user_profiles_roles",
-            joinColumns = @JoinColumn(name = "user_profile_id"),
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
@@ -81,8 +57,8 @@ public class UserProfile extends BaseEntity {
 
     @ManyToMany(fetch = EAGER, cascade = MERGE)
     @JoinTable(
-            name = "user_profiles_aspirations",
-            joinColumns = @JoinColumn(name = "user_profile_id"),
+            name = "users_aspirations",
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> aspirations = new HashSet<>();
 
@@ -92,6 +68,18 @@ public class UserProfile extends BaseEntity {
 
     public void addAllAspirations(Collection<Role> aspirations) {
         this.aspirations.addAll(aspirations);
+    }
+
+    public void encodePassword(PasswordEncoder passwordEncoder) {
+        setPassword(passwordEncoder.encode(getPassword()));
+    }
+
+    // used by AseMapper
+    public Set<String> getAspirationNames() {
+        return aspirations
+                .stream()
+                .map(Role::getName)
+                .collect(toSet());
     }
 
 }

@@ -34,7 +34,7 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
         given()
                 .header("Authorization", uuid())
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest("updated_name", "updated_phone"))
+                .body(new UpdateUserProfileRequest(uuid(), uuid(), uuid()))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()
@@ -52,7 +52,7 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
         given()
                 .header("Authorization", refreshToken)
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest("updated_name", "updated_phone"))
+                .body(new UpdateUserProfileRequest(uuid(), uuid(), uuid()))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()
@@ -62,15 +62,17 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
 
     @Test
     public void doFilterInternal_403_blacklistedAccessToken() {
+        var registration = mockUtil.doConfirmedRegistration();
+        mockUtil.savedUserProfile(registration.getId());
+        var accessToken = mockUtil.doAuthentication(registration);
+        var email = registration.getEmail();
+        var oauthToken = mockUtil.toOAuthAccessTokenDto(email, accessToken);
         var admin = mockUtil.savedAdmin();
-        var user = mockUtil.savedUserProfile();
-        var accessToken = mockUtil.doAuthentication(user.getEmail(), user.getPassword());
-        var oauthToken = mockUtil.toOAuthAccessTokenDto(user, accessToken);
         blacklistService.blacklistTokens(List.of(oauthToken), admin.getId());
         given()
                 .header("Authorization", accessToken)
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest("updated_name", "updated_phone"))
+                .body(new UpdateUserProfileRequest(uuid(), uuid(), uuid()))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()
@@ -80,11 +82,12 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
 
     @Test
     public void doFilterInternal_200_ok() {
-        var accessToken = mockUtil.doAuthentication();
+        var registration = mockUtil.doConfirmedRegistration();
+        mockUtil.savedUserProfile(registration.getId());
         given()
-                .header("Authorization", accessToken)
+                .header("Authorization", mockUtil.doAuthentication(registration))
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest("updated_name", "updated_phone"))
+                .body(new UpdateUserProfileRequest(uuid(), uuid(), uuid()))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()

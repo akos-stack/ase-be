@@ -1,8 +1,6 @@
 package com.bloxico.ase.userservice.config;
 
-import com.bloxico.ase.userservice.filter.CommonsRequestLoggingFilter;
-import com.bloxico.ase.userservice.filter.MdcFilter;
-import com.bloxico.ase.userservice.filter.RepeatableReadRequestFilter;
+import com.bloxico.ase.userservice.filter.*;
 import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.loader.ClasspathLoader;
 import com.mitchellbosecke.pebble.loader.Loader;
@@ -11,14 +9,10 @@ import com.mitchellbosecke.pebble.spring.extension.SpringExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.DispatcherType;

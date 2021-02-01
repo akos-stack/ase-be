@@ -2,9 +2,7 @@ package com.bloxico.ase.userservice.service.address.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
+import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,33 +26,33 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     private LocationServiceImpl service;
 
     @Test
-    public void allCountries() {
+    public void findAllCountries() {
         assertEquals(
                 List.of(),
-                service.allCountries());
+                service.findAllCountries());
         var country1 = mockUtil.savedCountryDto();
         assertEquals(
                 List.of(country1),
-                service.allCountries());
+                service.findAllCountries());
         var country2 = mockUtil.savedCountryDto();
         assertEquals(
                 List.of(country1, country2),
-                service.allCountries());
+                service.findAllCountries());
     }
 
     @Test
-    public void allCities() {
+    public void findAllCities() {
         assertEquals(
                 List.of(),
-                service.allCities());
+                service.findAllCities());
         var city1 = mockUtil.savedCityDto();
         assertEquals(
                 List.of(city1),
-                service.allCities());
+                service.findAllCities());
         var city2 = mockUtil.savedCityDto();
         assertEquals(
                 List.of(city1, city2),
-                service.allCities());
+                service.findAllCities());
     }
 
     @Test(expected = NullPointerException.class)
@@ -67,18 +65,18 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         var principalId = mockUtil.savedAdmin().getId();
         var country = new CountryDto();
         country.setName(uuid());
-        assertEquals(List.of(), service.allCountries());
+        assertEquals(List.of(), service.findAllCountries());
         service.findOrSaveCountry(country, principalId);
-        assertEquals(List.of(country), service.allCountries());
+        assertEquals(List.of(country), service.findAllCountries());
     }
 
     @Test
     public void findOrSaveCountry_found() {
         var principalId = mockUtil.savedAdmin().getId();
         var country = mockUtil.savedCountryDto();
-        assertEquals(List.of(country), service.allCountries());
+        assertEquals(List.of(country), service.findAllCountries());
         assertEquals(country, service.findOrSaveCountry(country, principalId));
-        assertEquals(List.of(country), service.allCountries());
+        assertEquals(List.of(country), service.findAllCountries());
     }
 
     @Test(expected = NullPointerException.class)
@@ -92,18 +90,18 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         var city = new CityDto();
         city.setCountry(mockUtil.savedCountryDto());
         city.setName(uuid());
-        assertEquals(List.of(), service.allCities());
+        assertEquals(List.of(), service.findAllCities());
         service.findOrSaveCity(city, principalId);
-        assertEquals(List.of(city), service.allCities());
+        assertEquals(List.of(city), service.findAllCities());
     }
 
     @Test
     public void findOrSaveCity_found() {
         var principalId = mockUtil.savedAdmin().getId();
         var city = mockUtil.savedCityDto();
-        assertEquals(List.of(city), service.allCities());
+        assertEquals(List.of(city), service.findAllCities());
         assertEquals(city, service.findOrSaveCity(city, principalId));
-        assertEquals(List.of(city), service.allCities());
+        assertEquals(List.of(city), service.findAllCities());
     }
 
     @Test(expected = NullPointerException.class)

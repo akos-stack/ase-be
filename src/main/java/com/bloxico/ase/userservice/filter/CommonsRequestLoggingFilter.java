@@ -60,7 +60,7 @@ public class CommonsRequestLoggingFilter extends AbstractRequestLoggingFilter {
         logger.debug(requestJson);
     }
 
-    private String maskPayload(HttpServletRequest request, String message) {
+    private static String maskPayload(HttpServletRequest request, String message) {
         if (StringUtils.isEmpty(message)) return "";
         // don't display pass in log
         final String requestJson;
@@ -73,7 +73,7 @@ public class CommonsRequestLoggingFilter extends AbstractRequestLoggingFilter {
         return requestJson;
     }
 
-    private String maskPass(final String passField, final String message) {
+    private static String maskPass(final String passField, final String message) {
         String passFieldReplaceString = "\"" + passField + "\":\"*****\"";
         return message.replaceAll("\"" + passField + "\"\\s*?:\\s*?\".+?\"", passFieldReplaceString);
     }

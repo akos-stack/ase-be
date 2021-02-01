@@ -1,9 +1,7 @@
 package com.bloxico.ase.userservice.web.model.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -17,8 +15,13 @@ public class UpdateUserProfileRequest {
 
     @NotNull
     @NotEmpty
-    @JsonProperty("name")
-    String name;
+    @JsonProperty("first_name")
+    String firstName;
+
+    @NotNull
+    @NotEmpty
+    @JsonProperty("last_name")
+    String lastName;
 
     @JsonProperty("phone")
     String phone;

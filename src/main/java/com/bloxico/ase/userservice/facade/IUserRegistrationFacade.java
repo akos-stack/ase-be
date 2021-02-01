@@ -1,9 +1,11 @@
 package com.bloxico.ase.userservice.facade;
 
-import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
+import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.springframework.core.io.ByteArrayResource;
 
@@ -26,6 +28,8 @@ public interface IUserRegistrationFacade {
     void withdrawEvaluatorInvitation(EvaluatorInvitationWithdrawalRequest request);
 
     EvaluatorDto submitEvaluator(SubmitEvaluatorRequest request);
+
+    ArtOwnerDto submitArtOwner(SubmitArtOwnerRequest request);
 
     void requestEvaluatorRegistration(EvaluatorRegistrationRequest request, long principalId);
 

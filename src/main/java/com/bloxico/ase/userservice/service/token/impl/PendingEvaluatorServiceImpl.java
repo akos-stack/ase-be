@@ -11,10 +11,7 @@ import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -114,14 +111,17 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
 
     @Override
     public ByteArrayResource getEvaluatorResume(String email, long principalId) {
+        log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - start | email: {}, principalId {}", email, principalId);
         requireNonNull(email);
         var cvPath = pendingEvaluatorRepository
                 .findByEmailIgnoreCase(email)
                 .orElseThrow(TOKEN_NOT_FOUND::newException)
                 .getCvPath();
-        if(StringUtils.isEmpty(cvPath))
+        if (StringUtils.isEmpty(cvPath))
             throw RESUME_NOT_FOUND.newException();
-        return s3Service.downloadFile(cvPath);
+        var resume = s3Service.downloadFile(cvPath);
+        log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - end | email: {}, principalId {}", email, principalId);
+        return resume;
     }
 
     private PendingEvaluator updateStatus(PendingEvaluator pendingEvaluator, Status status, long principalId) {
@@ -134,7 +134,7 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
         var pendingEvaluator = MAPPER.toPendingEvaluator(request);
         pendingEvaluator.setToken(UUID.randomUUID().toString());
         pendingEvaluator.setCreatorId(principalId);
-        if(request.getCv() != null) {
+        if (request.getCv() != null) {
             var filePath = s3Service.uploadFile(FileCategory.CV, request.getCv());
             pendingEvaluator.setCvPath(filePath);
         }

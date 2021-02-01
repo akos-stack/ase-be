@@ -1,9 +1,6 @@
 package com.bloxico.ase.userservice.web.error;
 
-import com.bloxico.ase.userservice.exception.AmazonS3Exception;
-import com.bloxico.ase.userservice.exception.AseRuntimeException;
-import com.bloxico.ase.userservice.exception.TokenException;
-import com.bloxico.ase.userservice.exception.UserProfileException;
+import com.bloxico.ase.userservice.exception.*;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -38,12 +35,12 @@ public interface ErrorCodes {
                 "4",
                 "When registering user, if password and matchPassword values are not valid."),
 
-        ROLE_NOT_FOUND (
+        ROLE_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "5",
                 "When filtering users, if role parameter is non existing role."),
 
-        RESUME_NOT_FOUND (
+        RESUME_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "6",
                 "When downloading user resume, if resume path is null or empty."
@@ -59,7 +56,7 @@ public interface ErrorCodes {
         }
 
         public AseRuntimeException newException(Throwable cause) {
-            return new UserProfileException(httpStatus, code, cause);
+            return new UserException(httpStatus, code, cause);
         }
 
     }

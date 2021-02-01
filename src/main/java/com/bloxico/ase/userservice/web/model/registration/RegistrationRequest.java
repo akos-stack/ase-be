@@ -1,18 +1,15 @@
 package com.bloxico.ase.userservice.web.model.registration;
 
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.validator.RegularPassword;
 import com.bloxico.ase.userservice.validator.ValidEmail;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.Value;
+import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
 import java.util.Set;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -23,12 +20,28 @@ import static lombok.AccessLevel.PRIVATE;
 @ToString(exclude = {"password", "matchPassword"})
 public class RegistrationRequest {
 
+    @JsonIgnore
+    public String getRole() {
+        return Role.USER;
+    }
+
+    @JsonIgnore
+    public boolean getEnabled() {
+        return false;
+    }
+
     @NotNull
     @NotEmpty
     @ValidEmail
     @JsonProperty("email")
     @ApiModelProperty(required = true)
     String email;
+
+    @NotNull
+    @NotEmpty
+    @JsonProperty("username")
+    @ApiModelProperty(required = true)
+    String username;
 
     @NotNull
     @NotEmpty
@@ -45,18 +58,12 @@ public class RegistrationRequest {
     String matchPassword;
 
     @JsonProperty("aspirations")
-    @ApiModelProperty(required = false)
     Set<String> aspirationNames;
 
     @JsonIgnore
     public boolean isPasswordMatching() {
         //noinspection ConstantConditions
         return password.equals(matchPassword);
-    }
-
-    public String extractNameFromEmail() {
-        //noinspection ConstantConditions
-        return email.split("@")[0];
     }
 
 }

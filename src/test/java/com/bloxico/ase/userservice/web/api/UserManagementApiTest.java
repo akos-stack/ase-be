@@ -53,12 +53,13 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()
                 .assertThat()
-                .statusCode(400);
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.User.ROLE_NOT_FOUND.getCode()));
     }
 
     @Test
     public void searchUsers_200_ok() {
-        mockUtil.saveUserProfiles();
+        mockUtil.saveUsers();
         given()
                 .header("Authorization", mockUtil.doAdminAuthentication())
                 .contentType(JSON)
@@ -69,7 +70,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("user_profiles", notNullValue());
+                .body("users", notNullValue());
     }
 
     @Test
@@ -90,6 +91,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
     public void disableUser_200_ok() {
         var registration = mockUtil.doConfirmedRegistration();
         var userToken = mockUtil.doAuthentication(registration);
+        mockUtil.savedUserProfile(registration.getId());
         // User can access secured endpoints
         given()
                 .header("Authorization", userToken)
@@ -144,6 +146,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
     public void blacklistTokens_200_ok() {
         var registration = mockUtil.doConfirmedRegistration();
         var userToken = mockUtil.doAuthentication(registration);
+        mockUtil.savedUserProfile(registration.getId());
         // User can access secured endpoints
         given()
                 .header("Authorization", userToken)

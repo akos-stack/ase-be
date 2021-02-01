@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.util.Functions.doto;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
@@ -64,16 +65,17 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
     }
 
     @Override
-    public void consumeTokenForUser(String tokenValue, long userId) {
-        log.debug("TokenServiceImpl.consumeTokenForUser - start | tokenValue: {}, userId: {}", tokenValue, userId);
+    public TokenDto consumeToken(String tokenValue) {
+        log.debug("TokenServiceImpl.consumeToken - start | tokenValue: {}", tokenValue);
         requireNonNull(tokenValue);
-        var token = tokenRepository
+        var tokenDto = tokenRepository
                 .findByValue(tokenValue)
-                .filter(t -> t.getUserId() == userId)
                 .filter(not(Token::isExpired))
+                .map(doto(tokenRepository::delete))
+                .map(MAPPER::toDto)
                 .orElseThrow(TOKEN_NOT_FOUND::newException);
-        tokenRepository.delete(token);
-        log.debug("TokenServiceImpl.consumeTokenForUser - start | tokenValue: {}, userId: {}", tokenValue, userId);
+        log.debug("TokenServiceImpl.consumeToken - start | tokenValue: {}", tokenValue);
+        return tokenDto;
     }
 
     @Override

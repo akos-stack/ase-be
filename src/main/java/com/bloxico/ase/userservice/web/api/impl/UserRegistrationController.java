@@ -1,11 +1,13 @@
 package com.bloxico.ase.userservice.web.api.impl;
 
-import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
 import com.bloxico.ase.userservice.web.api.UserRegistrationApi;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
+import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -13,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.security.Principal;
 
 import static com.bloxico.ase.userservice.util.Principals.extractId;
@@ -80,6 +81,12 @@ public class UserRegistrationController implements UserRegistrationApi {
     }
 
     @Override
+    public ResponseEntity<ArtOwnerDto> submitArtOwner(SubmitArtOwnerRequest request) {
+        var response = userRegistrationFacade.submitArtOwner(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
     public ResponseEntity<Void> requestEvaluatorRegistration(EvaluatorRegistrationRequest request, Principal principal) {
         var id = extractId(principal);
         userRegistrationFacade.requestEvaluatorRegistration(request, id);
@@ -93,7 +100,7 @@ public class UserRegistrationController implements UserRegistrationApi {
     }
 
     @Override
-    public ResponseEntity<Resource> downloadEvaluatorResume(@Valid String email, Principal principal) {
+    public ResponseEntity<Resource> downloadEvaluatorResume(String email, Principal principal) {
         var id = extractId(principal);
         var response = userRegistrationFacade.downloadEvaluatorResume(email, id);
         return ResponseEntity.ok(response);

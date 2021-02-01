@@ -3,12 +3,13 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.exception.TokenException;
-import com.bloxico.ase.userservice.exception.UserProfileException;
+import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
-import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
+import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
+import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
-import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
+import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.*;
 import org.junit.Test;
@@ -36,13 +37,16 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     private TokenRepository tokenRepository;
 
     @Autowired
-    private UserProfileServiceImpl userProfileService;
+    private UserServiceImpl userService;
 
     @Autowired
     private PendingEvaluatorServiceImpl pendingEvaluatorService;
 
     @Autowired
     private EvaluatorRepository evaluatorRepository;
+
+    @Autowired
+    private ArtOwnerRepository artOwnerRepository;
 
     @Autowired
     private PendingEvaluatorRepository pendingEvaluatorRepository;
@@ -55,47 +59,42 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         userRegistrationFacade.registerUserWithVerificationToken(null);
     }
 
-    @Test(expected = UserProfileException.class)
+    @Test(expected = UserException.class)
     public void registerUserWithVerificationToken_passwordMismatch() {
-        var request = new RegistrationRequest("passwordMismatch@mail.com", "Password1!", "Password2!", Set.of());
+        var email = genEmail();
+        var request = new RegistrationRequest(email, email, email, uuid(), Set.of());
         userRegistrationFacade.registerUserWithVerificationToken(request);
     }
 
-    @Test(expected = UserProfileException.class)
+    @Test(expected = UserException.class)
     public void registerUserWithVerificationToken_userAlreadyExists() {
-        var request1 = new RegistrationRequest(
-                "temp@mail.com", "Password1!", "Password1!", Set.of());
-        var request2 = new RegistrationRequest(
-                "temp@mail.com", "Password1!", "Password1!", Set.of());
-        userRegistrationFacade.registerUserWithVerificationToken(request1);
-        userRegistrationFacade.registerUserWithVerificationToken(request2);
+        var request = mockUtil.genRegistrationRequest();
+        userRegistrationFacade.registerUserWithVerificationToken(request);
+        userRegistrationFacade.registerUserWithVerificationToken(request);
     }
 
-    @Test(expected = UserProfileException.class)
+    @Test(expected = UserException.class)
     public void registerUserWithVerificationToken_invalidAspirationName() {
-        var request = new RegistrationRequest(
-                "temp@mail.com",
-                "Password1!", "Password1!",
-                Set.of(uuid()));
-
+        var email = genEmail();
+        var request = new RegistrationRequest(email, email, email, email, Set.of(uuid()));
         userRegistrationFacade.registerUserWithVerificationToken(request);
     }
 
     @Test
     public void registerDisabledUser() {
-        var request = new RegistrationRequest(
-                "passwordMatches@mail.com","Password1!", "Password1!", Set.of());
+        var email = genEmail();
+        var request = new RegistrationRequest(email, email, email, email, Set.of());
         var response = userRegistrationFacade.registerUserWithVerificationToken(request);
         assertNotNull(response.getTokenValue());
     }
 
     @Test
     public void registerDisabledUser_withAspirations() {
-        var userAspirationName = mockUtil.getUserAspiration().getName();
-        var evaluatorAspirationName = mockUtil.getEvaluatorAspiration().getName();
-        var request = new RegistrationRequest(
-                "passwordMatches@mail.com","Password1!", "Password1!",
-                Set.of(userAspirationName, evaluatorAspirationName));
+        var email = genEmail();
+        var aspirations = Set.of(
+                mockUtil.getUserAspiration().getName(),
+                mockUtil.getEvaluatorAspiration().getName());
+        var request = new RegistrationRequest(email, email, email, email, aspirations);
         var response = userRegistrationFacade.registerUserWithVerificationToken(request);
         assertNotNull(response.getTokenValue());
     }
@@ -105,32 +104,23 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         userRegistrationFacade.handleTokenValidation(null);
     }
 
-    @Test(expected = UserProfileException.class)
-    public void handleTokenValidation_userNotFound() {
-        var invalid = uuid();
-        var request = new TokenValidationRequest(invalid, invalid);
-        userRegistrationFacade.handleTokenValidation(request);
-    }
-
     @Test(expected = TokenException.class)
     public void handleTokenValidation_tokenNotFound() {
-        var regRequest = new RegistrationRequest(
-                "passwordMatches@mail.com", "Password1!", "Password1!", Set.of());
+        var regRequest = mockUtil.genRegistrationRequest();
         userRegistrationFacade.registerUserWithVerificationToken(regRequest);
-        var invalid = uuid();
-        var tknRequest = new TokenValidationRequest(regRequest.getEmail(), invalid);
+        var tknRequest = new TokenValidationRequest(regRequest.getEmail());
         userRegistrationFacade.handleTokenValidation(tknRequest);
     }
 
     @Test
     public void handleTokenValidation() {
-        var email = "passwordMatches@mail.com";
-        var regRequest = new RegistrationRequest(email, "Password1!", "Password1!", Set.of());
+        var regRequest = mockUtil.genRegistrationRequest();
+        var email = regRequest.getEmail();
         var token = userRegistrationFacade.registerUserWithVerificationToken(regRequest).getTokenValue();
-        var tknRequest = new TokenValidationRequest(email, token);
+        var tknRequest = new TokenValidationRequest(token);
         userRegistrationFacade.handleTokenValidation(tknRequest);
         assertTrue(tokenRepository.findByValue(token).isEmpty());
-        assertTrue(userProfileService.findUserProfileByEmail(email).getEnabled());
+        assertTrue(userService.findUserByEmail(email).getEnabled());
     }
 
     @Test(expected = NullPointerException.class)
@@ -147,8 +137,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Test
     @DirtiesContext(methodMode = BEFORE_METHOD)
     public void refreshExpiredToken() {
-        var request = new RegistrationRequest(
-                "passwordMatches@mail.com", "Password1!", "Password1!", Set.of());
+        var request = mockUtil.genRegistrationRequest();
         var tokenValue = userRegistrationFacade.registerUserWithVerificationToken(request).getTokenValue();
         var originalTokenDto = MAPPER.toDto(
                 tokenRepository
@@ -170,7 +159,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         userRegistrationFacade.resendVerificationToken(null);
     }
 
-    @Test(expected = UserProfileException.class)
+    @Test(expected = UserException.class)
     public void resendVerificationToken_userNotFound() {
         var request = new ResendTokenRequest(uuid());
         userRegistrationFacade.resendVerificationToken(request);
@@ -178,8 +167,8 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void resendVerificationToken() {
-        var email = "passwordMatches@mail.com";
-        var regRequest = new RegistrationRequest(email, "Password1!", "Password1!", Set.of());
+        var regRequest = mockUtil.genRegistrationRequest();
+        var email = regRequest.getEmail();
         userRegistrationFacade.registerUserWithVerificationToken(regRequest);
         var resRequest = new ResendTokenRequest(email);
         userRegistrationFacade.resendVerificationToken(resRequest);
@@ -200,9 +189,28 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void submitEvaluator_evaluatorPending() {
         var request = mockUtil.newSubmitInvitedEvaluatorRequest();
         assertTrue(evaluatorRepository.findAll().isEmpty());
-        userRegistrationFacade.submitEvaluator(request);
-        var userProfile = userProfileService.findUserProfileByEmail(request.getEmail());
-        assertEquals(userProfile, userProfileService.findUserProfileByEmail(userProfile.getEmail()));
+        var evaluatorId = userRegistrationFacade.submitEvaluator(request).getId();
+        assertTrue(evaluatorRepository.findById(evaluatorId).isPresent());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void submitArtOwner_nullRequest() {
+        userRegistrationFacade.submitArtOwner(null);
+    }
+
+    @Test(expected = UserException.class)
+    public void submitArtOwner_userAlreadyExists() {
+        var request = mockUtil.newSubmitArtOwnerRequest();
+        userRegistrationFacade.submitArtOwner(request);
+        userRegistrationFacade.submitArtOwner(request);
+    }
+
+    @Test
+    public void submitArtOwner() {
+        var request = mockUtil.newSubmitArtOwnerRequest();
+        assertTrue(artOwnerRepository.findAll().isEmpty());
+        var artOwnerId = userRegistrationFacade.submitArtOwner(request).getId();
+        assertTrue(artOwnerRepository.findById(artOwnerId).isPresent());
     }
 
     @Test(expected = NullPointerException.class)
@@ -214,7 +222,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test(expected = TokenException.class)
     public void sendEvaluatorInvitation_evaluatorAlreadyInvited() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -228,7 +236,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void sendEvaluatorInvitation_evaluatorAlreadyRequested() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
         var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         userRegistrationFacade.requestEvaluatorRegistration(registrationRequest, user.getId());
@@ -251,7 +259,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void sendEvaluatorInvitation() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
@@ -314,7 +322,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void resendEvaluatorInvitation() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         // send invitation to user
@@ -347,7 +355,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void withdrawEvaluatorInvitation() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         // send invitation to user
@@ -373,7 +381,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test(expected = TokenException.class)
     public void requestEvaluatorRegistration_evaluatorAlreadyRegistered() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
@@ -386,7 +394,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test(expected = TokenException.class)
     public void requestEvaluatorRegistration_evaluatorAlreadyInvited() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
 
         var invitationRequest = new EvaluatorInvitationRequest(user.getEmail());
@@ -400,7 +408,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void requestEvaluatorRegistration() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
@@ -436,12 +444,12 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void downloadEvaluatorResume() {
-        var user = mockUtil.savedUserProfile();
+        var user = mockUtil.savedUser();
         var admin = mockUtil.savedAdmin();
         var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
         userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
-
         var response = userRegistrationFacade.downloadEvaluatorResume(user.getEmail(), admin.getId());
-        assertTrue(response != null);
+        assertNotNull(response);
     }
+
 }

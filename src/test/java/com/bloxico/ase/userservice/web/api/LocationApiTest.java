@@ -24,7 +24,7 @@ public class LocationApiTest extends AbstractSpringTest {
     private MockUtil mockUtil;
 
     @Test
-    public void allCountries_200_ok() {
+    public void findAllCountries_200_ok() {
         mockUtil.savedCountry();
         mockUtil.savedCountry();
         mockUtil.savedCountry();
@@ -36,11 +36,11 @@ public class LocationApiTest extends AbstractSpringTest {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("size()", is(3));
+                .body("countries.size()", is(3));
     }
 
     @Test
-    public void allCities_200_ok() {
+    public void findAllCities_200_ok() {
         mockUtil.savedCity();
         mockUtil.savedCity();
         mockUtil.savedCity();
@@ -52,7 +52,7 @@ public class LocationApiTest extends AbstractSpringTest {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("size()", is(3));
+                .body("cities.size()", is(3));
     }
 
 }

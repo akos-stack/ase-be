@@ -35,4 +35,5 @@ public abstract class AbstractSpringTestWithAWS extends AbstractSpringTest {
     public void teardownAmazonS3Mock() {
         api.shutdown();
     }
+
 }

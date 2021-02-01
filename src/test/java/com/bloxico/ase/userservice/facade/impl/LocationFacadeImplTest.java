@@ -2,6 +2,8 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
+import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,33 +20,33 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     private LocationFacadeImpl facade;
 
     @Test
-    public void allCountries() {
+    public void findAllCountries() {
         assertEquals(
-                List.of(),
-                facade.allCountries());
+                new SearchCountriesResponse(List.of()),
+                facade.findAllCountries());
         var country1 = mockUtil.savedCountryDto();
         assertEquals(
-                List.of(country1),
-                facade.allCountries());
+                new SearchCountriesResponse(List.of(country1)),
+                facade.findAllCountries());
         var country2 = mockUtil.savedCountryDto();
         assertEquals(
-                List.of(country1, country2),
-                facade.allCountries());
+                new SearchCountriesResponse(List.of(country1, country2)),
+                facade.findAllCountries());
     }
 
     @Test
-    public void allCities() {
+    public void findAllCities() {
         assertEquals(
-                List.of(),
-                facade.allCities());
+                new SearchCitiesResponse(List.of()),
+                facade.findAllCities());
         var city1 = mockUtil.savedCityDto();
         assertEquals(
-                List.of(city1),
-                facade.allCities());
+                new SearchCitiesResponse(List.of(city1)),
+                facade.findAllCities());
         var city2 = mockUtil.savedCityDto();
         assertEquals(
-                List.of(city1, city2),
-                facade.allCities());
+                new SearchCitiesResponse(List.of(city1, city2)),
+                facade.findAllCities());
     }
 
 }

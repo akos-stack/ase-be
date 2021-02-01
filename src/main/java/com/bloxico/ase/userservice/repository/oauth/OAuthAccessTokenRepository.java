@@ -2,9 +2,7 @@ package com.bloxico.ase.userservice.repository.oauth;
 
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,7 +16,7 @@ public interface OAuthAccessTokenRepository extends JpaRepository<OAuthAccessTok
     void deleteByUserNameIgnoreCase(String email);
 
     @Modifying
-    @Query("DELETE FROM OAuthAccessToken e WHERE e.expiration < CURRENT_TIMESTAMP")
+    @Query("DELETE FROM OAuthAccessToken o WHERE o.expiration < CURRENT_TIMESTAMP")
     void deleteExpiredTokens();
 
 }

@@ -1,11 +1,7 @@
 package com.bloxico.ase.userservice.dto.entity.oauth;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import lombok.Value;
-import org.springframework.security.oauth2.core.AuthenticationMethod;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import lombok.*;
+import org.springframework.security.oauth2.core.*;
 
 import java.util.Set;
 

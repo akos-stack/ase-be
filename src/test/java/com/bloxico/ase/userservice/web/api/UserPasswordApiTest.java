@@ -3,10 +3,7 @@ package com.bloxico.ase.userservice.web.api;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
-import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
-import com.bloxico.ase.userservice.web.model.password.ForgottenPasswordUpdateRequest;
-import com.bloxico.ase.userservice.web.model.password.KnownPasswordUpdateRequest;
-import com.bloxico.ase.userservice.web.model.password.SetPasswordRequest;
+import com.bloxico.ase.userservice.web.model.password.*;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +28,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void initForgotPasswordProcedure_200_ok() {
-        var email = mockUtil.savedUserProfile().getEmail();
+        var email = mockUtil.savedUser().getEmail();
         given()
                 .contentType(JSON)
                 .body(new ForgotPasswordRequest(email))

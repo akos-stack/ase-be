@@ -24,7 +24,7 @@ public class UserProfileFacadeImpl implements IUserProfileFacade {
     @Override
     public UserProfileDataResponse returnMyProfileData(long principalId) {
         log.info("UserProfileFacadeImpl.returnMyProfileData - start | principalId: {}", principalId);
-        var userProfileDto = userProfileService.findUserProfileById(principalId);
+        var userProfileDto = userProfileService.findUserProfileByUserId(principalId);
         var response = new UserProfileDataResponse(userProfileDto);
         log.info("UserProfileFacadeImpl.returnMyProfileData - end | principalId: {}", principalId);
         return response;

@@ -10,7 +10,7 @@ public interface ITokenService {
 
     TokenDto refreshToken(String token);
 
-    void consumeTokenForUser(String token, long userId);
+    TokenDto consumeToken(String token);
 
     TokenDto getOrCreateTokenForUser(long userId);
 

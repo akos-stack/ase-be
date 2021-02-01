@@ -1,20 +1,16 @@
 package com.bloxico.ase.userservice.config.security;
 
 import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepository;
-import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
+import com.bloxico.ase.userservice.repository.user.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.oauth2.provider.ClientDetails;
-import org.springframework.security.oauth2.provider.ClientDetailsService;
-import org.springframework.security.oauth2.provider.ClientRegistrationException;
+import org.springframework.security.oauth2.provider.*;
 import org.springframework.security.oauth2.provider.client.BaseClientDetails;
 import org.springframework.stereotype.Service;
 
@@ -25,17 +21,17 @@ import static java.util.Objects.requireNonNull;
 @Slf4j
 @Service
 public class AseSecurityService extends DefaultOAuth2UserService
-        implements UserDetailsService,
-                   ClientDetailsService {
+        implements UserDetailsService, ClientDetailsService
+{
 
-    private final UserProfileRepository userProfileRepository;
+    private final UserRepository userRepository;
     private final OAuthClientDetailsRepository oAuthClientDetailsRepository;
 
     @Autowired
-    public AseSecurityService(UserProfileRepository userProfileRepository,
+    public AseSecurityService(UserRepository userRepository,
                               OAuthClientDetailsRepository oAuthClientDetailsRepository)
     {
-        this.userProfileRepository = userProfileRepository;
+        this.userRepository = userRepository;
         this.oAuthClientDetailsRepository = oAuthClientDetailsRepository;
     }
 
@@ -43,10 +39,10 @@ public class AseSecurityService extends DefaultOAuth2UserService
     public UserDetails loadUserByUsername(String email) {
         log.debug("AseSecurityService.loadUserByUsername - start | email: {}", email);
         requireNonNull(email);
-        var userProfile = userProfileRepository
+        var user = userRepository
                 .findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
-        var aseUserDetails = AsePrincipal.newUserDetails(userProfile);
+        var aseUserDetails = AsePrincipal.newUserDetails(user);
         log.debug("AseSecurityService.loadUserByUsername - end | email: {}", email);
         return aseUserDetails;
     }
@@ -55,6 +51,7 @@ public class AseSecurityService extends DefaultOAuth2UserService
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest request) {
         log.debug("AseSecurityService.loadUser - start | request: {}", request);
+        requireNonNull(request);
         var oAuth2User = super.loadUser(request);
         try {
             var provider = request.getClientRegistration().getRegistrationId();
@@ -64,13 +61,13 @@ public class AseSecurityService extends DefaultOAuth2UserService
             if (email == null || email.isBlank())
                 throw new InternalAuthenticationServiceException(
                         "Email not found from OAuth2 provider");
-            var userProfile = userProfileRepository
+            var user = userRepository
                     .findByEmailIgnoreCase(email)
-                    .map(extractor::validateUserProfile)
-                    .map(user -> extractor.updatedUserProfile(user, attributes))
-                    .orElseGet(() -> extractor.newUserProfile(attributes));
-            userProfile = userProfileRepository.saveAndFlush(userProfile);
-            var aseOauth2User = AsePrincipal.newOAuth2User(userProfile, attributes);
+                    .map(extractor::validateUser)
+                    .map(u -> extractor.updatedUser(u, attributes))
+                    .orElseGet(() -> extractor.newUser(attributes));
+            user = userRepository.saveAndFlush(user);
+            var aseOauth2User = AsePrincipal.newOAuth2User(user, attributes);
             log.debug("AseSecurityService.loadUser - end | request: {}", request);
             return aseOauth2User;
         } catch (AuthenticationException ex) {

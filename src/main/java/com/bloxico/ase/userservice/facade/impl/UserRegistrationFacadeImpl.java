@@ -1,8 +1,8 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
-import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
-import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.dto.entity.user.UserDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
@@ -13,25 +13,25 @@ import com.bloxico.ase.userservice.util.MailUtil;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
-import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
+import com.bloxico.ase.userservice.web.model.user.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.EVALUATOR_INVITATION;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.VERIFICATION;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
 
 @Slf4j
 @Service
 @Transactional
 public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
 
+    private final IUserService userService;
     private final IUserProfileService userProfileService;
-    private final IUserRegistrationService userRegistrationService;
     private final ILocationService locationService;
     private final ITokenService registrationTokenService;
     private final IPendingEvaluatorService pendingEvaluatorService;
@@ -39,16 +39,16 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     private final MailUtil mailUtil;
 
     @Autowired
-    public UserRegistrationFacadeImpl(IUserProfileService userProfileService,
-                                      IUserRegistrationService userRegistrationService,
+    public UserRegistrationFacadeImpl(IUserService userService,
+                                      IUserProfileService userProfileService,
                                       ILocationService locationService,
                                       RegistrationTokenServiceImpl registrationTokenService,
                                       IPendingEvaluatorService pendingEvaluatorService,
                                       IRolePermissionService rolePermissionService,
                                       MailUtil mailUtil)
     {
+        this.userService = userService;
         this.userProfileService = userProfileService;
-        this.userRegistrationService = userRegistrationService;
         this.locationService = locationService;
         this.registrationTokenService = registrationTokenService;
         this.pendingEvaluatorService = pendingEvaluatorService;
@@ -59,9 +59,13 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public RegistrationResponse registerUserWithVerificationToken(RegistrationRequest request) {
         log.info("UserRegistrationFacadeImpl.registerUserWithVerificationToken - start | request: {}", request);
-        var userProfileDto = userRegistrationService.registerDisabledUser(request);
-        var tokenDto = registrationTokenService.createTokenForUser(userProfileDto.getId());
-        mailUtil.sendTokenEmail(VERIFICATION, userProfileDto.getEmail(), tokenDto.getValue());
+        if (!request.isPasswordMatching())
+            throw MATCH_REGISTRATION_PASSWORD_ERROR.newException();
+        var userDto = MAPPER.toUserDto(request);
+        userDto.addRole(rolePermissionService.findRoleByName(request.getRole()));
+        userDto = userService.saveUser(userDto);
+        var tokenDto = registrationTokenService.createTokenForUser(userDto.getId());
+        mailUtil.sendTokenEmail(VERIFICATION, userDto.getEmail(), tokenDto.getValue());
         var response = new RegistrationResponse(tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.registerUserWithVerificationToken - end | request: {}", request);
         return response;
@@ -70,9 +74,8 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public void handleTokenValidation(TokenValidationRequest request) {
         log.info("UserRegistrationFacadeImpl.handleTokenValidation - start | request: {}", request);
-        var userProfileDto = userProfileService.findUserProfileByEmail(request.getEmail());
-        registrationTokenService.consumeTokenForUser(request.getTokenValue(), userProfileDto.getId());
-        userRegistrationService.enableUser(userProfileDto.getId());
+        var token = registrationTokenService.consumeToken(request.getTokenValue());
+        userService.enableUser(token.getUserId());
         log.info("UserRegistrationFacadeImpl.handleTokenValidation - end | request: {}", request);
     }
 
@@ -80,16 +83,16 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public void refreshExpiredToken(String expiredTokenValue) {
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - start | expiredTokenValue: {}", expiredTokenValue);
         var tokenDto = registrationTokenService.refreshToken(expiredTokenValue);
-        var userProfileDto = userProfileService.findUserProfileById(tokenDto.getId());
-        mailUtil.sendTokenEmail(VERIFICATION, userProfileDto.getEmail(), tokenDto.getValue());
+        var userDto = userService.findUserById(tokenDto.getId());
+        mailUtil.sendTokenEmail(VERIFICATION, userDto.getEmail(), tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - end | expiredTokenValue: {}", expiredTokenValue);
     }
 
     @Override
     public void resendVerificationToken(ResendTokenRequest request) {
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - start | request: {}", request);
-        var userProfileDto = userProfileService.findUserProfileByEmail(request.getEmail());
-        var tokenDto = registrationTokenService.getTokenByUserId(userProfileDto.getId());
+        var userDto = userService.findUserByEmail(request.getEmail());
+        var tokenDto = registrationTokenService.getTokenByUserId(userDto.getId());
         mailUtil.sendTokenEmail(VERIFICATION, request.getEmail(), tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.refreshExpiredToken - end | request: {}", request);
     }
@@ -128,34 +131,23 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public EvaluatorDto submitEvaluator(SubmitEvaluatorRequest request) {
         log.info("UserRegistrationFacadeImpl.submitEvaluator - start | request: {}", request);
         pendingEvaluatorService.consumePendingEvaluator(request.getEmail(), request.getToken());
-        var userProfileDto = obtainUserProfileDto(request);
-        var principalId = userProfileDto.getId();
-        var evaluatorDto = MAPPER.toEvaluatorDto(request);
-        evaluatorDto.setUserProfile(userProfileDto);
-        evaluatorDto = userProfileService.saveEvaluator(evaluatorDto, principalId);
+        var evaluatorDto = doSaveEvaluator(request);
         log.info("UserRegistrationFacadeImpl.submitEvaluator - end | request: {}", request);
         return evaluatorDto;
     }
 
-    private UserProfileDto obtainUserProfileDto(SubmitEvaluatorRequest request) {
-        var userProfileDto = MAPPER.toUserProfileDto(request);
-        userProfileDto.addRole(rolePermissionService.findRoleByName(EVALUATOR));
-        userProfileDto = userProfileService.saveEnabledUserProfile(userProfileDto);
-        var locationDto = obtainLocationDto(request, userProfileDto.getId());
-        return userProfileService.updateLocation(userProfileDto, locationDto);
+    @Override
+    public ArtOwnerDto submitArtOwner(SubmitArtOwnerRequest request) {
+        log.info("UserRegistrationFacadeImpl.submitArtOwner - start | request: {}", request);
+        var artOwnerDto = doSaveArtOwner(request);
+        var userId = artOwnerDto.getUserProfile().getUserId();
+        var tokenDto = registrationTokenService.createTokenForUser(userId);
+        mailUtil.sendTokenEmail(VERIFICATION, request.getEmail(), tokenDto.getValue());
+        log.info("UserRegistrationFacadeImpl.submitArtOwner - end | request: {}", request);
+        return artOwnerDto;
     }
 
-    private LocationDto obtainLocationDto(SubmitEvaluatorRequest request, long principalId) {
-        var countryDto = MAPPER.toCountryDto(request);
-        countryDto = locationService.findOrSaveCountry(countryDto, principalId);
-        var cityDto = MAPPER.toCityDto(request);
-        cityDto.setCountry(countryDto);
-        cityDto = locationService.findOrSaveCity(cityDto, principalId);
-        var locationDto = MAPPER.toLocationDto(request);
-        locationDto.setCity(cityDto);
-        return locationService.saveLocation(locationDto, principalId);
-    }
-
+    @Override
     public void requestEvaluatorRegistration(EvaluatorRegistrationRequest request, long principalId) {
         log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - start | request: {}, principalId: {}", request, principalId);
         pendingEvaluatorService.createPendingEvaluator(request, principalId);
@@ -177,6 +169,56 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var response = pendingEvaluatorService.getEvaluatorResume(email, principalId);
         log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - end | email: {}, principalId: {}", email, principalId);
         return response;
+    }
+
+    // HELPER METHODS
+
+    private CountryDto doSaveCountry(ISubmitUserProfileRequest request, long principalId) {
+        var countryDto = MAPPER.toCountryDto(request);
+        return locationService.findOrSaveCountry(countryDto, principalId);
+    }
+
+    private CityDto doSaveCity(CountryDto countryDto, ISubmitUserProfileRequest request, long principalId) {
+        var cityDto = MAPPER.toCityDto(request);
+        cityDto.setCountry(countryDto);
+        return locationService.findOrSaveCity(cityDto, principalId);
+    }
+
+    private LocationDto doSaveLocation(ISubmitUserProfileRequest request, long principalId) {
+        var countryDto = doSaveCountry(request, principalId);
+        var cityDto = doSaveCity(countryDto, request, principalId);
+        var locationDto = MAPPER.toLocationDto(request);
+        locationDto.setCity(cityDto);
+        return locationService.saveLocation(locationDto, principalId);
+    }
+
+    private UserDto doSaveUser(ISubmitUserProfileRequest request) {
+        var userDto = MAPPER.toUserDto(request);
+        userDto.addRole(rolePermissionService.findRoleByName(request.getRole()));
+        return userService.saveUser(userDto);
+    }
+
+    private UserProfileDto doSaveUserProfile(ISubmitUserProfileRequest request) {
+        var principalId = doSaveUser(request).getId();
+        var locationDto = doSaveLocation(request, principalId);
+        var userProfileDto = MAPPER.toUserProfileDto(request);
+        userProfileDto.setUserId(principalId);
+        userProfileDto.setLocation(locationDto);
+        return userProfileService.saveUserProfile(userProfileDto, principalId);
+    }
+
+    private ArtOwnerDto doSaveArtOwner(SubmitArtOwnerRequest request) {
+        var userProfileDto = doSaveUserProfile(request);
+        var artOwnerDto = MAPPER.toArtOwnerDto(request);
+        artOwnerDto.setUserProfile(userProfileDto);
+        return userProfileService.saveArtOwner(artOwnerDto, userProfileDto.getUserId());
+    }
+
+    private EvaluatorDto doSaveEvaluator(SubmitEvaluatorRequest request) {
+        var userProfileDto = doSaveUserProfile(request);
+        var evaluatorDto = MAPPER.toEvaluatorDto(request);
+        evaluatorDto.setUserProfile(userProfileDto);
+        return userProfileService.saveEvaluator(evaluatorDto, userProfileDto.getUserId());
     }
 
 }

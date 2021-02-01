@@ -1,10 +1,7 @@
 package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.userservice.util.FileCategory;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +25,8 @@ public interface S3Api {
     @ApiResponses({
             @ApiResponse(code = 200, message = "File successfully uploaded.")
     })
-    ResponseEntity<Void> validateFile(@RequestParam(name = "fileCategory") FileCategory fileCategory, @RequestPart(value = "file") MultipartFile file);
+    ResponseEntity<Void> validateFile(@RequestParam(name = "fileCategory") FileCategory fileCategory,
+                                      @RequestPart(value = "file") MultipartFile file);
 
     @GetMapping(
             value = S3_DOWNLOAD,
