@@ -37,7 +37,12 @@ public interface AseMapper {
 
     LocationDto toDto(Location entity);
 
+    @Mapping(target = "aspirationNames", source = "aspirations")
     UserProfileDto toDto(UserProfile entity);
+
+    default String toName(Role entity) {
+        return entity.getName();
+    }
 
     EvaluatorDto toDto(Evaluator entity);
 

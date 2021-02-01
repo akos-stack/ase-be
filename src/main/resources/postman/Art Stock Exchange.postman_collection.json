@@ -199,7 +199,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"sekuloskimilos@gmail.com\",\n    \"password\": \"Sekula123!\",\n    \"match_password\": \"Sekula123!\",\n    \"regionName\": \"Serbia\"\n}"
+							"raw": "{\n    \"email\": \"sekuloskimilos@gmail.com\",\n    \"password\": \"Sekula123!\",\n    \"match_password\": \"Sekula123!\",\n    \"regionName\": \"Serbia\",\n    \"aspirations\": [\n        \"evaluator\"\n    ]\n}"
 						},
 						"url": {
 							"raw": "{{endpoint_ase}}/api/user/registration",

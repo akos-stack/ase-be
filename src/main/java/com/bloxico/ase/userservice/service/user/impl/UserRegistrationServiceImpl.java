@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
@@ -15,11 +16,10 @@ import java.util.Collection;
 import java.util.List;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_EXISTS;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.*;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toUnmodifiableList;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 @Slf4j
 @Service
@@ -51,6 +51,8 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         userProfile.setName(request.extractNameFromEmail());
         userProfile.setPassword(passwordEncoder.encode(request.getPassword()));
         userProfile.addRole(roleRepository.getUserRole());
+        if (isNotEmpty(request.getAspirationNames()))
+            userProfile.addAllAspirations(findAllAspirationsByNames(request.getAspirationNames()));
         userProfile = userProfileRepository.saveAndFlush(userProfile);
         var userProfileDto = MAPPER.toDto(userProfile);
         log.debug("UserRegistrationServiceImpl.registerDisabledUser - end | request: {}", request);
@@ -86,6 +88,13 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
 
     private boolean userAlreadyExists(String email) {
         return userProfileRepository.findByEmailIgnoreCase(email).isPresent();
+    }
+
+    private List<Role> findAllAspirationsByNames(Collection<String> names) {
+        var aspiredRoles = roleRepository.findAllByNameIgnoreCaseIn(names);
+        if (aspiredRoles.size() != names.size())
+            throw ROLE_NOT_FOUND.newException();
+        return aspiredRoles;
     }
 
 }

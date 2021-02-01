@@ -99,6 +99,7 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
         userProfileDto = userProfileService.saveEnabledUserProfile(userProfileDto);
         assertTrue(userProfileDto.getEnabled());
         assertEquals(Set.of(), userProfileDto.getRoles());
+        assertEquals(Set.of(), userProfileDto.getAspirationNames());
     }
 
     @Test(expected = NullPointerException.class)

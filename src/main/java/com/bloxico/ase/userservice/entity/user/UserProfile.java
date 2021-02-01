@@ -8,6 +8,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +19,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = "email", callSuper = false)
-@ToString(exclude = "roles")
+@ToString(exclude = { "roles", "aspirations" })
 @Entity
 @Table(name = "user_profiles")
 public class UserProfile extends BaseEntity {
@@ -76,6 +77,21 @@ public class UserProfile extends BaseEntity {
 
     public void addRole(Role role) {
         roles.add(role);
+    }
+
+    @ManyToMany(fetch = EAGER, cascade = MERGE)
+    @JoinTable(
+            name = "user_profiles_aspirations",
+            joinColumns = @JoinColumn(name = "user_profile_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> aspirations = new HashSet<>();
+
+    public void addAspiration(Role aspiration) {
+        aspirations.add(aspiration);
+    }
+
+    public void addAllAspirations(Collection<Role> aspirations) {
+        this.aspirations.addAll(aspirations);
     }
 
 }

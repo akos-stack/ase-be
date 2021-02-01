@@ -1,21 +1,14 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
-import com.bloxico.ase.userservice.dto.entity.user.EvaluatorDto;
-import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
-import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
+import com.bloxico.ase.userservice.dto.entity.user.*;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
-import com.bloxico.ase.userservice.repository.user.EvaluatorRepository;
-import com.bloxico.ase.userservice.repository.user.RoleRepository;
-import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
+import com.bloxico.ase.userservice.repository.user.*;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -157,7 +150,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     private String validateRole(String role) {
-        if(!StringUtils.isEmpty(role)) {
+        if (!StringUtils.isEmpty(role)) {
             roleRepository.findByNameIgnoreCase(role).orElseThrow(ROLE_NOT_FOUND::newException);
         }
         return role != null ? role : "";

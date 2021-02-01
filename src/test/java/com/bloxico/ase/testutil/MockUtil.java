@@ -1,30 +1,21 @@
 package com.bloxico.ase.testutil;
 
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
+import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserProfileDto;
 import com.bloxico.ase.userservice.entity.BaseEntity;
-import com.bloxico.ase.userservice.entity.address.City;
-import com.bloxico.ase.userservice.entity.address.Country;
-import com.bloxico.ase.userservice.entity.address.Location;
+import com.bloxico.ase.userservice.entity.address.*;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.entity.token.Token;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.UserProfile;
-import com.bloxico.ase.userservice.facade.impl.UserManagementFacadeImpl;
-import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImpl;
-import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
-import com.bloxico.ase.userservice.repository.address.CityRepository;
-import com.bloxico.ase.userservice.repository.address.CountryRepository;
-import com.bloxico.ase.userservice.repository.address.LocationRepository;
+import com.bloxico.ase.userservice.facade.impl.*;
+import com.bloxico.ase.userservice.repository.address.*;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
-import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
-import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
-import com.bloxico.ase.userservice.repository.token.TokenRepository;
+import com.bloxico.ase.userservice.repository.token.*;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
@@ -46,8 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -164,6 +154,7 @@ public class MockUtil {
         user.setLocked(false);
         user.setEnabled(true);
         user.addRole(roleRepository.getUserRole());
+        user.addAspiration(getUserAspiration());
         return userProfileRepository.saveAndFlush(user);
     }
 
@@ -360,7 +351,7 @@ public class MockUtil {
         String email = genEmail(), pass = genEmail();
         String token = given()
                 .contentType(JSON)
-                .body(new RegistrationRequest(email, pass, pass))
+                .body(new RegistrationRequest(email, pass, pass, Set.of()))
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .getBody()
                 .path("token_value");
@@ -487,6 +478,14 @@ public class MockUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Role getUserAspiration() {
+        return roleRepository.getUserRole();
+    }
+
+    public Role getEvaluatorAspiration() {
+        return roleRepository.getEvaluatorRole();
     }
 
     private static final AtomicLong along = new AtomicLong(0);

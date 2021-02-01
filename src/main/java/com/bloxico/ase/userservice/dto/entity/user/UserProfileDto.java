@@ -61,6 +61,9 @@ public class UserProfileDto {
     @JsonProperty("roles")
     private Set<RoleDto> roles = new HashSet<>();
 
+    @JsonProperty("aspirations")
+    private Set<String> aspirationNames = new HashSet<>();
+
     public void addRole(RoleDto role) {
         roles.add(role);
     }

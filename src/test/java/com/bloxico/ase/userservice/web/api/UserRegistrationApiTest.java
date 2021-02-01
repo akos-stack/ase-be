@@ -15,6 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.bloxico.ase.testutil.MockUtil.*;
@@ -43,11 +44,33 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registration_200_ok() {
+        var request = new RegistrationRequest(
+                "passwordMatches@mail.com",
+                "Password1!", "Password1!", Set.of());
+
         given()
                 .contentType(JSON)
-                .body(new RegistrationRequest(
-                        "passwordMatches@mail.com",
-                        "Password1!", "Password1!"))
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body("token_value", not(isEmptyOrNullString()));
+    }
+
+    @Test
+    public void registration_200_withAspirations() {
+        var userAspirationName = mockUtil.getUserAspiration().getName();
+        var evaluatorAspirationName = mockUtil.getEvaluatorAspiration().getName();
+        var request = new RegistrationRequest(
+                "passwordMatches@mail.com",
+                "Password1!", "Password1!",
+                Set.of(userAspirationName, evaluatorAspirationName));
+
+        given()
+                .contentType(JSON)
+                .body(request)
                 .when()
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .then()
@@ -62,7 +85,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .contentType(JSON)
                 .body(new RegistrationRequest(
                         "passwordMismatch@mail.com",
-                        "Password1!", "Password2!"))
+                        "Password1!", "Password2!", Set.of()))
                 .when()
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .then()
@@ -75,7 +98,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void registration_409_userAlreadyExists() {
         var request = new RegistrationRequest(
                 "passwordMatches@mail.com",
-                "Password1!", "Password1!");
+                "Password1!", "Password1!", Set.of());
         given()
                 .contentType(JSON)
                 .body(request)
@@ -93,6 +116,23 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .assertThat()
                 .statusCode(409)
                 .body(ERROR_CODE, is(ErrorCodes.User.USER_EXISTS.getCode()));
+    }
+
+    @Test
+    public void registration_400_invalidAspirationName() {
+        var request = new RegistrationRequest(
+                "passwordMatches@mail.com",
+                "Password1!", "Password1!", Set.of(uuid()));
+
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(400)
+                .body(ERROR_CODE, is(ErrorCodes.User.ROLE_NOT_FOUND.getCode()));
     }
 
     @Test

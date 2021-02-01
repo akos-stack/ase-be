@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
+import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.exception.UserProfileException;
 import com.bloxico.ase.userservice.repository.user.UserProfileRepository;
@@ -11,9 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Set;
 
+import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.*;
 
 public class UserRegistrationServiceImplTest extends AbstractSpringTest {
+
+    @Autowired
+    private MockUtil mockUtil;
 
     @Autowired
     private UserProfileRepository userProfileRepository;
@@ -28,27 +33,54 @@ public class UserRegistrationServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = UserProfileException.class)
     public void registerDisabledUser_passwordMismatch() {
-        var request = new RegistrationRequest("passwordMismatch@mail.com", "Password1!", "Password2!");
+        var request = new RegistrationRequest("passwordMismatch@mail.com", "Password1!", "Password2!", Set.of());
         userRegistrationService.registerDisabledUser(request);
     }
 
     @Test(expected = UserProfileException.class)
     public void registerDisabledUser_userAlreadyExists() {
-        var request1 = new RegistrationRequest("temp@mail.com", "Password1!", "Password1!");
-        var request2 = new RegistrationRequest("temp@mail.com", "Password1!", "Password1!");
+        var request1 = new RegistrationRequest(
+                "temp@mail.com", "Password1!", "Password1!", Set.of());
+        var request2 = new RegistrationRequest(
+                "temp@mail.com", "Password1!", "Password1!", Set.of());
         userRegistrationService.registerDisabledUser(request1);
         userRegistrationService.registerDisabledUser(request2);
     }
 
+    @Test(expected = UserProfileException.class)
+    public void registerDisabledUser_invalidAspirationName() {
+        var request = new RegistrationRequest(
+                "temp@mail.com", "Password1!", "Password1!", Set.of(uuid()));
+        userRegistrationService.registerDisabledUser(request);
+    }
+
     @Test
     public void registerDisabledUser() {
-        var request = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");
+        var request = new RegistrationRequest(
+                "passwordMatches@mail.com", "Password1!", "Password1!", Set.of());
         var user = userRegistrationService.registerDisabledUser(request);
         assertNotNull(user.getId());
         assertEquals(request.getEmail(), user.getEmail());
         assertTrue(request.getEmail().contains(user.getName()));
         assertNotEquals(request.getPassword(), user.getPassword());
         assertTrue(user.streamRoleNames().anyMatch(Role.USER::equals));
+    }
+
+    @Test
+    public void registerDisabledUser_withAspirations() {
+        var userAspirationName = mockUtil.getUserAspiration().getName();
+        var evaluatorAspirationName = mockUtil.getEvaluatorAspiration().getName();
+        var request = new RegistrationRequest(
+                "passwordMatches@mail.com", "Password1!", "Password1!",
+                Set.of(userAspirationName, evaluatorAspirationName));
+        var user = userRegistrationService.registerDisabledUser(request);
+        assertNotNull(user.getId());
+        assertEquals(request.getEmail(), user.getEmail());
+        assertTrue(request.getEmail().contains(user.getName()));
+        assertNotEquals(request.getPassword(), user.getPassword());
+        assertTrue(user.streamRoleNames().anyMatch(Role.USER::equals));
+        assertTrue(user.getAspirationNames().stream().anyMatch(userAspirationName::equals));
+        assertTrue(user.getAspirationNames().stream().anyMatch(evaluatorAspirationName::equals));
     }
 
     @Test(expected = UserProfileException.class)
@@ -58,7 +90,8 @@ public class UserRegistrationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void enableUser() {
-        var request = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");
+        var request = new RegistrationRequest(
+                "passwordMatches@mail.com", "Password1!", "Password1!", Set.of());
         var regUser = userRegistrationService.registerDisabledUser(request);
         assertFalse(regUser.getEnabled());
         userRegistrationService.enableUser(regUser.getId());
@@ -79,9 +112,9 @@ public class UserRegistrationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void deleteDisabledUsersWithIds() {
-        var req1 = new RegistrationRequest("temp1@mail.com", "Password1!", "Password1!");
-        var req2 = new RegistrationRequest("temp2@mail.com", "Password1!", "Password1!");
-        var req3 = new RegistrationRequest("temp3@mail.com", "Password1!", "Password1!");
+        var req1 = new RegistrationRequest("temp1@mail.com", "Password1!", "Password1!", Set.of());
+        var req2 = new RegistrationRequest("temp2@mail.com", "Password1!", "Password1!", Set.of());
+        var req3 = new RegistrationRequest("temp3@mail.com", "Password1!", "Password1!", Set.of());
         var user1 = userRegistrationService.registerDisabledUser(req1);
         var user2 = userRegistrationService.registerDisabledUser(req2);
         var user3 = userRegistrationService.registerDisabledUser(req3);

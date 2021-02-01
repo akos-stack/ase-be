@@ -559,6 +559,25 @@ databaseChangeLog:
                   defaultValueNumeric: 0
                   constraints:
                     nullable: false
+        - createTable:
+            tableName: user_profiles_aspirations
+            columns:
+              - column:
+                  name: user_profile_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_user_profile_aspiration
+                    references: user_profiles(id)
+              - column:
+                  name: role_id
+                  type: smallint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_aspiration_user_profile
+                    references: roles(id)
         - addForeignKeyConstraint:
             constraintName: fk_country_creator
             baseTableName: countries
@@ -595,3 +614,4 @@ databaseChangeLog:
             baseColumnNames: updater_id
             referencedTableName: user_profiles
             referencedColumnNames: id
+
