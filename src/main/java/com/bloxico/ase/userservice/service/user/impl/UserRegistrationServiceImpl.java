@@ -19,6 +19,7 @@ import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.*;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toUnmodifiableList;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 @Slf4j
 @Service
@@ -50,9 +51,8 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         userProfile.setName(request.extractNameFromEmail());
         userProfile.setPassword(passwordEncoder.encode(request.getPassword()));
         userProfile.addRole(roleRepository.getUserRole());
-        if (hasAnyAspiredRolesByNames(request.getAspirationNames())) {
-            userProfile.addAllAspirations(requireAllAspirationsFound(request.getAspirationNames()));
-        }
+        if (isNotEmpty(request.getAspirationNames()))
+            userProfile.addAllAspirations(findAllAspirationsByNames(request.getAspirationNames()));
         userProfile = userProfileRepository.saveAndFlush(userProfile);
         var userProfileDto = MAPPER.toDto(userProfile);
         log.debug("UserRegistrationServiceImpl.registerDisabledUser - end | request: {}", request);
@@ -90,19 +90,11 @@ public class UserRegistrationServiceImpl implements IUserRegistrationService {
         return userProfileRepository.findByEmailIgnoreCase(email).isPresent();
     }
 
-    private List<Role> requireAllAspirationsFound(Collection<String> names) {
-        var aspiredRoles= roleRepository.findAllByNameIgnoreCaseIn(names);
-        var numberOfRequestedAspirations = names.size();
-
-        if (aspiredRoles.size() != numberOfRequestedAspirations) {
+    private List<Role> findAllAspirationsByNames(Collection<String> names) {
+        var aspiredRoles = roleRepository.findAllByNameIgnoreCaseIn(names);
+        if (aspiredRoles.size() != names.size())
             throw ROLE_NOT_FOUND.newException();
-        }
-
         return aspiredRoles;
-    }
-
-    private boolean hasAnyAspiredRolesByNames(Collection<String> names) {
-        return names != null && names.size() > 0;
     }
 
 }
