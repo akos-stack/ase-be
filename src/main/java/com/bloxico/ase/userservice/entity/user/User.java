@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.entity.user;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -52,6 +53,10 @@ public class User extends BaseEntity {
 
     public void addRole(Role role) {
         roles.add(role);
+    }
+
+    public void encodePassword(PasswordEncoder passwordEncoder) {
+        setPassword(passwordEncoder.encode(getPassword()));
     }
 
 }
