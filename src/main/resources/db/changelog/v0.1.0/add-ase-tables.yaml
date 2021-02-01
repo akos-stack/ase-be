@@ -206,6 +206,33 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - createTable:
+            tableName: countries_evaluation_details
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: price_per_evaluation
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: availability_percentage
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: country_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_countries_evaluation_details_country
+                    references: countries(id)
+        - createTable:
             tableName: cities
             columns:
               - column:
