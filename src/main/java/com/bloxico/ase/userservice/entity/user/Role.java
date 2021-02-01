@@ -1,10 +1,12 @@
 package com.bloxico.ase.userservice.entity.user;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.FetchType.EAGER;
@@ -21,26 +23,7 @@ public class Role implements Serializable {
     public static final String ADMIN = "admin";
     public static final String USER = "user";
     public static final String EVALUATOR = "evaluator";
-    public static final String OWNER = "owner";
-
-    @Getter // Note: Currently not used
-    public enum Value {
-
-        ADMIN("admin"),
-        USER("user"),
-        EVALUATOR("evaluator");
-
-        private final String name;
-
-        Value(String name) {
-            this.name = name;
-        }
-
-        public List<Value> allRoles() {
-            return List.of(values());
-        }
-
-    }
+    public static final String ART_OWNER = "art_owner";
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

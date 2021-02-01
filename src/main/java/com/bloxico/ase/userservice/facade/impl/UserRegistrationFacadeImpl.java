@@ -134,14 +134,14 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     }
 
     @Override
-    public OwnerDto submitOwner(SubmitOwnerRequest request) {
-        log.info("UserRegistrationFacadeImpl.submitOwner - start | request: {}", request);
-        var ownerDto = doSaveOwner(request);
-        var userId = ownerDto.getUserProfile().getUserId();
+    public ArtOwnerDto submitArtOwner(SubmitArtOwnerRequest request) {
+        log.info("UserRegistrationFacadeImpl.submitArtOwner - start | request: {}", request);
+        var artOwnerDto = doSaveArtOwner(request);
+        var userId = artOwnerDto.getUserProfile().getUserId();
         var tokenDto = registrationTokenService.createTokenForUser(userId);
         mailUtil.sendTokenEmail(VERIFICATION, request.getEmail(), tokenDto.getValue());
-        log.info("UserRegistrationFacadeImpl.submitOwner - end | request: {}", request);
-        return ownerDto;
+        log.info("UserRegistrationFacadeImpl.submitArtOwner - end | request: {}", request);
+        return artOwnerDto;
     }
 
     @Override
@@ -196,11 +196,11 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         return userProfileService.saveUserProfile(userProfileDto, principalId);
     }
 
-    private OwnerDto doSaveOwner(SubmitOwnerRequest request) {
+    private ArtOwnerDto doSaveArtOwner(SubmitArtOwnerRequest request) {
         var userProfileDto = doSaveUserProfile(request);
-        var ownerDto = MAPPER.toOwnerDto(request);
-        ownerDto.setUserProfile(userProfileDto);
-        return userProfileService.saveOwner(ownerDto, userProfileDto.getUserId());
+        var artOwnerDto = MAPPER.toArtOwnerDto(request);
+        artOwnerDto.setUserProfile(userProfileDto);
+        return userProfileService.saveArtOwner(artOwnerDto, userProfileDto.getUserId());
     }
 
     private EvaluatorDto doSaveEvaluator(SubmitEvaluatorRequest request) {

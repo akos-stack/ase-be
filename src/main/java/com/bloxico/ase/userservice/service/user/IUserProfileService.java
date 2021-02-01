@@ -13,6 +13,6 @@ public interface IUserProfileService {
 
     EvaluatorDto saveEvaluator(EvaluatorDto evaluatorDto, long principalId);
 
-    OwnerDto saveOwner(OwnerDto ownerDto, long principalId);
+    ArtOwnerDto saveArtOwner(ArtOwnerDto artOwnerDto, long principalId);
 
 }

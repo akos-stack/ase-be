@@ -18,16 +18,16 @@ public class UserProfileServiceImpl implements IUserProfileService {
 
     private final UserProfileRepository userProfileRepository;
     private final EvaluatorRepository evaluatorRepository;
-    private final OwnerRepository ownerRepository;
+    private final ArtOwnerRepository artOwnerRepository;
 
     @Autowired
     public UserProfileServiceImpl(UserProfileRepository userProfileRepository,
                                   EvaluatorRepository evaluatorRepository,
-                                  OwnerRepository ownerRepository)
+                                  ArtOwnerRepository artOwnerRepository)
     {
         this.userProfileRepository = userProfileRepository;
         this.evaluatorRepository = evaluatorRepository;
-        this.ownerRepository = ownerRepository;
+        this.artOwnerRepository = artOwnerRepository;
     }
 
     @Override
@@ -81,13 +81,13 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     @Override
-    public OwnerDto saveOwner(OwnerDto ownerDto, long principalId) {
-        log.debug("UserProfileServiceImpl.saveOwner - start | ownerDto: {}, principalId: {}", ownerDto, principalId);
-        requireNonNull(ownerDto);
-        var owner = MAPPER.toEntity(ownerDto);
-        owner.setCreatorId(principalId);
-        var dto = MAPPER.toDto(ownerRepository.saveAndFlush(owner));
-        log.debug("UserProfileServiceImpl.saveOwner - start | ownerDto: {}, principalId: {}", ownerDto, principalId);
+    public ArtOwnerDto saveArtOwner(ArtOwnerDto artOwnerDto, long principalId) {
+        log.debug("UserProfileServiceImpl.saveArtOwner - start | artOwnerDto: {}, principalId: {}", artOwnerDto, principalId);
+        requireNonNull(artOwnerDto);
+        var artOwner = MAPPER.toEntity(artOwnerDto);
+        artOwner.setCreatorId(principalId);
+        var dto = MAPPER.toDto(artOwnerRepository.saveAndFlush(artOwner));
+        log.debug("UserProfileServiceImpl.saveArtOwner - start | artOwnerDto: {}, principalId: {}", artOwnerDto, principalId);
         return dto;
     }
 

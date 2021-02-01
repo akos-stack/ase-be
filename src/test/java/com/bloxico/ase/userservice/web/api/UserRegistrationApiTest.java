@@ -432,13 +432,13 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void submitOwner_200_ok() {
-        var request = mockUtil.newSubmitOwnerRequest();
+    public void submitArtOwner_200_ok() {
+        var request = mockUtil.newSubmitArtOwnerRequest();
         given()
                 .contentType(JSON)
                 .body(request)
                 .when()
-                .post(API_URL + REGISTRATION_OWNER_SUBMIT)
+                .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -452,13 +452,13 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void submitOwner_409_userAlreadyExists() {
-        var request = mockUtil.newSubmitOwnerRequest();
+    public void submitArtOwner_409_userAlreadyExists() {
+        var request = mockUtil.newSubmitArtOwnerRequest();
         given()
                 .contentType(JSON)
                 .body(request)
                 .when()
-                .post(API_URL + REGISTRATION_OWNER_SUBMIT)
+                .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
                 .then()
                 .assertThat()
                 .statusCode(200);
@@ -466,7 +466,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
                 .contentType(JSON)
                 .body(request)
                 .when()
-                .post(API_URL + REGISTRATION_OWNER_SUBMIT)
+                .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
                 .then()
                 .assertThat()
                 .statusCode(409);

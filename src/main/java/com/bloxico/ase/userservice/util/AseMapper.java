@@ -41,7 +41,7 @@ public interface AseMapper {
 
     EvaluatorDto toDto(Evaluator entity);
 
-    OwnerDto toDto(Owner entity);
+    ArtOwnerDto toDto(ArtOwner entity);
 
     TokenDto toDto(Token entity);
 
@@ -63,7 +63,7 @@ public interface AseMapper {
 
     Evaluator toEntity(EvaluatorDto dto);
 
-    Owner toEntity(OwnerDto dto);
+    ArtOwner toEntity(ArtOwnerDto dto);
 
     // OTHER
 
@@ -91,7 +91,7 @@ public interface AseMapper {
 
     EvaluatorDto toEvaluatorDto(SubmitEvaluatorRequest request);
 
-    OwnerDto toOwnerDto(SubmitOwnerRequest request);
+    ArtOwnerDto toArtOwnerDto(SubmitArtOwnerRequest request);
 
     PendingEvaluator toPendingEvaluator(IPendingEvaluatorRequest request);
 

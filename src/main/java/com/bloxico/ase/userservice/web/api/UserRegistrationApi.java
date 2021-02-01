@@ -1,12 +1,12 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.OwnerDto;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
-import com.bloxico.ase.userservice.web.model.user.SubmitOwnerRequest;
+import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +28,7 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_INVITATION_RESEND   = "/user/registration/evaluator/invitation/resend";
     String REGISTRATION_EVALUATOR_INVITATION_WITHDRAW = "/user/registration/evaluator/invitation/withdraw";
     String REGISTRATION_EVALUATOR_SUBMIT              = "/user/registration/evaluator/submit";
-    String REGISTRATION_OWNER_SUBMIT                  = "/user/registration/owner/submit";
+    String REGISTRATION_ART_OWNER_SUBMIT              = "/user/registration/art-owner/submit";
     String REGISTRATION_EVALUATOR_REQUEST             = "/user/registration/evaluator/request";
     String REGISTRATION_EVALUATOR_SEARCH              = "/user/registration/evaluator/search";
 
@@ -148,7 +148,7 @@ public interface UserRegistrationApi {
     ResponseEntity<EvaluatorDto> submitEvaluator(@Valid @RequestBody SubmitEvaluatorRequest request);
 
     @PostMapping(
-            value = REGISTRATION_OWNER_SUBMIT,
+            value = REGISTRATION_ART_OWNER_SUBMIT,
             produces = {"application/json"},
             consumes = {"application/json"})
     @ApiOperation(value = "Creates new art owner with given data.")
@@ -156,7 +156,7 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 200, message = "Art owner is created successfully."),
             @ApiResponse(code = 409, message = "User with given email already exists.")
     })
-    ResponseEntity<OwnerDto> submitOwner(@Valid @RequestBody SubmitOwnerRequest request);
+    ResponseEntity<ArtOwnerDto> submitArtOwner(@Valid @RequestBody SubmitArtOwnerRequest request);
 
     @GetMapping(value = REGISTRATION_EVALUATOR_SEARCH)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_users')")

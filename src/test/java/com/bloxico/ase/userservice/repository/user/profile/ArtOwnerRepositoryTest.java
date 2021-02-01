@@ -2,28 +2,28 @@ package com.bloxico.ase.userservice.repository.user.profile;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.entity.user.profile.Owner;
+import com.bloxico.ase.userservice.entity.user.profile.ArtOwner;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertTrue;
 
-public class OwnerRepositoryTest extends AbstractSpringTest {
+public class ArtOwnerRepositoryTest extends AbstractSpringTest {
 
     @Autowired
     private MockUtil mockUtil;
 
     @Autowired
-    private OwnerRepository repository;
+    private ArtOwnerRepository repository;
 
     @Test
     public void saveAndFindById() {
         assertTrue(repository.findById(-1L).isEmpty());
-        var owner = new Owner();
+        var artOwner = new ArtOwner();
         var userProfile = mockUtil.savedUserProfile();
-        owner.setUserProfile(userProfile);
-        owner.setCreatorId(userProfile.getUserId());
-        var id = repository.saveAndFlush(owner).getId();
+        artOwner.setUserProfile(userProfile);
+        artOwner.setCreatorId(userProfile.getUserId());
+        var id = repository.saveAndFlush(artOwner).getId();
         assertTrue(repository.findById(id).isPresent());
     }
 

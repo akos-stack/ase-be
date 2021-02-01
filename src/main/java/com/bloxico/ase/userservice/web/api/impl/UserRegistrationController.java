@@ -1,14 +1,14 @@
 package com.bloxico.ase.userservice.web.api.impl;
 
+import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.OwnerDto;
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
 import com.bloxico.ase.userservice.web.api.UserRegistrationApi;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
+import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
-import com.bloxico.ase.userservice.web.model.user.SubmitOwnerRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,8 +80,8 @@ public class UserRegistrationController implements UserRegistrationApi {
     }
 
     @Override
-    public ResponseEntity<OwnerDto> submitOwner(SubmitOwnerRequest request) {
-        var response = userRegistrationFacade.submitOwner(request);
+    public ResponseEntity<ArtOwnerDto> submitArtOwner(SubmitArtOwnerRequest request) {
+        var response = userRegistrationFacade.submitArtOwner(request);
         return ResponseEntity.ok(response);
     }
 

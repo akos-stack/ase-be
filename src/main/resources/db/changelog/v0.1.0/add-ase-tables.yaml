@@ -413,7 +413,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - createTable:
-            tableName: owners
+            tableName: art_owners
             columns:
               - column:
                   name: id
@@ -427,7 +427,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_owner_user_profile
+                    foreignKeyName: fk_art_owner_user_profile
                     references: user_profiles(id)
               # METADATA
               - column:
@@ -435,7 +435,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_owner_creator
+                    foreignKeyName: fk_art_owner_creator
                     references: users(id)
               - column:
                   name: created_at
@@ -447,7 +447,7 @@ databaseChangeLog:
                   name: updater_id
                   type: bigint
                   constraints:
-                    foreignKeyName: fk_owner_updater
+                    foreignKeyName: fk_art_owner_updater
                     references: users(id)
               - column:
                   name: updated_at

@@ -9,8 +9,8 @@ import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepositoryTe
 import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepositoryTest;
 import com.bloxico.ase.userservice.repository.token.*;
 import com.bloxico.ase.userservice.repository.user.*;
+import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepositoryTest;
 import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepositoryTest;
-import com.bloxico.ase.userservice.repository.user.profile.OwnerRepositoryTest;
 import com.bloxico.ase.userservice.service.address.impl.LocationServiceImplTest;
 import com.bloxico.ase.userservice.service.aws.impl.S3ServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
@@ -32,7 +32,7 @@ import org.junit.runners.Suite;
         PermissionRepositoryTest.class,
         RoleRepositoryTest.class,
         UserRepositoryTest.class,
-        OwnerRepositoryTest.class,
+        ArtOwnerRepositoryTest.class,
         EvaluatorRepositoryTest.class,
         BlacklistedTokenRepositoryTest.class,
         OAuthAccessTokenRepositoryTest.class,

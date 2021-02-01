@@ -23,12 +23,12 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
 @ToString(exclude = "password")
-public class SubmitOwnerRequest implements ISubmitUserProfileRequest {
+public class SubmitArtOwnerRequest implements ISubmitUserProfileRequest {
 
     @JsonIgnore
     @Override
     public String getRole() {
-        return Role.OWNER;
+        return Role.ART_OWNER;
     }
 
     @JsonIgnore
