@@ -59,7 +59,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
         var email = genEmail();
         given()
                 .contentType(JSON)
-                .body(new RegistrationRequest(email, email, email, uuid()))
+                .body(new RegistrationRequest(email, email, email, genEmail()))
                 .when()
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .then()

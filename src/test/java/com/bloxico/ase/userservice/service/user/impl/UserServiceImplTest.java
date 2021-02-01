@@ -2,7 +2,6 @@ package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
 import org.junit.Test;
@@ -99,7 +98,6 @@ public class UserServiceImplTest extends AbstractSpringTest {
         assertEquals(userDto.getEmail(), user.getEmail());
         assertTrue(userDto.getEmail().contains(user.getName()));
         assertNotEquals(userDto.getPassword(), user.getPassword());
-        assertTrue(user.streamRoleNames().anyMatch(Role.USER::equals));
     }
 
     @Test(expected = UserException.class)

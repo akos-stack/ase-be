@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Stream;
 
 @Data
 @EqualsAndHashCode(of = "email")
@@ -41,12 +40,6 @@ public class UserDto {
 
     public void addRole(RoleDto role) {
         roles.add(role);
-    }
-
-    public Stream<String> streamRoleNames() {
-        return roles
-                .stream()
-                .map(RoleDto::getName);
     }
 
 }

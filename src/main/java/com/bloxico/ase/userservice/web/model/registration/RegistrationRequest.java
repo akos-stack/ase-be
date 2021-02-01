@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.web.model.registration;
 
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.validator.RegularPassword;
 import com.bloxico.ase.userservice.validator.ValidEmail;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,6 +18,16 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor(force = true, access = PRIVATE)
 @ToString(exclude = {"password", "matchPassword"})
 public class RegistrationRequest {
+
+    @JsonIgnore
+    public String getRole() {
+        return Role.USER;
+    }
+
+    @JsonIgnore
+    public boolean getEnabled() {
+        return false;
+    }
 
     @NotNull
     @NotEmpty
@@ -44,11 +55,6 @@ public class RegistrationRequest {
     @JsonProperty("match_password")
     @ApiModelProperty(required = true)
     String matchPassword;
-
-    @JsonIgnore
-    public boolean getEnabled() {
-        return false;
-    }
 
     @JsonIgnore
     public boolean isPasswordMatching() {

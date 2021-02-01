@@ -60,7 +60,9 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         log.info("UserRegistrationFacadeImpl.registerUserWithVerificationToken - start | request: {}", request);
         if (!request.isPasswordMatching())
             throw MATCH_REGISTRATION_PASSWORD_ERROR.newException();
-        var userDto = userService.saveUser(MAPPER.toUserDto(request));
+        var userDto = MAPPER.toUserDto(request);
+        userDto.addRole(rolePermissionService.findRoleByName(request.getRole()));
+        userDto = userService.saveUser(userDto);
         var tokenDto = registrationTokenService.createTokenForUser(userDto.getId());
         mailUtil.sendTokenEmail(VERIFICATION, userDto.getEmail(), tokenDto.getValue());
         var response = new RegistrationResponse(tokenDto.getValue());
