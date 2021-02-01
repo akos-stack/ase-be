@@ -31,6 +31,12 @@ public class SubmitOwnerRequest implements ISubmitUserProfileRequest {
         return Role.OWNER;
     }
 
+    @JsonIgnore
+    @Override
+    public boolean getEnabled() {
+        return false;
+    }
+
     @NotNull
     @NotEmpty
     @JsonProperty("username")

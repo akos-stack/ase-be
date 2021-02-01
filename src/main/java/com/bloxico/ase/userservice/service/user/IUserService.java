@@ -13,9 +13,7 @@ public interface IUserService {
 
     List<UserDto> findUsersByEmailOrRole(String email, String role, int page, int size, String sort);
 
-    UserDto saveDisabledUser(UserDto userDto);
-
-    UserDto saveEnabledUser(UserDto userDto);
+    UserDto saveUser(UserDto userDto);
 
     void enableUser(long id);
 

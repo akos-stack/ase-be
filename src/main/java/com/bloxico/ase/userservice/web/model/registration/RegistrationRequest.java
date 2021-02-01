@@ -46,6 +46,11 @@ public class RegistrationRequest {
     String matchPassword;
 
     @JsonIgnore
+    public boolean getEnabled() {
+        return false;
+    }
+
+    @JsonIgnore
     public boolean isPasswordMatching() {
         //noinspection ConstantConditions
         return password.equals(matchPassword);

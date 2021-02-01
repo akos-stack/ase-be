@@ -80,46 +80,26 @@ public class UserServiceImplTest extends AbstractSpringTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void saveDisabledUser_nullRequest() {
-        userService.saveDisabledUser(null);
+    public void saveUser_nullRequest() {
+        userService.saveUser(null);
     }
 
     @Test(expected = UserException.class)
-    public void saveDisabledUser_userAlreadyExists() {
+    public void saveUser_userAlreadyExists() {
         var userDto = mockUtil.genUserDto();
-        userService.saveDisabledUser(userDto);
-        userService.saveDisabledUser(userDto);
+        userService.saveUser(userDto);
+        userService.saveUser(userDto);
     }
 
     @Test
-    public void saveDisabledUser() {
+    public void saveUser() {
         var userDto = mockUtil.genUserDto();
-        var user = userService.saveDisabledUser(userDto);
+        var user = userService.saveUser(userDto);
         assertNotNull(user.getId());
         assertEquals(userDto.getEmail(), user.getEmail());
         assertTrue(userDto.getEmail().contains(user.getName()));
         assertNotEquals(userDto.getPassword(), user.getPassword());
         assertTrue(user.streamRoleNames().anyMatch(Role.USER::equals));
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void saveEnabledUser_nullUser() {
-        userService.saveEnabledUser(null);
-    }
-
-    @Test(expected = UserException.class)
-    public void saveEnabledUser_userAlreadyExists() {
-        var userDto = mockUtil.genUserDto();
-        userService.saveEnabledUser(userDto);
-        userService.saveEnabledUser(userDto);
-    }
-
-    @Test
-    public void saveEnabledUser() {
-        var userDto = mockUtil.genUserDto();
-        userDto = userService.saveEnabledUser(userDto);
-        assertTrue(userDto.getEnabled());
-        assertEquals(Set.of(), userDto.getRoles());
     }
 
     @Test(expected = UserException.class)
@@ -129,7 +109,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void enableUser() {
-        var regUser = userService.saveDisabledUser(mockUtil.genUserDto());
+        var regUser = userService.saveUser(mockUtil.genUserDto());
         assertFalse(regUser.getEnabled());
         userService.enableUser(regUser.getId());
         var ebdUser = userRepository.findById(regUser.getId()).orElseThrow();
@@ -164,9 +144,9 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void deleteDisabledUsersWithIds() {
-        var user1 = userService.saveDisabledUser(mockUtil.genUserDto());
-        var user2 = userService.saveDisabledUser(mockUtil.genUserDto());
-        var user3 = userService.saveDisabledUser(mockUtil.genUserDto());
+        var user1 = userService.saveUser(mockUtil.genUserDto());
+        var user2 = userService.saveUser(mockUtil.genUserDto());
+        var user3 = userService.saveUser(mockUtil.genUserDto());
         userService.enableUser(user1.getId());
         var regIds = Set.of(user1.getId(), user2.getId(), user3.getId());
         var delIds = Set.copyOf(userService.deleteDisabledUsersWithIds(regIds));

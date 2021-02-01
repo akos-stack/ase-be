@@ -31,6 +31,12 @@ public class SubmitEvaluatorRequest implements ISubmitUserProfileRequest {
         return Role.EVALUATOR;
     }
 
+    @JsonIgnore
+    @Override
+    public boolean getEnabled() {
+        return true;
+    }
+
     @NotNull
     @NotEmpty
     @JsonProperty("token")

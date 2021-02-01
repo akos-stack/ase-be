@@ -60,7 +60,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         log.info("UserRegistrationFacadeImpl.registerUserWithVerificationToken - start | request: {}", request);
         if (!request.isPasswordMatching())
             throw MATCH_REGISTRATION_PASSWORD_ERROR.newException();
-        var userDto = userService.saveDisabledUser(MAPPER.toUserDto(request));
+        var userDto = userService.saveUser(MAPPER.toUserDto(request));
         var tokenDto = registrationTokenService.createTokenForUser(userDto.getId());
         mailUtil.sendTokenEmail(VERIFICATION, userDto.getEmail(), tokenDto.getValue());
         var response = new RegistrationResponse(tokenDto.getValue());
@@ -137,6 +137,9 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public OwnerDto submitOwner(SubmitOwnerRequest request) {
         log.info("UserRegistrationFacadeImpl.submitOwner - start | request: {}", request);
         var ownerDto = doSaveOwner(request);
+        var userId = ownerDto.getUserProfile().getUserId();
+        var tokenDto = registrationTokenService.createTokenForUser(userId);
+        mailUtil.sendTokenEmail(VERIFICATION, request.getEmail(), tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.submitOwner - end | request: {}", request);
         return ownerDto;
     }
@@ -181,7 +184,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     private UserDto doSaveUser(ISubmitUserProfileRequest request) {
         var userDto = MAPPER.toUserDto(request);
         userDto.addRole(rolePermissionService.findRoleByName(request.getRole()));
-        return userService.saveEnabledUser(userDto);
+        return userService.saveUser(userDto);
     }
 
     private UserProfileDto doSaveUserProfile(ISubmitUserProfileRequest request) {

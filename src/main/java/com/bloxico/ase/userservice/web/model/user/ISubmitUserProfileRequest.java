@@ -7,6 +7,8 @@ public interface ISubmitUserProfileRequest {
 
     String getRole();
 
+    boolean getEnabled();
+
     String getUsername();
 
     String getPassword();
