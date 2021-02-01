@@ -27,6 +27,12 @@ public class RegistrationRequest {
 
     @NotNull
     @NotEmpty
+    @JsonProperty("username")
+    @ApiModelProperty(required = true)
+    String username;
+
+    @NotNull
+    @NotEmpty
     @RegularPassword
     @JsonProperty("password")
     @ApiModelProperty(required = true)
@@ -43,11 +49,6 @@ public class RegistrationRequest {
     public boolean isPasswordMatching() {
         //noinspection ConstantConditions
         return password.equals(matchPassword);
-    }
-
-    public String extractNameFromEmail() {
-        //noinspection ConstantConditions
-        return email.split("@")[0];
     }
 
 }

@@ -67,7 +67,8 @@ public interface AseMapper {
 
     // OTHER
 
-    User toUser(RegistrationRequest request);
+    @Mapping(target = "name", source = "username")
+    UserDto toUserDto(RegistrationRequest request);
 
     @Mapping(target = "name", source = "username")
     UserDto toUserDto(ISubmitUserProfileRequest request);

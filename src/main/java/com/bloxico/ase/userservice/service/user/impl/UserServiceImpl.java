@@ -6,7 +6,6 @@ import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
 import com.bloxico.ase.userservice.service.user.IUserService;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
-import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -86,21 +85,18 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserDto saveDisabledUser(RegistrationRequest request) {
-        log.debug("UserServiceImpl.saveDisabledUser - start | request: {}", request);
-        requireNonNull(request);
-        if (!request.isPasswordMatching())
-            throw MATCH_REGISTRATION_PASSWORD_ERROR.newException();
-        if (userAlreadyExists(request.getEmail()))
+    public UserDto saveDisabledUser(UserDto userDto) {
+        log.debug("UserServiceImpl.saveDisabledUser - start | userDto: {}", userDto);
+        requireNonNull(userDto);
+        if (userAlreadyExists(userDto.getEmail()))
             throw USER_EXISTS.newException();
-        var user = MAPPER.toUser(request);
-        user.setName(request.extractNameFromEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        var user = MAPPER.toEntity(userDto);
+        user.encodePassword(passwordEncoder);
         user.addRole(roleRepository.getUserRole());
         user = userRepository.saveAndFlush(user);
-        var userDto = MAPPER.toDto(user);
-        log.debug("UserServiceImpl.saveDisabledUser - end | request: {}", request);
-        return userDto;
+        var dto = MAPPER.toDto(user);
+        log.debug("UserServiceImpl.saveDisabledUser - end | userDto: {}", userDto);
+        return dto;
     }
 
     @Override

@@ -2,11 +2,9 @@ package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.dto.entity.user.UserDto;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
-import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -87,27 +85,20 @@ public class UserServiceImplTest extends AbstractSpringTest {
     }
 
     @Test(expected = UserException.class)
-    public void saveDisabledUser_passwordMismatch() {
-        var request = new RegistrationRequest("passwordMismatch@mail.com", "Password1!", "Password2!");
-        userService.saveDisabledUser(request);
-    }
-
-    @Test(expected = UserException.class)
     public void saveDisabledUser_userAlreadyExists() {
-        var request1 = new RegistrationRequest("temp@mail.com", "Password1!", "Password1!");
-        var request2 = new RegistrationRequest("temp@mail.com", "Password1!", "Password1!");
-        userService.saveDisabledUser(request1);
-        userService.saveDisabledUser(request2);
+        var userDto = mockUtil.genUserDto();
+        userService.saveDisabledUser(userDto);
+        userService.saveDisabledUser(userDto);
     }
 
     @Test
     public void saveDisabledUser() {
-        var request = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");
-        var user = userService.saveDisabledUser(request);
+        var userDto = mockUtil.genUserDto();
+        var user = userService.saveDisabledUser(userDto);
         assertNotNull(user.getId());
-        assertEquals(request.getEmail(), user.getEmail());
-        assertTrue(request.getEmail().contains(user.getName()));
-        assertNotEquals(request.getPassword(), user.getPassword());
+        assertEquals(userDto.getEmail(), user.getEmail());
+        assertTrue(userDto.getEmail().contains(user.getName()));
+        assertNotEquals(userDto.getPassword(), user.getPassword());
         assertTrue(user.streamRoleNames().anyMatch(Role.USER::equals));
     }
 
@@ -118,20 +109,14 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test(expected = UserException.class)
     public void saveEnabledUser_userAlreadyExists() {
-        var userDto = new UserDto();
-        userDto.setName(uuid());
-        userDto.setEmail(uuid());
-        userDto.setPassword(uuid());
+        var userDto = mockUtil.genUserDto();
         userService.saveEnabledUser(userDto);
         userService.saveEnabledUser(userDto);
     }
 
     @Test
     public void saveEnabledUser() {
-        var userDto = new UserDto();
-        userDto.setName(uuid());
-        userDto.setEmail(uuid());
-        userDto.setPassword(uuid());
+        var userDto = mockUtil.genUserDto();
         userDto = userService.saveEnabledUser(userDto);
         assertTrue(userDto.getEnabled());
         assertEquals(Set.of(), userDto.getRoles());
@@ -144,8 +129,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void enableUser() {
-        var request = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");
-        var regUser = userService.saveDisabledUser(request);
+        var regUser = userService.saveDisabledUser(mockUtil.genUserDto());
         assertFalse(regUser.getEnabled());
         userService.enableUser(regUser.getId());
         var ebdUser = userRepository.findById(regUser.getId()).orElseThrow();
@@ -180,12 +164,9 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void deleteDisabledUsersWithIds() {
-        var req1 = new RegistrationRequest("temp1@mail.com", "Password1!", "Password1!");
-        var req2 = new RegistrationRequest("temp2@mail.com", "Password1!", "Password1!");
-        var req3 = new RegistrationRequest("temp3@mail.com", "Password1!", "Password1!");
-        var user1 = userService.saveDisabledUser(req1);
-        var user2 = userService.saveDisabledUser(req2);
-        var user3 = userService.saveDisabledUser(req3);
+        var user1 = userService.saveDisabledUser(mockUtil.genUserDto());
+        var user2 = userService.saveDisabledUser(mockUtil.genUserDto());
+        var user3 = userService.saveDisabledUser(mockUtil.genUserDto());
         userService.enableUser(user1.getId());
         var regIds = Set.of(user1.getId(), user2.getId(), user3.getId());
         var delIds = Set.copyOf(userService.deleteDisabledUsersWithIds(regIds));

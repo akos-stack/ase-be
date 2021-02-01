@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.service.user;
 
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
-import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +13,7 @@ public interface IUserService {
 
     List<UserDto> findUsersByEmailOrRole(String email, String role, int page, int size, String sort);
 
-    UserDto saveDisabledUser(RegistrationRequest request);
+    UserDto saveDisabledUser(UserDto userDto);
 
     UserDto saveEnabledUser(UserDto userDto);
 

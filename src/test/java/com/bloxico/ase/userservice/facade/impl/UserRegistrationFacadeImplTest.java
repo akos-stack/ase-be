@@ -60,21 +60,21 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test(expected = UserException.class)
     public void registerUserWithVerificationToken_passwordMismatch() {
-        var request = new RegistrationRequest("passwordMismatch@mail.com", "Password1!", "Password2!");
+        var email = genEmail();
+        var request = new RegistrationRequest(email, email, email, uuid());
         userRegistrationFacade.registerUserWithVerificationToken(request);
     }
 
     @Test(expected = UserException.class)
     public void registerUserWithVerificationToken_userAlreadyExists() {
-        var request1 = new RegistrationRequest("temp@mail.com", "Password1!", "Password1!");
-        var request2 = new RegistrationRequest("temp@mail.com", "Password1!", "Password1!");
-        userRegistrationFacade.registerUserWithVerificationToken(request1);
-        userRegistrationFacade.registerUserWithVerificationToken(request2);
+        var request = mockUtil.genRegistrationRequest();
+        userRegistrationFacade.registerUserWithVerificationToken(request);
+        userRegistrationFacade.registerUserWithVerificationToken(request);
     }
 
     @Test
     public void registerDisabledUser() {
-        var request = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");
+        var request = mockUtil.genRegistrationRequest();
         var response = userRegistrationFacade.registerUserWithVerificationToken(request);
         assertNotNull(response.getTokenValue());
     }
@@ -86,7 +86,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test(expected = TokenException.class)
     public void handleTokenValidation_tokenNotFound() {
-        var regRequest = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");
+        var regRequest = mockUtil.genRegistrationRequest();
         userRegistrationFacade.registerUserWithVerificationToken(regRequest);
         var tknRequest = new TokenValidationRequest(regRequest.getEmail());
         userRegistrationFacade.handleTokenValidation(tknRequest);
@@ -94,8 +94,8 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void handleTokenValidation() {
-        var email = "passwordMatches@mail.com";
-        var regRequest = new RegistrationRequest(email, "Password1!", "Password1!");
+        var regRequest = mockUtil.genRegistrationRequest();
+        var email = regRequest.getEmail();
         var token = userRegistrationFacade.registerUserWithVerificationToken(regRequest).getTokenValue();
         var tknRequest = new TokenValidationRequest(token);
         userRegistrationFacade.handleTokenValidation(tknRequest);
@@ -117,7 +117,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
     @Test
     @DirtiesContext(methodMode = BEFORE_METHOD)
     public void refreshExpiredToken() {
-        var request = new RegistrationRequest("passwordMatches@mail.com", "Password1!", "Password1!");
+        var request = mockUtil.genRegistrationRequest();
         var tokenValue = userRegistrationFacade.registerUserWithVerificationToken(request).getTokenValue();
         var originalTokenDto = MAPPER.toDto(
                 tokenRepository
@@ -147,8 +147,8 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void resendVerificationToken() {
-        var email = "passwordMatches@mail.com";
-        var regRequest = new RegistrationRequest(email, "Password1!", "Password1!");
+        var regRequest = mockUtil.genRegistrationRequest();
+        var email = regRequest.getEmail();
         userRegistrationFacade.registerUserWithVerificationToken(regRequest);
         var resRequest = new ResendTokenRequest(email);
         userRegistrationFacade.resendVerificationToken(resRequest);

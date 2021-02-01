@@ -378,22 +378,36 @@ public class MockUtil {
                 uuid(), uuid(), ONE, TEN);
     }
 
+    public RegistrationRequest genRegistrationRequest() {
+        var email = genEmail();
+        return new RegistrationRequest(email, email, email, email);
+    }
+
+    public UserDto genUserDto() {
+        var email = genEmail();
+        var userDto = new UserDto();
+        userDto.setName(email);
+        userDto.setPassword(email);
+        userDto.setEmail(email);
+        return userDto;
+    }
+
     @lombok.Value
     public static class Registration {
         long id;
-        String email, password, token;
+        String email, username, password, token;
     }
 
     public Registration doRegistration() {
         String email = genEmail(), pass = genEmail();
         String token = given()
                 .contentType(JSON)
-                .body(new RegistrationRequest(email, pass, pass))
+                .body(new RegistrationRequest(email, email, pass, pass))
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .getBody()
                 .path("token_value");
         long id = userService.findUserByEmail(email).getId();
-        return new Registration(id, email, pass, token);
+        return new Registration(id, email, email, pass, token);
     }
 
     public void doConfirmation(String token) {

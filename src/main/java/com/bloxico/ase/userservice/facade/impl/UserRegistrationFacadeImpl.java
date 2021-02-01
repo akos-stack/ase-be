@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.EVALUATOR_INVITATION;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.VERIFICATION;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
 
 @Slf4j
 @Service
@@ -57,7 +58,9 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public RegistrationResponse registerUserWithVerificationToken(RegistrationRequest request) {
         log.info("UserRegistrationFacadeImpl.registerUserWithVerificationToken - start | request: {}", request);
-        var userDto = userService.saveDisabledUser(request);
+        if (!request.isPasswordMatching())
+            throw MATCH_REGISTRATION_PASSWORD_ERROR.newException();
+        var userDto = userService.saveDisabledUser(MAPPER.toUserDto(request));
         var tokenDto = registrationTokenService.createTokenForUser(userDto.getId());
         mailUtil.sendTokenEmail(VERIFICATION, userDto.getEmail(), tokenDto.getValue());
         var response = new RegistrationResponse(tokenDto.getValue());

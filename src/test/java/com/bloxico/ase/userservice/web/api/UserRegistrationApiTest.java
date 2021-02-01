@@ -45,9 +45,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
     public void registration_200_ok() {
         given()
                 .contentType(JSON)
-                .body(new RegistrationRequest(
-                        "passwordMatches@mail.com",
-                        "Password1!", "Password1!"))
+                .body(mockUtil.genRegistrationRequest())
                 .when()
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .then()
@@ -58,11 +56,10 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
 
     @Test
     public void registration_400_passwordMismatch() {
+        var email = genEmail();
         given()
                 .contentType(JSON)
-                .body(new RegistrationRequest(
-                        "passwordMismatch@mail.com",
-                        "Password1!", "Password2!"))
+                .body(new RegistrationRequest(email, email, email, uuid()))
                 .when()
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .then()
@@ -73,9 +70,7 @@ public class UserRegistrationApiTest extends AbstractSpringTest {
 
     @Test
     public void registration_409_userAlreadyExists() {
-        var request = new RegistrationRequest(
-                "passwordMatches@mail.com",
-                "Password1!", "Password1!");
+        var request = mockUtil.genRegistrationRequest();
         given()
                 .contentType(JSON)
                 .body(request)
