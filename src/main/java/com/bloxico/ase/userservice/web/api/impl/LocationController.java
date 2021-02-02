@@ -2,10 +2,7 @@ package com.bloxico.ase.userservice.web.api.impl;
 
 import com.bloxico.ase.userservice.facade.ILocationFacade;
 import com.bloxico.ase.userservice.web.api.LocationApi;
-import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
-import com.bloxico.ase.userservice.web.model.address.RegionDataResponse;
-import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
-import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
+import com.bloxico.ase.userservice.web.model.address.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,5 +37,15 @@ public class LocationController implements LocationApi {
         var response = locationFacade.createRegion(request, id);
         return ResponseEntity.ok(response);
     }
+
+    @Override
+    public ResponseEntity<CountryDataResponse> createCountry(
+            @Valid @RequestBody CreateCountryRequest request, Principal principal) {
+
+        var id = extractId(principal);
+        var response = locationFacade.createCountry(request, id);
+        return ResponseEntity.ok(response);
+    }
+
 
 }

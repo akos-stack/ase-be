@@ -1,6 +1,8 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
 import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.entity.address.Country;
+import com.bloxico.ase.userservice.entity.address.CountryEvaluationDetails;
 import com.bloxico.ase.userservice.repository.address.*;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.REGION_EXISTS;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.*;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
@@ -113,6 +115,28 @@ public class LocationServiceImpl implements ILocationService {
         return regionDto;
     }
 
+    @Override
+    public CountryDto createCountry(CountryDto dto, long principalId) {
+        log.debug("LocationServiceImpl.createCountry - start | dto: {}, principalId: {}", dto, principalId);
+        requireNonNull(dto);
+        if (doesCountryExist(dto.getName())) {
+            throw COUNTRY_EXISTS.newException();
+        }
+        var region = regionRepository
+                .findByNameIgnoreCase(dto.getRegion().getName())
+                .orElseThrow(REGION_NOT_FOUND::newException);
+        var evaluationDetails = MAPPER.toEntity(dto.getCountryEvaluationDetails());
+        var country = MAPPER.toEntity(dto);
+        country.setCreatorId(principalId);
+        country.setRegion(region);
+        country.setCountryEvaluationDetails(evaluationDetails);
+        evaluationDetails.setCountry(country);
+        countryRepository.saveAndFlush(country);
+        var countryDto = MAPPER.toDto(country);
+        log.debug("LocationServiceImpl.createCountry - end | dto: {}, principalId: {}", dto, principalId);
+        return countryDto;
+    }
+
     private CountryDto saveCountry(CountryDto dto, long principalId) {
         var country = MAPPER.toEntity(dto);
         country.setCreatorId(principalId);
@@ -127,6 +151,12 @@ public class LocationServiceImpl implements ILocationService {
 
     private boolean doesRegionExist(String name) {
         return regionRepository
+                .findByNameIgnoreCase(name)
+                .isPresent();
+    }
+
+    private boolean doesCountryExist(String name) {
+        return countryRepository
                 .findByNameIgnoreCase(name)
                 .isPresent();
     }

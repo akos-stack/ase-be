@@ -18,4 +18,6 @@ public interface ILocationService {
 
     RegionDto createRegion(RegionDto dto, long principalId);
 
+    CountryDto createCountry(CountryDto dto, long principalId);
+
 }

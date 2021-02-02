@@ -13,6 +13,7 @@ import com.bloxico.ase.userservice.entity.token.*;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
 import com.bloxico.ase.userservice.entity.user.profile.*;
+import com.bloxico.ase.userservice.web.model.address.CreateCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
@@ -50,6 +51,10 @@ public interface AseMapper {
 
     PendingEvaluatorDto toDto(PendingEvaluator entity);
 
+    RegionDto toDto(Region entity);
+
+    CountryEvaluationDetailsDto toDto(CountryEvaluationDetails entity);
+
     // DTO -> ENTITY
 
     User toEntity(UserDto dto);
@@ -65,6 +70,10 @@ public interface AseMapper {
     Evaluator toEntity(EvaluatorDto dto);
 
     ArtOwner toEntity(ArtOwnerDto dto);
+
+    Region toEntity(RegionDto dto);
+
+    CountryEvaluationDetails toEntity(CountryEvaluationDetailsDto dto);
 
     // OTHER
 
@@ -96,10 +105,19 @@ public interface AseMapper {
 
     PendingEvaluator toPendingEvaluator(IPendingEvaluatorRequest request);
 
-    Region toEntity(RegionDto dto);
+    RegionDto toRegionDto(CreateRegionRequest request);
 
-    RegionDto toDto(CreateRegionRequest request);
-
-    RegionDto toDto(Region entity);
+    default CountryDto toDto(CreateCountryRequest request) {
+        var regionDto = new RegionDto();
+        regionDto.setName(request.getRegion());
+        var evaluationDetailsDto = new CountryEvaluationDetailsDto();
+        evaluationDetailsDto.setPricePerEvaluation(request.getPricePerEvaluation());
+        evaluationDetailsDto.setAvailabilityPercentage(request.getAvailabilityPercentage());
+        var countryDto = new CountryDto();
+        countryDto.setName(request.getName());
+        countryDto.setRegion(regionDto);
+        countryDto.setCountryEvaluationDetails(evaluationDetailsDto);
+        return countryDto;
+    }
 
 }

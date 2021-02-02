@@ -1,9 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
-import com.bloxico.ase.userservice.web.model.address.RegionDataResponse;
-import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
-import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
+import com.bloxico.ase.userservice.web.model.address.*;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,9 +14,10 @@ import java.security.Principal;
 @Api(value = "location")
 public interface LocationApi {
 
-    String COUNTRIES        = "/countries";
-    String CITIES           = "/cities";
-    String REGIONS_CREATE   = "/regions/create";
+    String COUNTRIES            = "/countries";
+    String COUNTRIES_CREATE     = "/countries/create";
+    String CITIES               = "/cities";
+    String REGIONS_CREATE       = "/regions/create";
 
     @GetMapping(value = COUNTRIES)
     @ApiOperation(value = "Fetch all countries.")
@@ -47,5 +45,19 @@ public interface LocationApi {
     })
     ResponseEntity<RegionDataResponse> createRegion(
             @Valid @RequestBody CreateRegionRequest request, Principal principal);
+
+    @PostMapping(
+            value = COUNTRIES_CREATE,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'create_country')")
+    @ApiOperation(value = "Creates country in the database.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Country successfully created."),
+            @ApiResponse(code = 409, message = "Country already exists."),
+            @ApiResponse(code = 404, message = "Specified region doesn't exist.")
+    })
+    ResponseEntity<CountryDataResponse> createCountry(
+            @Valid @RequestBody CreateCountryRequest request, Principal principal);
 
 }

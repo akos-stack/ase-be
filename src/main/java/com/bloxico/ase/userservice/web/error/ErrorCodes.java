@@ -135,7 +135,19 @@ public interface ErrorCodes {
         REGION_EXISTS(
                 HttpStatus.CONFLICT,
                 "30",
-                "Region already exists in the database.");
+                "Region already exists in the database."),
+        REGION_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "31",
+                "Region with specified name was not found."),
+        COUNTRY_EXISTS(
+                HttpStatus.CONFLICT,
+                "32",
+                "Country already exists in the database."),
+        COUNTRY_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "33",
+                "Country with specified name was not found.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
