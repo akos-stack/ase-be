@@ -14,7 +14,7 @@ public class CountryDto {
     @JsonProperty("name")
     private String name;
 
-    @JsonProperty("name")
+    @JsonProperty("region")
     private RegionDto region;
 
     @JsonProperty("evaluation_details")

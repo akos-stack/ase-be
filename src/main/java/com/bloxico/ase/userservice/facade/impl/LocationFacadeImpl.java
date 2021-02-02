@@ -44,6 +44,7 @@ public class LocationFacadeImpl implements ILocationFacade {
     @Override
     public RegionDataResponse createRegion(CreateRegionRequest request, long principalId) {
         log.debug("LocationFacadeImpl.createRegion - start | request: {}, principalId: {}", request, principalId);
+        requireNonNull(request);
         var dto = MAPPER.toRegionDto(request);
         dto = locationService.createRegion(dto, principalId);
         log.debug("LocationFacadeImpl.createRegion - end | request: {}, principalId: {}", request, principalId);
