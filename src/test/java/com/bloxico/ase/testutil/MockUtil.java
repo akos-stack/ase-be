@@ -90,6 +90,7 @@ public class MockUtil {
     private final PendingEvaluatorRepository pendingEvaluatorRepository;
     private final PendingEvaluatorServiceImpl pendingEvaluatorService;
     private final UserProfileRepository userProfileRepository;
+    private final RegionRepository regionRepository;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
@@ -107,7 +108,8 @@ public class MockUtil {
                     UserRegistrationFacadeImpl userRegistrationFacade,
                     PendingEvaluatorRepository pendingEvaluatorRepository,
                     PendingEvaluatorServiceImpl pendingEvaluatorService,
-                    UserProfileRepository userProfileRepository)
+                    UserProfileRepository userProfileRepository,
+                    RegionRepository regionRepository)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -125,6 +127,7 @@ public class MockUtil {
         this.pendingEvaluatorRepository = pendingEvaluatorRepository;
         this.pendingEvaluatorService = pendingEvaluatorService;
         this.userProfileRepository = userProfileRepository;
+        this.regionRepository = regionRepository;
     }
 
     public User savedAdmin() {
@@ -232,6 +235,20 @@ public class MockUtil {
 
     public LocationDto savedLocationDto() {
         return MAPPER.toDto(savedLocation());
+    }
+
+    public Region savedRegion() {
+        var creatorId = savedAdmin().getId();
+        var region = new Region();
+        region.setName(uuid());
+        region.setCreatorId(creatorId);
+        return regionRepository.saveAndFlush(region);
+    }
+
+    public RegionDto genRegionDto() {
+        var userDto = new RegionDto();
+        userDto.setName(uuid());
+        return userDto;
     }
 
     public Token savedToken(Token.Type type) {

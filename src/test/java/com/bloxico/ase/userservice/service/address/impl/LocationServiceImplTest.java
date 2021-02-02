@@ -2,8 +2,13 @@ package com.bloxico.ase.userservice.service.address.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.dto.entity.address.CityDto;
+import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
+import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
+import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
+import com.bloxico.ase.userservice.exception.LocationException;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
+import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,6 +18,7 @@ import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class LocationServiceImplTest extends AbstractSpringTest {
 
@@ -24,6 +30,9 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Autowired
     private LocationServiceImpl service;
+
+    @Autowired
+    private RegionRepository regionRepository;
 
     @Test
     public void findAllCountries() {
@@ -124,6 +133,38 @@ public class LocationServiceImplTest extends AbstractSpringTest {
                         .stream()
                         .map(MAPPER::toDto)
                         .collect(toList()));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void createRegion_nullRegion() {
+        service.createRegion(null, 1);
+    }
+
+    @Test(expected = LocationException.class)
+    public void createRegion_regionAlreadyExists() {
+        var dto = mockUtil.genRegionDto();
+        service.createRegion(dto, 1);
+        service.createRegion(dto, 1);
+    }
+
+    @Test
+    public void createRegion_regionSuccessfullyCreated() {
+        var principalId = mockUtil.savedAdmin().getId();
+        var regionName = uuid();
+        var dto = new RegionDto();
+        dto.setName(regionName);
+
+        var regionDto = service.createRegion(dto, principalId);
+        var newlyCreatedRegion = regionRepository
+                .findByNameIgnoreCase(regionName)
+                .orElse(null);
+
+        assertNotNull(newlyCreatedRegion);
+        assertEquals(regionDto.getId(), newlyCreatedRegion.getId());
+        assertEquals(principalId, newlyCreatedRegion.getCreatorId());
+        assertEquals(regionName, newlyCreatedRegion.getName());
+        assertEquals(0, regionDto.getNumberOfCountries().intValue());
+        assertEquals(0, regionDto.getNumberOfEvaluators().intValue());
     }
 
 }
