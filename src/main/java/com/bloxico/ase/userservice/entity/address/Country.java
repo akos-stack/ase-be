@@ -23,6 +23,10 @@ public class Country extends BaseEntity {
     @Column(name = "name")
     private String name;
 
+    @ManyToOne(fetch = EAGER)
+    @JoinColumn(name="region_id")
+    private Region region;
+
     @OneToOne(
             mappedBy = "country",
             cascade = { PERSIST, MERGE, REMOVE },
