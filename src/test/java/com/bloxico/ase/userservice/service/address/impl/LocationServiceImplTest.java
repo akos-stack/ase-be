@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
 import com.bloxico.ase.userservice.exception.LocationException;
+import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import org.junit.Test;
@@ -33,6 +34,9 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Autowired
     private RegionRepository regionRepository;
+
+    @Autowired
+    private CountryRepository countryRepository;
 
     @Test
     public void findAllCountries() {
@@ -165,6 +169,44 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         assertEquals(regionName, newlyCreatedRegion.getName());
         assertEquals(0, regionDto.getNumberOfCountries().intValue());
         assertEquals(0, regionDto.getNumberOfEvaluators().intValue());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void createCountry_nullCountry() {
+        service.createCountry(null, 1);
+    }
+
+    @Test(expected = LocationException.class)
+    public void createCountry_countryAlreadyExists() {
+        var countryDto = mockUtil.genCountryDto(mockUtil.savedRegionDto());
+        service.createCountry(countryDto, 1);
+        service.createCountry(countryDto, 1);
+    }
+
+    @Test(expected = LocationException.class)
+    public void createCountry_regionNotFound() {
+        var countryDto = mockUtil.genCountryDto(mockUtil.genRegionDto());
+        service.createCountry(countryDto, 1);
+    }
+
+    @Test
+    public void createCountry_countrySuccessfullyCreated() {
+        var principalId = mockUtil.savedAdmin().getId();
+        var dto = mockUtil.genCountryDto(mockUtil.savedRegionDto());
+
+        var countryDto = service.createCountry(dto, principalId);
+        var newlyCreatedCountry = countryRepository
+                .findByNameIgnoreCase(countryDto.getName())
+                .orElse(null);
+
+        assertNotNull(newlyCreatedCountry);
+        assertEquals(countryDto.getRegion().getName(), newlyCreatedCountry.getRegion().getName());
+        assertEquals(countryDto.getId(), newlyCreatedCountry.getId());
+        assertEquals(countryDto.getName(), newlyCreatedCountry.getName());
+        assertEquals(principalId, newlyCreatedCountry.getCreatorId());
+        assertEquals(countryDto.getCountryEvaluationDetails().getPricePerEvaluation(), 10);
+        assertEquals(countryDto.getCountryEvaluationDetails().getAvailabilityPercentage(), 40);
+        assertEquals(countryDto.getCountryEvaluationDetails().getTotalOfEvaluators(), 0);
     }
 
 }

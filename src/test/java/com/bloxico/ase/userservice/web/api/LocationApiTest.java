@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.web.model.address.CreateCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.bloxico.ase.testutil.MockUtil.ERROR_CODE;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.web.api.LocationApi.*;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.REGION_EXISTS;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.is;
@@ -104,5 +105,73 @@ public class LocationApiTest extends AbstractSpringTest {
                 .body(ERROR_CODE, is(REGION_EXISTS.getCode()));
     }
 
+    @Test
+    public void createCountry_200_countrySuccessfullyCreated() {
+        var region = mockUtil.savedRegion();
+        var request =
+                new CreateCountryRequest(uuid(), region.getName(), 10, 40);
+        given()
+                .header("Authorization", mockUtil.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + COUNTRIES_CREATE)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body(
+                        "country", notNullValue(),
+                        "country.id", notNullValue(),
+                        "country.name", is(request.getName()),
+                        "country.region", notNullValue(),
+                        "country.region.id", is(region.getId()),
+                        "country.region.name", is(region.getName()),
+                        "country.evaluation_details.price_per_evaluation", is(10),
+                        "country.evaluation_details.availability_percentage", is(40),
+                        "country.evaluation_details.total_of_evaluators", is(0));
+    }
+
+    @Test
+    public void createCountry_409_countryAlreadyExists() {
+        var adminBearerToken = mockUtil.doAdminAuthentication();
+        var region = mockUtil.savedRegion();
+        var request =
+                new CreateCountryRequest(uuid(), region.getName(), 10, 40);
+        given()
+                .header("Authorization", adminBearerToken)
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + COUNTRIES_CREATE)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        given()
+                .header("Authorization", adminBearerToken)
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + COUNTRIES_CREATE)
+                .then()
+                .assertThat()
+                .statusCode(409)
+                .body(ERROR_CODE, is(COUNTRY_EXISTS.getCode()));
+    }
+
+    @Test
+    public void createCountry_404_regionNotFound() {
+        var request =
+                new CreateCountryRequest(uuid(), uuid(), 10, 40);
+        given()
+                .header("Authorization", mockUtil.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + COUNTRIES_CREATE)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(REGION_NOT_FOUND.getCode()));
+    }
 
 }

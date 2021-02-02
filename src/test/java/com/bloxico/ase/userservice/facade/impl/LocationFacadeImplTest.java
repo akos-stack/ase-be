@@ -3,7 +3,9 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.exception.LocationException;
+import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
+import com.bloxico.ase.userservice.web.model.address.CreateCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
 import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
 import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
@@ -25,6 +27,9 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
 
     @Autowired
     private RegionRepository regionRepository;
+
+    @Autowired
+    private CountryRepository countryRepository;
 
     @Test
     public void findAllCountries() {
@@ -89,6 +94,54 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
         assertEquals(response.getRegion().getId(), newlyCreatedRegion.getId());
         assertEquals(0, response.getRegion().getNumberOfCountries().intValue());
         assertEquals(0, response.getRegion().getNumberOfEvaluators().intValue());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void createCountry_requestIsNull() {
+        facade.createCountry(null, 1);
+    }
+
+    @Test(expected = LocationException.class)
+    public void createCountry_countryAlreadyExists() {
+        var region = mockUtil.savedRegion();
+        var request =
+                new CreateCountryRequest(uuid(), region.getName(), 10, 40);
+        facade.createCountry(request, 1);
+        facade.createCountry(request, 1);
+    }
+
+    @Test(expected = LocationException.class)
+    public void createCountry_regionNotFound() {
+        var request =
+                new CreateCountryRequest(uuid(), uuid(), 10, 40);
+        facade.createCountry(request, 1);
+    }
+
+    @Test
+    public void createCountry_countrySuccessfullyCreated() {
+        var principalId = mockUtil.savedAdmin().getId();
+        var name = uuid();
+        var region = mockUtil.savedRegion();
+
+        var request =
+                new CreateCountryRequest(name, region.getName(), 10, 40);
+        var response = facade.createCountry(request, principalId);
+
+        assertNotNull(response);
+        assertNotNull(response.getCountry());
+
+        var newlyCreatedCountry = countryRepository
+                .findByNameIgnoreCase(name)
+                .orElse(null);
+
+        assertNotNull(newlyCreatedCountry);
+        assertEquals(region.getName(), newlyCreatedCountry.getRegion().getName());
+        assertEquals(response.getCountry().getId(), newlyCreatedCountry.getId());
+        assertEquals(name, newlyCreatedCountry.getName());
+        assertEquals(principalId, newlyCreatedCountry.getCreatorId());
+        assertEquals(response.getCountry().getCountryEvaluationDetails().getPricePerEvaluation(), 10);
+        assertEquals(response.getCountry().getCountryEvaluationDetails().getAvailabilityPercentage(), 40);
+        assertEquals(response.getCountry().getCountryEvaluationDetails().getTotalOfEvaluators(), 0);
     }
 
 }

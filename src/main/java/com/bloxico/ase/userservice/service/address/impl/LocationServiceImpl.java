@@ -133,6 +133,7 @@ public class LocationServiceImpl implements ILocationService {
         evaluationDetails.setCountry(country);
         countryRepository.saveAndFlush(country);
         var countryDto = MAPPER.toDto(country);
+        countryDto.getCountryEvaluationDetails().setTotalOfEvaluators(0);
         log.debug("LocationServiceImpl.createCountry - end | dto: {}, principalId: {}", dto, principalId);
         return countryDto;
     }

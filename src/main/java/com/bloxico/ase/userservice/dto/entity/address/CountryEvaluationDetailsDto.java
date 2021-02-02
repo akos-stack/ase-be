@@ -15,4 +15,6 @@ public class CountryEvaluationDetailsDto {
     @JsonProperty("availability_percentage")
     private int availabilityPercentage;
 
+    @JsonProperty("total_of_evaluators")
+    private int totalOfEvaluators;
 }

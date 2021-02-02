@@ -245,10 +245,29 @@ public class MockUtil {
         return regionRepository.saveAndFlush(region);
     }
 
+    public RegionDto savedRegionDto() {
+        return MAPPER.toDto(savedRegion());
+    }
+
     public RegionDto genRegionDto() {
-        var userDto = new RegionDto();
-        userDto.setName(uuid());
-        return userDto;
+        var regionDto = new RegionDto();
+        regionDto.setName(uuid());
+        return regionDto;
+    }
+
+    public CountryDto genCountryDto(RegionDto regionDto) {
+        var countryDto = new CountryDto();
+        countryDto.setName(uuid());
+        countryDto.setRegion(regionDto);
+        countryDto.setCountryEvaluationDetails(genCountryEvaluationDetailsDto());
+        return countryDto;
+    }
+
+    public CountryEvaluationDetailsDto genCountryEvaluationDetailsDto() {
+        var evaluationDetailsDto = new CountryEvaluationDetailsDto();
+        evaluationDetailsDto.setPricePerEvaluation(10);
+        evaluationDetailsDto.setAvailabilityPercentage(40);
+        return  evaluationDetailsDto;
     }
 
     public Token savedToken(Token.Type type) {
