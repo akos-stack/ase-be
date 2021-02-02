@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.facade.ILocationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
+import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.address.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +18,20 @@ import static java.util.Objects.requireNonNull;
 public class LocationFacadeImpl implements ILocationFacade {
 
     private final ILocationService locationService;
+    private final IUserProfileService userProfileService;
 
     @Autowired
-    public LocationFacadeImpl(ILocationService locationService) {
+    public LocationFacadeImpl(ILocationService locationService,
+                              IUserProfileService userProfileService) {
         this.locationService = locationService;
+        this.userProfileService = userProfileService;
     }
 
     @Override
     public SearchCountriesResponse findAllCountries() {
         log.info("LocationFacadeImpl.findAllCountries - start");
         var countries = locationService.findAllCountries();
+        userProfileService.fetchTotalOfEvaluatorsForCountries(countries);
         var response = new SearchCountriesResponse(countries);
         log.info("LocationFacadeImpl.findAllCountries - end");
         return response;

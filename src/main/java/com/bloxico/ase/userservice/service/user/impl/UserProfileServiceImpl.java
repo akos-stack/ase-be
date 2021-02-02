@@ -1,5 +1,7 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
+import com.bloxico.ase.userservice.dto.CountryIdTotalOfEvaluatorsPair;
+import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.repository.user.profile.*;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
@@ -8,9 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.List;
+
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toMap;
 
 @Slf4j
 @Service
@@ -88,6 +94,24 @@ public class UserProfileServiceImpl implements IUserProfileService {
         var dto = MAPPER.toDto(artOwnerRepository.saveAndFlush(artOwner));
         log.debug("UserProfileServiceImpl.saveArtOwner - start | artOwnerDto: {}, principalId: {}", artOwnerDto, principalId);
         return dto;
+    }
+
+    @Override
+    public void fetchTotalOfEvaluatorsForCountries(Collection<CountryDto> countries) {
+        log.debug("UserProfileServiceImpl.countTotalOfEvaluatorsForCountries - start | countries: {}", countries);
+        var countriesMap = countries.stream()
+                .collect(toMap(CountryDto::getId, country -> country));
+        var pairs = evaluatorRepository
+                .countTotalOfEvaluatorsForEachCountryIdIn(countriesMap.keySet());
+        pairs
+                .forEach(p -> {
+                    var countryId = p.getCountryId();
+                    var totalOfEvaluators = p.getTotalOfEvaluators();
+                    countriesMap.get(countryId)
+                            .getCountryEvaluationDetails()
+                            .setTotalOfEvaluators(totalOfEvaluators);
+                });
+        log.debug("UserProfileServiceImpl.countTotalOfEvaluatorsForCountries - end | countries: {}", countries);
     }
 
 }
