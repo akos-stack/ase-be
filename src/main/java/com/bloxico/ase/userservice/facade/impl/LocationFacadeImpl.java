@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @Service
@@ -46,6 +47,7 @@ public class LocationFacadeImpl implements ILocationFacade {
     @Override
     public RegionDataResponse createRegion(CreateRegionRequest request, long principalId) {
         log.debug("LocationFacadeImpl.createRegion - start | request: {}, principalId: {}", request, principalId);
+        requireNonNull(request);
         var dto = MAPPER.toDto(request);
         dto = locationService.createRegion(dto, principalId);
         log.debug("LocationFacadeImpl.createRegion - end | request: {}, principalId: {}", request, principalId);
