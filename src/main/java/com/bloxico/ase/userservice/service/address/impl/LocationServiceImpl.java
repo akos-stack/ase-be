@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.REGION_EXISTS;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
@@ -20,15 +21,18 @@ public class LocationServiceImpl implements ILocationService {
     private final CountryRepository countryRepository;
     private final CityRepository cityRepository;
     private final LocationRepository locationRepository;
+    private final RegionRepository regionRepository;
 
     @Autowired
     public LocationServiceImpl(CountryRepository countryRepository,
                                CityRepository cityRepository,
-                               LocationRepository locationRepository)
+                               LocationRepository locationRepository,
+                               RegionRepository regionRepository)
     {
         this.countryRepository = countryRepository;
         this.cityRepository = cityRepository;
         this.locationRepository = locationRepository;
+        this.regionRepository = regionRepository;
     }
 
     @Override
@@ -92,6 +96,23 @@ public class LocationServiceImpl implements ILocationService {
         return locationDto;
     }
 
+    @Override
+    public RegionDto createRegion(RegionDto dto, long principalId) {
+        log.debug("LocationServiceImpl.createRegion - start | dto: {}, principalId: {}", dto, principalId);
+        requireNonNull(dto);
+        if (doesRegionExist(dto.getName())) {
+            throw REGION_EXISTS.newException();
+        }
+        var region = MAPPER.toEntity(dto);
+        region.setCreatorId(principalId);
+        region = regionRepository.saveAndFlush(region);
+        var regionDto = MAPPER.toDto(region);
+        regionDto.setNumberOfCountries(0);
+        regionDto.setNumberOfEvaluators(0);
+        log.debug("LocationServiceImpl.createRegion - end | dto: {}, principalId: {}", dto, principalId);
+        return regionDto;
+    }
+
     private CountryDto saveCountry(CountryDto dto, long principalId) {
         var country = MAPPER.toEntity(dto);
         country.setCreatorId(principalId);
@@ -102,6 +123,12 @@ public class LocationServiceImpl implements ILocationService {
         var city = MAPPER.toEntity(dto);
         city.setCreatorId(principalId);
         return MAPPER.toDto(cityRepository.saveAndFlush(city));
+    }
+
+    private boolean doesRegionExist(String name) {
+        return regionRepository
+                .findByNameIgnoreCase(name)
+                .isPresent();
     }
 
 }

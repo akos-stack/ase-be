@@ -16,4 +16,6 @@ public interface ILocationService {
 
     LocationDto saveLocation(LocationDto locationDto, long principalId);
 
+    RegionDto createRegion(RegionDto dto, long principalId);
+
 }

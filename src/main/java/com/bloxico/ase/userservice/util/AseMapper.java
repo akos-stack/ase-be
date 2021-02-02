@@ -13,6 +13,7 @@ import com.bloxico.ase.userservice.entity.token.*;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
 import com.bloxico.ase.userservice.entity.user.profile.*;
+import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import com.bloxico.ase.userservice.web.model.user.*;
@@ -94,5 +95,11 @@ public interface AseMapper {
     ArtOwnerDto toArtOwnerDto(SubmitArtOwnerRequest request);
 
     PendingEvaluator toPendingEvaluator(IPendingEvaluatorRequest request);
+
+    Region toEntity(RegionDto dto);
+
+    RegionDto toDto(CreateRegionRequest request);
+
+    RegionDto toDto(Region entity);
 
 }

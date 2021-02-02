@@ -129,4 +129,28 @@ public interface ErrorCodes {
 
     }
 
+    @Getter
+    enum Location implements ErrorCodes {
+
+        REGION_EXISTS(
+                HttpStatus.CONFLICT,
+                "30",
+                "Region already exists in the database.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        Location(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new LocationException(httpStatus, code, cause);
+        }
+
+    }
+
 }
