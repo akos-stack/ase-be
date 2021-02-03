@@ -1,23 +1,39 @@
 package com.bloxico.ase.testutil;
 
-import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.dto.entity.address.CityDto;
+import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
+import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
 import com.bloxico.ase.userservice.entity.BaseEntity;
-import com.bloxico.ase.userservice.entity.address.*;
+import com.bloxico.ase.userservice.entity.address.City;
+import com.bloxico.ase.userservice.entity.address.Country;
+import com.bloxico.ase.userservice.entity.address.Location;
+import com.bloxico.ase.userservice.entity.artwork.*;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
 import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
-import com.bloxico.ase.userservice.facade.impl.*;
-import com.bloxico.ase.userservice.repository.address.*;
+import com.bloxico.ase.userservice.facade.impl.UserManagementFacadeImpl;
+import com.bloxico.ase.userservice.facade.impl.UserPasswordFacadeImpl;
+import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
+import com.bloxico.ase.userservice.repository.address.CityRepository;
+import com.bloxico.ase.userservice.repository.address.CountryRepository;
+import com.bloxico.ase.userservice.repository.address.LocationRepository;
+import com.bloxico.ase.userservice.repository.artwork.CategoryRepository;
+import com.bloxico.ase.userservice.repository.artwork.MaterialRepository;
+import com.bloxico.ase.userservice.repository.artwork.MediumRepository;
+import com.bloxico.ase.userservice.repository.artwork.StyleRepository;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
-import com.bloxico.ase.userservice.repository.token.*;
+import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
+import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
+import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
 import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
@@ -41,7 +57,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -90,6 +108,10 @@ public class MockUtil {
     private final PendingEvaluatorRepository pendingEvaluatorRepository;
     private final PendingEvaluatorServiceImpl pendingEvaluatorService;
     private final UserProfileRepository userProfileRepository;
+    private final CategoryRepository categoryRepository;
+    private final MaterialRepository materialRepository;
+    private final MediumRepository mediumRepository;
+    private final StyleRepository styleRepository;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
@@ -107,7 +129,7 @@ public class MockUtil {
                     UserRegistrationFacadeImpl userRegistrationFacade,
                     PendingEvaluatorRepository pendingEvaluatorRepository,
                     PendingEvaluatorServiceImpl pendingEvaluatorService,
-                    UserProfileRepository userProfileRepository)
+                    UserProfileRepository userProfileRepository, CategoryRepository categoryRepository, MaterialRepository materialRepository, MediumRepository mediumRepository, StyleRepository styleRepository)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -125,6 +147,10 @@ public class MockUtil {
         this.pendingEvaluatorRepository = pendingEvaluatorRepository;
         this.pendingEvaluatorService = pendingEvaluatorService;
         this.userProfileRepository = userProfileRepository;
+        this.categoryRepository = categoryRepository;
+        this.materialRepository = materialRepository;
+        this.mediumRepository = mediumRepository;
+        this.styleRepository = styleRepository;
     }
 
     public User savedAdmin() {
@@ -232,6 +258,58 @@ public class MockUtil {
 
     public LocationDto savedLocationDto() {
         return MAPPER.toDto(savedLocation());
+    }
+
+    public ArtworkMetadataDto savedCategoryDto() {
+        return MAPPER.toDto(savedCategory());
+    }
+
+    public ArtworkMetadataDto savedMaterialDto() {
+        return MAPPER.toDto(savedMaterial());
+    }
+
+    public ArtworkMetadataDto savedMediumDto() {
+        return MAPPER.toDto(savedMedium());
+    }
+
+    public ArtworkMetadataDto savedStyleDto() {
+        return MAPPER.toDto(savedStyle());
+    }
+
+    private Category savedCategory() {
+        var creatorId= savedAdmin().getId();
+        var category = new Category();
+        category.setName(uuid());
+        category.setStatus(ArtworkMetadataStatus.APPROVED);
+        category.setCreatorId(creatorId);
+        return categoryRepository.saveAndFlush(category);
+    }
+
+    private Material savedMaterial() {
+        var creatorId= savedAdmin().getId();
+        var material = new Material();
+        material.setName(uuid());
+        material.setStatus(ArtworkMetadataStatus.APPROVED);
+        material.setCreatorId(creatorId);
+        return materialRepository.saveAndFlush(material);
+    }
+
+    private Medium savedMedium() {
+        var creatorId= savedAdmin().getId();
+        var medium = new Medium();
+        medium.setName(uuid());
+        medium.setStatus(ArtworkMetadataStatus.APPROVED);
+        medium.setCreatorId(creatorId);
+        return mediumRepository.saveAndFlush(medium);
+    }
+
+    private Style savedStyle() {
+        var creatorId= savedAdmin().getId();
+        var style = new Style();
+        style.setName(uuid());
+        style.setStatus(ArtworkMetadataStatus.APPROVED);
+        style.setCreatorId(creatorId);
+        return styleRepository.saveAndFlush(style);
     }
 
     public Token savedToken(Token.Type type) {

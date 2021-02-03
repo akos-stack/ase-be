@@ -64,6 +64,8 @@ import org.junit.runners.Suite;
         UserProfileFacadeImplTest.class,
         LocationFacadeImplTest.class,
         UserManagementFacadeImplTest.class,
+        ArtworkMetadataFacadeImplTest.class,
+        ArtworkMetadataManagementFacadeImplTest.class,
 
         // Run these individually for now
         // They stuck for some reason
