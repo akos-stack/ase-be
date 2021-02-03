@@ -18,5 +18,5 @@ public interface MaterialRepository extends JpaRepository<Material, Long> {
     @Query("SELECT m FROM Material m WHERE (:status IS NULL or m.status = :status) and (:name IS NULL or m.name like %:name%)")
     Page<Material> fetchMaterials(@Param("status") ArtworkMetadataStatus status, @Param("name") String name, Pageable pageable);
 
-    List<Material> findAllByStatus(ArtworkMetadataStatus status);
+    List<Material> findAllByStatusAndNameContains(ArtworkMetadataStatus status, String name);
 }

@@ -7,6 +7,9 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.validation.Valid;
 
 @Api(value = "artworksMetadata")
 public interface ArtworkMetadataApi {
@@ -21,21 +24,21 @@ public interface ArtworkMetadataApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Categories successfully fetched.")
     })
-    ResponseEntity<ArrayArtworkMetadataResponse> fetchCategories();
+    ResponseEntity<ArrayArtworkMetadataResponse> fetchCategories(@Valid @RequestParam(value = "name", required = false) String name);
 
     @GetMapping(value = FETCH_MATERIALS)
     @ApiOperation(value = "User fetches approved materials")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Materials successfully fetched.")
     })
-    ResponseEntity<ArrayArtworkMetadataResponse> fetchMaterials();
+    ResponseEntity<ArrayArtworkMetadataResponse> fetchMaterials(@Valid @RequestParam(value = "name", required = false) String name);
 
     @GetMapping(value = FETCH_MEDIUMS)
     @ApiOperation(value = "User fetches approved mediums")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Mediums successfully fetched.")
     })
-    ResponseEntity<ArrayArtworkMetadataResponse> fetchMediums();
+    ResponseEntity<ArrayArtworkMetadataResponse> fetchMediums(@Valid @RequestParam(value = "name", required = false) String name);
 
     @GetMapping(value = FETCH_STYLES)
     @ApiOperation(value = "User fetches approved styles")
@@ -43,5 +46,5 @@ public interface ArtworkMetadataApi {
             @ApiResponse(code = 200, message = "Styles successfully fetched."),
             @ApiResponse(code = 404, message = "Status not found.")
     })
-    ResponseEntity<ArrayArtworkMetadataResponse> fetchStyles();
+    ResponseEntity<ArrayArtworkMetadataResponse> fetchStyles(@Valid @RequestParam(value = "name", required = false) String name);
 }

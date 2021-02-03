@@ -18,7 +18,7 @@ public interface IArtworkMetadataService {
 
     Page<ArtworkMetadataDto> fetchCategories(ArtworkMetadataStatus status, String name, int page, int size, String sort);
 
-    List<ArtworkMetadataDto> fetchApprovedCategories();
+    List<ArtworkMetadataDto> fetchApprovedCategories(String name);
 
     // MATERIALS
 
@@ -30,7 +30,7 @@ public interface IArtworkMetadataService {
 
     Page<ArtworkMetadataDto> fetchMaterials(ArtworkMetadataStatus status, String name, int page, int size, String sort);
 
-    List<ArtworkMetadataDto> fetchApprovedMaterials();
+    List<ArtworkMetadataDto> fetchApprovedMaterials(String name);
 
     // MEDIUMS
 
@@ -42,7 +42,7 @@ public interface IArtworkMetadataService {
 
     Page<ArtworkMetadataDto> fetchMediums(ArtworkMetadataStatus status, String name, int page, int size, String sort);
 
-    List<ArtworkMetadataDto> fetchApprovedMediums();
+    List<ArtworkMetadataDto> fetchApprovedMediums(String name);
 
     // STYLES
 
@@ -54,5 +54,5 @@ public interface IArtworkMetadataService {
 
     Page<ArtworkMetadataDto> fetchStyles(ArtworkMetadataStatus status, String name, int page, int size, String sort);
 
-    List<ArtworkMetadataDto> fetchApprovedStyles();
+    List<ArtworkMetadataDto> fetchApprovedStyles(String name);
 }

@@ -87,10 +87,10 @@ public class ArtworkMetadataServiceImpl implements IArtworkMetadataService {
     }
 
     @Override
-    public List<ArtworkMetadataDto> fetchApprovedCategories() {
+    public List<ArtworkMetadataDto> fetchApprovedCategories(String name) {
         log.debug("ArtworkMetadataServiceImpl.fetchApprovedCategories - start");
         List<ArtworkMetadataDto> categoriesDto = categoryRepository
-                .findAllByStatus(APPROVED).stream().map(MAPPER::toDto).collect(Collectors.toList());
+                .findAllByStatusAndNameContains(APPROVED, name != null ? name: "").stream().map(MAPPER::toDto).collect(Collectors.toList());
         log.debug("ArtworkMetadataServiceImpl.fetchApprovedCategories - end");
         return categoriesDto;
     }
@@ -144,10 +144,10 @@ public class ArtworkMetadataServiceImpl implements IArtworkMetadataService {
     }
 
     @Override
-    public List<ArtworkMetadataDto> fetchApprovedMaterials() {
+    public List<ArtworkMetadataDto> fetchApprovedMaterials(String name) {
         log.debug("ArtworkMetadataServiceImpl.fetchApprovedMaterials - start");
         List<ArtworkMetadataDto> materialsDto = materialRepository
-                .findAllByStatus(APPROVED).stream().map(MAPPER::toDto).collect(Collectors.toList());
+                .findAllByStatusAndNameContains(APPROVED, name != null ? name: "").stream().map(MAPPER::toDto).collect(Collectors.toList());
         log.debug("ArtworkMetadataServiceImpl.fetchApprovedMaterials - end");
         return materialsDto;
     }
@@ -201,10 +201,10 @@ public class ArtworkMetadataServiceImpl implements IArtworkMetadataService {
     }
 
     @Override
-    public List<ArtworkMetadataDto> fetchApprovedMediums() {
+    public List<ArtworkMetadataDto> fetchApprovedMediums(String name) {
         log.debug("ArtworkMetadataServiceImpl.fetchApprovedMediums - start");
         List<ArtworkMetadataDto> mediumsDto = mediumRepository
-                .findAllByStatus(APPROVED).stream().map(MAPPER::toDto).collect(Collectors.toList());
+                .findAllByStatusAndNameContains(APPROVED, name != null ? name: "").stream().map(MAPPER::toDto).collect(Collectors.toList());
         log.debug("ArtworkMetadataServiceImpl.fetchApprovedMediums - end");
         return mediumsDto;
     }
@@ -258,10 +258,10 @@ public class ArtworkMetadataServiceImpl implements IArtworkMetadataService {
     }
 
     @Override
-    public List<ArtworkMetadataDto> fetchApprovedStyles() {
+    public List<ArtworkMetadataDto> fetchApprovedStyles(String name) {
         log.debug("ArtworkMetadataServiceImpl.fetchApprovedStyles - start");
         List<ArtworkMetadataDto> stylesDto = styleRepository
-                .findAllByStatus(APPROVED).stream().map(MAPPER::toDto).collect(Collectors.toList());
+                .findAllByStatusAndNameContains(APPROVED, name != null ? name: "").stream().map(MAPPER::toDto).collect(Collectors.toList());
         log.debug("ArtworkMetadataServiceImpl.fetchApprovedStyles - end");
         return stylesDto;
     }

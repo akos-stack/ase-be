@@ -18,6 +18,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query(value = "SELECT c FROM Category c WHERE (:status IS NULL or c.status = :status) and (:name IS NULL or c.name like %:name%)")
     Page<Category> fetchCategories(@Param("status") ArtworkMetadataStatus status, @Param("name") String name, Pageable pageable);
 
-    List<Category> findAllByStatus(ArtworkMetadataStatus status);
+    List<Category> findAllByStatusAndNameContains(ArtworkMetadataStatus status, String name);
 
 }

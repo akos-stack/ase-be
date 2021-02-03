@@ -14,26 +14,26 @@ public class ArtworkMetadataController implements ArtworkMetadataApi {
     private IArtworkMetadataFacade artworkMetadataFacade;
 
     @Override
-    public ResponseEntity<ArrayArtworkMetadataResponse> fetchCategories() {
-        var response = artworkMetadataFacade.fetchApprovedCategories();
+    public ResponseEntity<ArrayArtworkMetadataResponse> fetchCategories(String name) {
+        var response = artworkMetadataFacade.fetchApprovedCategories(name);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<ArrayArtworkMetadataResponse> fetchMaterials() {
-        var response = artworkMetadataFacade.fetchApprovedMaterials();
+    public ResponseEntity<ArrayArtworkMetadataResponse> fetchMaterials(String name) {
+        var response = artworkMetadataFacade.fetchApprovedMaterials(name);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<ArrayArtworkMetadataResponse> fetchMediums() {
-        var response = artworkMetadataFacade.fetchApprovedMediums();
+    public ResponseEntity<ArrayArtworkMetadataResponse> fetchMediums(String name) {
+        var response = artworkMetadataFacade.fetchApprovedMediums(name);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<ArrayArtworkMetadataResponse> fetchStyles() {
-        var response = artworkMetadataFacade.fetchApprovedStyles();
+    public ResponseEntity<ArrayArtworkMetadataResponse> fetchStyles(String name) {
+        var response = artworkMetadataFacade.fetchApprovedStyles(name);
         return ResponseEntity.ok(response);
     }
 }

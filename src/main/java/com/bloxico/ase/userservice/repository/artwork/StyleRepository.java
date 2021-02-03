@@ -18,5 +18,5 @@ public interface StyleRepository extends JpaRepository<Style, Long> {
     @Query("SELECT s FROM Style s WHERE (:status IS NULL or s.status = :status) and (:name IS NULL or s.name like %:name%)")
     Page<Style> fetchStyles(@Param("status") ArtworkMetadataStatus status, @Param("name") String name, Pageable pageable);
 
-    List<Style> findAllByStatus(ArtworkMetadataStatus status);
+    List<Style> findAllByStatusAndNameContains(ArtworkMetadataStatus status, String name);
 }

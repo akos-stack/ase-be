@@ -4,11 +4,11 @@ import com.bloxico.ase.userservice.web.model.artwork.ArrayArtworkMetadataRespons
 
 public interface IArtworkMetadataFacade {
 
-    ArrayArtworkMetadataResponse fetchApprovedCategories();
+    ArrayArtworkMetadataResponse fetchApprovedCategories(String name);
 
-    ArrayArtworkMetadataResponse fetchApprovedMaterials();
+    ArrayArtworkMetadataResponse fetchApprovedMaterials(String name);
 
-    ArrayArtworkMetadataResponse fetchApprovedMediums();
+    ArrayArtworkMetadataResponse fetchApprovedMediums(String name);
 
-    ArrayArtworkMetadataResponse fetchApprovedStyles();
+    ArrayArtworkMetadataResponse fetchApprovedStyles(String name);
 }

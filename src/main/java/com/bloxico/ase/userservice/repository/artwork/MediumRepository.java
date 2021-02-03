@@ -18,5 +18,5 @@ public interface MediumRepository extends JpaRepository<Medium, Long> {
     @Query("SELECT m FROM Medium m WHERE (:status IS NULL or m.status = :status) and (:name IS NULL or m.name like %:name%)")
     Page<Medium> fetchMediums(@Param("status") ArtworkMetadataStatus status, @Param("name") String name, Pageable pageable);
 
-    List<Medium> findAllByStatus(ArtworkMetadataStatus status);
+    List<Medium> findAllByStatusAndNameContains(ArtworkMetadataStatus status, String name);
 }

@@ -19,36 +19,36 @@ public class ArtworkMetadataFacadeImpl implements IArtworkMetadataFacade {
     }
 
     @Override
-    public ArrayArtworkMetadataResponse fetchApprovedCategories() {
+    public ArrayArtworkMetadataResponse fetchApprovedCategories(String name) {
         log.info("ArtworkMetadataFacadeImpl.fetchApprovedCategories - start");
-        var artworkMetadataDtos = artworkMetadataService.fetchApprovedCategories();
+        var artworkMetadataDtos = artworkMetadataService.fetchApprovedCategories(name);
         var response = new ArrayArtworkMetadataResponse(artworkMetadataDtos);
         log.info("ArtworkMetadataFacadeImpl.fetchApprovedCategories - end");
         return response;
     }
 
     @Override
-    public ArrayArtworkMetadataResponse fetchApprovedMaterials() {
+    public ArrayArtworkMetadataResponse fetchApprovedMaterials(String name) {
         log.info("ArtworkMetadataFacadeImpl.fetchApprovedMaterials - start");
-        var artworkMetadataDtos = artworkMetadataService.fetchApprovedMaterials();
+        var artworkMetadataDtos = artworkMetadataService.fetchApprovedMaterials(name);
         var response = new ArrayArtworkMetadataResponse(artworkMetadataDtos);
         log.info("ArtworkMetadataFacadeImpl.fetchApprovedMaterials - end");
         return response;
     }
 
     @Override
-    public ArrayArtworkMetadataResponse fetchApprovedMediums() {
+    public ArrayArtworkMetadataResponse fetchApprovedMediums(String name) {
         log.info("ArtworkMetadataFacadeImpl.fetchApprovedMediums - start");
-        var artworkMetadataDtos = artworkMetadataService.fetchApprovedMediums();
+        var artworkMetadataDtos = artworkMetadataService.fetchApprovedMediums(name);
         var response = new ArrayArtworkMetadataResponse(artworkMetadataDtos);
         log.info("ArtworkMetadataFacadeImpl.fetchApprovedMediums - end");
         return response;
     }
 
     @Override
-    public ArrayArtworkMetadataResponse fetchApprovedStyles() {
+    public ArrayArtworkMetadataResponse fetchApprovedStyles(String name) {
         log.info("ArtworkMetadataFacadeImpl.fetchApprovedStyles - start");
-        var artworkMetadataDtos = artworkMetadataService.fetchApprovedStyles();
+        var artworkMetadataDtos = artworkMetadataService.fetchApprovedStyles(name);
         var response = new ArrayArtworkMetadataResponse(artworkMetadataDtos);
         log.info("ArtworkMetadataFacadeImpl.fetchApprovedStyles - end");
         return response;
