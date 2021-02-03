@@ -4,19 +4,31 @@ import com.bloxico.ase.userservice.config.security.AseSecurityServiceTest;
 import com.bloxico.ase.userservice.config.security.PersistentJwtTokenStoreTest;
 import com.bloxico.ase.userservice.entity.BaseEntityTest;
 import com.bloxico.ase.userservice.facade.impl.*;
-import com.bloxico.ase.userservice.repository.address.*;
+import com.bloxico.ase.userservice.repository.address.CityRepositoryTest;
+import com.bloxico.ase.userservice.repository.address.CountryRepositoryTest;
+import com.bloxico.ase.userservice.repository.address.LocationRepositoryTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepositoryTest;
 import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepositoryTest;
-import com.bloxico.ase.userservice.repository.token.*;
-import com.bloxico.ase.userservice.repository.user.*;
+import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepositoryTest;
+import com.bloxico.ase.userservice.repository.token.PasswordResetTokenRepositoryTest;
+import com.bloxico.ase.userservice.repository.token.RegistrationTokenRepositoryTest;
+import com.bloxico.ase.userservice.repository.user.PermissionRepositoryTest;
+import com.bloxico.ase.userservice.repository.user.RoleRepositoryTest;
+import com.bloxico.ase.userservice.repository.user.UserRepositoryTest;
 import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepositoryTest;
 import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepositoryTest;
 import com.bloxico.ase.userservice.service.address.impl.LocationServiceImplTest;
+import com.bloxico.ase.userservice.service.artwork.impl.ArtworkMetadataServiceImplTest;
 import com.bloxico.ase.userservice.service.aws.impl.S3ServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
-import com.bloxico.ase.userservice.service.token.impl.*;
-import com.bloxico.ase.userservice.service.user.impl.*;
+import com.bloxico.ase.userservice.service.token.impl.PasswordResetTokenServiceImplTest;
+import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImplTest;
+import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImplTest;
+import com.bloxico.ase.userservice.service.token.impl.TokenBlacklistServiceImplTest;
+import com.bloxico.ase.userservice.service.user.impl.RolePermissionServiceImplTest;
+import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImplTest;
+import com.bloxico.ase.userservice.service.user.impl.UserServiceImplTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -56,6 +68,7 @@ import org.junit.runners.Suite;
         LocationServiceImplTest.class,
         PendingEvaluatorServiceImplTest.class,
         S3ServiceImplTest.class,
+        ArtworkMetadataServiceImplTest.class,
 
         // facade
         QuartzOperationsFacadeImplTest.class,
