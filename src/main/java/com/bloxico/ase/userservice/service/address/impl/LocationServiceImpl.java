@@ -1,19 +1,25 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.*;
-import com.bloxico.ase.userservice.entity.address.Country;
-import com.bloxico.ase.userservice.entity.address.CountryEvaluationDetails;
-import com.bloxico.ase.userservice.repository.address.*;
+import com.bloxico.ase.userservice.dto.entity.address.CityDto;
+import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
+import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
+import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
+import com.bloxico.ase.userservice.repository.address.CityRepository;
+import com.bloxico.ase.userservice.repository.address.CountryRepository;
+import com.bloxico.ase.userservice.repository.address.LocationRepository;
+import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.*;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Slf4j
@@ -45,6 +51,7 @@ public class LocationServiceImpl implements ILocationService {
                 .stream()
                 .map(MAPPER::toDto)
                 .collect(toUnmodifiableList());
+        fetchTotalOfEvaluatorsForCountries(countries);
         log.debug("CountryServiceImpl.findAllCountries - end");
         return countries;
     }
@@ -102,7 +109,7 @@ public class LocationServiceImpl implements ILocationService {
     public RegionDto createRegion(RegionDto dto, long principalId) {
         log.debug("LocationServiceImpl.createRegion - start | dto: {}, principalId: {}", dto, principalId);
         requireNonNull(dto);
-        if (doesRegionExist(dto.getName())) {
+        if (regionAlreadyExists(dto.getName())) {
             throw REGION_EXISTS.newException();
         }
         var region = MAPPER.toEntity(dto);
@@ -119,7 +126,7 @@ public class LocationServiceImpl implements ILocationService {
     public CountryDto createCountry(CountryDto dto, long principalId) {
         log.debug("LocationServiceImpl.createCountry - start | dto: {}, principalId: {}", dto, principalId);
         requireNonNull(dto);
-        if (doesCountryExist(dto.getName())) {
+        if (countryAlreadyExists(dto.getName())) {
             throw COUNTRY_EXISTS.newException();
         }
         var region = regionRepository
@@ -150,16 +157,34 @@ public class LocationServiceImpl implements ILocationService {
         return MAPPER.toDto(cityRepository.saveAndFlush(city));
     }
 
-    private boolean doesRegionExist(String name) {
+    private boolean regionAlreadyExists(String name) {
         return regionRepository
                 .findByNameIgnoreCase(name)
                 .isPresent();
     }
 
-    private boolean doesCountryExist(String name) {
+    private boolean countryAlreadyExists(String name) {
         return countryRepository
                 .findByNameIgnoreCase(name)
                 .isPresent();
+    }
+
+    private void fetchTotalOfEvaluatorsForCountries(Collection<CountryDto> countries) {
+        if (countries.isEmpty()) {
+            return;
+        }
+        var countriesMap = countries.stream()
+                .collect(toMap(CountryDto::getId, country -> country));
+        var pairs = countryRepository
+                .countTotalOfEvaluatorsByIdIn(countriesMap.keySet());
+        pairs
+                .forEach(p -> {
+                    var countryId = p.getCountryId();
+                    var totalOfEvaluators = p.getTotalOfEvaluators();
+                    countriesMap.get(countryId)
+                            .getCountryEvaluationDetails()
+                            .setTotalOfEvaluators(totalOfEvaluators);
+                });
     }
 
 }

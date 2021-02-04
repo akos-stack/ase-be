@@ -107,7 +107,7 @@ public interface AseMapper {
 
     RegionDto toRegionDto(CreateRegionRequest request);
 
-    default CountryDto toDto(CreateCountryRequest request) {
+    default CountryDto toCountryDto(CreateCountryRequest request) {
         var regionDto = new RegionDto();
         regionDto.setName(request.getRegion());
         var evaluationDetailsDto = new CountryEvaluationDetailsDto();

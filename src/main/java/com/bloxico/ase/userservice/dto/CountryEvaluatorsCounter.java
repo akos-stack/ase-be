@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.dto;
 
-public interface CountryIdTotalOfEvaluatorsPair {
+public interface CountryEvaluatorsCounter {
 
     int getCountryId();
 
