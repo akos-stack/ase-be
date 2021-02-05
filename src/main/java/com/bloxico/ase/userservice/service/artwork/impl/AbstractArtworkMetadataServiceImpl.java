@@ -32,20 +32,20 @@ abstract class AbstractArtworkMetadataServiceImpl<T extends IArtworkMetadataEnti
 
     @Override
     public ArtworkMetadataDto findOrSaveArtworkMetadata(ArtworkMetadataDto dto, long principalId) {
-        log.debug("ArtworkMetadataServiceImpl.findOrSaveCategory - start | dto: {}, principalId: {}", dto, principalId);
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].findOrSaveArtworkMetadata - start | dto: {}, principalId: {}", getType(), dto, principalId);
         requireNonNull(dto);
         var artworkMetadataDto = repository
                 .findByNameIgnoreCase(dto.getName())
                 .map(this::toDto)
                 .filter(dto::equals)
                 .orElseGet(() -> saveArtworkMetadata(dto, principalId));
-        log.debug("ArtworkMetadataServiceImpl.findOrSaveCategory - end | dto: {}, principalId: {}", dto, principalId);
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].findOrSaveArtworkMetadata - end | dto: {}, principalId: {}", getType(), dto, principalId);
         return artworkMetadataDto;
     }
 
     @Override
     public void updateArtworkMetadataStatus(ArtworkMetadataDto dto, long principalId) {
-        log.debug("ArtworkMetadataServiceImpl.updateCategoryStatus - start | dto: {}, principalId: {}", dto, principalId);
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].updateArtworkMetadataStatus - start | dto: {}, principalId: {}", getType(), dto, principalId);
         requireNonNull(dto);
         var artworkMetadata = repository
                 .findByNameIgnoreCase(dto.getName())
@@ -53,39 +53,40 @@ abstract class AbstractArtworkMetadataServiceImpl<T extends IArtworkMetadataEnti
         artworkMetadata.setStatus(dto.getStatus());
         artworkMetadata.setUpdaterId(principalId);
         repository.saveAndFlush(artworkMetadata);
-        log.debug("ArtworkMetadataServiceImpl.updateCategoryStatus - end | dto: {}, principalId: {}", dto, principalId);
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].updateArtworkMetadataStatus - end | dto: {}, principalId: {}", getType(), dto, principalId);
     }
 
     @Override
     public void deleteArtworkMetadata(String name) {
-        log.debug("ArtworkMetadataServiceImpl.deleteCategory - start | name: {}", name);
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].deleteArtworkMetadata - start | name: {}", getType(), name);
         requireNonNull(name);
         var artworkMetadata = repository
                 .findByNameIgnoreCase(name)
                 .orElseThrow(ARTWORK_METADATA_NOT_FOUND::newException);
         repository.delete(artworkMetadata);
-        log.debug("ArtworkMetadataServiceImpl.deleteCategory - end | name: {}", name);
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].deleteArtworkMetadata - end | name: {}", getType(), name);
     }
 
     @Override
     public Page<ArtworkMetadataDto> searchArtworkMetadata(ArtworkMetadataStatus status, String name, int page, int size, String sort) {
-        log.debug("ArtworkMetadataServiceImpl.fetchCategories - start | status: {}, name:{}, page: {}, size: {}, sort {}", status, name, page, size, sort);
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].searchArtworkMetadata - start | status: {}, name:{}, page: {}, size: {}, sort {}", getType(), status, name, page, size, sort);
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
         var artworkMetadataDtos = repository
                 .search(status, name, pageable)
                 .map(this::toDto);
-        log.debug("ArtworkMetadataServiceImpl.fetchCategories - end | status: {}, name:{}, page: {}, size: {}, sort {}", status, name, page, size, sort);
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].searchArtworkMetadata - end | status: {}, name:{}, page: {}, size: {}, sort {}", getType(), status, name, page, size, sort);
         return artworkMetadataDtos;
     }
 
     @Override
     public List<ArtworkMetadataDto> searchApprovedArtworkMetadata(String name) {
-        log.debug("ArtworkMetadataServiceImpl.fetchApprovedCategories - start");
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].searchApprovedArtworkMetadata - start | name: {}", getType(), name);
         List<ArtworkMetadataDto> artworkMetadataDtos = repository
                 .findAllByStatusAndNameContains(APPROVED, name != null ? name: "").stream().map(this::toDto).collect(Collectors.toList());
-        log.debug("ArtworkMetadataServiceImpl.fetchApprovedCategories - end");
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].searchApprovedArtworkMetadata - end | name: {}", getType(), name);
         return artworkMetadataDtos;
     }
+
     private ArtworkMetadataDto saveArtworkMetadata(ArtworkMetadataDto dto, long principalId) {
         var artworkMetadata = toEntity(dto);
         artworkMetadata.setCreatorId(principalId);

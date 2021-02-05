@@ -22,43 +22,43 @@ abstract class AbstractArtworkMetadataFacadeImpl implements IArtworkMetadataFaca
 
     @Override
     public ArtworkMetadataDto createArtworkMetadata(ArtworkMetadataCreateRequest request, long principalId) {
-        log.info("ArtworkMetadataManagementFacadeImpl.createCategory - start | request: {}, principalId: {}", request, principalId);
+        log.info("AbstractArtworkMetadataFacadeImpl.createArtworkMetadata - start | request: {}, principalId: {}", request, principalId);
         var dto = MAPPER.toArtworkMetadataDto(request);
         var response = getService(request.getType()).findOrSaveArtworkMetadata(dto, principalId);
-        log.info("ArtworkMetadataManagementFacadeImpl.createCategory - end | request: {}, principalId: {}", request, principalId);
+        log.info("AbstractArtworkMetadataFacadeImpl.createArtworkMetadata - end | request: {}, principalId: {}", request, principalId);
         return response;
     }
 
     @Override
     public void updateArtworkMetadataStatus(ArtworkMetadataUpdateRequest request, long principalId) {
-        log.info("ArtworkMetadataManagementFacadeImpl.updateCategory - start | request: {}, principalId: {}", request, principalId);
+        log.info("AbstractArtworkMetadataFacadeImpl.updateArtworkMetadataStatus - start | request: {}, principalId: {}", request, principalId);
         var dto = MAPPER.toArtworkMetadataDto(request);
         getService(request.getType()).updateArtworkMetadataStatus(dto, principalId);
-        log.info("ArtworkMetadataManagementFacadeImpl.updateCategory - end | request: {}, principalId: {}", request, principalId);
+        log.info("AbstractArtworkMetadataFacadeImpl.updateArtworkMetadataStatus - end | request: {}, principalId: {}", request, principalId);
     }
 
     @Override
     public void deleteArtworkMetadata(String name, ArtworkMetadataType type) {
-        log.info("ArtworkMetadataManagementFacadeImpl.deleteCategory - start | name: {}", name);
+        log.info("AbstractArtworkMetadataFacadeImpl.deleteArtworkMetadata - start | name: {}, type: {}", name, type);
         getService(type).deleteArtworkMetadata(name);
-        log.info("ArtworkMetadataManagementFacadeImpl.deleteCategory - end | name: {}", name);
+        log.info("AbstractArtworkMetadataFacadeImpl.deleteArtworkMetadata - end | name: {}, type: {}", name, type);
     }
 
     @Override
     public PagedArtworkMetadataResponse searchArtworkMetadata(ArtworkMetadataType type, ArtworkMetadataStatus status, String name, int page, int size, String sort) {
-        log.info("ArtworkMetadataManagementFacadeImpl.fetchCategories - start | status: {}, page: {}, size: {}, sort: {}", status, page, size, sort);
+        log.info("AbstractArtworkMetadataFacadeImpl.searchArtworkMetadata - start | type: {}, status: {}, page: {}, size: {}, sort: {}", type, status, page, size, sort);
         var pagedDto = getService(type).searchArtworkMetadata(status, name, page, size, sort);
         var response = new PagedArtworkMetadataResponse(pagedDto.getContent(), pagedDto.getContent().size(), pagedDto.getTotalElements(), pagedDto.getTotalPages());
-        log.info("ArtworkMetadataManagementFacadeImpl.fetchCategories - end | status: {}, page: {}, size: {}, sort: {}", status, page, size, sort);
+        log.info("AbstractArtworkMetadataFacadeImpl.searchArtworkMetadata - end | type: {}, status: {}, page: {}, size: {}, sort: {}", type, status, page, size, sort);
         return response;
     }
 
     @Override
     public ArrayArtworkMetadataResponse searchApprovedArtworkMetadata(String name, ArtworkMetadataType type) {
-        log.info("ArtworkMetadataFacadeImpl.fetchApprovedCategories - start");
+        log.info("AbstractArtworkMetadataFacadeImpl.searchApprovedArtworkMetadata - start | name: {}, type: {}", name, type);
         var artworkMetadataDtos = getService(type).searchApprovedArtworkMetadata(name);
         var response = new ArrayArtworkMetadataResponse(artworkMetadataDtos);
-        log.info("ArtworkMetadataFacadeImpl.fetchApprovedCategories - end");
+        log.info("AbstractArtworkMetadataFacadeImpl.searchApprovedArtworkMetadata - end | name: {}, type: {}", name, type);
         return response;
     }
 }
