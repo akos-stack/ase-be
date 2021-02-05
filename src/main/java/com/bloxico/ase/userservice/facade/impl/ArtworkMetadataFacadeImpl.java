@@ -1,56 +1,37 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.userservice.facade.IArtworkMetadataFacade;
 import com.bloxico.ase.userservice.service.artwork.IArtworkMetadataService;
-import com.bloxico.ase.userservice.web.model.artwork.ArrayArtworkMetadataResponse;
-import lombok.extern.slf4j.Slf4j;
+import com.bloxico.ase.userservice.util.ArtworkMetadataType;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_METADATA_TYPE_NOT_FOUND;
+
 @Service
-@Transactional
-public class ArtworkMetadataFacadeImpl implements IArtworkMetadataFacade {
+public class ArtworkMetadataFacadeImpl extends AbstractArtworkMetadataFacadeImpl {
+    private final IArtworkMetadataService categoryMetadataService;
+    private final IArtworkMetadataService materialMetadataService;
+    private final IArtworkMetadataService mediumMetadataService;
+    private final IArtworkMetadataService styleMetadataService;
 
-    private final IArtworkMetadataService artworkMetadataService;
-
-    public ArtworkMetadataFacadeImpl(IArtworkMetadataService artworkMetadataService) {
-        this.artworkMetadataService = artworkMetadataService;
+    public ArtworkMetadataFacadeImpl(@Qualifier("categoryServiceImpl") IArtworkMetadataService categoryMetadataService,
+                                     @Qualifier("materialServiceImpl") IArtworkMetadataService materialMetadataService,
+                                     @Qualifier("mediumServiceImpl") IArtworkMetadataService mediumMetadataService,
+                                     @Qualifier("styleServiceImpl") IArtworkMetadataService styleMetadataService) {
+        this.categoryMetadataService = categoryMetadataService;
+        this.materialMetadataService = materialMetadataService;
+        this.mediumMetadataService = mediumMetadataService;
+        this.styleMetadataService = styleMetadataService;
     }
 
     @Override
-    public ArrayArtworkMetadataResponse fetchApprovedCategories(String name) {
-        log.info("ArtworkMetadataFacadeImpl.fetchApprovedCategories - start");
-        var artworkMetadataDtos = artworkMetadataService.fetchApprovedCategories(name);
-        var response = new ArrayArtworkMetadataResponse(artworkMetadataDtos);
-        log.info("ArtworkMetadataFacadeImpl.fetchApprovedCategories - end");
-        return response;
-    }
-
-    @Override
-    public ArrayArtworkMetadataResponse fetchApprovedMaterials(String name) {
-        log.info("ArtworkMetadataFacadeImpl.fetchApprovedMaterials - start");
-        var artworkMetadataDtos = artworkMetadataService.fetchApprovedMaterials(name);
-        var response = new ArrayArtworkMetadataResponse(artworkMetadataDtos);
-        log.info("ArtworkMetadataFacadeImpl.fetchApprovedMaterials - end");
-        return response;
-    }
-
-    @Override
-    public ArrayArtworkMetadataResponse fetchApprovedMediums(String name) {
-        log.info("ArtworkMetadataFacadeImpl.fetchApprovedMediums - start");
-        var artworkMetadataDtos = artworkMetadataService.fetchApprovedMediums(name);
-        var response = new ArrayArtworkMetadataResponse(artworkMetadataDtos);
-        log.info("ArtworkMetadataFacadeImpl.fetchApprovedMediums - end");
-        return response;
-    }
-
-    @Override
-    public ArrayArtworkMetadataResponse fetchApprovedStyles(String name) {
-        log.info("ArtworkMetadataFacadeImpl.fetchApprovedStyles - start");
-        var artworkMetadataDtos = artworkMetadataService.fetchApprovedStyles(name);
-        var response = new ArrayArtworkMetadataResponse(artworkMetadataDtos);
-        log.info("ArtworkMetadataFacadeImpl.fetchApprovedStyles - end");
-        return response;
+    protected IArtworkMetadataService getService(ArtworkMetadataType type) {
+       switch (type) {
+           case CATEGORY: return categoryMetadataService;
+           case MATERIAL: return materialMetadataService;
+           case MEDIUM: return mediumMetadataService;
+           case STYLE: return styleMetadataService;
+           default: throw ARTWORK_METADATA_TYPE_NOT_FOUND.newException();
+       }
     }
 }

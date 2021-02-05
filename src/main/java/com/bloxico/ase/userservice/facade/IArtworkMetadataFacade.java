@@ -1,14 +1,22 @@
 package com.bloxico.ase.userservice.facade;
 
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
+import com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus;
+import com.bloxico.ase.userservice.util.ArtworkMetadataType;
 import com.bloxico.ase.userservice.web.model.artwork.ArrayArtworkMetadataResponse;
+import com.bloxico.ase.userservice.web.model.artwork.ArtworkMetadataCreateRequest;
+import com.bloxico.ase.userservice.web.model.artwork.ArtworkMetadataUpdateRequest;
+import com.bloxico.ase.userservice.web.model.artwork.PagedArtworkMetadataResponse;
 
 public interface IArtworkMetadataFacade {
 
-    ArrayArtworkMetadataResponse fetchApprovedCategories(String name);
+    ArtworkMetadataDto createArtworkMetadata(ArtworkMetadataCreateRequest request, long principalId);
 
-    ArrayArtworkMetadataResponse fetchApprovedMaterials(String name);
+    void updateArtworkMetadataStatus(ArtworkMetadataUpdateRequest request, long principalId);
 
-    ArrayArtworkMetadataResponse fetchApprovedMediums(String name);
+    void deleteArtworkMetadata(String name, ArtworkMetadataType type);
 
-    ArrayArtworkMetadataResponse fetchApprovedStyles(String name);
+    PagedArtworkMetadataResponse searchArtworkMetadata(ArtworkMetadataType type, ArtworkMetadataStatus status, String name, int page, int size, String sort);
+
+    ArrayArtworkMetadataResponse searchApprovedArtworkMetadata(String name, ArtworkMetadataType type);
 }

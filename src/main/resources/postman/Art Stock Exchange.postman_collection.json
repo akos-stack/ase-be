@@ -747,716 +747,176 @@
 			"name": "Artwork Metadata Management",
 			"item": [
 				{
-					"name": "Categories",
-					"item": [
-						{
-							"name": "Create category",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"categoryName\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/category",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"category"
-									]
+					"name": "Create artwork metadata",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token}}",
+									"type": "string"
 								}
-							},
-							"response": []
+							]
 						},
-						{
-							"name": "Fetch categories",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/categories",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"categories"
-									],
-									"query": [
-										{
-											"key": "status",
-											"value": "APPROVED",
-											"disabled": true
-										},
-										{
-											"key": "name",
-											"value": "",
-											"disabled": true
-										},
-										{
-											"key": "page",
-											"value": "",
-											"disabled": true
-										},
-										{
-											"key": "size",
-											"value": null,
-											"disabled": true
-										},
-										{
-											"key": "sort",
-											"value": null,
-											"disabled": true
-										}
-									]
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"categoryName\",\r\n    \"type\": \"CATEGORY\"\r\n}\r\n\r\n// type: CATEGORY | MATERIAL | MEDIUM | STYLE",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							},
-							"response": []
+							}
 						},
-						{
-							"name": "Delete Category",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/category/delete?name=categoryName",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"category",
-										"delete"
-									],
-									"query": [
-										{
-											"key": "name",
-											"value": "categoryName"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update Category Status",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"categoryName\",\r\n    \"status\": \"PENDING\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/category/update",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"category",
-										"update"
-									]
-								}
-							},
-							"response": []
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/create",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork",
+								"management",
+								"metadata",
+								"create"
+							]
 						}
-					]
+					},
+					"response": []
 				},
 				{
-					"name": "Materials",
-					"item": [
-						{
-							"name": "Create material",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"materialName\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/material",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"material"
-									]
+					"name": "Search artwork metadata",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token}}",
+									"type": "string"
 								}
-							},
-							"response": []
+							]
 						},
-						{
-							"name": "Fetch materials",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork/management/metadata?type=CATEGORY",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork",
+								"management",
+								"metadata"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "APPROVED",
+									"disabled": true
 								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/materials",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"materials"
-									],
-									"query": [
-										{
-											"key": "status",
-											"value": "APPROVED",
-											"disabled": true
-										},
-										{
-											"key": "name",
-											"value": "name",
-											"disabled": true
-										},
-										{
-											"key": "page",
-											"value": "",
-											"disabled": true
-										},
-										{
-											"key": "size",
-											"value": null,
-											"disabled": true
-										},
-										{
-											"key": "sort",
-											"value": "name",
-											"disabled": true
-										}
-									]
+								{
+									"key": "name",
+									"value": "5",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "type",
+									"value": "CATEGORY"
 								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete Material",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/material/delete?name=categoryName",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"material",
-										"delete"
-									],
-									"query": [
-										{
-											"key": "name",
-											"value": "categoryName"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update Material Status",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"materialName\",\r\n    \"status\": \"PENDING\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/material/update",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"material",
-										"update"
-									]
-								}
-							},
-							"response": []
+							]
 						}
-					]
+					},
+					"response": []
 				},
 				{
-					"name": "Mediums",
-					"item": [
-						{
-							"name": "Create medium",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"mediumName\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/medium",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"medium"
-									]
+					"name": "Update artwork metadata status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token}}",
+									"type": "string"
 								}
-							},
-							"response": []
+							]
 						},
-						{
-							"name": "Fetch mediums",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/mediums",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"mediums"
-									],
-									"query": [
-										{
-											"key": "status",
-											"value": "APPROVED",
-											"disabled": true
-										},
-										{
-											"key": "name",
-											"value": "mediumName",
-											"disabled": true
-										},
-										{
-											"key": "page",
-											"value": "",
-											"disabled": true
-										},
-										{
-											"key": "size",
-											"value": null,
-											"disabled": true
-										},
-										{
-											"key": "sort",
-											"value": "name",
-											"disabled": true
-										}
-									]
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"categoryName\",\r\n    \"status\": \"PENDING\",\r\n    \"type\": \"CATEGORY\"\r\n}\r\n\r\n// status: APPROVED | PENDING\r\n// type: CATEGORY | MATERIAL | MEDIUM | STYLE",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							},
-							"response": []
+							}
 						},
-						{
-							"name": "Delete Medium",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/medium/delete?name=mediumName",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"medium",
-										"delete"
-									],
-									"query": [
-										{
-											"key": "name",
-											"value": "mediumName"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update Medium Status",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"mediumName\",\r\n    \"status\": \"PENDING\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/medium/update",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"medium",
-										"update"
-									]
-								}
-							},
-							"response": []
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/update",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork",
+								"management",
+								"metadata",
+								"update"
+							]
 						}
-					]
+					},
+					"response": []
 				},
 				{
-					"name": "Styles",
-					"item": [
-						{
-							"name": "Create style",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"styleName\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/style",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"style"
-									]
+					"name": "Delete artwork metadata",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token}}",
+									"type": "string"
 								}
-							},
-							"response": []
+							]
 						},
-						{
-							"name": "Fetch styles",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/delete?name=categoryName&type=CATEGORY",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork",
+								"management",
+								"metadata",
+								"delete"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "categoryName"
 								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/styles",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"styles"
-									],
-									"query": [
-										{
-											"key": "status",
-											"value": "APPROVED",
-											"disabled": true
-										},
-										{
-											"key": "name",
-											"value": "name",
-											"disabled": true
-										},
-										{
-											"key": "page",
-											"value": "",
-											"disabled": true
-										},
-										{
-											"key": "size",
-											"value": null,
-											"disabled": true
-										},
-										{
-											"key": "sort",
-											"value": "name",
-											"disabled": true
-										}
-									]
+								{
+									"key": "type",
+									"value": "CATEGORY"
 								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete Style",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/style/delete?name=styleName",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"style",
-										"delete"
-									],
-									"query": [
-										{
-											"key": "name",
-											"value": "styleName"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update Style Status",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access-token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"name\": \"styleName\",\r\n    \"status\": \"PENDING\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{ase-endpoint}}/api/artwork/management/style/update",
-									"host": [
-										"{{ase-endpoint}}"
-									],
-									"path": [
-										"api",
-										"artwork",
-										"management",
-										"style",
-										"update"
-									]
-								}
-							},
-							"response": []
+							]
 						}
-					]
+					},
+					"response": []
 				}
 			]
 		},
@@ -1464,7 +924,7 @@
 			"name": "Artwork Metadata",
 			"item": [
 				{
-					"name": "Fetch approved categories",
+					"name": "Fetch approved metadata",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1479,101 +939,25 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/categories",
+							"raw": "{{ase-endpoint}}/api/artwork/metadata?type=CATEGORY",
 							"host": [
 								"{{ase-endpoint}}"
 							],
 							"path": [
 								"api",
 								"artwork",
-								"categories"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Fetch approved materials",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
+								"metadata"
+							],
+							"query": [
 								{
-									"key": "token",
-									"value": "{{access-token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/materials",
-							"host": [
-								"{{ase-endpoint}}"
-							],
-							"path": [
-								"api",
-								"artwork",
-								"materials"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Fetch approved mediums",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
+									"key": "type",
+									"value": "CATEGORY"
+								},
 								{
-									"key": "token",
-									"value": "{{access-token}}",
-									"type": "string"
+									"key": "name",
+									"value": "<searchText>",
+									"disabled": true
 								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/mediums",
-							"host": [
-								"{{ase-endpoint}}"
-							],
-							"path": [
-								"api",
-								"artwork",
-								"mediums"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Fetch approved styles",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access-token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/styles",
-							"host": [
-								"{{ase-endpoint}}"
-							],
-							"path": [
-								"api",
-								"artwork",
-								"styles"
 							]
 						}
 					},

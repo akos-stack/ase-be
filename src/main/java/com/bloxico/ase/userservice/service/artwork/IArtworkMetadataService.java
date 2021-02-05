@@ -8,51 +8,13 @@ import java.util.List;
 
 public interface IArtworkMetadataService {
 
-    // CATEGORIES
+    ArtworkMetadataDto findOrSaveArtworkMetadata(ArtworkMetadataDto dto, long principalId);
 
-    ArtworkMetadataDto findOrSaveCategory(ArtworkMetadataDto dto, long principalId);
+    void updateArtworkMetadataStatus(ArtworkMetadataDto dto, long principalId);
 
-    void updateCategoryStatus(ArtworkMetadataDto dto, long principalId);
+    void deleteArtworkMetadata(String name);
 
-    void deleteCategory(String name);
+    Page<ArtworkMetadataDto> searchArtworkMetadata(ArtworkMetadataStatus status, String name, int page, int size, String sort);
 
-    Page<ArtworkMetadataDto> fetchCategories(ArtworkMetadataStatus status, String name, int page, int size, String sort);
-
-    List<ArtworkMetadataDto> fetchApprovedCategories(String name);
-
-    // MATERIALS
-
-    ArtworkMetadataDto findOrSaveMaterial(ArtworkMetadataDto dto, long principalId);
-
-    void updateMaterialStatus(ArtworkMetadataDto dto, long principalId);
-
-    void deleteMaterial(String name);
-
-    Page<ArtworkMetadataDto> fetchMaterials(ArtworkMetadataStatus status, String name, int page, int size, String sort);
-
-    List<ArtworkMetadataDto> fetchApprovedMaterials(String name);
-
-    // MEDIUMS
-
-    ArtworkMetadataDto findOrSaveMedium(ArtworkMetadataDto dto, long principalId);
-
-    void updateMediumStatus(ArtworkMetadataDto dto, long principalId);
-
-    void deleteMedium(String name);
-
-    Page<ArtworkMetadataDto> fetchMediums(ArtworkMetadataStatus status, String name, int page, int size, String sort);
-
-    List<ArtworkMetadataDto> fetchApprovedMediums(String name);
-
-    // STYLES
-
-    ArtworkMetadataDto findOrSaveStyle(ArtworkMetadataDto dto, long principalId);
-
-    void updateStyleStatus(ArtworkMetadataDto dto, long principalId);
-
-    void deleteStyle(String name);
-
-    Page<ArtworkMetadataDto> fetchStyles(ArtworkMetadataStatus status, String name, int page, int size, String sort);
-
-    List<ArtworkMetadataDto> fetchApprovedStyles(String name);
+    List<ArtworkMetadataDto> searchApprovedArtworkMetadata(String name);
 }

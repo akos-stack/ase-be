@@ -140,7 +140,12 @@ public interface ErrorCodes {
         ARTWORK_METADATA_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "21",
-                "Artwork metadata not found.");
+                "Artwork metadata not found."),
+
+        ARTWORK_METADATA_TYPE_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "22",
+                "Artwork metadata type not found.");
 
         private final HttpStatus httpStatus;
         private final String code, description;

@@ -8,11 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bloxico.ase.userservice.web.api.ArtworkMetadataApi.FETCH_CATEGORIES;
-import static com.bloxico.ase.userservice.web.api.ArtworkMetadataApi.FETCH_MATERIALS;
-import static com.bloxico.ase.userservice.web.api.ArtworkMetadataApi.FETCH_MEDIUMS;
-import static com.bloxico.ase.userservice.web.api.ArtworkMetadataApi.FETCH_STYLES;
-import static com.bloxico.ase.userservice.web.api.ArtworkMetadataManagementApi.*;
+import static com.bloxico.ase.userservice.util.ArtworkMetadataType.*;
+import static com.bloxico.ase.userservice.web.api.ArtworkMetadataApi.SEARCH_ARTWORK_METADATA;
+import static com.bloxico.ase.userservice.web.api.ArtworkMetadataManagementApi.CREATE_METADATA;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
@@ -33,9 +31,9 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", mockUtil.doAdminAuthentication())
                 .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("category"))
+                .body(new ArtworkMetadataCreateRequest("category", CATEGORY))
                 .when()
-                .post(API_URL + CREATE_CATEGORY)
+                .post(API_URL + CREATE_METADATA)
                 .then()
                 .assertThat()
                 .statusCode(200);
@@ -43,8 +41,9 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", mockUtil.doAuthentication())
                 .contentType(JSON)
+                .param("type", CATEGORY)
                 .when()
-                .get(API_URL + FETCH_CATEGORIES)
+                .get(API_URL + SEARCH_ARTWORK_METADATA)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -56,9 +55,9 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", mockUtil.doAdminAuthentication())
                 .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("material"))
+                .body(new ArtworkMetadataCreateRequest("material", MATERIAL))
                 .when()
-                .post(API_URL + CREATE_MATERIAL)
+                .post(API_URL + CREATE_METADATA)
                 .then()
                 .assertThat()
                 .statusCode(200);
@@ -66,8 +65,9 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", mockUtil.doAuthentication())
                 .contentType(JSON)
+                .param("type", MATERIAL)
                 .when()
-                .get(API_URL + FETCH_MATERIALS)
+                .get(API_URL + SEARCH_ARTWORK_METADATA)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -79,9 +79,9 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", mockUtil.doAdminAuthentication())
                 .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("medium"))
+                .body(new ArtworkMetadataCreateRequest("medium", MEDIUM))
                 .when()
-                .post(API_URL + CREATE_MEDIUM)
+                .post(API_URL + CREATE_METADATA)
                 .then()
                 .assertThat()
                 .statusCode(200);
@@ -89,8 +89,9 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", mockUtil.doAuthentication())
                 .contentType(JSON)
+                .param("type", MEDIUM)
                 .when()
-                .get(API_URL + FETCH_MEDIUMS)
+                .get(API_URL + SEARCH_ARTWORK_METADATA)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -102,9 +103,9 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", mockUtil.doAdminAuthentication())
                 .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("style"))
+                .body(new ArtworkMetadataCreateRequest("style", STYLE))
                 .when()
-                .post(API_URL + CREATE_STYLE)
+                .post(API_URL + CREATE_METADATA)
                 .then()
                 .assertThat()
                 .statusCode(200);
@@ -112,8 +113,9 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", mockUtil.doAuthentication())
                 .contentType(JSON)
+                .param("type", MEDIUM)
                 .when()
-                .get(API_URL + FETCH_STYLES)
+                .get(API_URL + SEARCH_ARTWORK_METADATA)
                 .then()
                 .assertThat()
                 .statusCode(200)

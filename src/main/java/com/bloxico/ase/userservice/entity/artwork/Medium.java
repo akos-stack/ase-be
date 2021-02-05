@@ -13,7 +13,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @EqualsAndHashCode(of = {"name"}, callSuper = false)
 @Entity
 @Table(name = "mediums")
-public class Medium extends BaseEntity {
+public class Medium extends BaseEntity implements IArtworkMetadataEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

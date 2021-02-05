@@ -18,7 +18,10 @@ import com.bloxico.ase.userservice.repository.user.UserRepositoryTest;
 import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepositoryTest;
 import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepositoryTest;
 import com.bloxico.ase.userservice.service.address.impl.LocationServiceImplTest;
-import com.bloxico.ase.userservice.service.artwork.impl.ArtworkMetadataServiceImplTest;
+import com.bloxico.ase.userservice.service.artwork.impl.ArtworkCategoryServiceImplTest;
+import com.bloxico.ase.userservice.service.artwork.impl.ArtworkMaterialServiceImplTest;
+import com.bloxico.ase.userservice.service.artwork.impl.ArtworkMediumServiceImplTest;
+import com.bloxico.ase.userservice.service.artwork.impl.ArtworkStyleServiceImplTest;
 import com.bloxico.ase.userservice.service.aws.impl.S3ServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
@@ -68,7 +71,10 @@ import org.junit.runners.Suite;
         LocationServiceImplTest.class,
         PendingEvaluatorServiceImplTest.class,
         S3ServiceImplTest.class,
-        ArtworkMetadataServiceImplTest.class,
+        ArtworkCategoryServiceImplTest.class,
+        ArtworkMaterialServiceImplTest.class,
+        ArtworkMediumServiceImplTest.class,
+        ArtworkStyleServiceImplTest.class,
 
         // facade
         QuartzOperationsFacadeImplTest.class,
@@ -78,7 +84,6 @@ import org.junit.runners.Suite;
         LocationFacadeImplTest.class,
         UserManagementFacadeImplTest.class,
         ArtworkMetadataFacadeImplTest.class,
-        ArtworkMetadataManagementFacadeImplTest.class,
 
         // Run these individually for now
         // They stuck for some reason

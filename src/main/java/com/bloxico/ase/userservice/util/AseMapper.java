@@ -67,13 +67,13 @@ public interface AseMapper {
 
     PendingEvaluatorDto toDto(PendingEvaluator entity);
 
-    ArtworkMetadataDto toDto(Category entity);
+    ArtworkMetadataDto toDto(Category category);
 
-    ArtworkMetadataDto toDto(Material entity);
+    ArtworkMetadataDto toDto(Material material);
 
-    ArtworkMetadataDto toDto(Medium entity);
+    ArtworkMetadataDto toDto(Medium medium);
 
-    ArtworkMetadataDto toDto(Style entity);
+    ArtworkMetadataDto toDto(Style style);
 
     // DTO -> ENTITY
 
@@ -130,5 +130,4 @@ public interface AseMapper {
     Medium toMediumEntity(ArtworkMetadataDto dto);
 
     Style toStyleEntity(ArtworkMetadataDto dto);
-
 }
