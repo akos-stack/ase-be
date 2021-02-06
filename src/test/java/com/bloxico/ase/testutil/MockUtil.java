@@ -91,6 +91,7 @@ public class MockUtil {
     private final PendingEvaluatorServiceImpl pendingEvaluatorService;
     private final UserProfileRepository userProfileRepository;
     private final RegionRepository regionRepository;
+    private final CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Autowired
     public MockUtil(PasswordEncoder passwordEncoder,
@@ -109,7 +110,8 @@ public class MockUtil {
                     PendingEvaluatorRepository pendingEvaluatorRepository,
                     PendingEvaluatorServiceImpl pendingEvaluatorService,
                     UserProfileRepository userProfileRepository,
-                    RegionRepository regionRepository)
+                    RegionRepository regionRepository,
+                    CountryEvaluationDetailsRepository countryEvaluationDetailsRepository)
     {
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
@@ -128,6 +130,7 @@ public class MockUtil {
         this.pendingEvaluatorService = pendingEvaluatorService;
         this.userProfileRepository = userProfileRepository;
         this.regionRepository = regionRepository;
+        this.countryEvaluationDetailsRepository = countryEvaluationDetailsRepository;
     }
 
     public User savedAdmin() {
@@ -200,14 +203,26 @@ public class MockUtil {
 
     public Country savedCountry() {
         var creatorId = savedAdmin().getId();
+        var region = savedRegion();
         var country = new Country();
         country.setName(uuid());
+        country.setRegion(region);
         country.setCreatorId(creatorId);
-        return countryRepository.saveAndFlush(country);
+        country = countryRepository.saveAndFlush(country);
+        var evaluationDetails = savedCountryEvaluationDetails(country);
+        country.setCountryEvaluationDetails(evaluationDetails);
+        return country;
     }
 
     public CountryDto savedCountryDto() {
         return MAPPER.toDto(savedCountry());
+    }
+
+    public CountryDto genCountryDto(RegionDto regionDto) {
+        var countryDto = new CountryDto();
+        countryDto.setName(uuid());
+        countryDto.setRegion(regionDto);
+        return countryDto;
     }
 
     public City savedCity() {
@@ -255,19 +270,21 @@ public class MockUtil {
         return regionDto;
     }
 
-    public CountryDto genCountryDto(RegionDto regionDto) {
-        var countryDto = new CountryDto();
-        countryDto.setName(uuid());
-        countryDto.setRegion(regionDto);
-        countryDto.setCountryEvaluationDetails(genCountryEvaluationDetailsDto());
-        return countryDto;
+    public CountryEvaluationDetails savedCountryEvaluationDetails(Country country) {
+        var evaluationDetails = new CountryEvaluationDetails();
+        evaluationDetails.setPricePerEvaluation(10);
+        evaluationDetails.setAvailabilityPercentage(40);
+        evaluationDetails.setCountry(country);
+        evaluationDetails.setCreatorId(country.getCreatorId());
+        evaluationDetails = countryEvaluationDetailsRepository.saveAndFlush(evaluationDetails);
+        return evaluationDetails;
     }
 
     public CountryEvaluationDetailsDto genCountryEvaluationDetailsDto() {
         var evaluationDetailsDto = new CountryEvaluationDetailsDto();
         evaluationDetailsDto.setPricePerEvaluation(10);
         evaluationDetailsDto.setAvailabilityPercentage(40);
-        return  evaluationDetailsDto;
+        return evaluationDetailsDto;
     }
 
     public Token savedToken(Token.Type type) {

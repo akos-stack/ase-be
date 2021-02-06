@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.util;
 
+import com.bloxico.ase.userservice.dto.projection.CountryProjection;
 import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
@@ -107,17 +108,21 @@ public interface AseMapper {
 
     RegionDto toRegionDto(CreateRegionRequest request);
 
-    default CountryDto toCountryDto(CreateCountryRequest request) {
-        var regionDto = new RegionDto();
-        regionDto.setName(request.getRegion());
-        var evaluationDetailsDto = new CountryEvaluationDetailsDto();
-        evaluationDetailsDto.setPricePerEvaluation(request.getPricePerEvaluation());
-        evaluationDetailsDto.setAvailabilityPercentage(request.getAvailabilityPercentage());
-        var countryDto = new CountryDto();
-        countryDto.setName(request.getName());
-        countryDto.setRegion(regionDto);
-        countryDto.setCountryEvaluationDetails(evaluationDetailsDto);
-        return countryDto;
-    }
+    CountryDto toCountryDto(CreateCountryRequest request);
+
+    @Mapping(target = "name")
+    RegionDto toRegionDto(String name);
+
+    CountryEvaluationDetailsDto toCountryEvaluationDetailsDto(CreateCountryRequest request);
+
+    @Mapping(target = "id", source = "countryId")
+    @Mapping(target = "name", source = "countryName")
+    @Mapping(target = "region.id", source = "regionId")
+    @Mapping(target = "region.name", source = "regionName")
+    @Mapping(target = "countryEvaluationDetails.id", source = "countryEvaluationDetailsId")
+    @Mapping(target = "countryEvaluationDetails.pricePerEvaluation", source = "pricePerEvaluation")
+    @Mapping(target = "countryEvaluationDetails.availabilityPercentage", source = "availabilityPercentage")
+    @Mapping(target = "countryEvaluationDetails.totalOfEvaluators", source = "totalOfEvaluators")
+    CountryDto toCountryDto(CountryProjection projection);
 
 }

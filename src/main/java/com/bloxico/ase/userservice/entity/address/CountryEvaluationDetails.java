@@ -1,16 +1,18 @@
 package com.bloxico.ase.userservice.entity.address;
 
+import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "countries_evaluation_details")
-public class CountryEvaluationDetails implements Serializable {
+public class CountryEvaluationDetails extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

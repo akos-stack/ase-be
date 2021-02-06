@@ -23,6 +23,6 @@ public class RegionDto {
 
     @JsonProperty("number_of_evaluators")
     @JsonInclude(NON_NULL)
-    Integer numberOfEvaluators;
+    private Integer numberOfEvaluators;
 
 }

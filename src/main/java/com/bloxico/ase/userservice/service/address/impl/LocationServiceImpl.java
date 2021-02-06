@@ -1,25 +1,17 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
-import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
-import com.bloxico.ase.userservice.repository.address.CityRepository;
-import com.bloxico.ase.userservice.repository.address.CountryRepository;
-import com.bloxico.ase.userservice.repository.address.LocationRepository;
-import com.bloxico.ase.userservice.repository.address.RegionRepository;
+import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.repository.address.*;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.*;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Slf4j
@@ -30,28 +22,30 @@ public class LocationServiceImpl implements ILocationService {
     private final CityRepository cityRepository;
     private final LocationRepository locationRepository;
     private final RegionRepository regionRepository;
+    private final CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Autowired
     public LocationServiceImpl(CountryRepository countryRepository,
                                CityRepository cityRepository,
                                LocationRepository locationRepository,
-                               RegionRepository regionRepository)
+                               RegionRepository regionRepository,
+                               CountryEvaluationDetailsRepository countryEvaluationDetailsRepository)
     {
         this.countryRepository = countryRepository;
         this.cityRepository = cityRepository;
         this.locationRepository = locationRepository;
         this.regionRepository = regionRepository;
+        this.countryEvaluationDetailsRepository = countryEvaluationDetailsRepository;
     }
 
     @Override
     public List<CountryDto> findAllCountries() {
         log.debug("CountryServiceImpl.findAllCountries - start");
         var countries = countryRepository
-                .findAll()
+                .findAllComplete()
                 .stream()
-                .map(MAPPER::toDto)
+                .map(MAPPER::toCountryDto)
                 .collect(toUnmodifiableList());
-        fetchTotalOfEvaluatorsForCountries(countries);
         log.debug("CountryServiceImpl.findAllCountries - end");
         return countries;
     }
@@ -132,17 +126,32 @@ public class LocationServiceImpl implements ILocationService {
         var region = regionRepository
                 .findByNameIgnoreCase(dto.getRegion().getName())
                 .orElseThrow(REGION_NOT_FOUND::newException);
-        var evaluationDetails = MAPPER.toEntity(dto.getCountryEvaluationDetails());
         var country = MAPPER.toEntity(dto);
         country.setCreatorId(principalId);
         country.setRegion(region);
-        country.setCountryEvaluationDetails(evaluationDetails);
-        evaluationDetails.setCountry(country);
         countryRepository.saveAndFlush(country);
         var countryDto = MAPPER.toDto(country);
-        countryDto.getCountryEvaluationDetails().setTotalOfEvaluators(0);
         log.debug("LocationServiceImpl.createCountry - end | dto: {}, principalId: {}", dto, principalId);
         return countryDto;
+    }
+
+    @Override
+    public CountryEvaluationDetailsDto createCountryEvaluationDetails(
+            CountryEvaluationDetailsDto dto, int countryId, long principalId) {
+        log.debug("LocationServiceImpl.createCountryEvaluationDetails - start | dto: {}, countryId: {}, principalId: {}",
+                dto, countryId, principalId);
+        requireNonNull(dto);
+        var country = countryRepository
+                .findById(countryId)
+                .orElseThrow(COUNTRY_NOT_FOUND::newException);
+        var evaluationDetails = MAPPER.toEntity(dto);
+        evaluationDetails.setCreatorId(principalId);
+        evaluationDetails.setCountry(country);
+        countryEvaluationDetailsRepository.saveAndFlush(evaluationDetails);
+        var evaluationDetailsDto = MAPPER.toDto(evaluationDetails);
+        log.debug("LocationServiceImpl.createCountryEvaluationDetails - end | dto: {}, countryId: {}, principalId: {}",
+                dto, countryId, principalId);
+        return evaluationDetailsDto;
     }
 
     private CountryDto saveCountry(CountryDto dto, long principalId) {
@@ -167,24 +176,6 @@ public class LocationServiceImpl implements ILocationService {
         return countryRepository
                 .findByNameIgnoreCase(name)
                 .isPresent();
-    }
-
-    private void fetchTotalOfEvaluatorsForCountries(Collection<CountryDto> countries) {
-        if (countries.isEmpty()) {
-            return;
-        }
-        var countriesMap = countries.stream()
-                .collect(toMap(CountryDto::getId, country -> country));
-        var pairs = countryRepository
-                .countTotalOfEvaluatorsByIdIn(countriesMap.keySet());
-        pairs
-                .forEach(p -> {
-                    var countryId = p.getCountryId();
-                    var totalOfEvaluators = p.getTotalOfEvaluators();
-                    countriesMap.get(countryId)
-                            .getCountryEvaluationDetails()
-                            .setTotalOfEvaluators(totalOfEvaluators);
-                });
     }
 
 }

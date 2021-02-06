@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
 import com.bloxico.ase.userservice.exception.LocationException;
+import com.bloxico.ase.userservice.repository.address.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
@@ -37,6 +38,9 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Autowired
     private CountryRepository countryRepository;
+
+    @Autowired
+    private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test
     public void findAllCountries() {
@@ -193,7 +197,6 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     public void createCountry_countrySuccessfullyCreated() {
         var principalId = mockUtil.savedAdmin().getId();
         var dto = mockUtil.genCountryDto(mockUtil.savedRegionDto());
-
         var countryDto = service.createCountry(dto, principalId);
         var newlyCreatedCountry = countryRepository
                 .findByNameIgnoreCase(countryDto.getName())
@@ -204,9 +207,38 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         assertEquals(countryDto.getId(), newlyCreatedCountry.getId());
         assertEquals(countryDto.getName(), newlyCreatedCountry.getName());
         assertEquals(principalId, newlyCreatedCountry.getCreatorId());
-        assertEquals(countryDto.getCountryEvaluationDetails().getPricePerEvaluation(), 10);
-        assertEquals(countryDto.getCountryEvaluationDetails().getAvailabilityPercentage(), 40);
-        assertEquals(countryDto.getCountryEvaluationDetails().getTotalOfEvaluators(), 0);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void createCountryEvaluationDetails_nullEvaluationDetails() {
+        var countryId = mockUtil.savedCountry().getId();
+        service.createCountryEvaluationDetails(null, countryId, 1);
+    }
+
+    @Test(expected = LocationException.class)
+    public void createCountryEvaluationDetails_countryNotFound() {
+        var evaluationDetailsDto = mockUtil.genCountryEvaluationDetailsDto();
+        service.createCountryEvaluationDetails(evaluationDetailsDto, -1, 1);
+    }
+
+    @Test
+    public void createCountryEvaluationDetails_evaluationDetailsSuccessfullyCreated() {
+        var adminId = mockUtil.savedAdmin().getId();
+        var countryDto = mockUtil.genCountryDto(mockUtil.savedRegionDto());
+        countryDto = service.createCountry(countryDto, adminId);
+        var evaluationDetailsDto = mockUtil.genCountryEvaluationDetailsDto();
+        evaluationDetailsDto =
+                service.createCountryEvaluationDetails(evaluationDetailsDto, countryDto.getId(), adminId);
+
+        var newlyCreatedEvaluationDetails = countryEvaluationDetailsRepository
+                .findById(evaluationDetailsDto.getId())
+                .orElse(null);
+
+        assertNotNull(newlyCreatedEvaluationDetails);
+        assertEquals(countryDto.getId(), newlyCreatedEvaluationDetails.getCountry().getId());
+        assertEquals(evaluationDetailsDto.getPricePerEvaluation(), newlyCreatedEvaluationDetails.getPricePerEvaluation());
+        assertEquals(evaluationDetailsDto.getAvailabilityPercentage(), newlyCreatedEvaluationDetails.getAvailabilityPercentage());
+        assertEquals(adminId, newlyCreatedEvaluationDetails.getCreatorId());
     }
 
 }

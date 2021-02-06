@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
-import static javax.persistence.CascadeType.*;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -27,10 +26,7 @@ public class Country extends BaseEntity {
     @JoinColumn(name="region_id")
     private Region region;
 
-    @OneToOne(
-            mappedBy = "country",
-            cascade = { PERSIST, MERGE, REMOVE },
-            fetch = EAGER)
+    @OneToOne(mappedBy = "country", fetch = EAGER)
     private CountryEvaluationDetails countryEvaluationDetails;
 
 }

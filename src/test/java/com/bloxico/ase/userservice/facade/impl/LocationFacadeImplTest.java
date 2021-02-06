@@ -104,16 +104,14 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     @Test(expected = LocationException.class)
     public void createCountry_countryAlreadyExists() {
         var region = mockUtil.savedRegion();
-        var request =
-                new CreateCountryRequest(uuid(), region.getName(), 10, 40);
+        var request = new CreateCountryRequest(uuid(), region.getName(), 10, 40);
         facade.createCountry(request, 1);
         facade.createCountry(request, 1);
     }
 
     @Test(expected = LocationException.class)
     public void createCountry_regionNotFound() {
-        var request =
-                new CreateCountryRequest(uuid(), uuid(), 10, 40);
+        var request = new CreateCountryRequest(uuid(), uuid(), 10, 40);
         facade.createCountry(request, 1);
     }
 
@@ -123,8 +121,7 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
         var name = uuid();
         var region = mockUtil.savedRegion();
 
-        var request =
-                new CreateCountryRequest(name, region.getName(), 10, 40);
+        var request = new CreateCountryRequest(name, region.getName(), 10, 40);
         var response = facade.createCountry(request, principalId);
 
         assertNotNull(response);
