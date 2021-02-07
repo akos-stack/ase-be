@@ -151,18 +151,6 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private boolean isAuthorizedRedirectUri(String uri) {
         return uri.contains("/landing-page");
-//        var clientRedirectUri = URI.create(uri);
-//        return List.of(baseUrl)
-//                .stream()
-//                .anyMatch(authorizedRedirectUri -> {
-//                    // Only validate host and port. Let the clients use different paths if they want to
-//                    var authorizedURI = URI.create(authorizedRedirectUri);
-//                    return authorizedURI
-//                            .getHost()
-//                            .equalsIgnoreCase(clientRedirectUri.getHost())
-//                        && authorizedURI
-//                            .getPort() == clientRedirectUri.getPort();
-//                });
     }
 
 }
