@@ -4,13 +4,6 @@ import com.bloxico.ase.userservice.config.security.AseSecurityServiceTest;
 import com.bloxico.ase.userservice.config.security.PersistentJwtTokenStoreTest;
 import com.bloxico.ase.userservice.entity.BaseEntityTest;
 import com.bloxico.ase.userservice.facade.impl.*;
-import com.bloxico.ase.userservice.repository.address.*;
-import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepositoryTest;
-import com.bloxico.ase.userservice.repository.oauth.OAuthClientDetailsRepositoryTest;
-import com.bloxico.ase.userservice.repository.token.*;
-import com.bloxico.ase.userservice.repository.user.*;
-import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepositoryTest;
-import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepositoryTest;
 import com.bloxico.ase.userservice.service.address.impl.LocationServiceImplTest;
 import com.bloxico.ase.userservice.service.aws.impl.S3ServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
@@ -24,21 +17,6 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         // entity
         BaseEntityTest.class,
-
-        // repository
-        CountryRepositoryTest.class,
-        CityRepositoryTest.class,
-        LocationRepositoryTest.class,
-        PermissionRepositoryTest.class,
-        RoleRepositoryTest.class,
-        UserRepositoryTest.class,
-        ArtOwnerRepositoryTest.class,
-        EvaluatorRepositoryTest.class,
-        BlacklistedTokenRepositoryTest.class,
-        OAuthAccessTokenRepositoryTest.class,
-        OAuthClientDetailsRepositoryTest.class,
-        RegistrationTokenRepositoryTest.class,
-        PasswordResetTokenRepositoryTest.class,
 
         // config
         PersistentJwtTokenStoreTest.class,
