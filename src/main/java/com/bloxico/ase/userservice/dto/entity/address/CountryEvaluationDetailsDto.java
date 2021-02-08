@@ -17,4 +17,5 @@ public class CountryEvaluationDetailsDto {
 
     @JsonProperty("total_of_evaluators")
     private int totalOfEvaluators;
+
 }

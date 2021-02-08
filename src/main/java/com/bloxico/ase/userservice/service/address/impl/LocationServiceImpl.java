@@ -42,7 +42,7 @@ public class LocationServiceImpl implements ILocationService {
     public List<CountryDto> findAllCountries() {
         log.debug("CountryServiceImpl.findAllCountries - start");
         var countries = countryRepository
-                .findAllComplete()
+                .findAllIncludeEvaluatorsCount()
                 .stream()
                 .map(MAPPER::toCountryDto)
                 .collect(toUnmodifiableList());
@@ -108,7 +108,7 @@ public class LocationServiceImpl implements ILocationService {
         }
         var region = MAPPER.toEntity(dto);
         region.setCreatorId(principalId);
-        region = regionRepository.saveAndFlush(region);
+        regionRepository.saveAndFlush(region);
         var regionDto = MAPPER.toDto(region);
         regionDto.setNumberOfCountries(0);
         regionDto.setNumberOfEvaluators(0);

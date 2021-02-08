@@ -20,7 +20,6 @@ public interface ILocationService {
 
     CountryDto createCountry(CountryDto dto, long principalId);
 
-    CountryEvaluationDetailsDto createCountryEvaluationDetails(
-            CountryEvaluationDetailsDto dto, int countryId, long principalId);
+    CountryEvaluationDetailsDto createCountryEvaluationDetails(CountryEvaluationDetailsDto dto, int countryId, long principalId);
 
 }

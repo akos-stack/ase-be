@@ -8,7 +8,6 @@ import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import com.bloxico.ase.userservice.web.model.address.CreateCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
 import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
-import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,17 +32,14 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void findAllCountries() {
-        assertEquals(
-                new SearchCountriesResponse(List.of()),
-                facade.findAllCountries());
         var country1 = mockUtil.savedCountryDto();
-        assertEquals(
-                new SearchCountriesResponse(List.of(country1)),
-                facade.findAllCountries());
+        assertTrue(facade.findAllCountries()
+                .getCountries()
+                .contains(country1));
         var country2 = mockUtil.savedCountryDto();
-        assertEquals(
-                new SearchCountriesResponse(List.of(country1, country2)),
-                facade.findAllCountries());
+        assertTrue(facade.findAllCountries()
+                .getCountries()
+                .containsAll(List.of(country1, country2)));
     }
 
     @Test

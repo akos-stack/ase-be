@@ -47,5 +47,4 @@ public class LocationController implements LocationApi {
         return ResponseEntity.ok(response);
     }
 
-
 }

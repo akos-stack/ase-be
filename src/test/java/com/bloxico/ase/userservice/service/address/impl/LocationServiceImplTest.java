@@ -19,8 +19,7 @@ import java.util.List;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class LocationServiceImplTest extends AbstractSpringTest {
 
@@ -44,17 +43,12 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findAllCountries() {
-        assertEquals(
-                List.of(),
-                service.findAllCountries());
         var country1 = mockUtil.savedCountryDto();
-        assertEquals(
-                List.of(country1),
-                service.findAllCountries());
+        assertTrue(service.findAllCountries()
+                .contains(country1));
         var country2 = mockUtil.savedCountryDto();
-        assertEquals(
-                List.of(country1, country2),
-                service.findAllCountries());
+        assertTrue(service.findAllCountries()
+                .containsAll(List.of(country1, country2)));
     }
 
     @Test
