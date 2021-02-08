@@ -9,7 +9,9 @@ import javax.persistence.EntityNotFoundException;
 
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.config.security.AsePrincipal.authorityOf;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RolePermissionServiceImplTest extends AbstractSpringTest {
 
@@ -25,21 +27,25 @@ public class RolePermissionServiceImplTest extends AbstractSpringTest {
         assertFalse(role.getPermissions().isEmpty());
         var map = rolePermissionService.permissionNameGrantedAuthoritiesMap();
         assertFalse(map.isEmpty());
-        role.getPermissions().forEach(permission -> assertTrue(
-                map.get(permission
-                        .getName())
-                        .contains(authorityOf(role.getName()))));
+        role.getPermissions().forEach(permission ->
+                assertThat(
+                        map.get(permission.getName()),
+                        hasItems(authorityOf(role.getName()))));
         assertSame(map, rolePermissionService.permissionNameGrantedAuthoritiesMap());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void findRoleByName_nullName() {
-        rolePermissionService.findRoleByName(null);
+        assertThrows(
+                NullPointerException.class,
+                () -> rolePermissionService.findRoleByName(null));
     }
 
-    @Test(expected = EntityNotFoundException.class)
+    @Test
     public void findRoleByName_notFound() {
-        rolePermissionService.findRoleByName(uuid());
+        assertThrows(
+                EntityNotFoundException.class,
+                () -> rolePermissionService.findRoleByName(uuid()));
     }
 
     @Test

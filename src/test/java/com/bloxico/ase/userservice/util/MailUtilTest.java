@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.bloxico.ase.testutil.MockUtil.genEmail;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Slf4j
 public class MailUtilTest extends AbstractSpringTest {
@@ -14,26 +16,32 @@ public class MailUtilTest extends AbstractSpringTest {
     @Autowired
     private MailUtil mailUtil;
 
-    @Test(expected = NullPointerException.class)
-    public void sendTokenEmail_nullTemplate() {
-        mailUtil.sendTokenEmail(null, uuid(), uuid());
+    @Test
+    public void sendTokenEmail_nullArguments() {
+        assertThrows(
+                NullPointerException.class,
+                () -> mailUtil.sendTokenEmail(null, uuid(), uuid()));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void sendTokenEmail_nullEmail() {
         for (var template : Template.values())
-            mailUtil.sendTokenEmail(template, null, uuid());
+            assertThrows(
+                    NullPointerException.class,
+                    () -> mailUtil.sendTokenEmail(template, null, uuid()));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void sendTokenEmail_nullToken() {
         for (var template : Template.values())
-            mailUtil.sendTokenEmail(template, uuid(), null);
+            assertThrows(
+                    NullPointerException.class,
+                    () -> mailUtil.sendTokenEmail(template, uuid(), null));
     }
 
     @Test
     public void sendTokenEmail() {
-        var email = uuid() + "@mailinator.com";
+        var email = genEmail();
         var token = uuid();
         log.info("Generated email: " + email);
         for (var template : Template.values())

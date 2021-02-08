@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserProfileServiceImplTest extends AbstractSpringTest {
 
@@ -24,9 +25,11 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
     @Autowired
     private UserProfileServiceImpl userProfileService;
 
-    @Test(expected = UserException.class)
+    @Test
     public void findUserProfileByUserId_notFound() {
-        userProfileService.findUserProfileByUserId(-1);
+        assertThrows(
+                UserException.class,
+                () -> userProfileService.findUserProfileByUserId(-1));
     }
 
     @Test
@@ -37,15 +40,19 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
                 userProfileService.findUserProfileByUserId(userProfileDto.getUserId()));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void updateUserProfile_nullRequest() {
-        userProfileService.updateUserProfile(1, null);
+        assertThrows(
+                NullPointerException.class,
+                () -> userProfileService.updateUserProfile(1, null));
     }
 
-    @Test(expected = UserException.class)
+    @Test
     public void updateUserProfile_userNotFound() {
         var request = new UpdateUserProfileRequest(uuid(), uuid(), uuid());
-        userProfileService.updateUserProfile(-1, request);
+        assertThrows(
+                UserException.class,
+                () -> userProfileService.updateUserProfile(-1, request));
     }
 
     @Test
@@ -58,10 +65,12 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
         assertEquals(request.getPhone(), updated.getPhone());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void saveEvaluator_nullEvaluatorDto() {
         var principalId = mockUtil.savedUserProfileDto().getUserId();
-        userProfileService.saveEvaluator(null, principalId);
+        assertThrows(
+                NullPointerException.class,
+                () -> userProfileService.saveEvaluator(null, principalId));
     }
 
     @Test
@@ -74,10 +83,12 @@ public class UserProfileServiceImplTest extends AbstractSpringTest {
         assertNotNull(evaluatorDto.getId());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void saveArtOwner_nullOwnerDto() {
         var principalId = mockUtil.savedUserProfileDto().getUserId();
-        userProfileService.saveArtOwner(null, principalId);
+        assertThrows(
+                NullPointerException.class,
+                () -> userProfileService.saveArtOwner(null, principalId));
     }
 
     @Test

@@ -23,6 +23,7 @@ import com.bloxico.ase.userservice.repository.user.UserRepository;
 import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
+import com.bloxico.ase.userservice.util.SupportedFileExtension;
 import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
@@ -43,7 +44,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
@@ -144,6 +144,10 @@ public class MockUtil {
         user.setEnabled(true);
         user.addRole(roleRepository.getAdminRole());
         return userRepository.saveAndFlush(user);
+    }
+
+    public UserDto savedAdminDto() {
+        return MAPPER.toDto(savedAdmin());
     }
 
     public User savedUser() {
@@ -495,39 +499,24 @@ public class MockUtil {
                 .getValue();
     }
 
-    public void saveUsers() {
-        savedAdmin("user1@gmail.com", "123!");
-        savedAdmin("user2@gmail.com", "123!");
-        savedAdmin("user3@gmail.com", "123!");
-    }
-
     public boolean isEvaluatorAlreadyPending(String email) {
         return pendingEvaluatorRepository
                 .findByEmailIgnoreCase(email)
                 .isPresent();
     }
 
-    public List<PendingEvaluatorDto> createInvitedPendingEvaluators() {
-        var emails = Stream
-                .generate(MockUtil::genEmail)
-                .limit(10)
-                .collect(Collectors.toList());
-
-        return createInvitedPendingEvaluators(emails);
+    public PendingEvaluatorDto savedInvitedPendingEvaluatorDto() {
+        var principal = savedAdmin().getId();
+        var request = new EvaluatorInvitationRequest(genEmail());
+        return pendingEvaluatorService.createPendingEvaluator(request, principal);
     }
 
-    public List<PendingEvaluatorDto> createInvitedPendingEvaluators(List<String> emails) {
-        var adminId = savedAdmin().getId();
-
-        return emails
-                .stream()
-                .map(EvaluatorInvitationRequest::new)
-                .map(request -> pendingEvaluatorService.createPendingEvaluator(request, adminId))
-                .collect(Collectors.toList());
-    }
-
-    public static MultipartFile createMultipartFile() {
-        return new MockMultipartFile("file.txt", "file.txt", "text/plain", "Some file".getBytes());
+    public static MultipartFile genMultipartFile(SupportedFileExtension extension) {
+        var fileName = "file." + extension.toString();
+        return new MockMultipartFile(
+                fileName, fileName,
+                extension.getContentType(),
+                uuid().getBytes());
     }
 
     public static byte[] getTestCVBytes() {
@@ -548,8 +537,10 @@ public class MockUtil {
 
     private static final AtomicLong along = new AtomicLong(0);
 
+    public static final String EMAIL_COMMON = "aseUser@mail.com";
+
     public static String genEmail() {
-        return along.incrementAndGet() + "aseUser@mail.com";
+        return along.incrementAndGet() + EMAIL_COMMON;
     }
 
     public static String uuid() {
@@ -564,8 +555,8 @@ public class MockUtil {
         return LocalDateTime.now().plusHours(1);
     }
 
-    public static <T> T randElt(List<? extends T> list) {
-        return list.get(current().nextInt(0, list.size()));
+    public static <T> T randElt(Collection<? extends T> coll) {
+        return List.copyOf(coll).get(current().nextInt(0, coll.size()));
     }
 
     public static <T extends Enum<T>> T randEnumConst(Class<T> type) {

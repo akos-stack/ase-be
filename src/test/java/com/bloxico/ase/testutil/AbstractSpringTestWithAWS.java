@@ -32,7 +32,7 @@ public abstract class AbstractSpringTestWithAWS extends AbstractSpringTest {
     }
 
     @After
-    public void teardownAmazonS3Mock() {
+    public void shutdownAmazonS3Mock() {
         api.shutdown();
     }
 

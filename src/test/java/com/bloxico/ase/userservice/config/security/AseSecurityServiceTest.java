@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 
+import java.util.Set;
+
 import static com.bloxico.ase.testutil.MockUtil.uuid;
-import static com.bloxico.ase.userservice.config.security.AsePrincipal.newUserDetails;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AseSecurityServiceTest extends AbstractSpringTest {
 
@@ -24,33 +26,46 @@ public class AseSecurityServiceTest extends AbstractSpringTest {
     @Autowired
     private OAuthClientDetailsRepository oAuthClientDetailsRepository;
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void loadUserByUsername_nullEmail() {
-        service.loadUserByUsername(null);
-    }
-
-    @Test(expected = UsernameNotFoundException.class)
-    public void loadUserByUsername_notFound() {
-        service.loadUserByUsername(uuid());
+        assertThrows(
+                NullPointerException.class,
+                () -> service.loadUserByUsername(null));
     }
 
     @Test
-    public void loadUserByUsername_found() {
+    public void loadUserByUsername_notFound() {
+        assertThrows(
+                UsernameNotFoundException.class,
+                () -> service.loadUserByUsername(uuid()));
+    }
+
+    @Test
+    public void loadUserByUsername() {
         var user = mockUtil.savedUser();
         assertEquals(
-                newUserDetails(user),
+                AsePrincipal.newUserDetails(user),
                 service.loadUserByUsername(user.getEmail()));
     }
 
-    @Test(expected = NullPointerException.class)
+    // TODO-TEST loadUser_null
+
+    // TODO-TEST loadUser_notExists (for each provider)
+
+    // TODO-TEST loadUser_exists (for each provider)
+
+    @Test
     public void loadClientByClientId_null() {
-        service.loadClientByClientId(null);
+        assertThrows(
+                NullPointerException.class,
+                () -> service.loadClientByClientId(null));
     }
 
-    @Test(expected = ClientRegistrationException.class)
+    @Test
     public void loadClientByClientId_notFound() {
-        var id = uuid();
-        service.loadClientByClientId(id);
+        assertThrows(
+                ClientRegistrationException.class,
+                () -> service.loadClientByClientId(uuid()));
     }
 
     @Test
@@ -62,7 +77,19 @@ public class AseSecurityServiceTest extends AbstractSpringTest {
         oAuthClientDetails.setAuthorizedGrantTypes("foo,bar,baz");
         oAuthClientDetails.setAuthorities("foo,bar,baz");
         oAuthClientDetailsRepository.save(oAuthClientDetails);
-        service.loadClientByClientId(id);
+        var clientDetails = service.loadClientByClientId(id);
+        assertEquals(
+                oAuthClientDetails.getClientId(),
+                clientDetails.getClientId());
+        assertEquals(
+                Set.of(oAuthClientDetails.getScope().split(",")),
+                clientDetails.getScope());
+        assertEquals(
+                Set.of(oAuthClientDetails.getAuthorizedGrantTypes().split(",")),
+                clientDetails.getAuthorizedGrantTypes());
+        assertEquals(
+                oAuthClientDetails.getClientId(),
+                clientDetails.getClientId());
     }
 
 }

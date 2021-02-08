@@ -6,7 +6,6 @@ import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -15,12 +14,10 @@ import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_UPDATE_ENDPOINT;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
-@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class JwtAuthorizationFilterTest extends AbstractSpringTest {
 
     @Autowired

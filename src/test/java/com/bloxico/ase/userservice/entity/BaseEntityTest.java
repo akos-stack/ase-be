@@ -11,6 +11,7 @@ import static com.bloxico.ase.testutil.MockUtil.copyBaseEntityData;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BaseEntityTest extends AbstractSpringTest {
 
@@ -20,11 +21,13 @@ public class BaseEntityTest extends AbstractSpringTest {
     @Autowired
     private CountryRepository countryRepository;
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void prePersist_creator_isNull() {
         var country = new Country();
         country.setName(uuid());
-        countryRepository.saveAndFlush(country);
+        assertThrows(
+                NullPointerException.class,
+                () -> countryRepository.saveAndFlush(country));
     }
 
     @Test
@@ -38,7 +41,7 @@ public class BaseEntityTest extends AbstractSpringTest {
         assertNotNull(country.getCreatedAt());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void preUpdate_updater_isNull() {
         var oldCountry = new Country();
         {
@@ -52,7 +55,9 @@ public class BaseEntityTest extends AbstractSpringTest {
             newCountry.setId(oldCountry.getId());
             newCountry.setName(uuid()); // update
             copyBaseEntityData(oldCountry, newCountry);
-            countryRepository.saveAndFlush(newCountry);
+            assertThrows(
+                    NullPointerException.class,
+                    () -> countryRepository.saveAndFlush(newCountry));
         }
     }
 
