@@ -75,7 +75,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public void handleTokenValidation(TokenValidationRequest request) {
         log.info("UserRegistrationFacadeImpl.handleTokenValidation - start | request: {}", request);
         var token = registrationTokenService.consumeToken(request.getTokenValue());
-        userService.enableUser(token.getUserId());
+        userService.enableUser(token.getUserId(), token.getUserId());
         log.info("UserRegistrationFacadeImpl.handleTokenValidation - end | request: {}", request);
     }
 
