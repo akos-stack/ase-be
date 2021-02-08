@@ -6,12 +6,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IS3Service {
 
-    void validateFile(FileCategory fileCategory, MultipartFile file);
+    void validateFile(FileCategory category, MultipartFile file);
 
-    String uploadFile(FileCategory fileCategory, MultipartFile file);
+    String uploadFile(FileCategory category, MultipartFile file);
 
-    ByteArrayResource downloadFile(String fileName);
+    ByteArrayResource downloadFile(String path);
 
-    boolean deleteFile(String fileName);
+    void deleteFile(String path);
 
 }
