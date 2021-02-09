@@ -3,7 +3,7 @@ package com.bloxico.ase.userservice.entity.artwork;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.METADATA_STATUS_NOT_FOUND;
 
 public enum ArtworkMetadataStatus {
-    PENDING, APPROVED, DECLINED;
+    PENDING, APPROVED;
 
     public static ArtworkMetadataStatus findByName(String name) {
         try {
