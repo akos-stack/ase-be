@@ -3,7 +3,7 @@ package com.bloxico.ase.userservice.web.api.impl;
 import com.bloxico.ase.userservice.facade.IArtworkMetadataFacade;
 import com.bloxico.ase.userservice.util.ArtworkMetadataType;
 import com.bloxico.ase.userservice.web.api.ArtworkMetadataApi;
-import com.bloxico.ase.userservice.web.model.artwork.ArrayArtworkMetadataResponse;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkMetadataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +15,7 @@ public class ArtworkMetadataController implements ArtworkMetadataApi {
     private IArtworkMetadataFacade artworkMetadataFacade;
 
     @Override
-    public ResponseEntity<ArrayArtworkMetadataResponse> searchApprovedArtworkMetadata(ArtworkMetadataType type, String name) {
+    public ResponseEntity<SearchArtworkMetadataResponse> searchApprovedArtworkMetadata(ArtworkMetadataType type, String name) {
         var response = artworkMetadataFacade.searchApprovedArtworkMetadata(name, type);
         return ResponseEntity.ok(response);
     }

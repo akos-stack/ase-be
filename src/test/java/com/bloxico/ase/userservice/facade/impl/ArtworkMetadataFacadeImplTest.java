@@ -7,7 +7,7 @@ import com.bloxico.ase.userservice.repository.artwork.CategoryRepository;
 import com.bloxico.ase.userservice.repository.artwork.MaterialRepository;
 import com.bloxico.ase.userservice.repository.artwork.MediumRepository;
 import com.bloxico.ase.userservice.repository.artwork.StyleRepository;
-import com.bloxico.ase.userservice.web.model.artwork.ArrayArtworkMetadataResponse;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkMetadataResponse;
 import com.bloxico.ase.userservice.web.model.artwork.ArtworkMetadataCreateRequest;
 import com.bloxico.ase.userservice.web.model.artwork.ArtworkMetadataUpdateRequest;
 import com.bloxico.ase.userservice.web.model.artwork.PagedArtworkMetadataResponse;
@@ -220,60 +220,60 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
         @Test
     public void findApprovedCategories() {
         assertEquals(
-                new ArrayArtworkMetadataResponse(List.of()),
+                new SearchArtworkMetadataResponse(List.of()),
                 facade.searchApprovedArtworkMetadata("", CATEGORY));
         var dto = mockUtil.savedCategoryDto();
         assertEquals(
-                new ArrayArtworkMetadataResponse(List.of(dto)),
+                new SearchArtworkMetadataResponse(List.of(dto)),
                 facade.searchApprovedArtworkMetadata("", CATEGORY));
         var dto2 = mockUtil.savedCategoryDto();
         assertEquals(
-                new ArrayArtworkMetadataResponse(List.of(dto, dto2)),
+                new SearchArtworkMetadataResponse(List.of(dto, dto2)),
                 facade.searchApprovedArtworkMetadata("", CATEGORY));
     }
 
     @Test
     public void findApprovedMaterials() {
         assertEquals(
-                new ArrayArtworkMetadataResponse(List.of()),
+                new SearchArtworkMetadataResponse(List.of()),
                 facade.searchApprovedArtworkMetadata("", MATERIAL));
         var dto = mockUtil.savedMaterialDto();
         assertEquals(
-                new ArrayArtworkMetadataResponse(List.of(dto)),
+                new SearchArtworkMetadataResponse(List.of(dto)),
                 facade.searchApprovedArtworkMetadata("", MATERIAL));
         var dto2 = mockUtil.savedMaterialDto();
         assertEquals(
-                new ArrayArtworkMetadataResponse(List.of(dto, dto2)),
+                new SearchArtworkMetadataResponse(List.of(dto, dto2)),
                 facade.searchApprovedArtworkMetadata("", MATERIAL));
     }
 
     @Test
     public void findApprovedMediums() {
         assertEquals(
-                new ArrayArtworkMetadataResponse(List.of()),
+                new SearchArtworkMetadataResponse(List.of()),
                 facade.searchApprovedArtworkMetadata("", MEDIUM));
         var dto = mockUtil.savedMediumDto();
         assertEquals(
-                new ArrayArtworkMetadataResponse(List.of(dto)),
+                new SearchArtworkMetadataResponse(List.of(dto)),
                 facade.searchApprovedArtworkMetadata("", MEDIUM));
         var dto2 = mockUtil.savedMediumDto();
         assertEquals(
-                new ArrayArtworkMetadataResponse(List.of(dto, dto2)),
+                new SearchArtworkMetadataResponse(List.of(dto, dto2)),
                 facade.searchApprovedArtworkMetadata("", MEDIUM));
     }
 
     @Test
     public void findApprovedStyles() {
         assertEquals(
-                new ArrayArtworkMetadataResponse(List.of()),
+                new SearchArtworkMetadataResponse(List.of()),
                 facade.searchApprovedArtworkMetadata("", STYLE));
         var dto = mockUtil.savedStyleDto();
         assertEquals(
-                new ArrayArtworkMetadataResponse(List.of(dto)),
+                new SearchArtworkMetadataResponse(List.of(dto)),
                 facade.searchApprovedArtworkMetadata("", STYLE));
         var dto2 = mockUtil.savedStyleDto();
         assertEquals(
-                new ArrayArtworkMetadataResponse(List.of(dto, dto2)),
+                new SearchArtworkMetadataResponse(List.of(dto, dto2)),
                 facade.searchApprovedArtworkMetadata("", STYLE));
     }
 }

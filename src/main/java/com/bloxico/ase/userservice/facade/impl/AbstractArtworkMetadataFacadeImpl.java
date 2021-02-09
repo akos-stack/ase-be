@@ -5,7 +5,7 @@ import com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus;
 import com.bloxico.ase.userservice.facade.IArtworkMetadataFacade;
 import com.bloxico.ase.userservice.service.artwork.IArtworkMetadataService;
 import com.bloxico.ase.userservice.util.ArtworkMetadataType;
-import com.bloxico.ase.userservice.web.model.artwork.ArrayArtworkMetadataResponse;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkMetadataResponse;
 import com.bloxico.ase.userservice.web.model.artwork.ArtworkMetadataCreateRequest;
 import com.bloxico.ase.userservice.web.model.artwork.ArtworkMetadataUpdateRequest;
 import com.bloxico.ase.userservice.web.model.artwork.PagedArtworkMetadataResponse;
@@ -54,10 +54,10 @@ abstract class AbstractArtworkMetadataFacadeImpl implements IArtworkMetadataFaca
     }
 
     @Override
-    public ArrayArtworkMetadataResponse searchApprovedArtworkMetadata(String name, ArtworkMetadataType type) {
+    public SearchArtworkMetadataResponse searchApprovedArtworkMetadata(String name, ArtworkMetadataType type) {
         log.info("AbstractArtworkMetadataFacadeImpl.searchApprovedArtworkMetadata - start | name: {}, type: {}", name, type);
         var artworkMetadataDtos = getService(type).searchApprovedArtworkMetadata(name);
-        var response = new ArrayArtworkMetadataResponse(artworkMetadataDtos);
+        var response = new SearchArtworkMetadataResponse(artworkMetadataDtos);
         log.info("AbstractArtworkMetadataFacadeImpl.searchApprovedArtworkMetadata - end | name: {}, type: {}", name, type);
         return response;
     }

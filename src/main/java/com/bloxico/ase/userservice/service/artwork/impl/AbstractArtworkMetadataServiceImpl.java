@@ -1,7 +1,8 @@
 package com.bloxico.ase.userservice.service.artwork.impl;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
-import com.bloxico.ase.userservice.entity.artwork.*;
+import com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus;
+import com.bloxico.ase.userservice.entity.artwork.IArtworkMetadataEntity;
 import com.bloxico.ase.userservice.repository.artwork.ArtworkMetadataRepository;
 import com.bloxico.ase.userservice.service.artwork.IArtworkMetadataService;
 import com.bloxico.ase.userservice.util.ArtworkMetadataType;
@@ -16,7 +17,6 @@ import java.util.stream.Collectors;
 
 import static com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus.APPROVED;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_METADATA_NOT_FOUND;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_METADATA_TYPE_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -111,23 +111,7 @@ abstract class AbstractArtworkMetadataServiceImpl<T extends IArtworkMetadataEnti
         if ( dto == null ) {
             return null;
         }
-        T artworkMetadataEntity;
-        switch (getType()) {
-            case CATEGORY:
-                artworkMetadataEntity = (T) new Category();
-                break;
-            case MATERIAL:
-                artworkMetadataEntity = (T) new Material();
-                break;
-            case MEDIUM:
-                artworkMetadataEntity = (T) new Medium();
-                break;
-            case STYLE:
-                artworkMetadataEntity = (T) new Style();
-                break;
-            default:
-                throw ARTWORK_METADATA_TYPE_NOT_FOUND.newException();
-        }
+        T artworkMetadataEntity = (T) getType().getNewObject();
 
         artworkMetadataEntity.setId( dto.getId() );
         artworkMetadataEntity.setName( dto.getName() );

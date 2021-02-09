@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.userservice.util.ArtworkMetadataType;
-import com.bloxico.ase.userservice.web.model.artwork.ArrayArtworkMetadataResponse;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkMetadataResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -22,5 +22,5 @@ public interface ArtworkMetadataApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Metadata successfully fetched.")
     })
-    ResponseEntity<ArrayArtworkMetadataResponse> searchApprovedArtworkMetadata(@Valid @RequestParam(value = "type") ArtworkMetadataType type, @Valid @RequestParam(value = "name", required = false) String name);
+    ResponseEntity<SearchArtworkMetadataResponse> searchApprovedArtworkMetadata(@Valid @RequestParam(value = "type") ArtworkMetadataType type, @Valid @RequestParam(value = "name", required = false) String name);
 }

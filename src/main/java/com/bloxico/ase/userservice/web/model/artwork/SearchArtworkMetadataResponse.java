@@ -8,7 +8,7 @@ import lombok.Value;
 import java.util.List;
 
 @Value
-public class ArrayArtworkMetadataResponse {
+public class SearchArtworkMetadataResponse {
 
     @JsonProperty("entries")
     @ApiModelProperty(required = true)
