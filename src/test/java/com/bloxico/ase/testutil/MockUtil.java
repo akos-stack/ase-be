@@ -42,6 +42,7 @@ import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
+import com.bloxico.ase.userservice.web.model.token.EvaluatorRegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
@@ -600,8 +601,19 @@ public class MockUtil {
         return emails
                 .stream()
                 .map(EvaluatorInvitationRequest::new)
-                .map(request -> pendingEvaluatorService.createPendingEvaluator(request, adminId))
+                .map(request -> pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), adminId))
                 .collect(Collectors.toList());
+    }
+
+    public String createRequestedPendingEvaluator() {
+        var adminId = savedAdmin().getId();
+
+        EvaluatorRegistrationRequest evaluatorRegistrationRequest = new EvaluatorRegistrationRequest();
+        String email = genEmail();
+        evaluatorRegistrationRequest.setEmail(email);
+        evaluatorRegistrationRequest.setCv(createMultipartFile());
+        userRegistrationFacade.requestEvaluatorRegistration(evaluatorRegistrationRequest, adminId);
+        return email;
     }
 
     public static MultipartFile createMultipartFile() {

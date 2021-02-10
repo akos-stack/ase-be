@@ -1,19 +1,21 @@
 package com.bloxico.ase.userservice.service.token.impl;
 
+import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDocumentDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluatorDocument;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluatorDocumentId;
+import com.bloxico.ase.userservice.repository.token.PendingEvaluatorDocumentRepository;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
-import com.bloxico.ase.userservice.service.aws.IS3Service;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
-import com.bloxico.ase.userservice.util.FileCategory;
-import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
@@ -28,17 +30,16 @@ import static java.util.Objects.requireNonNull;
 public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
 
     private final PendingEvaluatorRepository pendingEvaluatorRepository;
-
-    private final IS3Service s3Service;
+    private final PendingEvaluatorDocumentRepository pendingEvaluatorDocumentRepository;
 
     @Autowired
-    public PendingEvaluatorServiceImpl(PendingEvaluatorRepository pendingEvaluatorRepository, IS3Service s3Service) {
+    public PendingEvaluatorServiceImpl(PendingEvaluatorRepository pendingEvaluatorRepository, PendingEvaluatorDocumentRepository pendingEvaluatorDocumentRepository) {
         this.pendingEvaluatorRepository = pendingEvaluatorRepository;
-        this.s3Service = s3Service;
+        this.pendingEvaluatorDocumentRepository = pendingEvaluatorDocumentRepository;
     }
 
     @Override
-    public PendingEvaluatorDto createPendingEvaluator(IPendingEvaluatorRequest request, long principalId) {
+    public PendingEvaluatorDto createPendingEvaluator(PendingEvaluatorDto request, long principalId) {
         log.debug("PendingEvaluatorServiceImpl.createPendingEvaluator - start | request: {}, principalId: {}", request, principalId);
         requireNonNull(request);
         var status = request.getStatus();
@@ -110,19 +111,27 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     }
 
     @Override
-    public ByteArrayResource getEvaluatorResume(String email, long principalId) {
+    public PendingEvaluatorDocumentDto getEvaluatorResume(String email, long principalId) {
         log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - start | email: {}, principalId {}", email, principalId);
         requireNonNull(email);
-        var cvPath = pendingEvaluatorRepository
-                .findByEmailIgnoreCase(email)
-                .orElseThrow(TOKEN_NOT_FOUND::newException)
-                .getCvPath();
-        if (StringUtils.isEmpty(cvPath))
-            throw RESUME_NOT_FOUND.newException();
-        var resume = s3Service.downloadFile(cvPath);
-        log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - end | email: {}, principalId {}", email, principalId);
-        return resume;
+        var pendingEvaluatorDocument = pendingEvaluatorDocumentRepository
+                .findByPendingEvaluatorDocumentId_Email(email).orElseThrow(RESUME_NOT_FOUND::newException);
+        log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - end | email: {}, principalId: {}", email, principalId);
+        return MAPPER.toDto(pendingEvaluatorDocument);
     }
+
+    @Override
+    public void savePendingEvaluatorDocument(String email, long documentId) {
+        log.debug("PendingEvaluatorServiceImpl.savePendingEvaluatorDocument - start | email: {}, documentId {}", email, documentId);
+        var pendingEvaluatorDocument = new PendingEvaluatorDocument();
+        var pendingEvaluatorDocumentId = new PendingEvaluatorDocumentId();
+        pendingEvaluatorDocumentId.setDocumentId(documentId);
+        pendingEvaluatorDocumentId.setEmail(email);
+        pendingEvaluatorDocument.setPendingEvaluatorDocumentId(pendingEvaluatorDocumentId);
+        pendingEvaluatorDocumentRepository.saveAndFlush(pendingEvaluatorDocument);
+        log.debug("PendingEvaluatorServiceImpl.savePendingEvaluatorDocument - end | email: {}, documentId {}", email, documentId);
+    }
+
 
     private PendingEvaluator updateStatus(PendingEvaluator pendingEvaluator, Status status, long principalId) {
         pendingEvaluator.setStatus(status);
@@ -130,14 +139,10 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
         return pendingEvaluatorRepository.saveAndFlush(pendingEvaluator);
     }
 
-    private PendingEvaluator newPendingEvaluator(IPendingEvaluatorRequest request, long principalId) {
-        var pendingEvaluator = MAPPER.toPendingEvaluator(request);
+    private PendingEvaluator newPendingEvaluator(PendingEvaluatorDto request, long principalId) {
+        var pendingEvaluator = MAPPER.toEntity(request);
         pendingEvaluator.setToken(UUID.randomUUID().toString());
         pendingEvaluator.setCreatorId(principalId);
-        if (request.getCv() != null) {
-            var filePath = s3Service.uploadFile(FileCategory.CV, request.getCv());
-            pendingEvaluator.setCvPath(filePath);
-        }
         return pendingEvaluatorRepository.saveAndFlush(pendingEvaluator);
     }
 

@@ -4,7 +4,9 @@ import com.bloxico.ase.userservice.dto.entity.address.CityDto;
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
+import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
+import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDocumentDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
@@ -19,9 +21,11 @@ import com.bloxico.ase.userservice.entity.artwork.Category;
 import com.bloxico.ase.userservice.entity.artwork.Material;
 import com.bloxico.ase.userservice.entity.artwork.Medium;
 import com.bloxico.ase.userservice.entity.artwork.Style;
+import com.bloxico.ase.userservice.entity.document.Document;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluatorDocument;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
@@ -75,6 +79,12 @@ public interface AseMapper {
 
     ArtworkMetadataDto toDto(Style style);
 
+    DocumentDto toDto(Document document);
+
+    @Mapping(target = "email", source = "pendingEvaluatorDocument.pendingEvaluatorDocumentId.email")
+    @Mapping(target = "documentId", source = "pendingEvaluatorDocument.pendingEvaluatorDocumentId.documentId")
+    PendingEvaluatorDocumentDto toDto(PendingEvaluatorDocument pendingEvaluatorDocument);
+
     // DTO -> ENTITY
 
     User toEntity(UserDto dto);
@@ -90,6 +100,10 @@ public interface AseMapper {
     Evaluator toEntity(EvaluatorDto dto);
 
     ArtOwner toEntity(ArtOwnerDto dto);
+
+    Document toEntity(DocumentDto dto);
+
+    PendingEvaluator toEntity(PendingEvaluatorDto pendingEvaluatorDto);
 
     // OTHER
 
@@ -119,8 +133,6 @@ public interface AseMapper {
 
     ArtOwnerDto toArtOwnerDto(SubmitArtOwnerRequest request);
 
-    PendingEvaluator toPendingEvaluator(IPendingEvaluatorRequest request);
-
     ArtworkMetadataDto toArtworkMetadataDto(IArtworkMetadataRequest request);
 
     Category toCategoryEntity(ArtworkMetadataDto dto);
@@ -130,4 +142,6 @@ public interface AseMapper {
     Medium toMediumEntity(ArtworkMetadataDto dto);
 
     Style toStyleEntity(ArtworkMetadataDto dto);
+
+    PendingEvaluatorDto toPendingEvaluatorDto(IPendingEvaluatorRequest request);
 }

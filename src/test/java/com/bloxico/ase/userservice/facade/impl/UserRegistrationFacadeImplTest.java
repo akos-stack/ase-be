@@ -271,7 +271,6 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
         assertNotNull(newlyCreatedPendingEvaluator);
         assertNotNull(newlyCreatedPendingEvaluator.getToken());
-        assertNull(newlyCreatedPendingEvaluator.getCvPath());
         assertEquals(user.getEmail(), newlyCreatedPendingEvaluator.getEmail());
         assertEquals(admin.getId(), newlyCreatedPendingEvaluator.getCreatorId());
         assertSame(INVITED, newlyCreatedPendingEvaluator.getStatus());
@@ -291,7 +290,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void checkEvaluatorInvitation_invitationTokenNotFound() {
         var principalId = mockUtil.savedAdmin().getId();
         var request = new EvaluatorRegistrationRequest(genEmail(), MockUtil.createMultipartFile());
-        var pending = pendingEvaluatorService.createPendingEvaluator(request, principalId);
+        var pending = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principalId);
         userRegistrationFacade.checkEvaluatorInvitation(pending.getToken());
     }
 
@@ -299,7 +298,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void checkEvaluatorInvitation() {
         var principalId = mockUtil.savedAdmin().getId();
         var request = new EvaluatorInvitationRequest(genEmail());
-        var pending = pendingEvaluatorService.createPendingEvaluator(request, principalId);
+        var pending = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principalId);
         userRegistrationFacade.checkEvaluatorInvitation(pending.getToken());
     }
 
@@ -421,7 +420,6 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertNotNull(newlyCreatedPendingEvaluator.getToken());
         assertEquals(user.getEmail(), newlyCreatedPendingEvaluator.getEmail());
         assertEquals(user.getId(), newlyCreatedPendingEvaluator.getCreatorId());
-        assertNotNull(newlyCreatedPendingEvaluator.getCvPath());
         assertSame(REQUESTED, newlyCreatedPendingEvaluator.getStatus());
     }
 
