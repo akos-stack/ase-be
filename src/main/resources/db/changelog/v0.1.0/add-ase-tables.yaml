@@ -372,12 +372,12 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
               - column:
-                  name: city_id
+                  name: country_id
                   type: integer
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_location_city
-                    references: cities(id)
+                    foreignKeyName: fk_location_country
+                    references: countries(id)
               - column:
                   name: address
                   type: varchar(256)

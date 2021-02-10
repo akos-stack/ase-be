@@ -19,6 +19,7 @@ import java.util.List;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.*;
 
 public class LocationServiceImplTest extends AbstractSpringTest {
@@ -43,10 +44,10 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findAllCountries() {
-        var country1 = mockUtil.savedCountryDto();
+        var country1 = mockUtil.savedCountryTotalOfEvaluatorsProj();
         assertTrue(service.findAllCountries()
                 .contains(country1));
-        var country2 = mockUtil.savedCountryDto();
+        var country2 = mockUtil.savedCountryTotalOfEvaluatorsProj();
         assertTrue(service.findAllCountries()
                 .containsAll(List.of(country1, country2)));
     }
@@ -76,18 +77,17 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         var principalId = mockUtil.savedAdmin().getId();
         var country = new CountryDto();
         country.setName(uuid());
-        assertEquals(List.of(), service.findAllCountries());
+        assertFalse(countryRepository.findByNameIgnoreCase(country.getName()).isPresent());
         service.findOrSaveCountry(country, principalId);
-        assertEquals(List.of(country), service.findAllCountries());
+        assertTrue(countryRepository.findByNameIgnoreCase(country.getName()).isPresent());
     }
 
     @Test
     public void findOrSaveCountry_found() {
         var principalId = mockUtil.savedAdmin().getId();
         var country = mockUtil.savedCountryDto();
-        assertEquals(List.of(country), service.findAllCountries());
+        assertTrue(countryRepository.findById(country.getId()).isPresent());
         assertEquals(country, service.findOrSaveCountry(country, principalId));
-        assertEquals(List.of(country), service.findAllCountries());
     }
 
     @Test(expected = NullPointerException.class)
@@ -124,7 +124,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     public void saveLocation() {
         var principalId = mockUtil.savedAdmin().getId();
         var location = new LocationDto();
-        location.setCity(mockUtil.savedCityDto());
+        location.setCountry(mockUtil.savedCountryDto());
         location.setAddress(uuid());
         assertEquals(List.of(), repository.findAll());
         service.saveLocation(location, principalId);

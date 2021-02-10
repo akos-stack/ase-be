@@ -32,11 +32,11 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void findAllCountries() {
-        var country1 = mockUtil.savedCountryDto();
+        var country1 = mockUtil.savedCountryTotalOfEvaluatorsProj();
         assertTrue(facade.findAllCountries()
                 .getCountries()
                 .contains(country1));
-        var country2 = mockUtil.savedCountryDto();
+        var country2 = mockUtil.savedCountryTotalOfEvaluatorsProj();
         assertTrue(facade.findAllCountries()
                 .getCountries()
                 .containsAll(List.of(country1, country2)));

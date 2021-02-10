@@ -15,6 +15,7 @@ import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
 import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
 import com.bloxico.ase.userservice.facade.impl.*;
+import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
 import com.bloxico.ase.userservice.repository.address.*;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import com.bloxico.ase.userservice.repository.token.*;
@@ -218,6 +219,16 @@ public class MockUtil {
         return MAPPER.toDto(savedCountry());
     }
 
+    public CountryTotalOfEvaluatorsProj savedCountryTotalOfEvaluatorsProj() {
+        var countryDto = savedCountryDto();
+        return new CountryTotalOfEvaluatorsProj(
+                countryDto.getId(), countryDto.getName(), countryDto.getRegion().getName(),
+                countryDto.getCountryEvaluationDetails().getPricePerEvaluation(),
+                countryDto.getCountryEvaluationDetails().getAvailabilityPercentage(),
+                0
+        );
+    }
+
     public CountryDto genCountryDto(RegionDto regionDto) {
         var countryDto = new CountryDto();
         countryDto.setName(uuid());
@@ -240,11 +251,11 @@ public class MockUtil {
     }
 
     public Location savedLocation() {
-        var city = savedCity();
+        var country = savedCountry();
         var location = new Location();
-        location.setCity(city);
+        location.setCountry(country);
         location.setAddress(uuid());
-        location.setCreatorId(city.getCreatorId());
+        location.setCreatorId(country.getCreatorId());
         return locationRepository.saveAndFlush(location);
     }
 

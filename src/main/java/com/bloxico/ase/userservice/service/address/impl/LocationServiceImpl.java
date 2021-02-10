@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
 import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
 import com.bloxico.ase.userservice.repository.address.*;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import lombok.extern.slf4j.Slf4j;
@@ -39,12 +40,11 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public List<CountryDto> findAllCountries() {
+    public List<CountryTotalOfEvaluatorsProj> findAllCountries() {
         log.debug("CountryServiceImpl.findAllCountries - start");
         var countries = countryRepository
                 .findAllIncludeEvaluatorsCount()
                 .stream()
-                .map(MAPPER::toCountryDto)
                 .collect(toUnmodifiableList());
         log.debug("CountryServiceImpl.findAllCountries - end");
         return countries;

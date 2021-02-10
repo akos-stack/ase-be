@@ -1,6 +1,5 @@
 package com.bloxico.ase.userservice.util;
 
-import com.bloxico.ase.userservice.dto.projection.CountryEvaluatorsCounterDto;
 import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
@@ -95,7 +94,7 @@ public interface AseMapper {
     @Mapping(target = "name", source = "city")
     CityDto toCityDto(ISubmitUserProfileRequest request);
 
-    @Mapping(ignore = true, target = "city")
+    @Mapping(ignore = true, target = "country")
     LocationDto toLocationDto(ISubmitUserProfileRequest request);
 
     UserProfileDto toUserProfileDto(ISubmitUserProfileRequest request);
@@ -114,14 +113,5 @@ public interface AseMapper {
     RegionDto toRegionDto(String name);
 
     CountryEvaluationDetailsDto toCountryEvaluationDetailsDto(CreateCountryRequest request);
-
-    @Mapping(target = "id", source = "country.id")
-    @Mapping(target = "name", source = "country.name")
-    @Mapping(target = "region", source = "country.region")
-    @Mapping(target = "countryEvaluationDetails.id", source = "country.countryEvaluationDetails.id")
-    @Mapping(target = "countryEvaluationDetails.pricePerEvaluation", source = "country.countryEvaluationDetails.pricePerEvaluation")
-    @Mapping(target = "countryEvaluationDetails.availabilityPercentage", source = "country.countryEvaluationDetails.availabilityPercentage")
-    @Mapping(target = "countryEvaluationDetails.totalOfEvaluators", source = "totalOfEvaluators")
-    CountryDto toCountryDto(CountryEvaluatorsCounterDto projection);
 
 }

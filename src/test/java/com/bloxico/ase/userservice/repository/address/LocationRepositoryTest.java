@@ -20,11 +20,11 @@ public class LocationRepositoryTest extends AbstractSpringTest {
     @Test
     public void saveAndFindById() {
         assertTrue(repository.findById(-1L).isEmpty());
-        var city = mockUtil.savedCity();
+        var country = mockUtil.savedCountry();
         var location = new Location();
-        location.setCity(city);
+        location.setCountry(country);
         location.setAddress(uuid());
-        location.setCreatorId(city.getCreatorId());
+        location.setCreatorId(country.getCreatorId());
         var id = repository.saveAndFlush(location).getId();
         assertTrue(repository.findById(id).isPresent());
     }

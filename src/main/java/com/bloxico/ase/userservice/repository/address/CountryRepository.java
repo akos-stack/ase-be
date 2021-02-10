@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.repository.address;
 
-import com.bloxico.ase.userservice.dto.projection.CountryEvaluatorsCounterDto;
 import com.bloxico.ase.userservice.entity.address.Country;
+import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -16,10 +16,13 @@ public interface CountryRepository extends JpaRepository<Country, Integer> {
 
     @Query(value =
             "select " +
-                    "new com.bloxico.ase.userservice.dto.projection.CountryEvaluatorsCounterDto(c, count(e.id)) " +
+                    "new com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj " +
+                    "(c.id, c.name, c.region.name, c.countryEvaluationDetails.pricePerEvaluation, " +
+                    "c.countryEvaluationDetails.availabilityPercentage, count(e.id)) " +
                     "from Evaluator e " +
-                    "right join e.userProfile.location.city.country c " +
-                    "group by c ")
-    List<CountryEvaluatorsCounterDto> findAllIncludeEvaluatorsCount();
+                    "right join e.userProfile.location.country c " +
+                    "group by c, c.region.name, c.countryEvaluationDetails.pricePerEvaluation, " +
+                    "c.countryEvaluationDetails.availabilityPercentage")
+    List<CountryTotalOfEvaluatorsProj> findAllIncludeEvaluatorsCount();
 
 }

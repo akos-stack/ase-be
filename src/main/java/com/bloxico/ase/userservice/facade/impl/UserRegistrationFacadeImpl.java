@@ -186,9 +186,8 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
 
     private LocationDto doSaveLocation(ISubmitUserProfileRequest request, long principalId) {
         var countryDto = doSaveCountry(request, principalId);
-        var cityDto = doSaveCity(countryDto, request, principalId);
         var locationDto = MAPPER.toLocationDto(request);
-        locationDto.setCity(cityDto);
+        locationDto.setCountry(countryDto);
         return locationService.saveLocation(locationDto, principalId);
     }
 

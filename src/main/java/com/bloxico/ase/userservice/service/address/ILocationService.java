@@ -1,12 +1,13 @@
 package com.bloxico.ase.userservice.service.address;
 
 import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
 
 import java.util.List;
 
 public interface ILocationService {
 
-    List<CountryDto> findAllCountries();
+    List<CountryTotalOfEvaluatorsProj> findAllCountries();
 
     List<CityDto> findAllCities();
 
