@@ -3,9 +3,9 @@ package com.bloxico.ase.userservice.web.api;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
+import com.bloxico.ase.userservice.web.model.user.UserProfileDataResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.testutil.MockUtil.uuid;
@@ -13,13 +13,11 @@ import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_ENDP
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_UPDATE_ENDPOINT;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
-@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class UserProfileApiTest extends AbstractSpringTest {
 
     @Autowired
@@ -28,28 +26,29 @@ public class UserProfileApiTest extends AbstractSpringTest {
     @Test
     public void accessMyProfile_200_ok() {
         var registration = mockUtil.doConfirmedRegistration();
-        var userProfile = mockUtil.savedUserProfile(registration.getId());
-        given()
+        var userProfileDto1 = mockUtil.savedUserProfileDto(registration.getId());
+        var userProfileDto2 = given()
                 .header("Authorization", mockUtil.doAuthentication(registration))
                 .when()
                 .get(API_URL + MY_PROFILE_ENDPOINT)
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body(
-                        "user_profile.first_name", is(userProfile.getFirstName()),
-                        "user_profile.last_name", is(userProfile.getLastName()),
-                        "user_profile.phone", is(userProfile.getPhone()));
+                .extract()
+                .body()
+                .as(UserProfileDataResponse.class)
+                .getUserProfile();
+        assertEquals(userProfileDto1, userProfileDto2);
     }
 
     @Test
     public void updateMyProfile_200_ok() {
         var registration = mockUtil.doConfirmedRegistration();
-        mockUtil.savedUserProfile(registration.getId());
+        mockUtil.savedUserProfileDto(registration.getId());
         var firstName = uuid();
         var lastName = uuid();
         var phone = uuid();
-        given()
+        var userProfileDto = given()
                 .header("Authorization", mockUtil.doAuthentication(registration))
                 .contentType(JSON)
                 .body(new UpdateUserProfileRequest(firstName, lastName, phone))
@@ -58,10 +57,13 @@ public class UserProfileApiTest extends AbstractSpringTest {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body(
-                        "user_profile.first_name", is(firstName),
-                        "user_profile.last_name", is(lastName),
-                        "user_profile.phone", is(phone));
+                .extract()
+                .body()
+                .as(UserProfileDataResponse.class)
+                .getUserProfile();
+        assertEquals(firstName, userProfileDto.getFirstName());
+        assertEquals(lastName, userProfileDto.getLastName());
+        assertEquals(phone, userProfileDto.getPhone());
     }
 
 }

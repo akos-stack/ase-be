@@ -4,17 +4,19 @@ import com.bloxico.ase.userservice.config.security.AseSecurityServiceTest;
 import com.bloxico.ase.userservice.config.security.PersistentJwtTokenStoreTest;
 import com.bloxico.ase.userservice.entity.BaseEntityTest;
 import com.bloxico.ase.userservice.facade.impl.*;
+import com.bloxico.ase.userservice.filter.JwtAuthorizationFilterTest;
 import com.bloxico.ase.userservice.service.address.impl.LocationServiceImplTest;
 import com.bloxico.ase.userservice.service.aws.impl.S3ServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
 import com.bloxico.ase.userservice.service.token.impl.*;
 import com.bloxico.ase.userservice.service.user.impl.*;
+import com.bloxico.ase.userservice.web.api.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({
+@Suite.SuiteClasses(value = {
         // entity
         BaseEntityTest.class,
 
@@ -43,18 +45,15 @@ import org.junit.runners.Suite;
         LocationFacadeImplTest.class,
         UserManagementFacadeImplTest.class,
 
-        // Run these individually for now
-        // They stuck for some reason
-
         // filter
-        // JwtAuthorizationFilterTest.class
+        JwtAuthorizationFilterTest.class,
 
         // api
-        // UserRegistrationApiTest.class,
-        // UserPasswordApiTest.class,
-        // UserProfileApiTest.class,
-        // LocationApiTest.class,
-        // UserManagementApiTest.class,
+        UserRegistrationApiTest.class,
+        UserPasswordApiTest.class,
+        UserProfileApiTest.class,
+        LocationApiTest.class,
+        UserManagementApiTest.class,
 })
 public class TestSuite {
 }

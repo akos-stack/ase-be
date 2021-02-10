@@ -10,13 +10,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Set;
 
 import static com.bloxico.ase.testutil.MockUtil.uuid;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class QuartzOperationsFacadeImplTest extends AbstractSpringTest {
@@ -57,29 +56,44 @@ public class QuartzOperationsFacadeImplTest extends AbstractSpringTest {
 
         mockUtil.disableUser(expiredRegistrationToken.getUserId());
 
-        assertEquals(
-                Set.of(validRegistrationToken, validPasswordResetToken,
-                        expiredRegistrationToken, expiredPasswordResetToken),
-                Set.copyOf(tokenRepository.findAll()));
-        assertEquals(
-                Set.of(validOAuthAccessToken, expiredOAuthAccessToken),
-                Set.copyOf(oAuthAccessTokenRepository.findAll()));
-        assertEquals(
-                Set.of(validBlacklistedToken, expiredBlacklistedToken),
-                Set.copyOf(blacklistedTokenRepository.findAll()));
+        assertThat(
+                tokenRepository.findAll(),
+                hasItems(
+                        validRegistrationToken,
+                        validPasswordResetToken,
+                        expiredRegistrationToken,
+                        expiredPasswordResetToken));
+
+        assertThat(
+                oAuthAccessTokenRepository.findAll(),
+                hasItems(
+                        validOAuthAccessToken,
+                        expiredOAuthAccessToken));
+
+        assertThat(
+                blacklistedTokenRepository.findAll(),
+                hasItems(
+                        validBlacklistedToken,
+                        expiredBlacklistedToken));
+
         assertTrue(userRepository.findById(expiredRegistrationToken.getUserId()).isPresent());
 
         quartzOperationsFacade.deleteExpiredTokens();
 
-        assertEquals(
-                List.of(validRegistrationToken, validPasswordResetToken),
-                tokenRepository.findAll());
-        assertEquals(
-                List.of(validOAuthAccessToken),
-                oAuthAccessTokenRepository.findAll());
-        assertEquals(
-                List.of(validBlacklistedToken),
-                blacklistedTokenRepository.findAll());
+        assertThat(
+                tokenRepository.findAll(),
+                hasItems(
+                        validRegistrationToken,
+                        validPasswordResetToken));
+
+        assertThat(
+                oAuthAccessTokenRepository.findAll(),
+                hasItems(validOAuthAccessToken));
+
+        assertThat(
+                blacklistedTokenRepository.findAll(),
+                hasItems(validBlacklistedToken));
+
         entityManager.clear(); // needs to be cleared because of deleteInBatch
         assertTrue(userRepository.findById(expiredRegistrationToken.getUserId()).isEmpty());
     }

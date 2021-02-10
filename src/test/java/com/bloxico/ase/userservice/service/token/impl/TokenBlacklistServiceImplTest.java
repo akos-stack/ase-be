@@ -49,6 +49,7 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
     @Test
     public void blacklistTokens_emptyTokens() {
         var principalId = mockUtil.savedAdmin().getId();
+        service.blacklistTokens(List.of(), principalId); // refresh cache
         var size = service.blacklistedTokens().size();
         service.blacklistTokens(List.of(), principalId);
         assertEquals(size, service.blacklistedTokens().size());
@@ -124,12 +125,13 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
                         valid.getTokenId(),
                         expired.getTokenId())));
         service.blacklistTokens(List.of(valid, expired), principal.getId());
-        assertEquals(
+        assertThat(
                 service.blacklistedTokens(),
-                hasItems(valid.getTokenId(),
+                hasItems(
+                        valid.getTokenId(),
                         expired.getTokenId()));
         service.deleteExpiredTokens();
-        assertEquals(
+        assertThat(
                 service.blacklistedTokens(),
                 hasItems(valid.getTokenId()));
     }

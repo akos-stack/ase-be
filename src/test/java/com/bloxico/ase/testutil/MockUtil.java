@@ -11,7 +11,6 @@ import com.bloxico.ase.userservice.entity.address.*;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.entity.token.Token;
-import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
 import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
 import com.bloxico.ase.userservice.facade.impl.*;
@@ -26,6 +25,7 @@ import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import com.bloxico.ase.userservice.util.SupportedFileExtension;
 import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
+import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
@@ -151,10 +151,14 @@ public class MockUtil {
     }
 
     public User savedUser() {
-        return savedUser(genEmail());
+        return savedUserWithEmail(genEmail());
     }
 
-    public User savedUser(String password) {
+    public User savedUserWithEmail(String email) {
+        return savedUser(email, genPassword());
+    }
+
+    public User savedUserWithPassword(String password) {
         return savedUser(genEmail(), password);
     }
 
@@ -165,13 +169,18 @@ public class MockUtil {
         user.setEmail(email);
         user.setLocked(false);
         user.setEnabled(true);
-        user.addRole(roleRepository.getUserRole());
-        user.addAspiration(getUserAspiration());
+        var role = roleRepository.getUserRole();
+        user.addRole(role);
+        user.addAspiration(role);
         return userRepository.saveAndFlush(user);
     }
 
     public UserDto savedUserDto() {
         return MAPPER.toDto(savedUser());
+    }
+
+    public UserDto savedUserDtoWithEmail(String email) {
+        return MAPPER.toDto(savedUserWithEmail(email));
     }
 
     public UserProfile savedUserProfile(long userId) {
@@ -355,7 +364,7 @@ public class MockUtil {
 
     public SubmitEvaluatorRequest newSubmitUninvitedEvaluatorRequest() {
         var email = genEmail();
-        var password = genEmail();
+        var password = genPassword();
         return new SubmitEvaluatorRequest(
                 uuid(), uuid(), password,
                 email, uuid(), uuid(),
@@ -366,7 +375,7 @@ public class MockUtil {
 
     public SubmitArtOwnerRequest newSubmitArtOwnerRequest() {
         return new SubmitArtOwnerRequest(
-                uuid(), genEmail(),
+                uuid(), genPassword(),
                 genEmail(), uuid(), uuid(),
                 uuid(), LocalDate.now(),
                 uuid(), uuid(), uuid(),
@@ -375,7 +384,7 @@ public class MockUtil {
 
     public SubmitEvaluatorRequest newSubmitInvitedEvaluatorRequest() {
         var email = genEmail();
-        var password = genEmail();
+        var password = genPassword();
         var principalId = savedAdmin().getId();
         userRegistrationFacade.sendEvaluatorInvitation(new EvaluatorInvitationRequest(email), principalId);
         var token = pendingEvaluatorRepository.findByEmailIgnoreCase(email).orElseThrow().getToken();
@@ -389,14 +398,26 @@ public class MockUtil {
 
     public RegistrationRequest genRegistrationRequest() {
         var email = genEmail();
-        return new RegistrationRequest(email, email, email, email, Set.of());
+        var password = genPassword();
+        return new RegistrationRequest(email, email, password, password, Set.of());
+    }
+
+    public RegistrationRequest genRegistrationRequestPasswordMismatch() {
+        var email = genEmail();
+        return new RegistrationRequest(email, email, genPassword(), genPassword(), Set.of());
+    }
+
+    public RegistrationRequest genRegistrationRequestWithAspirations(String... aspirations) {
+        var email = genEmail();
+        var password = genPassword();
+        return new RegistrationRequest(email, email, password, password, Set.of(aspirations));
     }
 
     public UserDto genUserDto() {
         var email = genEmail();
         var userDto = new UserDto();
         userDto.setName(email);
-        userDto.setPassword(email);
+        userDto.setPassword(genPassword());
         userDto.setEmail(email);
         return userDto;
     }
@@ -408,15 +429,17 @@ public class MockUtil {
     }
 
     public Registration doRegistration() {
-        String email = genEmail(), pass = genEmail();
-        String token = given()
+        var email = genEmail();
+        var password = genPassword();
+        var token = given()
                 .contentType(JSON)
-                .body(new RegistrationRequest(email, email, pass, pass, Set.of()))
+                .body(new RegistrationRequest(email, email, password, password, Set.of()))
                 .post(API_URL + REGISTRATION_ENDPOINT)
-                .getBody()
-                .path("token_value");
-        long id = userService.findUserByEmail(email).getId();
-        return new Registration(id, email, email, pass, token);
+                .body()
+                .as(RegistrationResponse.class)
+                .getTokenValue();
+        var id = userService.findUserByEmail(email).getId();
+        return new Registration(id, email, email, password, token);
     }
 
     public void doConfirmation(String token) {
@@ -438,7 +461,7 @@ public class MockUtil {
     }
 
     public String doAuthentication(String password) {
-        var email = savedUser(password).getEmail();
+        var email = savedUserWithPassword(password).getEmail();
         return doAuthentication(email, password);
     }
 
@@ -449,7 +472,7 @@ public class MockUtil {
     }
 
     public String doAdminAuthentication() {
-        var password = "admin";
+        var password = genPassword();
         var email = savedAdmin(password).getEmail();
         return doAuthentication(email, password);
     }
@@ -506,8 +529,12 @@ public class MockUtil {
     }
 
     public PendingEvaluatorDto savedInvitedPendingEvaluatorDto() {
+        return savedInvitedPendingEvaluatorDto(genEmail());
+    }
+
+    public PendingEvaluatorDto savedInvitedPendingEvaluatorDto(String email) {
         var principal = savedAdmin().getId();
-        var request = new EvaluatorInvitationRequest(genEmail());
+        var request = new EvaluatorInvitationRequest(email);
         return pendingEvaluatorService.createPendingEvaluator(request, principal);
     }
 
@@ -527,20 +554,19 @@ public class MockUtil {
         }
     }
 
-    public Role getUserAspiration() {
-        return roleRepository.getUserRole();
+    private static final String DEFAULT_LOCAL_PART = randElt(List.of("aseUserX", "aseUserY", "aseUserZ"));
+    private static final AtomicLong LONG = new AtomicLong(0);
+
+    public static String genPassword() {
+        return genEmail(DEFAULT_LOCAL_PART);
     }
-
-    public Role getEvaluatorAspiration() {
-        return roleRepository.getEvaluatorRole();
-    }
-
-    private static final AtomicLong along = new AtomicLong(0);
-
-    public static final String EMAIL_COMMON = "aseUser@mail.com";
 
     public static String genEmail() {
-        return along.incrementAndGet() + EMAIL_COMMON;
+        return genEmail(DEFAULT_LOCAL_PART);
+    }
+
+    public static String genEmail(String localPart) {
+        return LONG.incrementAndGet() + "_" + localPart + "@mail.com";
     }
 
     public static String uuid() {

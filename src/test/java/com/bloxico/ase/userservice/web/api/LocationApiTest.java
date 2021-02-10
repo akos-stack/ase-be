@@ -2,22 +2,22 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
+import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.userservice.web.api.LocationApi.CITIES;
 import static com.bloxico.ase.userservice.web.api.LocationApi.COUNTRIES;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
-@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class LocationApiTest extends AbstractSpringTest {
 
     @Autowired
@@ -25,10 +25,10 @@ public class LocationApiTest extends AbstractSpringTest {
 
     @Test
     public void findAllCountries_200_ok() {
-        mockUtil.savedCountry();
-        mockUtil.savedCountry();
-        mockUtil.savedCountry();
-        given()
+        var c1 = mockUtil.savedCountryDto();
+        var c2 = mockUtil.savedCountryDto();
+        var c3 = mockUtil.savedCountryDto();
+        var countries = given()
                 .header("Authorization", mockUtil.doAdminAuthentication())
                 .contentType(JSON)
                 .when()
@@ -36,15 +36,19 @@ public class LocationApiTest extends AbstractSpringTest {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("countries.size()", is(3));
+                .extract()
+                .body()
+                .as(SearchCountriesResponse.class)
+                .getCountries();
+        assertThat(countries, hasItems(c1, c2, c3));
     }
 
     @Test
     public void findAllCities_200_ok() {
-        mockUtil.savedCity();
-        mockUtil.savedCity();
-        mockUtil.savedCity();
-        given()
+        var c1 = mockUtil.savedCityDto();
+        var c2 = mockUtil.savedCityDto();
+        var c3 = mockUtil.savedCityDto();
+        var cities = given()
                 .header("Authorization", mockUtil.doAdminAuthentication())
                 .contentType(JSON)
                 .when()
@@ -52,7 +56,11 @@ public class LocationApiTest extends AbstractSpringTest {
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("cities.size()", is(3));
+                .extract()
+                .body()
+                .as(SearchCitiesResponse.class)
+                .getCities();
+        assertThat(cities, hasItems(c1, c2, c3));
     }
 
 }

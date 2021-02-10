@@ -11,8 +11,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Set;
 
+import static com.bloxico.ase.testutil.MockUtil.genPassword;
 import static com.bloxico.ase.testutil.MockUtil.uuid;
-import static com.bloxico.ase.userservice.entity.user.Role.ADMIN;
+import static com.bloxico.ase.userservice.entity.user.Role.*;
 import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -81,8 +82,12 @@ public class UserServiceImplTest extends AbstractSpringTest {
         var u2 = mockUtil.savedUserDto();
         var u3 = mockUtil.savedUserDto();
         assertThat(
-                userService.findUsersByEmailOrRole(u1.getEmail(), null, 0, MAX_VALUE, "name").getContent(),
-                allOf(hasItems(u1), not(hasItems(u2, u3))));
+                userService
+                        .findUsersByEmailOrRole(u1.getEmail(), null, 0, MAX_VALUE, "name")
+                        .getContent(),
+                allOf(
+                        hasItems(u1),
+                        not(hasItems(u2, u3))));
     }
 
     @Test
@@ -91,8 +96,12 @@ public class UserServiceImplTest extends AbstractSpringTest {
         var u2 = mockUtil.savedAdminDto();
         var u3 = mockUtil.savedAdminDto();
         assertThat(
-                userService.findUsersByEmailOrRole("", ADMIN, 0, MAX_VALUE, "name").getContent(),
-                allOf(hasItems(u2, u3), not(hasItems(u1))));
+                userService
+                        .findUsersByEmailOrRole("", ADMIN, 0, MAX_VALUE, "name")
+                        .getContent(),
+                allOf(
+                        hasItems(u2, u3),
+                        not(hasItems(u1))));
     }
 
     @Test
@@ -101,8 +110,12 @@ public class UserServiceImplTest extends AbstractSpringTest {
         var u2 = mockUtil.savedAdminDto();
         var u3 = mockUtil.savedAdminDto();
         assertThat(
-                userService.findUsersByEmailOrRole(u3.getEmail(), ADMIN, 0, MAX_VALUE, "name").getContent(),
-                allOf(hasItems(u3), not(hasItems(u1, u2))));
+                userService
+                        .findUsersByEmailOrRole(u3.getEmail(), ADMIN, 0, MAX_VALUE, "name")
+                        .getContent(),
+                allOf(
+                        hasItems(u3),
+                        not(hasItems(u1, u2))));
     }
 
     @Test
@@ -142,9 +155,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
     @Test
     public void saveUser_withAspirations() {
         var userDto = mockUtil.genUserDto();
-        userDto.setAspirationNames(Set.of(
-                mockUtil.getUserAspiration().getName(),
-                mockUtil.getEvaluatorAspiration().getName()));
+        userDto.setAspirationNames(Set.of(USER, EVALUATOR));
         var savedUserDto = userService.saveUser(userDto);
         assertNotNull(savedUserDto.getId());
         assertEquals(userDto.getEmail(), savedUserDto.getEmail());
@@ -213,14 +224,14 @@ public class UserServiceImplTest extends AbstractSpringTest {
     public void updatePassword_nullOldPassword() {
         assertThrows(
                 NullPointerException.class,
-                () -> userService.updatePassword(1, null, "newPassword"));
+                () -> userService.updatePassword(1, null, genPassword()));
     }
 
     @Test
     public void updatePassword_nullNewPassword() {
         assertThrows(
                 NullPointerException.class,
-                () -> userService.updatePassword(1, "oldPassword", null));
+                () -> userService.updatePassword(1, genPassword(), null));
     }
 
     @Test
@@ -234,14 +245,14 @@ public class UserServiceImplTest extends AbstractSpringTest {
     public void updatePassword_userNotFound() {
         assertThrows(
                 UserException.class,
-                () -> userService.updatePassword(-1, "oldPassword", "newPassword"));
+                () -> userService.updatePassword(-1, genPassword(), genPassword()));
     }
 
     @Test
     public void updatePassword_oldPasswordMismatch() {
         var user = mockUtil.savedAdmin();
-        var oldPassword = uuid();
-        var newPassword = "updatePassword";
+        var oldPassword = genPassword();
+        var newPassword = genPassword();
         assertThrows(
                 UserException.class,
                 () -> userService.updatePassword(user.getId(), oldPassword, newPassword));
@@ -249,9 +260,9 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void updatePassword() {
-        var oldPassword = "admin";
+        var oldPassword = genPassword();
         var user = mockUtil.savedAdmin(oldPassword);
-        var newPassword = "updatePassword";
+        var newPassword = genPassword();
         userService.updatePassword(user.getId(), oldPassword, newPassword);
         assertTrue(passwordEncoder.matches(
                 newPassword,
@@ -269,13 +280,13 @@ public class UserServiceImplTest extends AbstractSpringTest {
     public void setNewPassword_userNotFound() {
         assertThrows(
                 UserException.class,
-                () -> userService.setNewPassword(-1, "userNotFound"));
+                () -> userService.setNewPassword(-1, genPassword()));
     }
 
     @Test
     public void setNewPassword() {
         var user = mockUtil.savedUser();
-        var newPassword = "setNewPassword";
+        var newPassword = genPassword();
         userService.setNewPassword(user.getId(), newPassword);
         assertTrue(passwordEncoder.matches(
                 newPassword,

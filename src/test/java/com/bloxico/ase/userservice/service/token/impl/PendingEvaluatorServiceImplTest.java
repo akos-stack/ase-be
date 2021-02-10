@@ -15,7 +15,8 @@ import static com.bloxico.ase.testutil.MockUtil.*;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
 import static com.bloxico.ase.userservice.util.SupportedFileExtension.pdf;
-import static org.hamcrest.Matchers.hasItems;
+import static java.lang.Integer.MAX_VALUE;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -354,12 +355,14 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void searchPendingEvaluators() {
-        var p1 = mockUtil.savedInvitedPendingEvaluatorDto();
-        var p2 = mockUtil.savedInvitedPendingEvaluatorDto();
-        var p3 = mockUtil.savedInvitedPendingEvaluatorDto();
+        var p1 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var p2 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var p3 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
         assertThat(
-                service.searchPendingEvaluators(EMAIL_COMMON, 0, 10, "email").getContent(),
-                hasItems(p1, p2, p3));
+                service.searchPendingEvaluators("fooBar", 0, MAX_VALUE, "email").getContent(),
+                allOf(
+                        hasItems(p1, p2),
+                        not(hasItems(p3))));
     }
 
     // TODO-TEST getEvaluatorResume_nullEmail

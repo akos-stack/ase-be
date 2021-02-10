@@ -7,12 +7,12 @@ import com.bloxico.ase.userservice.service.token.impl.TokenBlacklistServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.Set;
-
+import static com.bloxico.ase.userservice.entity.user.Role.ADMIN;
+import static java.lang.Integer.MAX_VALUE;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
-import static org.springframework.test.annotation.DirtiesContext.MethodMode.BEFORE_METHOD;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserManagementFacadeImplTest extends AbstractSpringTest {
 
@@ -28,68 +28,91 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
     @Autowired
     private UserManagementFacadeImpl userManagementFacade;
 
+    // TODO-TEST searchUsers_nullArgs
+
+    // TODO-TEST searchUsers_notFound
 
     @Test
-    public void searchUsersByEmail() {
-        mockUtil.saveUsers();
-        assertEquals(1, userManagementFacade.searchUsers("user1", null, 0, 10, "name").getUsers().size());
+    public void searchUsers_byEmail() {
+        var u1 = mockUtil.savedUserDto();
+        var u2 = mockUtil.savedUserDto();
+        var u3 = mockUtil.savedUserDto();
+        assertThat(
+                userManagementFacade.searchUsers(u1.getEmail(), null, 0, MAX_VALUE, "name").getUsers(),
+                allOf(hasItems(u1), not(hasItems(u2, u3))));
     }
 
     @Test
-    public void searchUsersByRole() {
-        mockUtil.saveUsers();
-        assertEquals(4, userManagementFacade.searchUsers("", "admin", 0, 10, "name").getUsers().size());
+    public void searchUsers_byRole() {
+        var u1 = mockUtil.savedUserDto();
+        var u2 = mockUtil.savedAdminDto();
+        var u3 = mockUtil.savedAdminDto();
+        assertThat(
+                userManagementFacade.searchUsers("", ADMIN, 0, MAX_VALUE, "name").getUsers(),
+                allOf(hasItems(u2, u3), not(hasItems(u1))));
     }
 
     @Test
-    public void searchUsersByRoleAndEmail() {
-        mockUtil.saveUsers();
-        assertEquals(3, userManagementFacade.searchUsers("user", "admin", 0, 10, "name").getUsers().size());
+    public void searchUsers_byRoleAndEmail() {
+        var u1 = mockUtil.savedUserDto();
+        var u2 = mockUtil.savedAdminDto();
+        var u3 = mockUtil.savedAdminDto();
+        assertThat(
+                userManagementFacade.searchUsers(u3.getEmail(), ADMIN, 0, MAX_VALUE, "name").getUsers(),
+                allOf(hasItems(u3), not(hasItems(u1, u2))));
     }
 
-    @Test(expected = UserException.class)
+    @Test
     public void disableUser_notFound() {
         var principalId = mockUtil.savedAdmin().getId();
-        userManagementFacade.disableUser(-1, principalId);
+        assertThrows(
+                UserException.class,
+                () -> userManagementFacade.disableUser(-1, principalId));
     }
 
     @Test
-    @DirtiesContext(methodMode = BEFORE_METHOD) // clear cache
     public void disableUser() {
         var principalId = mockUtil.savedAdmin().getId();
         var user = mockUtil.savedUser();
         var userId = user.getId();
-        var tokens = Set.of(
-                mockUtil.savedOauthToken(user.getEmail()).getTokenId(),
-                mockUtil.savedOauthToken(user.getEmail()).getTokenId(),
-                mockUtil.savedOauthToken(user.getEmail()).getTokenId());
-        assertEquals(Set.of(), tokenBlacklistService.blacklistedTokens());
+        var t1 = mockUtil.savedOauthToken(user.getEmail()).getTokenId();
+        var t2 = mockUtil.savedOauthToken(user.getEmail()).getTokenId();
+        var t3 = mockUtil.savedOauthToken(user.getEmail()).getTokenId();
+        assertThat(
+                tokenBlacklistService.blacklistedTokens(),
+                not(hasItems(t1, t2, t3)));
         assertTrue(userService.findUserById(userId).getEnabled());
         userManagementFacade.disableUser(userId, principalId);
-        assertEquals(tokens, tokenBlacklistService.blacklistedTokens());
+        assertThat(
+                tokenBlacklistService.blacklistedTokens(),
+                hasItems(t1, t2, t3));
         assertFalse(userService.findUserById(userId).getEnabled());
     }
 
-    @Test(expected = UserException.class)
+    @Test
     public void blacklistTokens_notFound() {
         var principalId = mockUtil.savedAdmin().getId();
-        userManagementFacade.blacklistTokens(-1, principalId);
+        assertThrows(
+                UserException.class,
+                () -> userManagementFacade.blacklistTokens(-1, principalId));
     }
 
     @Test
-    @DirtiesContext(methodMode = BEFORE_METHOD) // clear cache
     public void blacklistTokens() {
         var principalId = mockUtil.savedAdmin().getId();
         var user = mockUtil.savedUser();
         var userId = user.getId();
-        var tokens = Set.of(
-                mockUtil.savedOauthToken(user.getEmail()).getTokenId(),
-                mockUtil.savedOauthToken(user.getEmail()).getTokenId(),
-                mockUtil.savedOauthToken(user.getEmail()).getTokenId());
-        assertEquals(Set.of(), tokenBlacklistService.blacklistedTokens());
+        var t1 = mockUtil.savedOauthToken(user.getEmail()).getTokenId();
+        var t2 = mockUtil.savedOauthToken(user.getEmail()).getTokenId();
+        var t3 = mockUtil.savedOauthToken(user.getEmail()).getTokenId();
+        assertThat(
+                tokenBlacklistService.blacklistedTokens(),
+                not(hasItems(t1, t2, t3)));
         assertTrue(userService.findUserById(userId).getEnabled());
         userManagementFacade.blacklistTokens(userId, principalId);
-        assertEquals(tokens, tokenBlacklistService.blacklistedTokens());
+        assertThat(
+                tokenBlacklistService.blacklistedTokens(),
+                hasItems(t1, t2, t3));
         assertTrue(userService.findUserById(userId).getEnabled());
     }
 
