@@ -23,6 +23,7 @@ import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.entity.user.Role.USER;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.SupportedFileExtension.pdf;
+import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -364,7 +365,6 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Test
     public void submitEvaluator_evaluatorPending() {
         var request = utilToken.submitInvitedEvaluatorRequest();
-        assertTrue(evaluatorRepository.findAll().isEmpty());
         var evaluatorId = userRegistrationFacade.submitEvaluator(request).getId();
         assertTrue(evaluatorRepository.findById(evaluatorId).isPresent());
     }
@@ -388,7 +388,6 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Test
     public void submitArtOwner() {
         var request = newSubmitArtOwnerRequest();
-        assertTrue(artOwnerRepository.findAll().isEmpty());
         var artOwnerId = userRegistrationFacade.submitArtOwner(request).getId();
         assertTrue(artOwnerRepository.findById(artOwnerId).isPresent());
     }
@@ -458,7 +457,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
         assertThat(
                 userRegistrationFacade
-                        .searchPendingEvaluators("fooBar", 0, 2, "email")
+                        .searchPendingEvaluators("fooBar", 0, MAX_VALUE, "email")
                         .getPendingEvaluators(),
                 allOf(
                         hasItems(pe1, pe2),
