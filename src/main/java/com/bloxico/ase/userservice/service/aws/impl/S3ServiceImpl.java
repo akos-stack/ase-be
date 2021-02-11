@@ -1,6 +1,5 @@
 package com.bloxico.ase.userservice.service.aws.impl;
 
-import com.bloxico.ase.userservice.exception.AmazonS3Exception;
 import com.bloxico.ase.userservice.service.aws.IS3Service;
 import com.bloxico.ase.userservice.util.AWSUtil;
 import com.bloxico.ase.userservice.util.FileCategory;
@@ -8,11 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @Service
@@ -28,46 +26,40 @@ public class S3ServiceImpl implements IS3Service {
     }
 
     @Override
-    public void validateFile(FileCategory fileCategory, MultipartFile file) {
-        log.debug("S3ServiceImpl.validateFile - start | fileCategory: {}, file: {}", fileCategory, file.getName());
-        fileCategory.validate(file, environment);
-        log.debug("S3ServiceImpl.validateFile - end | fileCategory: {}, file: {}", fileCategory, file.getName());
+    public void validateFile(FileCategory category, MultipartFile file) {
+        log.debug("S3ServiceImpl.validateFile - start | category: {}, file: {}", category, file.getName());
+        requireNonNull(category);
+        requireNonNull(file);
+        category.validate(file, environment);
+        log.debug("S3ServiceImpl.validateFile - end | category: {}, file: {}", category, file.getName());
     }
 
     @Override
-    public String uploadFile(FileCategory fileCategory, MultipartFile file) {
-        log.debug("S3ServiceImpl.uploadFile - start | file: {}", file.getName());
-        validateFile(fileCategory, file);
-        try {
-            String fileUploadPath = awsUtil.uploadFile(fileCategory, file);
-            log.debug("S3ServiceImpl.uploadFile - end | file: {}", file.getName());
-            return fileUploadPath;
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new AmazonS3Exception(HttpStatus.BAD_REQUEST, e.getMessage(), e.getCause());
-        }
+    public String uploadFile(FileCategory category, MultipartFile file) {
+        log.debug("S3ServiceImpl.uploadFile - start | category: {}, file: {}", category, file.getName());
+        requireNonNull(category);
+        requireNonNull(file);
+        validateFile(category, file);
+        var fileUploadPath = awsUtil.uploadFile(category, file);
+        log.debug("S3ServiceImpl.uploadFile - end | category: {}, file: {}", category, file.getName());
+        return fileUploadPath;
     }
 
     @Override
-    public ByteArrayResource downloadFile(String fileName) {
-        log.debug("S3ServiceImpl.downloadFile - start | fileName: {}", fileName);
-        ByteArrayResource byteArrayResource;
-        try {
-            byteArrayResource = new ByteArrayResource(awsUtil.downloadFile(fileName));
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new AmazonS3Exception(HttpStatus.BAD_REQUEST, e.getMessage(), e.getCause());
-        }
-        log.debug("S3ServiceImpl.downloadFile - end | fileName: {}", fileName);
-        return byteArrayResource;
+    public ByteArrayResource downloadFile(String path) {
+        log.debug("S3ServiceImpl.downloadFile - start | path: {}", path);
+        requireNonNull(path);
+        var file = new ByteArrayResource(awsUtil.downloadFile(path));
+        log.debug("S3ServiceImpl.downloadFile - end | path: {}", path);
+        return file;
     }
 
     @Override
-    public boolean deleteFile(String fileName) {
-        log.debug("S3ServiceImpl.deleteFile - start | fileName: {}", fileName);
-        awsUtil.deleteFileFromS3Bucket(fileName);
-        log.debug("S3ServiceImpl.deleteFile - end | fileName: {}", fileName);
-        return true;
+    public void deleteFile(String path) {
+        log.debug("S3ServiceImpl.deleteFile - start | path: {}", path);
+        requireNonNull(path);
+        awsUtil.deleteFile(path);
+        log.debug("S3ServiceImpl.deleteFile - end | path: {}", path);
     }
 
 }

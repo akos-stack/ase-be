@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.UtilUser;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
 import org.junit.Test;
@@ -11,149 +11,191 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Set;
 
-import static com.bloxico.ase.testutil.MockUtil.uuid;
-import static com.bloxico.ase.userservice.entity.user.Role.ADMIN;
+import static com.bloxico.ase.testutil.Util.genPassword;
+import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.testutil.UtilUser.genUserDto;
+import static com.bloxico.ase.userservice.entity.user.Role.*;
+import static java.lang.Integer.MAX_VALUE;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserServiceImplTest extends AbstractSpringTest {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    @Autowired private UtilUser utilUser;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private UserRepository userRepository;
+    @Autowired private UserServiceImpl userService;
 
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserServiceImpl userService;
-
-    @Test(expected = UserException.class)
+    @Test
     public void findUserById_notFound() {
-        userService.findUserById(-1);
+        assertThrows(
+                UserException.class,
+                () -> userService.findUserById(-1));
     }
 
     @Test
-    public void findUserById_found() {
-        var userDto = mockUtil.savedUserDto();
+    public void findUserById() {
+        var userDto = utilUser.savedUserDto();
         assertEquals(
                 userDto,
                 userService.findUserById(userDto.getId()));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void findUserByEmail_nullEmail() {
-        userService.findUserByEmail(null);
-    }
-
-    @Test(expected = UserException.class)
-    public void findUserByEmail_notFound() {
-        userService.findUserByEmail(uuid());
+        assertThrows(
+                NullPointerException.class,
+                () -> userService.findUserByEmail(null));
     }
 
     @Test
-    public void findUserByEmail_found() {
-        var userDto = mockUtil.savedUserDto();
+    public void findUserByEmail_notFound() {
+        assertThrows(
+                UserException.class,
+                () -> userService.findUserByEmail(genUUID()));
+    }
+
+    @Test
+    public void findUserByEmail() {
+        var userDto = utilUser.savedUserDto();
         assertEquals(
                 userDto,
                 userService.findUserByEmail(userDto.getEmail()));
     }
 
+    // TODO-TEST findUsersByEmailOrRole_nullArgs
+
+    // TODO-TEST findUsersByEmailOrRole_emptyArgs
+
+    // TODO-TEST findUsersByEmailOrRole_notFound
+
     @Test
     public void findUsersByEmailOrRole_byEmail() {
-        mockUtil.saveUsers();
-        assertEquals(1, userService.findUsersByEmailOrRole("user1", null, 0, 100, "name").getContent().size());
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedUserDto();
+        var u3 = utilUser.savedUserDto();
+        assertThat(
+                userService
+                        .findUsersByEmailOrRole(u1.getEmail(), null, 0, MAX_VALUE, "name")
+                        .getContent(),
+                allOf(
+                        hasItems(u1),
+                        not(hasItems(u2, u3))));
     }
 
     @Test
     public void findUsersByEmailOrRole_byRole() {
-        mockUtil.saveUsers();
-        assertEquals(4, userService.findUsersByEmailOrRole("", ADMIN, 0, 100, "name").getContent().size());
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedAdminDto();
+        var u3 = utilUser.savedAdminDto();
+        assertThat(
+                userService
+                        .findUsersByEmailOrRole("", ADMIN, 0, MAX_VALUE, "name")
+                        .getContent(),
+                allOf(
+                        hasItems(u2, u3),
+                        not(hasItems(u1))));
     }
 
     @Test
     public void findUsersByEmailOrRole_byRoleAndEmail() {
-        mockUtil.saveUsers();
-        assertEquals(3, userService.findUsersByEmailOrRole("user", ADMIN, 0, 100, "name").getContent().size());
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedAdminDto();
+        var u3 = utilUser.savedAdminDto();
+        assertThat(
+                userService
+                        .findUsersByEmailOrRole(u3.getEmail(), ADMIN, 0, MAX_VALUE, "name")
+                        .getContent(),
+                allOf(
+                        hasItems(u3),
+                        not(hasItems(u1, u2))));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void saveUser_nullRequest() {
-        userService.saveUser(null);
+        assertThrows(
+                NullPointerException.class,
+                () -> userService.saveUser(null));
     }
 
-    @Test(expected = UserException.class)
+    @Test
     public void saveUser_userAlreadyExists() {
-        var userDto = mockUtil.genUserDto();
+        var userDto = genUserDto();
         userService.saveUser(userDto);
-        userService.saveUser(userDto);
+        assertThrows(
+                UserException.class,
+                () -> userService.saveUser(userDto));
     }
 
-    @Test(expected = UserException.class)
+    @Test
     public void saveUser_invalidAspirationName() {
-        var userDto = mockUtil.genUserDto();
-        userDto.setAspirationNames(Set.of(uuid()));
-        userService.saveUser(userDto);
+        var userDto = genUserDto();
+        userDto.setAspirationNames(Set.of(genUUID()));
+        assertThrows(
+                UserException.class,
+                () -> userService.saveUser(userDto));
     }
 
     @Test
     public void saveUser_withoutAspirations() {
-        var userDto = mockUtil.genUserDto();
+        var userDto = genUserDto();
         var user = userService.saveUser(userDto);
         assertNotNull(user.getId());
         assertEquals(userDto.getEmail(), user.getEmail());
-        assertTrue(userDto.getEmail().contains(user.getName()));
         assertNotEquals(userDto.getPassword(), user.getPassword());
     }
 
     @Test
     public void saveUser_withAspirations() {
-        var userDto = mockUtil.genUserDto();
-        userDto.setAspirationNames(Set.of(
-                mockUtil.getUserAspiration().getName(),
-                mockUtil.getEvaluatorAspiration().getName()));
+        var userDto = genUserDto();
+        userDto.setAspirationNames(Set.of(USER, EVALUATOR));
         var savedUserDto = userService.saveUser(userDto);
         assertNotNull(savedUserDto.getId());
         assertEquals(userDto.getEmail(), savedUserDto.getEmail());
-        assertTrue(userDto.getEmail().contains(savedUserDto.getName()));
         assertNotEquals(userDto.getPassword(), savedUserDto.getPassword());
         assertEquals(userDto.getAspirationNames(), savedUserDto.getAspirationNames());
     }
 
-    @Test(expected = UserException.class)
+    @Test
     public void enableUser_notFound() {
-        userService.enableUser(-1);
+        assertThrows(
+                UserException.class,
+                () -> userService.enableUser(-1, utilUser.savedAdmin().getId()));
     }
 
     @Test
     public void enableUser() {
-        var regUser = userService.saveUser(mockUtil.genUserDto());
+        var principalId = utilUser.savedAdmin().getId();
+        var regUser = userService.saveUser(genUserDto());
         assertFalse(regUser.getEnabled());
-        userService.enableUser(regUser.getId());
+        userService.enableUser(regUser.getId(), principalId);
         var ebdUser = userRepository.findById(regUser.getId()).orElseThrow();
         assertTrue(ebdUser.getEnabled());
-        assertEquals(regUser.getId(), ebdUser.getUpdaterId());
     }
 
-    @Test(expected = UserException.class)
+    @Test
     public void disableUser_notFound() {
-        var adminId = mockUtil.savedAdmin().getId();
-        userService.disableUser(-1, adminId);
+        var adminId = utilUser.savedAdmin().getId();
+        assertThrows(
+                UserException.class,
+                () -> userService.disableUser(-1, adminId));
     }
 
     @Test
     public void disableUser() {
-        var adminId = mockUtil.savedAdmin().getId();
-        var userId = mockUtil.savedUser().getId();
+        var adminId = utilUser.savedAdmin().getId();
+        var userId = utilUser.savedUser().getId();
         assertTrue(userService.findUserById(userId).getEnabled());
         userService.disableUser(userId, adminId);
         assertFalse(userService.findUserById(userId).getEnabled());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void deleteDisabledUsersWithIds_nullIds() {
-        userService.deleteDisabledUsersWithIds(null);
+        assertThrows(
+                NullPointerException.class,
+                () -> userService.deleteDisabledUsersWithIds(null));
     }
 
     @Test
@@ -163,68 +205,82 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void deleteDisabledUsersWithIds() {
-        var user1 = userService.saveUser(mockUtil.genUserDto());
-        var user2 = userService.saveUser(mockUtil.genUserDto());
-        var user3 = userService.saveUser(mockUtil.genUserDto());
-        userService.enableUser(user1.getId());
+        var user1 = userService.saveUser(genUserDto());
+        var user2 = userService.saveUser(genUserDto());
+        var user3 = userService.saveUser(genUserDto());
+        userService.enableUser(user1.getId(), utilUser.savedAdmin().getId());
         var regIds = Set.of(user1.getId(), user2.getId(), user3.getId());
         var delIds = Set.copyOf(userService.deleteDisabledUsersWithIds(regIds));
         assertEquals(Set.of(user2.getId(), user3.getId()), delIds);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void updatePassword_nullOldPassword() {
-        userService.updatePassword(1, null, "newPassword");
+        assertThrows(
+                NullPointerException.class,
+                () -> userService.updatePassword(1, null, genPassword()));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void updatePassword_nullNewPassword() {
-        userService.updatePassword(1, "oldPassword", null);
+        assertThrows(
+                NullPointerException.class,
+                () -> userService.updatePassword(1, genPassword(), null));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void updatePassword_nullBothPasswords() {
-        userService.updatePassword(1, null, null);
+        assertThrows(
+                NullPointerException.class,
+                () -> userService.updatePassword(1, null, null));
     }
 
-    @Test(expected = UserException.class)
+    @Test
     public void updatePassword_userNotFound() {
-        userService.updatePassword(-1, "oldPassword", "newPassword");
+        assertThrows(
+                UserException.class,
+                () -> userService.updatePassword(-1, genPassword(), genPassword()));
     }
 
-    @Test(expected = UserException.class)
+    @Test
     public void updatePassword_oldPasswordMismatch() {
-        var user = mockUtil.savedAdmin();
-        var oldPassword = uuid();
-        var newPassword = "updatePassword";
-        userService.updatePassword(user.getId(), oldPassword, newPassword);
+        var user = utilUser.savedAdmin();
+        var oldPassword = genPassword();
+        var newPassword = genPassword();
+        assertThrows(
+                UserException.class,
+                () -> userService.updatePassword(user.getId(), oldPassword, newPassword));
     }
 
     @Test
     public void updatePassword() {
-        var oldPassword = "admin";
-        var user = mockUtil.savedAdmin(oldPassword);
-        var newPassword = "updatePassword";
+        var oldPassword = genPassword();
+        var user = utilUser.savedAdmin(oldPassword);
+        var newPassword = genPassword();
         userService.updatePassword(user.getId(), oldPassword, newPassword);
         assertTrue(passwordEncoder.matches(
                 newPassword,
                 userService.findUserById(user.getId()).getPassword()));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void setNewPassword_nullPassword() {
-        userService.setNewPassword(1, null);
+        assertThrows(
+                NullPointerException.class,
+                () -> userService.setNewPassword(1, null));
     }
 
-    @Test(expected = UserException.class)
+    @Test
     public void setNewPassword_userNotFound() {
-        userService.setNewPassword(-1, "userNotFound@mail.com");
+        assertThrows(
+                UserException.class,
+                () -> userService.setNewPassword(-1, genPassword()));
     }
 
     @Test
     public void setNewPassword() {
-        var user = mockUtil.savedUser();
-        var newPassword = "setNewPassword";
+        var user = utilUser.savedUser();
+        var newPassword = genPassword();
         userService.setNewPassword(user.getId(), newPassword);
         assertTrue(passwordEncoder.matches(
                 newPassword,

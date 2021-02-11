@@ -111,7 +111,22 @@ public interface ErrorCodes {
         FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY(
                 HttpStatus.BAD_REQUEST,
                 "22",
-                "File type is not supported for the category.");
+                "File type is not supported for the category."),
+
+        FILE_UPLOAD_FAILED(
+                HttpStatus.BAD_REQUEST,
+                "23",
+                "File upload failed."),
+
+        FILE_DOWNLOAD_FAILED(
+                HttpStatus.BAD_REQUEST,
+                "24",
+                "File download failed."),
+
+        FILE_DELETE_FAILED(
+                HttpStatus.BAD_REQUEST,
+                "25",
+                "File deletion failed.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
@@ -124,7 +139,7 @@ public interface ErrorCodes {
 
         @Override
         public AseRuntimeException newException(Throwable cause) {
-            return new AmazonS3Exception(httpStatus, code, cause);
+            return new S3Exception(httpStatus, code, cause);
         }
 
     }

@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
@@ -22,6 +21,7 @@ import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.RESUME_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
+import static org.springframework.util.StringUtils.isEmpty;
 
 @Slf4j
 @Service
@@ -103,7 +103,8 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     public Page<PendingEvaluatorDto> searchPendingEvaluators(String email, int page, int size, String sort) {
         log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - start | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-        var pendingEvaluatorsDto = pendingEvaluatorRepository.findAllByEmailContaining(email, pageable)
+        var pendingEvaluatorsDto = pendingEvaluatorRepository
+                .findAllByEmailContaining(email, pageable)
                 .map(MAPPER::toDto);
         log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - end | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
         return pendingEvaluatorsDto;
@@ -117,7 +118,7 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
                 .findByEmailIgnoreCase(email)
                 .orElseThrow(TOKEN_NOT_FOUND::newException)
                 .getCvPath();
-        if (StringUtils.isEmpty(cvPath))
+        if (isEmpty(cvPath))
             throw RESUME_NOT_FOUND.newException();
         var resume = s3Service.downloadFile(cvPath);
         log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - end | email: {}, principalId {}", email, principalId);

@@ -64,7 +64,7 @@ public class AseSecurityService extends DefaultOAuth2UserService
             var user = userRepository
                     .findByEmailIgnoreCase(email)
                     .map(extractor::validateUser)
-                    .map(u -> extractor.updatedUser(u, attributes))
+                    .map(u -> extractor.updateUser(u, attributes))
                     .orElseGet(() -> extractor.newUser(attributes));
             user = userRepository.saveAndFlush(user);
             var aseOauth2User = AsePrincipal.newOAuth2User(user, attributes);

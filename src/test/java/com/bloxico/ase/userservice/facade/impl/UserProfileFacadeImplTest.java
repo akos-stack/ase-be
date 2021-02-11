@@ -1,50 +1,54 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.UtilUserProfile;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.testutil.Util.genUUID;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserProfileFacadeImplTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
+    @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private UserProfileFacadeImpl userProfileFacade;
 
-    @Autowired
-    private UserProfileFacadeImpl userProfileFacade;
-
-    @Test(expected = UserException.class)
+    @Test
     public void returnMyProfileData_userNotFound() {
-        userProfileFacade.returnMyProfileData(-1);
+        assertThrows(
+                UserException.class,
+                () -> userProfileFacade.returnMyProfileData(-1));
     }
 
     @Test
     public void returnMyProfileData() {
-        var userProfileDto = mockUtil.savedUserProfileDto();
-        var userProfileDataResponse = userProfileFacade.returnMyProfileData(userProfileDto.getUserId());
-        assertEquals(userProfileDto, userProfileDataResponse.getUserProfile());
+        var userProfileDto = utilUserProfile.savedUserProfileDto();
+        var response = userProfileFacade.returnMyProfileData(userProfileDto.getUserId());
+        assertEquals(userProfileDto, response.getUserProfile());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void updateMyProfile_nullRequest() {
-        userProfileFacade.updateMyProfile(1, null);
+        assertThrows(
+                NullPointerException.class,
+                () -> userProfileFacade.updateMyProfile(1, null));
     }
 
-    @Test(expected = UserException.class)
+    @Test
     public void updateMyProfile_notFound() {
-        var request = new UpdateUserProfileRequest(uuid(), uuid(), uuid());
-        userProfileFacade.updateMyProfile(-1, request);
+        var request = new UpdateUserProfileRequest(genUUID(), genUUID(), genUUID());
+        assertThrows(
+                UserException.class,
+                () -> userProfileFacade.updateMyProfile(-1, request));
     }
 
     @Test
     public void updateMyProfile() {
-        var id = mockUtil.savedUserProfile().getUserId();
-        var request = new UpdateUserProfileRequest(uuid(), uuid(), uuid());
+        var id = utilUserProfile.savedUserProfile().getUserId();
+        var request = new UpdateUserProfileRequest(genUUID(), genUUID(), genUUID());
         var response = userProfileFacade.updateMyProfile(id, request);
         assertEquals(request.getFirstName(), response.getUserProfile().getFirstName());
         assertEquals(request.getLastName(), response.getUserProfile().getLastName());

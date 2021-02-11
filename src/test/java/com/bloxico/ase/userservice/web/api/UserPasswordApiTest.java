@@ -1,50 +1,32 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.password.*;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bloxico.ase.testutil.MockUtil.ERROR_CODE;
+import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.web.api.UserPasswordApi.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
-@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class UserPasswordApiTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Test
-    public void initForgotPasswordProcedure_200_ok() {
-        var email = mockUtil.savedUser().getEmail();
-        given()
-                .contentType(JSON)
-                .body(new ForgotPasswordRequest(email))
-                .when()
-                .post(API_URL + PASSWORD_FORGOT_ENDPOINT)
-                .then()
-                .assertThat()
-                .statusCode(200);
-    }
+    @Autowired private UtilAuth utilAuth;
+    @Autowired private UtilUser utilUser;
 
     @Test
     public void initForgotPasswordProcedure_404_userNotFound() {
-        var email = "userNotFound@mail.com";
         given()
                 .contentType(JSON)
-                .body(new ForgotPasswordRequest(email))
+                .body(new ForgotPasswordRequest(genEmail()))
                 .when()
                 .post(API_URL + PASSWORD_FORGOT_ENDPOINT)
                 .then()
@@ -54,14 +36,13 @@ public class UserPasswordApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void resendPasswordResetToken_200_ok() {
-        var email = mockUtil.savedAdmin().getEmail();
-        mockUtil.doForgotPasswordRequest(email);
+    public void initForgotPasswordProcedure_200_ok() {
+        var email = utilUser.savedAdmin().getEmail();
         given()
                 .contentType(JSON)
-                .body(new ResendTokenRequest(email))
+                .body(new ForgotPasswordRequest(email))
                 .when()
-                .post(API_URL + PASSWORD_TOKEN_RESEND_ENDPOINT)
+                .post(API_URL + PASSWORD_FORGOT_ENDPOINT)
                 .then()
                 .assertThat()
                 .statusCode(200);
@@ -69,10 +50,9 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void resendPasswordResetToken_404_userNotFound() {
-        var email = "userNotFound@mail.com";
         given()
                 .contentType(JSON)
-                .body(new ResendTokenRequest(email))
+                .body(new ResendTokenRequest(genEmail()))
                 .when()
                 .post(API_URL + PASSWORD_TOKEN_RESEND_ENDPOINT)
                 .then()
@@ -83,7 +63,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void resendPasswordResetToken_404_tokenNotFound() {
-        var email = mockUtil.savedAdmin().getEmail();
+        var email = utilUser.savedAdmin().getEmail();
         given()
                 .contentType(JSON)
                 .body(new ResendTokenRequest(email))
@@ -96,15 +76,14 @@ public class UserPasswordApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void updateForgottenPassword_200_ok() {
-        var email = mockUtil.savedAdmin().getEmail();
-        var token = mockUtil.doForgotPasswordRequest(email);
-        var password = "Password9!";
+    public void resendPasswordResetToken_200_ok() {
+        var email = utilUser.savedAdmin().getEmail();
+        utilAuth.doForgotPasswordRequest(email);
         given()
                 .contentType(JSON)
-                .body(new ForgottenPasswordUpdateRequest(email, token, password))
+                .body(new ResendTokenRequest(email))
                 .when()
-                .post(API_URL + PASSWORD_UPDATE_FORGOTTEN_ENDPOINT)
+                .post(API_URL + PASSWORD_TOKEN_RESEND_ENDPOINT)
                 .then()
                 .assertThat()
                 .statusCode(200);
@@ -112,12 +91,9 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void updateForgottenPassword_404_userNotFound() {
-        var email = "userNotFound@mail.com";
-        var token = "doesNotMatter";
-        var password = "Password9!";
         given()
                 .contentType(JSON)
-                .body(new ForgottenPasswordUpdateRequest(email, token, password))
+                .body(new ForgottenPasswordUpdateRequest(genEmail(), genUUID(), genPassword()))
                 .when()
                 .post(API_URL + PASSWORD_UPDATE_FORGOTTEN_ENDPOINT)
                 .then()
@@ -128,12 +104,10 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void updateForgottenPassword_404_tokenNotFound() {
-        var email = mockUtil.savedAdmin().getEmail();
-        var token = "doesNotMatter";
-        var password = "Password9!";
+        var email = utilUser.savedAdmin().getEmail();
         given()
                 .contentType(JSON)
-                .body(new ForgottenPasswordUpdateRequest(email, token, password))
+                .body(new ForgottenPasswordUpdateRequest(email, genUUID(), genPassword()))
                 .when()
                 .post(API_URL + PASSWORD_UPDATE_FORGOTTEN_ENDPOINT)
                 .then()
@@ -143,15 +117,15 @@ public class UserPasswordApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void updateKnownPassword_200_ok() {
-        var oldPassword = "Password1!";
-        var newPassword = "Password2!";
+    public void updateForgottenPassword_200_ok() {
+        var email = utilUser.savedAdmin().getEmail();
+        var token = utilAuth.doForgotPasswordRequest(email);
+        var password = genPassword();
         given()
-                .header("Authorization", mockUtil.doAuthentication(oldPassword))
                 .contentType(JSON)
-                .body(new KnownPasswordUpdateRequest(oldPassword, newPassword))
+                .body(new ForgottenPasswordUpdateRequest(email, token, password))
                 .when()
-                .post(API_URL + PASSWORD_UPDATE_ENDPOINT)
+                .post(API_URL + PASSWORD_UPDATE_FORGOTTEN_ENDPOINT)
                 .then()
                 .assertThat()
                 .statusCode(200);
@@ -159,10 +133,10 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void updateKnownPassword_400_oldPasswordMismatch() {
-        var oldPassword = "Password123!";
-        var newPassword = "Password2!";
+        var oldPassword = genPassword();
+        var newPassword = genPassword();
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
                 .body(new KnownPasswordUpdateRequest(oldPassword, newPassword))
                 .when()
@@ -174,11 +148,26 @@ public class UserPasswordApiTest extends AbstractSpringTest {
     }
 
     @Test
+    public void updateKnownPassword_200_ok() {
+        var oldPassword = genPassword();
+        var newPassword = genPassword();
+        given()
+                .header("Authorization", utilAuth.doAuthentication(oldPassword))
+                .contentType(JSON)
+                .body(new KnownPasswordUpdateRequest(oldPassword, newPassword))
+                .when()
+                .post(API_URL + PASSWORD_UPDATE_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
     public void setNewPassword_200_ok() {
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
-                .body(new SetPasswordRequest("Password123!"))
+                .body(new SetPasswordRequest(genPassword()))
                 .when()
                 .post(API_URL + PASSWORD_SET_ENDPOINT)
                 .then()

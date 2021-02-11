@@ -80,6 +80,7 @@ public class SubmitEvaluatorRequest implements ISubmitUserProfileRequest {
 
     @NotNull
     @JsonProperty("birthday")
+    // TODO replace with default LocalDate serde config
     @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)

@@ -101,7 +101,7 @@ public enum ExternalUserDataExtractor {
         return user;
     }
 
-    public User updatedUser(User user, Map<String, Object> attributes) {
+    public User updateUser(User user, Map<String, Object> attributes) {
         user.setName(getName(attributes));
         user.setUpdaterId(user.getId());
         return user;
