@@ -1,10 +1,7 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
-import com.bloxico.ase.userservice.entity.artwork.Category;
-import com.bloxico.ase.userservice.entity.artwork.Material;
-import com.bloxico.ase.userservice.entity.artwork.Medium;
-import com.bloxico.ase.userservice.entity.artwork.Style;
+import com.bloxico.ase.userservice.entity.artwork.*;
 import com.bloxico.ase.userservice.repository.artwork.CategoryRepository;
 import com.bloxico.ase.userservice.repository.artwork.MaterialRepository;
 import com.bloxico.ase.userservice.repository.artwork.MediumRepository;
@@ -25,21 +22,21 @@ public class UtilArtworkMetadata {
     @Autowired private MediumRepository mediumRepository;
     @Autowired private StyleRepository styleRepository;
 
-    public Category savedCategory() {
+    public Category savedCategory(ArtworkMetadataStatus status) {
         var adminId = utilUser.savedAdmin().getId();
         var category = new Category();
-        category.setStatus(APPROVED);
+        category.setStatus(status);
         category.setName(genUUID());
         category.setCreatorId(adminId);
         categoryRepository.saveAndFlush(category);
         return category;
     }
 
-    public ArtworkMetadataDto savedCategoryDto() {
-        return MAPPER.toDto(savedCategory());
+    public ArtworkMetadataDto savedCategoryDto(ArtworkMetadataStatus... status) {
+        return MAPPER.toDto(savedCategory(status.length > 0 ? status[0] : APPROVED));
     }
 
-    public Material savedMaterial() {
+    public Material savedMaterial(ArtworkMetadataStatus status) {
         var adminId = utilUser.savedAdmin().getId();
         var material = new Material();
         material.setStatus(APPROVED);
@@ -49,11 +46,11 @@ public class UtilArtworkMetadata {
         return material;
     }
 
-    public ArtworkMetadataDto savedMaterialDto() {
-        return MAPPER.toDto(savedMaterial());
+    public ArtworkMetadataDto savedMaterialDto(ArtworkMetadataStatus... status) {
+        return MAPPER.toDto(savedMaterial(status.length > 0 ? status[0] : APPROVED));
     }
 
-    public Medium savedMedium() {
+    public Medium savedMedium(ArtworkMetadataStatus status) {
         var adminId = utilUser.savedAdmin().getId();
         var medium = new Medium();
         medium.setStatus(APPROVED);
@@ -63,11 +60,11 @@ public class UtilArtworkMetadata {
         return medium;
     }
 
-    public ArtworkMetadataDto savedMediumDto() {
-        return MAPPER.toDto(savedMedium());
+    public ArtworkMetadataDto savedMediumDto(ArtworkMetadataStatus... status) {
+        return MAPPER.toDto(savedMedium(status.length > 0 ? status[0] : APPROVED));
     }
 
-    public Style savedStyle() {
+    public Style savedStyle(ArtworkMetadataStatus status) {
         var adminId = utilUser.savedAdmin().getId();
         var style = new Style();
         style.setStatus(APPROVED);
@@ -77,7 +74,7 @@ public class UtilArtworkMetadata {
         return style;
     }
 
-    public ArtworkMetadataDto savedStyleDto() {
-        return MAPPER.toDto(savedStyle());
+    public ArtworkMetadataDto savedStyleDto(ArtworkMetadataStatus... status) {
+        return MAPPER.toDto(savedStyle(status.length > 0 ? status[0] : APPROVED));
     }
 }

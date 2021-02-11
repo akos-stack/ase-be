@@ -10,11 +10,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus.APPROVED;
+import static com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus.PENDING;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class ArtworkMediumServiceImplTest extends AbstractSpringTest {
 
@@ -40,6 +41,37 @@ public class ArtworkMediumServiceImplTest extends AbstractSpringTest {
         var dto = utilArtworkMetadata.savedMediumDto();
         assertThat(mediumRepository.findAll(), hasItems(MAPPER.toMediumEntity(dto)));
         assertEquals(dto, service.findOrSaveArtworkMetadata(dto, principalId));
+    }
+
+    @Test
+    public void updateMediumStatus() {
+        var principalId = utilUser.savedAdmin().getId();
+        var dto = utilArtworkMetadata.savedMediumDto();
+
+        assertTrue(mediumRepository.findByNameIgnoreCase(dto.getName()).get().getStatus() == APPROVED);
+
+        dto.setStatus(PENDING);
+        service.updateArtworkMetadataStatus(dto, principalId);
+
+        assertTrue(mediumRepository.findByNameIgnoreCase(dto.getName()).get().getStatus() == PENDING);
+    }
+
+    @Test
+    public void deleteMedium() {
+        var dto = utilArtworkMetadata.savedMediumDto();
+        assertNotNull(mediumRepository.findByNameIgnoreCase(dto.getName()));
+
+        service.deleteArtworkMetadata(dto.getName());
+        assertTrue(mediumRepository.findByNameIgnoreCase(dto.getName()).isEmpty());
+    }
+
+    @Test
+    public void fetchApprovedMediums() {
+        var dto = utilArtworkMetadata.savedMediumDto();
+        var dto2 = utilArtworkMetadata.savedMediumDto(PENDING);
+        assertThat(
+                service.searchApprovedArtworkMetadata(""),
+                allOf(hasItems(dto), not(hasItems(dto2))));
     }
 
     @Test

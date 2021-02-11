@@ -43,7 +43,7 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void updateCategoryStatus() {
-        var savedCategory = utilArtworkMetadata.savedCategory();
+        var savedCategory = utilArtworkMetadata.savedCategory(APPROVED);
         var updateRequest = new ArtworkMetadataUpdateRequest(savedCategory.getName(), ArtworkMetadataStatus.PENDING, CATEGORY);
         facade.updateArtworkMetadataStatus(updateRequest, savedCategory.getCreatorId());
 
@@ -53,7 +53,7 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void deleteCategory() {
-        var savedCategory = utilArtworkMetadata.savedCategory();
+        var savedCategory = utilArtworkMetadata.savedCategory(APPROVED);
         facade.deleteArtworkMetadata(savedCategory.getName(), CATEGORY);
 
         assertTrue(categoryRepository.findByNameIgnoreCase(savedCategory.getName()).isEmpty());
@@ -64,7 +64,7 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
         assertThat(
                 facade.searchArtworkMetadata(CATEGORY, null, "", 0, 10, "name").getEntries(),
                 hasItems());
-        var dto = utilArtworkMetadata.savedCategoryDto();
+        var dto = utilArtworkMetadata.savedCategoryDto(APPROVED);
         assertThat(
                 facade.searchArtworkMetadata(CATEGORY, null, "", 0, 10, "name").getEntries(),
                 hasItems(dto));
@@ -84,7 +84,7 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void updateMaterialStatus() {
-        var savedMaterial = utilArtworkMetadata.savedMaterial();
+        var savedMaterial = utilArtworkMetadata.savedMaterial(APPROVED);
         var updateRequest = new ArtworkMetadataUpdateRequest(savedMaterial.getName(), ArtworkMetadataStatus.PENDING, MATERIAL);
         facade.updateArtworkMetadataStatus(updateRequest, savedMaterial.getCreatorId());
 
@@ -94,7 +94,7 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void deleteMaterial() {
-        var savedMaterial = utilArtworkMetadata.savedMaterial();
+        var savedMaterial = utilArtworkMetadata.savedMaterial(APPROVED);
         facade.deleteArtworkMetadata(savedMaterial.getName(), MATERIAL);
 
         assertTrue(materialRepository.findByNameIgnoreCase(savedMaterial.getName()).isEmpty());
@@ -125,7 +125,7 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void updateMediumStatus() {
-        var savedMedium = utilArtworkMetadata.savedMedium();
+        var savedMedium = utilArtworkMetadata.savedMedium(APPROVED);
         var updateRequest = new ArtworkMetadataUpdateRequest(savedMedium.getName(), ArtworkMetadataStatus.PENDING, MEDIUM);
         facade.updateArtworkMetadataStatus(updateRequest, savedMedium.getCreatorId());
 
@@ -135,7 +135,7 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void deleteMedium() {
-        var savedMedium = utilArtworkMetadata.savedMedium();
+        var savedMedium = utilArtworkMetadata.savedMedium(APPROVED);
         facade.deleteArtworkMetadata(savedMedium.getName(), MEDIUM);
 
         assertTrue(mediumRepository.findByNameIgnoreCase(savedMedium.getName()).isEmpty());
@@ -166,7 +166,7 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void updateStyleStatus() {
-        var savedStyle = utilArtworkMetadata.savedStyle();
+        var savedStyle = utilArtworkMetadata.savedStyle(APPROVED);
         var updateRequest = new ArtworkMetadataUpdateRequest(savedStyle.getName(), ArtworkMetadataStatus.PENDING, STYLE);
         facade.updateArtworkMetadataStatus(updateRequest, savedStyle.getCreatorId());
 
@@ -176,7 +176,7 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void deleteStyle() {
-        var savedStyle = utilArtworkMetadata.savedStyle();
+        var savedStyle = utilArtworkMetadata.savedStyle(APPROVED);
         facade.deleteArtworkMetadata(savedStyle.getName(), STYLE);
 
         assertTrue(materialRepository.findByNameIgnoreCase(savedStyle.getName()).isEmpty());
@@ -198,11 +198,11 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
         assertThat(
                 facade.searchApprovedArtworkMetadata("", CATEGORY).getEntries(),
                 hasItems());
-        var dto = utilArtworkMetadata.savedCategoryDto();
+        var dto = utilArtworkMetadata.savedCategoryDto(APPROVED);
         assertThat(
                 facade.searchApprovedArtworkMetadata("", CATEGORY).getEntries(),
                 hasItems(dto));
-        var dto2 = utilArtworkMetadata.savedCategoryDto();
+        var dto2 = utilArtworkMetadata.savedCategoryDto(APPROVED);
         assertThat(
                 facade.searchApprovedArtworkMetadata("", CATEGORY).getEntries(),
                 hasItems(dto, dto2));
