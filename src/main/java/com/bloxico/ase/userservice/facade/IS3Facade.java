@@ -6,9 +6,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IS3Facade {
 
-    void validateFile(FileCategory fileCategory, MultipartFile file);
+    void validateFile(FileCategory category, MultipartFile file);
 
-    ByteArrayResource downloadFile(String fileName);
+    ByteArrayResource downloadFile(String path);
 
-    void deleteFile(String fileName);
+    void deleteFile(String path);
+
 }

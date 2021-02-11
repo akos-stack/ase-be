@@ -16,7 +16,7 @@ public interface IUserService {
 
     UserDto saveUser(UserDto userDto);
 
-    void enableUser(long id);
+    void enableUser(long userId, long principalId);
 
     void disableUser(long userId, long principalId);
 

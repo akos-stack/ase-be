@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.service.token.impl;
 
-import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
@@ -11,94 +10,93 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.mapping.PropertyReferenceException;
 
-import static com.bloxico.ase.testutil.MockUtil.genEmail;
-import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
-import static java.util.stream.Collectors.toSet;
+import static com.bloxico.ase.userservice.util.SupportedFileExtension.pdf;
+import static java.lang.Integer.MAX_VALUE;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
-    @Autowired
-    private MockUtil mockUtil;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilToken utilToken;
+    @Autowired private PendingEvaluatorRepository repository;
+    @Autowired private PendingEvaluatorServiceImpl service;
 
-    @Autowired
-    private PendingEvaluatorRepository repository;
-
-    @Autowired
-    private PendingEvaluatorServiceImpl service;
-
-    @Test(expected = NullPointerException.class)
-    public void createPendingEvaluator_requestIsNull() {
-        var admin = mockUtil.savedAdmin();
-
-        service.createPendingEvaluator(null, admin.getId());
+    @Test
+    public void createPendingEvaluator_nullRequest() {
+        var admin = utilUser.savedAdmin();
+        assertThrows(
+                NullPointerException.class,
+                () -> service.createPendingEvaluator(null, admin.getId()));
     }
 
-    @Test(expected = TokenException.class)
-    public void createPendingEvaluator_evaluatorAlreadyPendingAfterInvitation() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+    @Test
+    public void createPendingEvaluator_evaluatorAlreadyInvited() {
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
         service.createPendingEvaluator(request, admin.getId());
 
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
-
-        service.createPendingEvaluator(request, admin.getId());
-    }
-
-    @Test(expected = TokenException.class)
-    public void createPendingEvaluator_evaluatorAlreadyPendingAfterRegistration() {
-        var user = mockUtil.savedUser();
-
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
-        service.createPendingEvaluator(request, user.getId());
-
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
-
-        service.createPendingEvaluator(request, user.getId());
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
+        assertThrows(
+                TokenException.class,
+                () -> service.createPendingEvaluator(request, admin.getId()));
     }
 
     @Test
-    public void createPendingEvaluator_evaluatorIsInvited() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+    public void createPendingEvaluator_evaluatorAlreadyRegistered() {
+        var user = utilUser.savedUser();
+
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
+        service.createPendingEvaluator(request, user.getId());
+
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
+        assertThrows(
+                TokenException.class,
+                () -> service.createPendingEvaluator(request, user.getId()));
+    }
+
+    @Test
+    public void createPendingEvaluator_evaluatorInvited() {
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
         var pendingEvaluatorDto = service.createPendingEvaluator(request, admin.getId());
 
         assertNotNull(pendingEvaluatorDto);
 
-        var newlyCreatedPendingEvaluator = repository
+        var newPendingEvaluator = repository
                 .findByEmailIgnoreCaseAndToken(user.getEmail(), pendingEvaluatorDto.getToken())
-                .orElse(null);
+                .orElseThrow();
 
-        assertNotNull(newlyCreatedPendingEvaluator);
-        assertEquals(pendingEvaluatorDto.getToken(), newlyCreatedPendingEvaluator.getToken());
-        assertEquals(user.getEmail(), newlyCreatedPendingEvaluator.getEmail());
-        assertEquals(admin.getId(), newlyCreatedPendingEvaluator.getCreatorId());
-        assertEquals(pendingEvaluatorDto.getStatus(), newlyCreatedPendingEvaluator.getStatus());
+        assertEquals(pendingEvaluatorDto.getToken(), newPendingEvaluator.getToken());
+        assertEquals(user.getEmail(), newPendingEvaluator.getEmail());
+        assertEquals(admin.getId(), newPendingEvaluator.getCreatorId());
+        assertEquals(pendingEvaluatorDto.getStatus(), newPendingEvaluator.getStatus());
 
-        assertNull(newlyCreatedPendingEvaluator.getCvPath());
-        assertSame(INVITED, newlyCreatedPendingEvaluator.getStatus());
+        assertNull(newPendingEvaluator.getCvPath());
+        assertSame(INVITED, newPendingEvaluator.getStatus());
     }
 
     @Test
-    public void createPendingEvaluator_evaluatorIsRequested() {
-        var user = mockUtil.savedUser();
+    public void createPendingEvaluator_evaluatorRequested() {
+        var user = utilUser.savedUser();
 
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         var pendingEvaluatorDto = service.createPendingEvaluator(request, user.getId());
 
         assertNotNull(pendingEvaluatorDto);
 
         var newlyCreatedPendingEvaluator = repository
                 .findByEmailIgnoreCaseAndToken(user.getEmail(), pendingEvaluatorDto.getToken())
-                .orElse(null);
+                .orElseThrow();
 
-        assertNotNull(newlyCreatedPendingEvaluator);
         assertEquals(pendingEvaluatorDto.getToken(), newlyCreatedPendingEvaluator.getToken());
         assertEquals(user.getEmail(), newlyCreatedPendingEvaluator.getEmail());
         assertEquals(user.getId(), newlyCreatedPendingEvaluator.getCreatorId());
@@ -110,17 +108,16 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void createPendingEvaluator_updateFromRequestedToInvited() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
 
-        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
+        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         service.createPendingEvaluator(registrationRequest, user.getId());
 
         var pendingEvaluator = repository
                 .findByEmailIgnoreCase(user.getEmail())
-                .orElse(null);
+                .orElseThrow();
 
-        assertNotNull(pendingEvaluator);
         assertNull(pendingEvaluator.getUpdaterId());
         assertSame(REQUESTED, pendingEvaluator.getStatus());
 
@@ -132,40 +129,46 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         assertSame(INVITED, pendingEvaluator.getStatus());
     }
 
-    @Test(expected = TokenException.class)
+    @Test
     public void createPendingEvaluator_updateFromInvitedToRequested() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
 
         var invitationRequest = new EvaluatorInvitationRequest(user.getEmail());
         service.createPendingEvaluator(invitationRequest, admin.getId());
 
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
-        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
-        service.createPendingEvaluator(registrationRequest, user.getId());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void getPendingEvaluatorToken_emailIsNull() {
-        service.getPendingEvaluatorToken(null);
-    }
-
-    @Test(expected = TokenException.class)
-    public void getPendingEvaluatorToken_tokenNotFound() {
-        service.getPendingEvaluatorToken(uuid());
+        var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
+        assertThrows(
+                TokenException.class,
+                () -> service.createPendingEvaluator(registrationRequest, user.getId()));
     }
 
     @Test
-    public void getPendingEvaluatorToken_whenInInvitedStatus() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+    public void getPendingEvaluatorToken_nullEmail() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.getPendingEvaluatorToken(null));
+    }
+
+    @Test
+    public void getPendingEvaluatorToken_tokenNotFound() {
+        assertThrows(
+                TokenException.class,
+                () -> service.getPendingEvaluatorToken(genUUID()));
+    }
+
+    @Test
+    public void getPendingEvaluatorToken_withInvitedStatus() {
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
         var pendingEvaluator = service.createPendingEvaluator(request, admin.getId());
 
         assertNotNull(pendingEvaluator);
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         var newlyCreatedPendingEvaluatorToken = service.getPendingEvaluatorToken(user.getEmail());
 
@@ -174,14 +177,14 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void getPendingEvaluatorToken_whenInRequestedStatus() {
-        var user = mockUtil.savedUser();
+    public void getPendingEvaluatorToken_withRequestedStatus() {
+        var user = utilUser.savedUser();
 
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         var pendingEvaluator = service.createPendingEvaluator(request, user.getId());
 
         assertNotNull(pendingEvaluator);
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         var newlyCreatedPendingEvaluatorToken = service.getPendingEvaluatorToken(user.getEmail());
 
@@ -189,172 +192,187 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         assertEquals(pendingEvaluator.getToken(), newlyCreatedPendingEvaluatorToken);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void checkInvitationToken_nullToken() {
-        service.checkInvitationToken(null);
+        assertThrows(
+                NullPointerException.class,
+                () -> service.checkInvitationToken(null));
     }
 
-    @Test(expected = TokenException.class)
+    @Test
     public void checkInvitationToken_tokenNotFound() {
-        service.checkInvitationToken(uuid());
+        assertThrows(
+                TokenException.class,
+                () -> service.checkInvitationToken(genUUID()));
     }
 
-    @Test(expected = TokenException.class)
+    @Test
     public void checkInvitationToken_invitationTokenNotFound() {
-        var principalId = mockUtil.savedAdmin().getId();
-        var request = new EvaluatorRegistrationRequest(genEmail(), MockUtil.createMultipartFile());
+        var principalId = utilUser.savedAdmin().getId();
+        var request = new EvaluatorRegistrationRequest(genEmail(), genMultipartFile(pdf));
         var pending = service.createPendingEvaluator(request, principalId);
-        service.checkInvitationToken(pending.getToken());
+        assertThrows(
+                TokenException.class,
+                () -> service.checkInvitationToken(pending.getToken()));
     }
 
     @Test
     public void checkInvitationToken() {
-        var principalId = mockUtil.savedAdmin().getId();
+        var principalId = utilUser.savedAdmin().getId();
         var request = new EvaluatorInvitationRequest(genEmail());
         var pending = service.createPendingEvaluator(request, principalId);
         service.checkInvitationToken(pending.getToken());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void deletePendingEvaluator_emailIsNull() {
-        service.deletePendingEvaluator(null);
+    @Test
+    public void deletePendingEvaluator_nullEmail() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.deletePendingEvaluator(null));
     }
 
-    @Test(expected = TokenException.class)
+    @Test
     public void deletePendingEvaluator_tokenNotFound() {
-        service.deletePendingEvaluator(uuid());
+        assertThrows(
+                TokenException.class,
+                () -> service.deletePendingEvaluator(genUUID()));
     }
 
     @Test
     public void deletePendingEvaluator_whenInInvitedStatus() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
         service.createPendingEvaluator(request, admin.getId());
 
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
-
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
         service.deletePendingEvaluator(user.getEmail());
-
-        assertFalse(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+        assertFalse(utilToken.isEvaluatorPending(user.getEmail()));
     }
 
     @Test
     public void deletePendingEvaluator_whenInRequestedStatus() {
-        var user = mockUtil.savedUser();
+        var user = utilUser.savedUser();
 
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         service.createPendingEvaluator(request, user.getId());
 
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
-
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
         service.deletePendingEvaluator(user.getEmail());
-
-        assertFalse(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+        assertFalse(utilToken.isEvaluatorPending(user.getEmail()));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void consumePendingEvaluator_emailIsNull() {
-        service.consumePendingEvaluator(null, uuid());
+    @Test
+    public void consumePendingEvaluator_nullEmail() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.consumePendingEvaluator(null, genUUID()));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void consumePendingEvaluator_tokenIsNull() {
-        service.consumePendingEvaluator(uuid(), null);
+    @Test
+    public void consumePendingEvaluator_nullToken() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.consumePendingEvaluator(genUUID(), null));
     }
 
-    @Test(expected = TokenException.class)
-    public void consumePendingEvaluator_evaluatorWithGivenEmailAndTokenNotFound() {
-        service.consumePendingEvaluator(uuid(), uuid());
+    @Test
+    public void consumePendingEvaluator_evaluatorNotFound() {
+        assertThrows(
+                TokenException.class,
+                () -> service.consumePendingEvaluator(genUUID(), genUUID()));
     }
 
     @Test
     public void consumePendingEvaluator() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
         var token = service
                 .createPendingEvaluator(request, admin.getId())
                 .getToken();
 
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
-
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
         service.consumePendingEvaluator(user.getEmail(), token);
-
-        assertFalse(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+        assertFalse(utilToken.isEvaluatorPending(user.getEmail()));
     }
 
-    @Test(expected = InvalidDataAccessApiUsageException.class)
-    public void searchPendingEvaluators_emailIsNull() {
-        service.searchPendingEvaluators(null, 0, 10, "email");
+    @Test
+    public void searchPendingEvaluators_nullEmail() {
+        assertThrows(
+                InvalidDataAccessApiUsageException.class,
+                () -> service.searchPendingEvaluators(null, 0, 10, "email"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void searchPendingEvaluators_pageIndexIsLessThanZero() {
-        service.searchPendingEvaluators(uuid(), -1, 10, "email");
+    @Test
+    public void searchPendingEvaluators_pageIndexLessThanZero() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.searchPendingEvaluators(genEmail(), -1, 10, "email"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void searchPendingEvaluators_pageSizeIsLessThanOne() {
-        service.searchPendingEvaluators(uuid(), 0, 0, "email");
+    @Test
+    public void searchPendingEvaluators_pageSizeLessThanOne() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.searchPendingEvaluators(genEmail(), 0, 0, "email"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void searchPendingEvaluators_sortCriteriaIsNull() {
-        service.searchPendingEvaluators(uuid(), 0, 10, null);
+    @Test
+    public void searchPendingEvaluators_nullSortCriteria() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.searchPendingEvaluators(genEmail(), 0, 10, null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void searchPendingEvaluators_sortCriteriaIsEmpty() {
-        service.searchPendingEvaluators(uuid(), 0, 10, "");
+    @Test
+    public void searchPendingEvaluators_emptySortCriteria() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.searchPendingEvaluators(genEmail(), 0, 10, ""));
     }
 
-    @Test(expected = PropertyReferenceException.class)
+    @Test
     public void searchPendingEvaluators_sortCriteriaDoesNotMatchAnyProperty() {
-        service.searchPendingEvaluators(uuid(), 0, 10, "missingProperty");
+        assertThrows(
+                PropertyReferenceException.class,
+                () -> service.searchPendingEvaluators(genEmail(), 0, 10, genUUID()));
     }
 
     @Test
     public void searchPendingEvaluators_emptyResultSet() {
-        mockUtil.createInvitedPendingEvaluators();
-
-        var list = service.searchPendingEvaluators(uuid(), 0, 10, "email");
-
+        utilToken.savedInvitedPendingEvaluatorDto();
+        var list = service.searchPendingEvaluators(genEmail(), 0, 10, "email");
         assertEquals(0, list.getContent().size());
     }
 
     @Test
     public void searchPendingEvaluators() {
-        var emailFilter = "aseUser";
-        var pageIndex = 1;
-        var pageSize = 4;
-
-        var expected = mockUtil
-                .createInvitedPendingEvaluators()
-                .stream()
-                .filter(p -> p.getEmail().contains(emailFilter))
-                .skip(pageIndex * pageSize)
-                .limit(pageSize)
-                .collect(toSet());
-
-        var actual = service
-                .searchPendingEvaluators(emailFilter, pageIndex, pageSize, "email")
-                .get()
-                .collect(toSet());
-
-        assertEquals(expected, actual);
+        var p1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var p2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var p3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
+        assertThat(
+                service.searchPendingEvaluators("fooBar", 0, MAX_VALUE, "email").getContent(),
+                allOf(
+                        hasItems(p1, p2),
+                        not(hasItems(p3))));
     }
 
+    // TODO-TEST getEvaluatorResume_nullEmail
+
+    // TODO-TEST getEvaluatorResume_tokenNotFound
+
+    // TODO-TEST getEvaluatorResume_resumeNotFound
+
     @Test
-    public void getEvaluatorResume_success() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), MockUtil.createMultipartFile());
+    public void getEvaluatorResume() {
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
+        var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         service.createPendingEvaluator(request, user.getId());
-        var response = service.getEvaluatorResume(user.getEmail(), admin.getId());
-        assertNotNull(response);
+        assertNotNull(service.getEvaluatorResume(user.getEmail(), admin.getId()));
     }
 
 }

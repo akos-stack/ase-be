@@ -2,58 +2,91 @@ package com.bloxico.ase.userservice.service.aws.impl;
 
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.userservice.exception.S3Exception;
 import com.bloxico.ase.userservice.util.FileCategory;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
+import static com.bloxico.ase.testutil.Util.genMultipartFile;
+import static com.bloxico.ase.testutil.Util.randOtherEnumConst;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Autowired
     private S3ServiceImpl s3Service;
 
-    @Test
-    public void validate_success() {
-        s3Service.validateFile(FileCategory.CV, MockUtil.createMultipartFile());
-    }
-
-    @Test(expected = com.bloxico.ase.userservice.exception.AmazonS3Exception.class)
-    public void validate_failOnTypeNotSupportedForCategory() {
-        s3Service.validateFile(FileCategory.IMAGE, MockUtil.createMultipartFile());
-    }
+    // TODO-TEST validateFile_nullArguments
 
     @Test
-    public void upload_success() {
-        MultipartFile multipartFile = new MockMultipartFile("some.txt", "some.txt", "text/plain", "Hello".getBytes());
-        String fileName = s3Service.uploadFile(FileCategory.CV, multipartFile);
-        assertNotNull(amazonS3.getObject(bucketName, fileName));
-    }
-
-    @Test(expected = com.bloxico.ase.userservice.exception.AmazonS3Exception.class)
-    public void upload_failOnTypeNotSupported() {
-        MultipartFile multipartFile = new MockMultipartFile("some.zip", "some.zip", "application/zip", "Hello".getBytes());
-        s3Service.uploadFile(FileCategory.CV, multipartFile);
+    public void validateFile_typeNotSupportedForCategory() {
+        for (var category : FileCategory.values())
+            for (var extension : category.getSupportedFileExtensions())
+                assertThrows(
+                        S3Exception.class,
+                        () -> s3Service.validateFile(
+                                randOtherEnumConst(category),
+                                genMultipartFile(extension)));
     }
 
     @Test
-    public void download_success() {
-        MultipartFile multipartFile = new MockMultipartFile("some.txt", "some.txt", "text/plain", "Hello".getBytes());
-        String fileName = s3Service.uploadFile(FileCategory.CV, multipartFile);
-        ByteArrayResource resource = s3Service.downloadFile(fileName);
-        assertNotNull(resource);
+    public void validateFile() {
+        for (var category : FileCategory.values())
+            for (var extension : category.getSupportedFileExtensions())
+                s3Service.validateFile(category, genMultipartFile(extension));
     }
 
-    @Test(expected = AmazonS3Exception.class)
-    public void delete_success() {
-        MultipartFile multipartFile = new MockMultipartFile("some.txt", "some.txt", "text/plain", "Hello".getBytes());
-        String fileName = s3Service.uploadFile(FileCategory.CV, multipartFile);
-        s3Service.deleteFile(fileName);
-        amazonS3.getObject(bucketName, fileName);
+    // TODO-TEST uploadFile_nullArguments
+
+    @Test
+    public void uploadFile() {
+        for (var category : FileCategory.values())
+            for (var extension : category.getSupportedFileExtensions()) {
+                var fileName = s3Service.uploadFile(category, genMultipartFile(extension));
+                assertNotNull(amazonS3.getObject(bucketName, fileName));
+            }
+    }
+
+    @Test
+    public void uploadFile_typeNotSupportedForCategory() {
+        for (var category : FileCategory.values())
+            for (var extension : category.getSupportedFileExtensions())
+                assertThrows(
+                        S3Exception.class,
+                        () -> s3Service.uploadFile(
+                                randOtherEnumConst(category),
+                                genMultipartFile(extension)));
+    }
+
+    // TODO-TEST downloadFile_nullPath
+
+    // TODO-TEST downloadFile_notFound
+
+    @Test
+    public void downloadFile() {
+        for (var category : FileCategory.values())
+            for (var extension : category.getSupportedFileExtensions()) {
+                var fileName = s3Service.uploadFile(category, genMultipartFile(extension));
+                assertNotNull(s3Service.downloadFile(fileName));
+            }
+    }
+
+    // TODO-TEST deleteFile_nullPath
+
+    // TODO-TEST downloadFile_notFound
+
+    @Test
+    public void deleteFile() {
+        for (var category : FileCategory.values())
+            for (var extension : category.getSupportedFileExtensions()) {
+                var fileName = s3Service.uploadFile(category, genMultipartFile(extension));
+                assertNotNull(s3Service.downloadFile(fileName));
+                s3Service.deleteFile(fileName);
+                assertThrows(
+                        AmazonS3Exception.class,
+                        () -> amazonS3.getObject(bucketName, fileName));
+            }
     }
 
 }

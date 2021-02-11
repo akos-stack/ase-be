@@ -4,7 +4,6 @@ import com.bloxico.ase.userservice.facade.IS3Facade;
 import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.api.S3Api;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,20 +17,21 @@ public class S3Controller implements S3Api {
     private IS3Facade s3Facade;
 
     @Override
-    public ResponseEntity<Void> validateFile(FileCategory fileCategory, MultipartFile file) {
-        s3Facade.validateFile(fileCategory, file);
+    public ResponseEntity<Void> validateFile(FileCategory category, MultipartFile file) {
+        s3Facade.validateFile(category, file);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Resource> downloadFile(String fileName) {
-        ByteArrayResource response = s3Facade.downloadFile(fileName);
+    public ResponseEntity<Resource> downloadFile(String path) {
+        var response = s3Facade.downloadFile(path);
         return ResponseEntity.ok().body(response);
     }
 
     @Override
-    public ResponseEntity<Void> deleteFile(String fileName) {
-        s3Facade.deleteFile(fileName);
+    public ResponseEntity<Void> deleteFile(String path) {
+        s3Facade.deleteFile(path);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 }

@@ -1,40 +1,36 @@
 package com.bloxico.ase.userservice.filter;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_UPDATE_ENDPOINT;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
-@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class JwtAuthorizationFilterTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Autowired
-    private ITokenBlacklistService blacklistService;
+    @Autowired private UtilAuth utilAuth;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilToken utilToken;
+    @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private ITokenBlacklistService blacklistService;
 
     @Test
     public void doFilterInternal_403_invalidAccessToken() {
         given()
-                .header("Authorization", uuid())
+                .header("Authorization", genUUID())
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest(uuid(), uuid(), uuid()))
+                .body(new UpdateUserProfileRequest(genUUID(), genUUID(), genUUID()))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()
@@ -44,15 +40,15 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
 
     @Test
     public void doFilterInternal_403_refreshTokenUsedInsteadOfAccessToken() {
-        var refreshToken = mockUtil
-                .doAuthenticationRequest(mockUtil.doConfirmedRegistration())
+        var refreshToken = utilAuth
+                .doAuthenticationRequest(utilAuth.doConfirmedRegistration())
                 .body()
                 .jsonPath()
                 .getString("refresh_token");
         given()
                 .header("Authorization", refreshToken)
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest(uuid(), uuid(), uuid()))
+                .body(new UpdateUserProfileRequest(genUUID(), genUUID(), genUUID()))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()
@@ -62,17 +58,17 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
 
     @Test
     public void doFilterInternal_403_blacklistedAccessToken() {
-        var registration = mockUtil.doConfirmedRegistration();
-        mockUtil.savedUserProfile(registration.getId());
-        var accessToken = mockUtil.doAuthentication(registration);
+        var registration = utilAuth.doConfirmedRegistration();
+        utilUserProfile.savedUserProfile(registration.getId());
+        var accessToken = utilAuth.doAuthentication(registration);
         var email = registration.getEmail();
-        var oauthToken = mockUtil.toOAuthAccessTokenDto(email, accessToken);
-        var admin = mockUtil.savedAdmin();
+        var oauthToken = utilToken.toOAuthAccessTokenDto(email, accessToken);
+        var admin = utilUser.savedAdmin();
         blacklistService.blacklistTokens(List.of(oauthToken), admin.getId());
         given()
                 .header("Authorization", accessToken)
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest(uuid(), uuid(), uuid()))
+                .body(new UpdateUserProfileRequest(genUUID(), genUUID(), genUUID()))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()
@@ -82,12 +78,12 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
 
     @Test
     public void doFilterInternal_200_ok() {
-        var registration = mockUtil.doConfirmedRegistration();
-        mockUtil.savedUserProfile(registration.getId());
+        var registration = utilAuth.doConfirmedRegistration();
+        utilUserProfile.savedUserProfile(registration.getId());
         given()
-                .header("Authorization", mockUtil.doAuthentication(registration))
+                .header("Authorization", utilAuth.doAuthentication(registration))
                 .contentType(JSON)
-                .body(new UpdateUserProfileRequest(uuid(), uuid(), uuid()))
+                .body(new UpdateUserProfileRequest(genUUID(), genUUID(), genUUID()))
                 .when()
                 .post(API_URL + MY_PROFILE_UPDATE_ENDPOINT)
                 .then()

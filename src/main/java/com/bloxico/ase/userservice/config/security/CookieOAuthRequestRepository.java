@@ -48,7 +48,7 @@ public class CookieOAuthRequestRepository implements AuthorizationRequestReposit
                 cookieExpireSeconds);
         response.addCookie(stateCookie);
 
-        String redirectUriAfterLogin = request.getParameter(REDIRECT_URI_PARAM_COOKIE_NAME);
+        var redirectUriAfterLogin = request.getParameter(REDIRECT_URI_PARAM_COOKIE_NAME);
         if (!redirectUriAfterLogin.isBlank()) {
             var redirectUriCookie = newCookie(
                     REDIRECT_URI_PARAM_COOKIE_NAME,

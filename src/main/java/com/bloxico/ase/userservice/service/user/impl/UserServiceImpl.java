@@ -97,15 +97,15 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void enableUser(long id) {
-        log.debug("UserServiceImpl.enableUser - start | id: {}", id);
+    public void enableUser(long userId, long principalId) {
+        log.debug("UserServiceImpl.enableUser - start | userId: {}, principalId: {}", userId, principalId);
         var user = userRepository
-                .findById(id)
+                .findById(userId)
                 .orElseThrow(USER_NOT_FOUND::newException);
         user.setEnabled(true);
-        user.setUpdaterId(id);
+        user.setUpdaterId(principalId);
         userRepository.saveAndFlush(user);
-        log.debug("UserServiceImpl.enableUser - end | id: {}", id);
+        log.debug("UserServiceImpl.enableUser - end | userId: {}, principalId: {}", userId, principalId);
     }
 
     @Override
