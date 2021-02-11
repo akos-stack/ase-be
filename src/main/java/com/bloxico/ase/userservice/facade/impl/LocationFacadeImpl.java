@@ -69,6 +69,16 @@ public class LocationFacadeImpl implements ILocationFacade {
         return new CountryDataResponse(countryDto);
     }
 
+    @Override
+    public void editCountry(EditCountryRequest request, int countryId, long principalId) {
+        log.debug("LocationFacadeImpl.editCountry - start | request: {}, countryId: {}, principalId: {}",
+                request, countryId, principalId);
+        requireNonNull(request);
+        doEditCountry(request, countryId, principalId);
+        log.debug("LocationFacadeImpl.editCountry - end | request: {}, countryId: {}, principalId: {}",
+                request, countryId, principalId);
+    }
+
     private CountryDto doCreateCountry(CreateCountryRequest request, long principalId) {
         var dto = MAPPER.toCountryDto(request);
         var countryDto = locationService.createCountry(dto, principalId);
@@ -81,6 +91,23 @@ public class LocationFacadeImpl implements ILocationFacade {
             CreateCountryRequest request, int countryId, long principalId) {
         var dto = MAPPER.toCountryEvaluationDetailsDto(request);
         return locationService.createCountryEvaluationDetails(dto, countryId, principalId);
+    }
+
+    private void doEditCountry(EditCountryRequest request, int countryId, long principalId) {
+        var dto = MAPPER.toCountryDto(request);
+        dto = locationService.editCountry(dto, countryId, principalId);
+        var evaluationDetailsChangeRequested =
+                request.getPricePerEvaluation() != dto.getCountryEvaluationDetails().getPricePerEvaluation()
+                        || request.getAvailabilityPercentage() != dto.getCountryEvaluationDetails().getAvailabilityPercentage();
+        if (!evaluationDetailsChangeRequested) {
+            return;
+        }
+        doEditCountryEvaluationDetails(request, countryId, principalId);
+    }
+
+    private void doEditCountryEvaluationDetails(EditCountryRequest request, int countryId, long principalId) {
+        var dto = MAPPER.toCountryEvaluationDetailsDto(request);
+        locationService.editCountryEvaluationDetails(dto, countryId, principalId);
     }
 
 }

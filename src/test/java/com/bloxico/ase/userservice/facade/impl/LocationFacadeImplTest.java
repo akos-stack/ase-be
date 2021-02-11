@@ -8,6 +8,7 @@ import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import com.bloxico.ase.userservice.web.model.address.CreateCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
+import com.bloxico.ase.userservice.web.model.address.EditCountryRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -154,6 +155,55 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
         assertEquals(10, countryResponse.getCountryEvaluationDetails().getPricePerEvaluation());
         assertEquals(40, countryResponse.getCountryEvaluationDetails().getAvailabilityPercentage());
         assertEquals(0, countryResponse.getCountryEvaluationDetails().getTotalOfEvaluators());
+    }
+
+    @Test
+    public void editCountry_requestIsNull() {
+        assertThrows(
+                NullPointerException.class,
+                () -> facade.editCountry(null, 1, 1));
+            }
+
+    @Test
+    public void editCountry_countryAlreadyExists() {
+        var country1 = utilLocation.savedCountryDto();
+        var country2 = utilLocation.savedCountryDto();
+        var request = new EditCountryRequest(
+                country2.getName(), country1.getRegion().getName(), 5, 55);
+        assertThrows(
+                LocationException.class,
+                () -> facade.editCountry(request, country1.getId(), 1));
+    }
+
+    @Test
+    public void editCountry_regionNotFound() {
+        var countryId = utilLocation.savedCountryDto().getId();
+        var request = new EditCountryRequest(genUUID(), genUUID(), 5, 55);
+        assertThrows(
+                LocationException.class,
+                () -> facade.editCountry(request, countryId, 1));
+    }
+
+    @Test
+    public void editCountry() {
+        var principalId = utilUser.savedAdmin().getId();
+        var name = genUUID();
+        var region = utilLocation.savedRegion();
+        var country = utilLocation.savedCountry();
+
+        var request = new EditCountryRequest(name, region.getName(), 5, 55);
+        facade.editCountry(request, country.getId(), principalId);
+
+        var editedCountry = countryRepository
+                .findByNameIgnoreCase(name)
+                .orElse(null);
+
+        assertNotNull(editedCountry);
+        assertEquals(name, editedCountry.getName());
+        assertEquals(region.getName(), editedCountry.getRegion().getName());
+        assertEquals(5, editedCountry.getCountryEvaluationDetails().getPricePerEvaluation());
+        assertEquals(55, editedCountry.getCountryEvaluationDetails().getAvailabilityPercentage());
+        assertEquals(principalId, editedCountry.getUpdaterId());
     }
 
 }

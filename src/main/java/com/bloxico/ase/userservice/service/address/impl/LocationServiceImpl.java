@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
 import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.entity.address.Country;
 import com.bloxico.ase.userservice.entity.address.Region;
 import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
 import com.bloxico.ase.userservice.repository.address.*;
@@ -168,6 +169,43 @@ public class LocationServiceImpl implements ILocationService {
         return evaluationDetailsDto;
     }
 
+    @Override
+    public CountryDto editCountry(CountryDto dto, int countryId, long principalId) {
+        log.debug("LocationServiceImpl.editCountry - start | dto: {}, countryId: {}, principalId: {}",
+                dto, countryId, principalId);
+        requireNonNull(dto);
+        var country = countryRepository
+                .findById(countryId)
+                .orElseThrow(COUNTRY_NOT_FOUND::newException);
+        country.setUpdaterId(principalId);
+        editCountryName(country, dto.getName());
+        editCountryRegion(country, dto.getRegion().getName());
+        countryRepository.saveAndFlush(country);
+        var countryDto = MAPPER.toDto(country);
+        log.debug("LocationServiceImpl.editCountry - end | dto: {}, countryId: {}, principalId: {}",
+                dto, countryId, principalId);
+        return countryDto;
+    }
+
+    @Override
+    public CountryEvaluationDetailsDto editCountryEvaluationDetails(
+            CountryEvaluationDetailsDto dto, int countryId, long principalId) {
+        log.debug("LocationServiceImpl.editCountryEvaluationDetails - start | dto: {}, countryId: {}, principalId: {}",
+                dto, countryId, principalId);
+        requireNonNull(dto);
+        var evaluationDetails = countryEvaluationDetailsRepository
+                .findByCountryId(countryId)
+                .orElseThrow(COUNTRY_NOT_FOUND::newException);
+        evaluationDetails.setUpdaterId(principalId);
+        evaluationDetails.setPricePerEvaluation(dto.getPricePerEvaluation());
+        evaluationDetails.setAvailabilityPercentage(dto.getAvailabilityPercentage());
+        countryEvaluationDetailsRepository.saveAndFlush(evaluationDetails);
+        var evaluationDetailsDto = MAPPER.toDto(evaluationDetails);
+        log.debug("LocationServiceImpl.editCountryEvaluationDetails - end | dto: {}, countryId: {}, principalId: {}",
+                dto, countryId, principalId);
+        return evaluationDetailsDto;
+    }
+
     private CountryDto saveCountry(CountryDto dto, long principalId) {
         var country = MAPPER.toEntity(dto);
         country.setCreatorId(principalId);
@@ -197,6 +235,29 @@ public class LocationServiceImpl implements ILocationService {
         return countryRepository
                 .findByNameIgnoreCase(name)
                 .isPresent();
+    }
+
+    private void editCountryName(Country country, String requestedName) {
+        var countryNameChangeRequested = !country.getName().equalsIgnoreCase(requestedName);
+        if (!countryNameChangeRequested) {
+            return;
+        }
+        if (countryAlreadyExists(requestedName)) {
+            throw COUNTRY_EXISTS.newException();
+        }
+        country.setName(requestedName);
+    }
+
+    private void editCountryRegion(Country country, String requestedRegion) {
+        var countryRegionChangeRequested = !country.getRegion().getName()
+                .equalsIgnoreCase(requestedRegion);
+        if (!countryRegionChangeRequested) {
+            return;
+        }
+        var region = regionRepository
+                .findByNameIgnoreCase(requestedRegion)
+                .orElseThrow(REGION_NOT_FOUND::newException);
+        country.setRegion(region);
     }
 
 }

@@ -84,6 +84,13 @@ public class UtilLocation {
         return evaluationDetailsDto;
     }
 
+    public CountryEvaluationDetailsDto genCountryEvaluationDetailsDto(int price, int availability) {
+        var evaluationDetailsDto = new CountryEvaluationDetailsDto();
+        evaluationDetailsDto.setPricePerEvaluation(price);
+        evaluationDetailsDto.setAvailabilityPercentage(availability);
+        return evaluationDetailsDto;
+    }
+
     public CountryTotalOfEvaluatorsProj savedCountryProj() {
         var countryDto = savedCountryDto();
         return new CountryTotalOfEvaluatorsProj(

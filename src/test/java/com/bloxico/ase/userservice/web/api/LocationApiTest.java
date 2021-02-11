@@ -3,11 +3,9 @@ package com.bloxico.ase.userservice.web.api;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilAuth;
 import com.bloxico.ase.testutil.UtilLocation;
+import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
-import com.bloxico.ase.userservice.web.model.address.CreateCountryRequest;
-import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
-import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
-import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
+import com.bloxico.ase.userservice.web.model.address.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +18,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 // Because RestAssured executes in another transaction
@@ -30,6 +28,7 @@ public class LocationApiTest extends AbstractSpringTest {
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilLocation utilLocation;
     @Autowired private RegionRepository regionRepository;
+    @Autowired private CountryRepository countryRepository;
 
     @Test
     public void findAllCountries_200_ok() {
@@ -232,6 +231,88 @@ public class LocationApiTest extends AbstractSpringTest {
                 .body(request)
                 .when()
                 .post(API_URL + COUNTRIES_CREATE)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(REGION_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void editCountry_200_ok() {
+        var countryId = utilLocation.savedCountry().getId();
+        var region = utilLocation.savedRegion();
+        var request = new EditCountryRequest(genUUID(), region.getName(), 5, 55);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .pathParam("id", countryId)
+                .body(request)
+                .when()
+                .put(API_URL + COUNTRIES_EDIT)
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+        var editedCountry = countryRepository
+                .findById(countryId)
+                .orElse(null);
+
+        assertNotNull(editedCountry);
+        assertEquals(request.getName(), editedCountry.getName());
+        assertEquals(request.getRegion(), editedCountry.getRegion().getName());
+        assertEquals(request.getPricePerEvaluation().intValue(),
+                editedCountry.getCountryEvaluationDetails().getPricePerEvaluation());
+        assertEquals(request.getAvailabilityPercentage().intValue(),
+                editedCountry.getCountryEvaluationDetails().getAvailabilityPercentage());
+    }
+
+    @Test
+    public void editCountry_404_countryAlreadyExists() {
+        var country1 = utilLocation.savedCountry();
+        var country2 = utilLocation.savedCountry();
+        var request =
+                new EditCountryRequest(country2.getName(), country1.getRegion().getName(), 5, 55);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .pathParam("id", country1.getId())
+                .body(request)
+                .when()
+                .put(API_URL + COUNTRIES_EDIT)
+                .then()
+                .assertThat()
+                .statusCode(409)
+                .body(ERROR_CODE, is(COUNTRY_EXISTS.getCode()));
+    }
+
+    @Test
+    public void editCountry_404_countryNotFound() {
+        var country = utilLocation.savedCountry();
+        var request = new EditCountryRequest(genUUID(), country.getRegion().getName(), 5, 55);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .pathParam("id", -1)
+                .body(request)
+                .when()
+                .put(API_URL + COUNTRIES_EDIT)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(COUNTRY_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void editCountry_404_regionNotFound() {
+        var country = utilLocation.savedCountry();
+        var request = new EditCountryRequest(genUUID(), genUUID(), 5, 55);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .pathParam("id", country.getId())
+                .body(request)
+                .when()
+                .put(API_URL + COUNTRIES_EDIT)
                 .then()
                 .assertThat()
                 .statusCode(404)

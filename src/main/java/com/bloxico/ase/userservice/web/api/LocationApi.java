@@ -14,6 +14,7 @@ public interface LocationApi {
 
     String COUNTRIES            = "/countries";
     String COUNTRIES_CREATE     = "/countries/create";
+    String COUNTRIES_EDIT       = "/countries/edit/{id}";
     String CITIES               = "/cities";
     String REGIONS_CREATE       = "/regions/create";
     String REGIONS_DELETE       = "/regions/delete/{id}";
@@ -69,5 +70,20 @@ public interface LocationApi {
     })
     ResponseEntity<CountryDataResponse> createCountry(
             @Valid @RequestBody CreateCountryRequest request, Principal principal);
+
+    @PutMapping(
+            value = COUNTRIES_EDIT,
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'manage_country')")
+    @ApiOperation(value = "Edits country in the database.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Country successfully edited."),
+            @ApiResponse(code = 409, message = "Country already exists."),
+            @ApiResponse(code = 404, message = "Specified region doesn't exist."),
+            @ApiResponse(code = 404, message = "Specified country doesn't exist.")
+    })
+    ResponseEntity<Void> editCountry(
+            @Valid @RequestBody EditCountryRequest request,
+            @Valid @PathVariable("id") Integer countryId, Principal principal);
 
 }

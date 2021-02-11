@@ -57,4 +57,14 @@ public class LocationController implements LocationApi {
         return ResponseEntity.ok(response);
     }
 
+    @Override
+    public ResponseEntity<Void> editCountry(
+            @Valid @RequestBody EditCountryRequest request,
+            @Valid @PathVariable("id") Integer countryId, Principal principal) {
+
+        var id = extractId(principal);
+        locationFacade.editCountry(request, countryId, id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

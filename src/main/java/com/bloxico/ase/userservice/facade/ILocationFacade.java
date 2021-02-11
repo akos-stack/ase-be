@@ -14,4 +14,6 @@ public interface ILocationFacade {
 
     CountryDataResponse createCountry(CreateCountryRequest request, long principalId);
 
+    void editCountry(EditCountryRequest request, int countryId, long principalId);
+
 }

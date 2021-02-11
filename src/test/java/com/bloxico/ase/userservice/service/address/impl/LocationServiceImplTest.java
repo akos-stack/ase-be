@@ -267,4 +267,83 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         assertEquals(adminId, newlyCreatedEvaluationDetails.getCreatorId());
     }
 
+    @Test
+    public void editCountry_nullCountry() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.editCountry(null, 1, 1));
+    }
+
+    @Test
+    public void editCountry_countryAlreadyExists() {
+        var country1 = utilLocation.savedCountryDto();
+        var country2 = utilLocation.savedCountryDto();
+        country1.setName(country2.getName());
+        assertThrows(
+                LocationException.class,
+                () -> service.editCountry(country1, country1.getId(), 1));
+    }
+
+    @Test
+    public void editCountry_regionNotFound() {
+        var country = utilLocation.savedCountryDto();
+        country.setRegion(utilLocation.genRegionDto());
+        assertThrows(
+                LocationException.class,
+                () -> service.editCountry(country, country.getId(), 1));
+    }
+
+    @Test
+    public void editCountry() {
+        var principalId = utilUser.savedAdmin().getId();
+        var countryId = utilLocation.savedCountryDto().getId();
+        var regionDto = utilLocation.savedRegionDto();
+
+        var dto = utilLocation.genCountryDtoWithRegionDto(regionDto);
+        service.editCountry(dto, countryId, principalId);
+
+        var editedCountry = countryRepository
+                .findById(countryId)
+                .orElse(null);
+
+        assertNotNull(editedCountry);
+        assertEquals(dto.getName(), editedCountry.getName());
+        assertEquals(regionDto.getName(), editedCountry.getRegion().getName());
+        assertEquals(principalId, editedCountry.getUpdaterId());
+    }
+
+    @Test
+    public void editCountryEvaluationDetails_nullEvaluationDetails() {
+        var countryId = utilLocation.savedCountry().getId();
+        assertThrows(
+                NullPointerException.class,
+                () -> service.editCountryEvaluationDetails(null, countryId, 1));
+    }
+
+    @Test
+    public void editCountryEvaluationDetails_countryNotFound() {
+        var evaluationDetailsDto = utilLocation.genCountryEvaluationDetailsDto();
+        assertThrows(
+                LocationException.class,
+                () -> service.editCountryEvaluationDetails(evaluationDetailsDto, -1, 1));
+    }
+
+    @Test
+    public void editCountryEvaluationDetails() {
+        var adminId = utilUser.savedAdmin().getId();
+        var countryDto = utilLocation.savedCountryDto();
+        var evaluationDetailsDto = utilLocation.genCountryEvaluationDetailsDto(5, 55);
+        evaluationDetailsDto = service.editCountryEvaluationDetails(evaluationDetailsDto, countryDto.getId(), adminId);
+
+        var editedEvaluationDetails = countryEvaluationDetailsRepository
+                .findById(evaluationDetailsDto.getId())
+                .orElse(null);
+
+        assertNotNull(editedEvaluationDetails);
+        assertEquals(countryDto.getId(), editedEvaluationDetails.getCountry().getId());
+        assertEquals(evaluationDetailsDto.getPricePerEvaluation(), editedEvaluationDetails.getPricePerEvaluation());
+        assertEquals(evaluationDetailsDto.getAvailabilityPercentage(), editedEvaluationDetails.getAvailabilityPercentage());
+        assertEquals(adminId, editedEvaluationDetails.getUpdaterId());
+    }
+
 }
