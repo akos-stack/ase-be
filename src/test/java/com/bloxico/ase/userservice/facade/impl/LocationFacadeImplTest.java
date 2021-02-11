@@ -79,6 +79,32 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
+    public void deleteRegion_regionNotFound() {
+        assertThrows(
+                LocationException.class,
+                () -> facade.deleteRegion(-1, utilUser.savedAdmin().getId()));
+    }
+
+    @Test
+    public void deleteRegion_regionHasCountries() {
+        var adminId = utilUser.savedAdmin().getId();
+        var region = utilLocation.savedRegionDto();
+        var request = new CreateCountryRequest(genUUID(), region.getName(), 10, 40);
+        facade.createCountry(request, adminId);
+        assertThrows(
+                LocationException.class,
+                () -> facade.deleteRegion(region.getId(), adminId));
+    }
+
+    @Test
+    public void deleteRegion_regionSuccessfullyDeleted() {
+        var id = utilLocation.savedRegion().getId();
+        assertTrue(regionRepository.findById(id).isPresent());
+        facade.deleteRegion(id, utilUser.savedAdmin().getId());
+        assertTrue(regionRepository.findById(id).isEmpty());
+    }
+
+    @Test
     public void createCountry_requestIsNull() {
         assertThrows(
                 NullPointerException.class,

@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
 import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.entity.address.Region;
 import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
 import com.bloxico.ase.userservice.repository.address.*;
 import com.bloxico.ase.userservice.service.address.ILocationService;
@@ -117,6 +118,19 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
+    public RegionDto deleteRegion(int regionId, long principalId) {
+        log.debug("LocationServiceImpl.deleteRegion - start | regionId: {}, principalId: {}", regionId, principalId);
+        var region = regionRepository
+                .findById(regionId)
+                .orElseThrow(REGION_NOT_FOUND::newException);
+        requireRegionHasNoCountries(region);
+        regionRepository.delete(region);
+        var regionDto = MAPPER.toDto(region);
+        log.debug("LocationServiceImpl.deleteRegion - end | regionId: {}, principalId: {}", regionId, principalId);
+        return regionDto;
+    }
+
+    @Override
     public CountryDto createCountry(CountryDto dto, long principalId) {
         log.debug("LocationServiceImpl.createCountry - start | dto: {}, principalId: {}", dto, principalId);
         requireNonNull(dto);
@@ -170,6 +184,13 @@ public class LocationServiceImpl implements ILocationService {
         return regionRepository
                 .findByNameIgnoreCase(name)
                 .isPresent();
+    }
+
+    private void requireRegionHasNoCountries(Region region) {
+        var countriesInRegion = countryRepository.countByRegionId(region.getId());
+        if (countriesInRegion > 0) {
+            throw REGION_DELETE_OPERATION_NOT_SUPPORTED.newException();
+        }
     }
 
     private boolean countryAlreadyExists(String name) {

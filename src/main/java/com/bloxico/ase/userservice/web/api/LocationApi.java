@@ -4,9 +4,7 @@ import com.bloxico.ase.userservice.web.model.address.*;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -18,6 +16,7 @@ public interface LocationApi {
     String COUNTRIES_CREATE     = "/countries/create";
     String CITIES               = "/cities";
     String REGIONS_CREATE       = "/regions/create";
+    String REGIONS_DELETE       = "/regions/delete/{id}";
 
     @GetMapping(value = COUNTRIES)
     @ApiOperation(value = "Fetch all countries.")
@@ -45,6 +44,17 @@ public interface LocationApi {
     })
     ResponseEntity<RegionDataResponse> createRegion(
             @Valid @RequestBody CreateRegionRequest request, Principal principal);
+
+    @DeleteMapping(value = REGIONS_DELETE)
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'manage_region')")
+    @ApiOperation(value = "Deletes region from the database.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Region successfully deleted."),
+            @ApiResponse(code = 404, message = "Specified region doesn't exist."),
+            @ApiResponse(code = 400, message = "Region has one or more countries tied down to it.")
+    })
+    ResponseEntity<Void> deleteRegion(
+            @Valid @PathVariable("id") Integer regionId, Principal principal);
 
     @PostMapping(
             value = COUNTRIES_CREATE,

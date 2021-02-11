@@ -167,6 +167,32 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
+    public void deleteRegion_regionNotFound() {
+        assertThrows(
+                LocationException.class,
+                () -> service.deleteRegion(-1, utilUser.savedAdmin().getId()));
+    }
+
+    @Test
+    public void deleteRegion_regionHasCountries() {
+        var adminId = utilUser.savedAdmin().getId();
+        var regionDto = utilLocation.savedRegionDto();
+        var countryDto = utilLocation.genCountryDtoWithRegionDto(regionDto);
+        service.createCountry(countryDto, adminId);
+        assertThrows(
+                LocationException.class,
+                () -> service.deleteRegion(regionDto.getId(), adminId));
+    }
+
+    @Test
+    public void deleteRegion() {
+        var id = utilLocation.savedRegion().getId();
+        assertTrue(regionRepository.findById(id).isPresent());
+        service.deleteRegion(id, utilUser.savedAdmin().getId());
+        assertTrue(regionRepository.findById(id).isEmpty());
+    }
+
+    @Test
     public void createCountry_nullCountry() {
         assertThrows(
                 NullPointerException.class,
@@ -219,7 +245,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         var evaluationDetailsDto = utilLocation.genCountryEvaluationDetailsDto();
         assertThrows(
                 LocationException.class,
-                () -> service.createCountryEvaluationDetails(evaluationDetailsDto, -1, 1));;
+                () -> service.createCountryEvaluationDetails(evaluationDetailsDto, -1, 1));
     }
 
     @Test

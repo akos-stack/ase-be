@@ -165,7 +165,12 @@ public interface ErrorCodes {
         COUNTRY_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "33",
-                "Country with specified name was not found.");
+                "Country with specified name was not found."),
+
+        REGION_DELETE_OPERATION_NOT_SUPPORTED(
+                HttpStatus.BAD_REQUEST,
+                "34",
+                "One or more countries are tied down to the region. Region cannot be deleted.");
 
         private final HttpStatus httpStatus;
         private final String code, description;

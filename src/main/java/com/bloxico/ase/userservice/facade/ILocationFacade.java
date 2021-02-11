@@ -10,6 +10,8 @@ public interface ILocationFacade {
 
     RegionDataResponse createRegion(CreateRegionRequest request, long principalId);
 
+    void deleteRegion(int regionId, long principalId);
+
     CountryDataResponse createCountry(CreateCountryRequest request, long principalId);
 
 }

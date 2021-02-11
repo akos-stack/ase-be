@@ -54,6 +54,13 @@ public class LocationFacadeImpl implements ILocationFacade {
     }
 
     @Override
+    public void deleteRegion(int regionId, long principalId) {
+        log.debug("LocationFacadeImpl.deleteRegion - start | regionId: {}, principalId: {}", regionId, principalId);
+        locationService.deleteRegion(regionId, principalId);
+        log.debug("LocationFacadeImpl.deleteRegion - end | regionId: {}, principalId: {}", regionId, principalId);
+    }
+
+    @Override
     public CountryDataResponse createCountry(CreateCountryRequest request, long principalId) {
         log.debug("LocationFacadeImpl.createCountry - start | request: {}, principalId: {}", request, principalId);
         requireNonNull(request);

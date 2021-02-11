@@ -19,6 +19,8 @@ public interface ILocationService {
 
     RegionDto createRegion(RegionDto dto, long principalId);
 
+    RegionDto deleteRegion(int regionId, long principalId);
+
     CountryDto createCountry(CountryDto dto, long principalId);
 
     CountryEvaluationDetailsDto createCountryEvaluationDetails(CountryEvaluationDetailsDto dto, int countryId, long principalId);

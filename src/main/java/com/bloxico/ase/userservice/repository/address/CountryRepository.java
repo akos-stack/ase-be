@@ -25,4 +25,6 @@ public interface CountryRepository extends JpaRepository<Country, Integer> {
                     "c.countryEvaluationDetails.availabilityPercentage")
     List<CountryTotalOfEvaluatorsProj> findAllIncludeEvaluatorsCount();
 
+    int countByRegionId(int id);
+
 }
