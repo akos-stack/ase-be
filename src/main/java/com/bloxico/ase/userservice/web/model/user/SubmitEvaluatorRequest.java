@@ -98,15 +98,6 @@ public class SubmitEvaluatorRequest implements ISubmitUserProfileRequest {
 
     @NotNull
     @NotEmpty
-    @JsonProperty("city")
-    @ApiModelProperty(required = true)
-    String city;
-
-    @JsonProperty("zip_code")
-    String zipCode;
-
-    @NotNull
-    @NotEmpty
     @JsonProperty("address")
     @ApiModelProperty(required = true)
     String address;

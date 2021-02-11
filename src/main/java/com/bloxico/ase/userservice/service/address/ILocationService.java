@@ -9,11 +9,7 @@ public interface ILocationService {
 
     List<CountryTotalOfEvaluatorsProj> findAllCountries();
 
-    List<CityDto> findAllCities();
-
     CountryDto findOrSaveCountry(CountryDto countryDto, long principalId);
-
-    CityDto findOrSaveCity(CityDto cityDto, long principalId);
 
     LocationDto saveLocation(LocationDto locationDto, long principalId);
 

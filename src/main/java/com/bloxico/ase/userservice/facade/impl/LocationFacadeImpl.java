@@ -35,15 +35,6 @@ public class LocationFacadeImpl implements ILocationFacade {
     }
 
     @Override
-    public SearchCitiesResponse findAllCities() {
-        log.info("LocationFacadeImpl.findAllCities - start");
-        var cities = locationService.findAllCities();
-        var response = new SearchCitiesResponse(cities);
-        log.info("LocationFacadeImpl.findAllCities - end");
-        return response;
-    }
-
-    @Override
     public RegionDataResponse createRegion(CreateRegionRequest request, long principalId) {
         log.debug("LocationFacadeImpl.createRegion - start | request: {}, principalId: {}", request, principalId);
         requireNonNull(request);

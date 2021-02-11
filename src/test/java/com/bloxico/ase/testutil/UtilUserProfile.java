@@ -54,8 +54,8 @@ public class UtilUserProfile {
                 genUUID(), genUUID(), password,
                 email, genUUID(), genUUID(),
                 genUUID(), LocalDate.now(),
-                genUUID(), genUUID(), genUUID(),
-                genUUID(), genUUID(), ONE, TEN);
+                genUUID(), genUUID(),
+                genUUID(), ONE, TEN);
     }
 
     public static SubmitArtOwnerRequest newSubmitArtOwnerRequest() {
@@ -63,7 +63,7 @@ public class UtilUserProfile {
                 genUUID(), genPassword(),
                 genEmail(), genUUID(), genUUID(),
                 genUUID(), LocalDate.now(),
-                genUUID(), genUUID(), genUUID(),
+                genUUID(),
                 genUUID(), genUUID(), ONE, TEN);
     }
 

@@ -1,8 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.UtilLocation;
-import com.bloxico.ase.testutil.UtilUser;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.LocationException;
 import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
@@ -30,14 +28,6 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
         assertThat(facade.findAllCountries().getCountries(), hasItems(c1));
         var c2 = utilLocation.savedCountryProj();
         assertThat(facade.findAllCountries().getCountries(), hasItems(c1, c2));
-    }
-
-    @Test
-    public void findAllCities() {
-        var c1 = utilLocation.savedCityDto();
-        assertThat(facade.findAllCities().getCities(), hasItems(c1));
-        var c2 = utilLocation.savedCityDto();
-        assertThat(facade.findAllCities().getCities(), hasItems(c1, c2));
     }
 
     @Test

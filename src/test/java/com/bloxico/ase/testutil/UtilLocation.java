@@ -1,10 +1,8 @@
 package com.bloxico.ase.testutil;
 
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
+import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.entity.address.*;
+import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
 import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
 import com.bloxico.ase.userservice.repository.address.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,6 @@ public class UtilLocation {
 
     @Autowired private UtilUser utilUser;
     @Autowired private CountryRepository countryRepository;
-    @Autowired private CityRepository cityRepository;
     @Autowired private LocationRepository locationRepository;
     @Autowired private RegionRepository regionRepository;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
@@ -96,20 +93,6 @@ public class UtilLocation {
 
     public CountryDto savedCountryDto() {
         return MAPPER.toDto(savedCountry());
-    }
-
-    public City savedCity() {
-        var country = savedCountry();
-        var city = new City();
-        city.setCountry(country);
-        city.setName(genUUID());
-        city.setZipCode(genUUID());
-        city.setCreatorId(country.getCreatorId());
-        return cityRepository.saveAndFlush(city);
-    }
-
-    public CityDto savedCityDto() {
-        return MAPPER.toDto(savedCity());
     }
 
     public Location savedLocation() {

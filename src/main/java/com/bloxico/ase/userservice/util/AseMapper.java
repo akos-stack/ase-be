@@ -8,6 +8,7 @@ import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.entity.address.*;
+import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.*;
 import com.bloxico.ase.userservice.entity.user.Role;
@@ -33,8 +34,6 @@ public interface AseMapper {
 
     RoleDto toDto(Role entity);
 
-    CityDto toDto(City entity);
-
     CountryDto toDto(Country entity);
 
     LocationDto toDto(Location entity);
@@ -58,8 +57,6 @@ public interface AseMapper {
     // DTO -> ENTITY
 
     User toEntity(UserDto dto);
-
-    City toEntity(CityDto dto);
 
     Country toEntity(CountryDto dto);
 
@@ -89,10 +86,6 @@ public interface AseMapper {
 
     @Mapping(target = "name", source = "country")
     CountryDto toCountryDto(ISubmitUserProfileRequest request);
-
-    @Mapping(ignore = true, target = "country")
-    @Mapping(target = "name", source = "city")
-    CityDto toCityDto(ISubmitUserProfileRequest request);
 
     @Mapping(ignore = true, target = "country")
     LocationDto toLocationDto(ISubmitUserProfileRequest request);

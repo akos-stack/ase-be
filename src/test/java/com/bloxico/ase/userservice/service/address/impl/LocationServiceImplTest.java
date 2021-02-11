@@ -1,16 +1,12 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
 import com.bloxico.ase.testutil.*;
-import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
+import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.exception.LocationException;
-import com.bloxico.ase.userservice.repository.address.CountryEvaluationDetailsRepository;
-import com.bloxico.ase.userservice.repository.address.CountryRepository;
-import com.bloxico.ase.userservice.repository.address.LocationRepository;
-import com.bloxico.ase.userservice.repository.address.RegionRepository;
+import com.bloxico.ase.userservice.repository.address.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -39,14 +35,6 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
-    public void findAllCities() {
-        var c1 = utilLocation.savedCityDto();
-        assertThat(service.findAllCities(), hasItems(c1));
-        var c2 = utilLocation.savedCityDto();
-        assertThat(service.findAllCities(), hasItems(c1, c2));
-    }
-
-    @Test
     public void findOrSaveCountry_nullCountry() {
         assertThrows(
                 NullPointerException.class,
@@ -70,38 +58,6 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         assertTrue(countryRepository.findById(country.getId()).isPresent());
         assertEquals(country, service.findOrSaveCountry(country, principalId));
         assertEquals(country, service.findOrSaveCountry(country, principalId));
-    }
-
-    @Test
-    public void findOrSaveCity_nullCity() {
-        assertThrows(
-                NullPointerException.class,
-                () -> service.findOrSaveCity(null, 1));
-    }
-
-    @Test
-    public void findOrSaveCity_saved() {
-        var principalId = utilUser.savedAdmin().getId();
-        var city = new CityDto();
-        city.setCountry(utilLocation.savedCountryDto());
-        city.setName(genUUID());
-        assertThat(service.findAllCities(), not(hasItems(city)));
-        service.findOrSaveCity(city, principalId);
-        assertThat(service.findAllCities(), hasItems(city));
-    }
-
-    @Test
-    public void findOrSaveCity_found() {
-        var principalId = utilUser.savedAdmin().getId();
-        var city = utilLocation.savedCityDto();
-        assertThat(service.findAllCities(), hasItems(city));
-        assertEquals(city, service.findOrSaveCity(city, principalId));
-        assertEquals(
-                List.of(city),
-                service.findAllCities()
-                        .stream()
-                        .filter(city::equals)
-                        .collect(toList()));
     }
 
     @Test
@@ -219,7 +175,8 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         var evaluationDetailsDto = utilLocation.genCountryEvaluationDetailsDto();
         assertThrows(
                 LocationException.class,
-                () -> service.createCountryEvaluationDetails(evaluationDetailsDto, -1, 1));;
+                () -> service.createCountryEvaluationDetails(evaluationDetailsDto, -1, 1));
+        ;
     }
 
     @Test

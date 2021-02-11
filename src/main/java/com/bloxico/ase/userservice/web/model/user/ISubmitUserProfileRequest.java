@@ -27,10 +27,6 @@ public interface ISubmitUserProfileRequest {
 
     String getCountry();
 
-    String getCity();
-
-    String getZipCode();
-
     String getAddress();
 
     BigDecimal getLatitude();

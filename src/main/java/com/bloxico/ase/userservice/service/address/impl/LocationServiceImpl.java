@@ -20,20 +20,17 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 public class LocationServiceImpl implements ILocationService {
 
     private final CountryRepository countryRepository;
-    private final CityRepository cityRepository;
     private final LocationRepository locationRepository;
     private final RegionRepository regionRepository;
     private final CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Autowired
     public LocationServiceImpl(CountryRepository countryRepository,
-                               CityRepository cityRepository,
                                LocationRepository locationRepository,
                                RegionRepository regionRepository,
                                CountryEvaluationDetailsRepository countryEvaluationDetailsRepository)
     {
         this.countryRepository = countryRepository;
-        this.cityRepository = cityRepository;
         this.locationRepository = locationRepository;
         this.regionRepository = regionRepository;
         this.countryEvaluationDetailsRepository = countryEvaluationDetailsRepository;
@@ -51,18 +48,6 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public List<CityDto> findAllCities() {
-        log.debug("LocationServiceImpl.findAllCities - start");
-        var cities = cityRepository
-                .findAll()
-                .stream()
-                .map(MAPPER::toDto)
-                .collect(toUnmodifiableList());
-        log.debug("LocationServiceImpl.findAllCities - end");
-        return cities;
-    }
-
-    @Override
     public CountryDto findOrSaveCountry(CountryDto dto, long principalId) {
         log.debug("LocationServiceImpl.findOrSaveCountry - start | dto: {}, principalId: {}", dto, principalId);
         requireNonNull(dto);
@@ -73,19 +58,6 @@ public class LocationServiceImpl implements ILocationService {
                 .orElseGet(() -> saveCountry(dto, principalId));
         log.debug("LocationServiceImpl.findOrSaveCountry - end | dto: {}, principalId: {}", dto, principalId);
         return countryDto;
-    }
-
-    @Override
-    public CityDto findOrSaveCity(CityDto dto, long principalId) {
-        log.debug("LocationServiceImpl.findOrSaveCity - start | dto: {}, principalId: {}", dto, principalId);
-        requireNonNull(dto);
-        var cityDto = cityRepository
-                .findByNameIgnoreCase(dto.getName())
-                .map(MAPPER::toDto)
-                .filter(dto::equals)
-                .orElseGet(() -> saveCity(dto, principalId));
-        log.debug("LocationServiceImpl.findOrSaveCity - end | dto: {}, principalId: {}", dto, principalId);
-        return cityDto;
     }
 
     @Override
@@ -158,12 +130,6 @@ public class LocationServiceImpl implements ILocationService {
         var country = MAPPER.toEntity(dto);
         country.setCreatorId(principalId);
         return MAPPER.toDto(countryRepository.saveAndFlush(country));
-    }
-
-    private CityDto saveCity(CityDto dto, long principalId) {
-        var city = MAPPER.toEntity(dto);
-        city.setCreatorId(principalId);
-        return MAPPER.toDto(cityRepository.saveAndFlush(city));
     }
 
     private boolean regionAlreadyExists(String name) {

@@ -1,12 +1,7 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.UtilAuth;
-import com.bloxico.ase.testutil.UtilLocation;
-import com.bloxico.ase.userservice.web.model.address.CreateCountryRequest;
-import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
-import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
-import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
+import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.userservice.web.model.address.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,26 +41,6 @@ public class LocationApiTest extends AbstractSpringTest {
                 .as(SearchCountriesResponse.class)
                 .getCountries();
         assertThat(countries, hasItems(c1, c2, c3));
-    }
-
-    @Test
-    public void findAllCities_200_ok() {
-        var c1 = utilLocation.savedCityDto();
-        var c2 = utilLocation.savedCityDto();
-        var c3 = utilLocation.savedCityDto();
-        var cities = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
-                .contentType(JSON)
-                .when()
-                .get(API_URL + CITIES)
-                .then()
-                .assertThat()
-                .statusCode(200)
-                .extract()
-                .body()
-                .as(SearchCitiesResponse.class)
-                .getCities();
-        assertThat(cities, hasItems(c1, c2, c3));
     }
 
     @Test
