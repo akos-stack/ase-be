@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserException;
@@ -13,27 +12,19 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static com.bloxico.ase.testutil.MockUtil.*;
+import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserPasswordFacadeImplTest extends AbstractSpringTest {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Autowired
-    private UserServiceImpl userService;
-
-    @Autowired
-    private TokenRepository tokenRepository;
-
-    @Autowired
-    private UserPasswordFacadeImpl userPasswordFacade;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilAuth utilAuth;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private UserServiceImpl userService;
+    @Autowired private TokenRepository tokenRepository;
+    @Autowired private UserPasswordFacadeImpl userPasswordFacade;
 
     @Test
     public void handleForgotPasswordRequest_nullRequest() {
@@ -52,7 +43,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void handleForgotPasswordRequest() {
-        var user = mockUtil.savedAdmin();
+        var user = utilUser.savedAdmin();
         assertTrue(tokenRepository.findByTypeAndUserId(PASSWORD_RESET, user.getId()).isEmpty());
         var request = new ForgotPasswordRequest(user.getEmail());
         userPasswordFacade.handleForgotPasswordRequest(request);
@@ -81,7 +72,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void resendPasswordToken_tokenNotFound() {
-        var email = mockUtil.savedAdmin().getEmail();
+        var email = utilUser.savedAdmin().getEmail();
         var request = new ResendTokenRequest(email);
         assertThrows(
                 TokenException.class,
@@ -90,8 +81,8 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void resendPasswordToken() {
-        var email = mockUtil.savedAdmin().getEmail();
-        mockUtil.doForgotPasswordRequest(email);
+        var email = utilUser.savedAdmin().getEmail();
+        utilAuth.doForgotPasswordRequest(email);
         var request = new ResendTokenRequest(email);
         userPasswordFacade.resendPasswordToken(request);
     }
@@ -105,7 +96,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void updateForgottenPassword_userNotFound() {
-        var token = mockUtil.doForgotPasswordRequest(mockUtil.savedAdmin().getEmail());
+        var token = utilAuth.doForgotPasswordRequest(utilUser.savedAdmin().getEmail());
         var request = new ForgottenPasswordUpdateRequest(genEmail(), token, genPassword());
         assertThrows(
                 UserException.class,
@@ -114,8 +105,8 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void updateForgottenPassword_tokenNotFound() {
-        var email = mockUtil.savedAdmin().getEmail();
-        var request = new ForgottenPasswordUpdateRequest(email, uuid(), genPassword());
+        var email = utilUser.savedAdmin().getEmail();
+        var request = new ForgottenPasswordUpdateRequest(email, genUUID(), genPassword());
         assertThrows(
                 TokenException.class,
                 () -> userPasswordFacade.updateForgottenPassword(request));
@@ -123,8 +114,8 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void updateForgottenPassword() {
-        var email = mockUtil.savedAdmin().getEmail();
-        var token = mockUtil.doForgotPasswordRequest(email);
+        var email = utilUser.savedAdmin().getEmail();
+        var token = utilAuth.doForgotPasswordRequest(email);
         var password = genPassword();
         var request = new ForgottenPasswordUpdateRequest(email, token, password);
         assertTrue(tokenRepository.findByValue(token).isPresent());
@@ -153,7 +144,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
     @Test
     public void updateKnownPassword_oldPasswordMismatch() {
         var request = new KnownPasswordUpdateRequest(genPassword(), genPassword());
-        var userId = mockUtil.savedAdmin().getId();
+        var userId = utilUser.savedAdmin().getId();
         assertThrows(
                 UserException.class,
                 () -> userPasswordFacade.updateKnownPassword(userId, request));
@@ -164,7 +155,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
         var oldPassword = genPassword();
         var newPassword = genPassword();
         var request = new KnownPasswordUpdateRequest(oldPassword, newPassword);
-        var userId = mockUtil.savedAdmin(oldPassword).getId();
+        var userId = utilUser.savedAdmin(oldPassword).getId();
         userPasswordFacade.updateKnownPassword(userId, request);
         assertTrue(passwordEncoder.matches(
                 newPassword,
@@ -190,7 +181,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
     public void setNewPassword() {
         var password = genPassword();
         var request = new SetPasswordRequest(password);
-        var userId = mockUtil.savedAdmin().getId();
+        var userId = utilUser.savedAdmin().getId();
         userPasswordFacade.setNewPassword(userId, request);
         assertTrue(passwordEncoder.matches(
                 password,

@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
@@ -14,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
-import static com.bloxico.ase.testutil.MockUtil.*;
+import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.testutil.UtilUserProfile.newSubmitArtOwnerRequest;
+import static com.bloxico.ase.testutil.UtilUserProfile.newSubmitUninvitedEvaluatorRequest;
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.entity.user.Role.USER;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.*;
@@ -29,11 +30,9 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 @Transactional(propagation = NOT_SUPPORTED)
 public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Autowired
-    private TokenRepository tokenRepository;
+    @Autowired private UtilAuth utilAuth;
+    @Autowired private UtilToken mockUtil;
+    @Autowired private TokenRepository tokenRepository;
 
     @Test
     public void registration_400_passwordMismatch() {
@@ -51,7 +50,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registration_409_userAlreadyExists() {
-        var request = mockUtil.genRegistrationRequest();
+        var request = utilAuth.genRegistrationRequest();
         given()
                 .contentType(JSON)
                 .body(request)
@@ -74,7 +73,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     public void registration_400_invalidAspirationName() {
         var email = genEmail();
-        var request = new RegistrationRequest(email, email, email, email, Set.of(uuid()));
+        var request = new RegistrationRequest(email, email, email, email, Set.of(genUUID()));
         given()
                 .contentType(JSON)
                 .body(request)
@@ -90,7 +89,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void registration_200_ok() {
         given()
                 .contentType(JSON)
-                .body(mockUtil.genRegistrationRequest())
+                .body(utilAuth.genRegistrationRequest())
                 .when()
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .then()
@@ -103,7 +102,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void registration_200_withAspirations() {
         given()
                 .contentType(JSON)
-                .body(mockUtil.genRegistrationRequestWithAspirations(USER, EVALUATOR))
+                .body(utilAuth.genRegistrationRequestWithAspirations(USER, EVALUATOR))
                 .when()
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .then()
@@ -114,8 +113,8 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registrationConfirm_404_tokenNotFound() {
-        mockUtil.doRegistration();
-        var token = uuid();
+        utilAuth.doRegistration();
+        var token = genUUID();
         given()
                 .contentType(JSON)
                 .body(new TokenValidationRequest(token))
@@ -129,7 +128,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registrationConfirm_200_ok() {
-        var registration = mockUtil.doRegistration();
+        var registration = utilAuth.doRegistration();
         var token = registration.getToken();
         given()
                 .contentType(JSON)
@@ -145,7 +144,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void registrationTokenRefresh_404_tokenNotFound() {
         given()
                 .when()
-                .param(TOKEN_PARAM, uuid())
+                .param(TOKEN_PARAM, genUUID())
                 .get(API_URL + REGISTRATION_TOKEN_REFRESH_ENDPOINT)
                 .then()
                 .assertThat()
@@ -157,7 +156,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void registrationTokenRefresh_200_ok() {
         given()
                 .when()
-                .param(TOKEN_PARAM, mockUtil.doRegistration().getToken())
+                .param(TOKEN_PARAM, utilAuth.doRegistration().getToken())
                 .get(API_URL + REGISTRATION_TOKEN_REFRESH_ENDPOINT)
                 .then()
                 .assertThat()
@@ -179,7 +178,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registrationTokenResend_404_tokenNotFound() {
-        var registration = mockUtil.doRegistration();
+        var registration = utilAuth.doRegistration();
         var tokenId = tokenRepository
                 .findByValue(registration.getToken())
                 .orElseThrow()
@@ -201,7 +200,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void registrationTokenResend_200_ok() {
         given()
                 .contentType(JSON)
-                .body(new ResendTokenRequest(mockUtil.doRegistration().getEmail()))
+                .body(new ResendTokenRequest(utilAuth.doRegistration().getEmail()))
                 .when()
                 .post(API_URL + REGISTRATION_TOKEN_RESEND_ENDPOINT)
                 .then()
@@ -211,8 +210,8 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void sendEvaluatorInvitation_409_evaluatorAlreadyInvited() {
-        var registration = mockUtil.doConfirmedRegistration();
-        var bearer = mockUtil.doAdminAuthentication();
+        var registration = utilAuth.doConfirmedRegistration();
+        var bearer = utilAuth.doAdminAuthentication();
         var request = new EvaluatorInvitationRequest(registration.getEmail());
         given()
                 .header("Authorization", bearer)
@@ -238,10 +237,10 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void sendEvaluatorInvitation_200_ok() {
-        var registration = mockUtil.doConfirmedRegistration();
+        var registration = utilAuth.doConfirmedRegistration();
         var request = new EvaluatorInvitationRequest(registration.getEmail());
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(request)
                 .when()
@@ -254,7 +253,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     public void checkEvaluatorInvitation_404_invitationNotFound() {
         given()
-                .pathParam("token", uuid())
+                .pathParam("token", genUUID())
                 .when()
                 .get(API_URL + REGISTRATION_EVALUATOR_INVITATION_CHECK)
                 .then()
@@ -275,10 +274,10 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void resendEvaluatorInvitation_404_evaluatorNotInvited() {
-        var registration = mockUtil.doConfirmedRegistration();
+        var registration = utilAuth.doConfirmedRegistration();
         var request = new EvaluatorInvitationResendRequest(registration.getEmail());
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(request)
                 .post(API_URL + REGISTRATION_EVALUATOR_INVITATION_RESEND)
@@ -290,8 +289,8 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void resendEvaluatorInvitation_200_ok() {
-        var registration = mockUtil.doConfirmedRegistration();
-        var bearer = mockUtil.doAdminAuthentication();
+        var registration = utilAuth.doConfirmedRegistration();
+        var bearer = utilAuth.doAdminAuthentication();
         given()
                 .header("Authorization", bearer)
                 .contentType(JSON)
@@ -314,10 +313,10 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void withdrawEvaluatorInvitation_404_evaluatorNotInvited() {
-        var registration = mockUtil.doConfirmedRegistration();
+        var registration = utilAuth.doConfirmedRegistration();
         var request = new EvaluatorInvitationRequest(registration.getEmail());
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(request)
                 .when()
@@ -330,8 +329,8 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void withdrawEvaluatorInvitation_200_ok() {
-        var registration = mockUtil.doConfirmedRegistration();
-        var bearer = mockUtil.doAdminAuthentication();
+        var registration = utilAuth.doConfirmedRegistration();
+        var bearer = utilAuth.doAdminAuthentication();
         given()
                 .header("Authorization", bearer)
                 .contentType(JSON)
@@ -354,8 +353,8 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void requestEvaluatorRegistration_409_evaluatorAlreadyPending() {
-        var registration = mockUtil.doConfirmedRegistration();
-        var bearerToken = mockUtil.doAuthentication(registration);
+        var registration = utilAuth.doConfirmedRegistration();
+        var bearerToken = utilAuth.doAuthentication(registration);
         var cvBytes = getTestCVBytes();
         given()
                 .header("Authorization", bearerToken)
@@ -380,10 +379,10 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void requestEvaluatorRegistration_200_ok() {
-        var registration = mockUtil.doConfirmedRegistration();
+        var registration = utilAuth.doConfirmedRegistration();
         var cvBytes = getTestCVBytes();
         given()
-                .header("Authorization", mockUtil.doAuthentication(registration))
+                .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParam("email", registration.getEmail())
                 .multiPart("cv", "cv.txt", cvBytes)
                 .when()
@@ -397,7 +396,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void submitEvaluator_404_tokenNotFound() {
         given()
                 .contentType(JSON)
-                .body(mockUtil.newSubmitUninvitedEvaluatorRequest())
+                .body(newSubmitUninvitedEvaluatorRequest())
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
                 .then()
@@ -410,7 +409,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitEvaluator_200_ok() {
-        var request = mockUtil.newSubmitInvitedEvaluatorRequest();
+        var request = mockUtil.submitInvitedEvaluatorRequest();
         var evaluator = given()
                 .contentType(JSON)
                 .body(request)
@@ -437,7 +436,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtOwner_409_userAlreadyExists() {
-        var request = mockUtil.newSubmitArtOwnerRequest();
+        var request = newSubmitArtOwnerRequest();
         given()
                 .contentType(JSON)
                 .body(request)
@@ -458,7 +457,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtOwner_200_ok() {
-        var request = mockUtil.newSubmitArtOwnerRequest();
+        var request = newSubmitArtOwnerRequest();
         var artOwner = given()
                 .contentType(JSON)
                 .body(request)
@@ -486,7 +485,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     public void searchPendingEvaluators_403_forbidden() {
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
                 .param("email", "aseUser")
                 .when()
@@ -502,7 +501,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
         var pe2 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
         var pe3 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
         var pendingEvaluators = given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .param("email", "fooBar")
                 .param("page", 0)
@@ -531,9 +530,9 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void downloadEvaluatorResume_200_ok() {
-        var registration = mockUtil.doConfirmedRegistration();
+        var registration = utilAuth.doConfirmedRegistration();
         given()
-                .header("Authorization", mockUtil.doAuthentication(registration))
+                .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParam("email", registration.getEmail())
                 .multiPart("cv", "cv.txt", getTestCVBytes())
                 .when()
@@ -542,7 +541,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .assertThat()
                 .statusCode(200);
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .queryParam("email", registration.getEmail())
                 .when()
                 .get(API_URL + REGISTRATION_EVALUATOR_RESUME_DOWNLOAD)

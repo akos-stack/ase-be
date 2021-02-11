@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
@@ -14,7 +13,9 @@ import com.bloxico.ase.userservice.web.model.token.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.bloxico.ase.testutil.MockUtil.*;
+import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.testutil.UtilUserProfile.newSubmitArtOwnerRequest;
+import static com.bloxico.ase.testutil.UtilUserProfile.newSubmitUninvitedEvaluatorRequest;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
@@ -28,29 +29,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Autowired
-    private TokenRepository tokenRepository;
-
-    @Autowired
-    private UserServiceImpl userService;
-
-    @Autowired
-    private PendingEvaluatorServiceImpl pendingEvaluatorService;
-
-    @Autowired
-    private EvaluatorRepository evaluatorRepository;
-
-    @Autowired
-    private ArtOwnerRepository artOwnerRepository;
-
-    @Autowired
-    private PendingEvaluatorRepository pendingEvaluatorRepository;
-
-    @Autowired
-    private UserRegistrationFacadeImpl userRegistrationFacade;
+    @Autowired private UtilAuth utilAuth;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilToken utilToken;
+    @Autowired private TokenRepository tokenRepository;
+    @Autowired private UserServiceImpl userService;
+    @Autowired private PendingEvaluatorServiceImpl pendingEvaluatorService;
+    @Autowired private EvaluatorRepository evaluatorRepository;
+    @Autowired private ArtOwnerRepository artOwnerRepository;
+    @Autowired private PendingEvaluatorRepository pendingEvaluatorRepository;
+    @Autowired private UserRegistrationFacadeImpl userRegistrationFacade;
 
     @Test
     public void registerUserWithVerificationToken_nullRequest() {
@@ -61,7 +49,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registerUserWithVerificationToken_passwordMismatch() {
-        var request = mockUtil.genRegistrationRequestPasswordMismatch();
+        var request = utilAuth.genRegistrationRequestPasswordMismatch();
         assertThrows(
                 UserException.class,
                 () -> userRegistrationFacade.registerUserWithVerificationToken(request));
@@ -69,7 +57,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registerUserWithVerificationToken_userAlreadyExists() {
-        var request = mockUtil.genRegistrationRequest();
+        var request = utilAuth.genRegistrationRequest();
         userRegistrationFacade.registerUserWithVerificationToken(request);
         assertThrows(
                 UserException.class,
@@ -78,7 +66,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registerUserWithVerificationToken_invalidAspirationName() {
-        var request = mockUtil.genRegistrationRequestWithAspirations(uuid());
+        var request = utilAuth.genRegistrationRequestWithAspirations(genUUID());
         assertThrows(
                 UserException.class,
                 () -> userRegistrationFacade.registerUserWithVerificationToken(request));
@@ -86,14 +74,14 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void registerDisabledUser() {
-        var request = mockUtil.genRegistrationRequest();
+        var request = utilAuth.genRegistrationRequest();
         var response = userRegistrationFacade.registerUserWithVerificationToken(request);
         assertNotNull(response.getTokenValue());
     }
 
     @Test
     public void registerDisabledUser_withAspirations() {
-        var request = mockUtil.genRegistrationRequestWithAspirations(USER, EVALUATOR);
+        var request = utilAuth.genRegistrationRequestWithAspirations(USER, EVALUATOR);
         var response = userRegistrationFacade.registerUserWithVerificationToken(request);
         assertNotNull(response.getTokenValue());
     }
@@ -107,7 +95,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void handleTokenValidation_tokenNotFound() {
-        var regRequest = mockUtil.genRegistrationRequest();
+        var regRequest = utilAuth.genRegistrationRequest();
         userRegistrationFacade.registerUserWithVerificationToken(regRequest);
         var tknRequest = new TokenValidationRequest(regRequest.getEmail());
         assertThrows(
@@ -117,7 +105,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void handleTokenValidation() {
-        var regRequest = mockUtil.genRegistrationRequest();
+        var regRequest = utilAuth.genRegistrationRequest();
         var email = regRequest.getEmail();
         var token = userRegistrationFacade.registerUserWithVerificationToken(regRequest).getTokenValue();
         var tknRequest = new TokenValidationRequest(token);
@@ -137,12 +125,12 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void refreshExpiredToken_tokenNotFound() {
         assertThrows(
                 TokenException.class,
-                () -> userRegistrationFacade.refreshExpiredToken(uuid()));
+                () -> userRegistrationFacade.refreshExpiredToken(genUUID()));
     }
 
     @Test
     public void refreshExpiredToken() {
-        var request = mockUtil.genRegistrationRequest();
+        var request = utilAuth.genRegistrationRequest();
         var tokenValue = userRegistrationFacade
                 .registerUserWithVerificationToken(request)
                 .getTokenValue();
@@ -170,7 +158,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void resendVerificationToken_userNotFound() {
-        var request = new ResendTokenRequest(uuid());
+        var request = new ResendTokenRequest(genUUID());
         assertThrows(
                 UserException.class,
                 () -> userRegistrationFacade.resendVerificationToken(request));
@@ -178,7 +166,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void resendVerificationToken() {
-        var regRequest = mockUtil.genRegistrationRequest();
+        var regRequest = utilAuth.genRegistrationRequest();
         var email = regRequest.getEmail();
         userRegistrationFacade.registerUserWithVerificationToken(regRequest);
         var resRequest = new ResendTokenRequest(email);
@@ -187,7 +175,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void sendEvaluatorInvitation_requestIsNull() {
-        var admin = mockUtil.savedAdmin();
+        var admin = utilUser.savedAdmin();
         assertThrows(
                 NullPointerException.class,
                 () -> userRegistrationFacade.sendEvaluatorInvitation(null, admin.getId()));
@@ -195,12 +183,12 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void sendEvaluatorInvitation_evaluatorAlreadyInvited() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
         userRegistrationFacade.sendEvaluatorInvitation(request, admin.getId());
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         assertThrows(
                 TokenException.class,
@@ -209,8 +197,8 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void sendEvaluatorInvitation_evaluatorAlreadyRequested() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
         var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         userRegistrationFacade.requestEvaluatorRegistration(registrationRequest, user.getId());
 
@@ -231,8 +219,8 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void sendEvaluatorInvitation() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
         userRegistrationFacade.sendEvaluatorInvitation(request, admin.getId());
@@ -259,12 +247,12 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void checkEvaluatorInvitation_tokenNotFound() {
         assertThrows(
                 TokenException.class,
-                () -> userRegistrationFacade.checkEvaluatorInvitation(uuid()));
+                () -> userRegistrationFacade.checkEvaluatorInvitation(genUUID()));
     }
 
     @Test
     public void checkEvaluatorInvitation_invitationTokenNotFound() {
-        var principalId = mockUtil.savedAdmin().getId();
+        var principalId = utilUser.savedAdmin().getId();
         var request = new EvaluatorRegistrationRequest(genEmail(), genMultipartFile(pdf));
         var pending = pendingEvaluatorService.createPendingEvaluator(request, principalId);
         assertThrows(
@@ -274,7 +262,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void checkEvaluatorInvitation() {
-        var principalId = mockUtil.savedAdmin().getId();
+        var principalId = utilUser.savedAdmin().getId();
         var request = new EvaluatorInvitationRequest(genEmail());
         var pending = pendingEvaluatorService.createPendingEvaluator(request, principalId);
         userRegistrationFacade.checkEvaluatorInvitation(pending.getToken());
@@ -305,13 +293,13 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void resendEvaluatorInvitation() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
 
         // send invitation
         var sendInvitationRequest = new EvaluatorInvitationRequest(user.getEmail());
         userRegistrationFacade.sendEvaluatorInvitation(sendInvitationRequest, admin.getId());
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         // resend invitation
         var resendInvitationRequest = new EvaluatorInvitationResendRequest(user.getEmail());
@@ -343,19 +331,19 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void withdrawEvaluatorInvitation() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
 
         // send invitation to user
         var sendInvitationRequest = new EvaluatorInvitationRequest(user.getEmail());
         userRegistrationFacade.sendEvaluatorInvitation(sendInvitationRequest, admin.getId());
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         // withdraw invitation
         var withdrawInvitationRequest = new EvaluatorInvitationWithdrawalRequest(user.getEmail());
         userRegistrationFacade.withdrawEvaluatorInvitation(withdrawInvitationRequest);
 
-        assertFalse(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+        assertFalse(utilToken.isEvaluatorPending(user.getEmail()));
     }
 
     @Test
@@ -367,7 +355,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitEvaluator_evaluatorNotPending() {
-        var request = mockUtil.newSubmitUninvitedEvaluatorRequest();
+        var request = newSubmitUninvitedEvaluatorRequest();
         assertThrows(
                 TokenException.class,
                 () -> userRegistrationFacade.submitEvaluator(request));
@@ -375,7 +363,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitEvaluator_evaluatorPending() {
-        var request = mockUtil.newSubmitInvitedEvaluatorRequest();
+        var request = utilToken.submitInvitedEvaluatorRequest();
         assertTrue(evaluatorRepository.findAll().isEmpty());
         var evaluatorId = userRegistrationFacade.submitEvaluator(request).getId();
         assertTrue(evaluatorRepository.findById(evaluatorId).isPresent());
@@ -390,7 +378,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtOwner_userAlreadyExists() {
-        var request = mockUtil.newSubmitArtOwnerRequest();
+        var request = newSubmitArtOwnerRequest();
         userRegistrationFacade.submitArtOwner(request);
         assertThrows(
                 UserException.class,
@@ -399,7 +387,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtOwner() {
-        var request = mockUtil.newSubmitArtOwnerRequest();
+        var request = newSubmitArtOwnerRequest();
         assertTrue(artOwnerRepository.findAll().isEmpty());
         var artOwnerId = userRegistrationFacade.submitArtOwner(request).getId();
         assertTrue(artOwnerRepository.findById(artOwnerId).isPresent());
@@ -407,7 +395,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void requestEvaluatorRegistration_requestIsNull() {
-        var admin = mockUtil.savedAdmin();
+        var admin = utilUser.savedAdmin();
         assertThrows(
                 NullPointerException.class,
                 () -> userRegistrationFacade.requestEvaluatorRegistration(null, admin.getId()));
@@ -415,11 +403,11 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void requestEvaluatorRegistration_evaluatorAlreadyRegistered() {
-        var user = mockUtil.savedUser();
+        var user = utilUser.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         assertThrows(
                 TokenException.class,
@@ -428,12 +416,12 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void requestEvaluatorRegistration_evaluatorAlreadyInvited() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
 
         var invitationRequest = new EvaluatorInvitationRequest(user.getEmail());
         userRegistrationFacade.sendEvaluatorInvitation(invitationRequest, admin.getId());
-        assertTrue(mockUtil.isEvaluatorAlreadyPending(user.getEmail()));
+        assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         assertThrows(
@@ -443,7 +431,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void requestEvaluatorRegistration() {
-        var user = mockUtil.savedUser();
+        var user = utilUser.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
@@ -465,9 +453,9 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void searchPendingEvaluators() {
-        var pe1 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
-        var pe2 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
-        var pe3 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
+        var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
         assertThat(
                 userRegistrationFacade
                         .searchPendingEvaluators("fooBar", 0, 2, "email")
@@ -485,8 +473,8 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void downloadEvaluatorResume() {
-        var user = mockUtil.savedUser();
-        var admin = mockUtil.savedAdmin();
+        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
         var response = userRegistrationFacade.downloadEvaluatorResume(user.getEmail(), admin.getId());

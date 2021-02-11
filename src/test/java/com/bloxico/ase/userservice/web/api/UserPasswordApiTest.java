@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.password.*;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
@@ -9,7 +8,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bloxico.ase.testutil.MockUtil.*;
+import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.web.api.UserPasswordApi.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -20,8 +19,8 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 @Transactional(propagation = NOT_SUPPORTED)
 public class UserPasswordApiTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
+    @Autowired private UtilAuth utilAuth;
+    @Autowired private UtilUser utilUser;
 
     @Test
     public void initForgotPasswordProcedure_404_userNotFound() {
@@ -38,7 +37,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void initForgotPasswordProcedure_200_ok() {
-        var email = mockUtil.savedAdmin().getEmail();
+        var email = utilUser.savedAdmin().getEmail();
         given()
                 .contentType(JSON)
                 .body(new ForgotPasswordRequest(email))
@@ -64,7 +63,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void resendPasswordResetToken_404_tokenNotFound() {
-        var email = mockUtil.savedAdmin().getEmail();
+        var email = utilUser.savedAdmin().getEmail();
         given()
                 .contentType(JSON)
                 .body(new ResendTokenRequest(email))
@@ -78,8 +77,8 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void resendPasswordResetToken_200_ok() {
-        var email = mockUtil.savedAdmin().getEmail();
-        mockUtil.doForgotPasswordRequest(email);
+        var email = utilUser.savedAdmin().getEmail();
+        utilAuth.doForgotPasswordRequest(email);
         given()
                 .contentType(JSON)
                 .body(new ResendTokenRequest(email))
@@ -94,7 +93,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
     public void updateForgottenPassword_404_userNotFound() {
         given()
                 .contentType(JSON)
-                .body(new ForgottenPasswordUpdateRequest(genEmail(), uuid(), genPassword()))
+                .body(new ForgottenPasswordUpdateRequest(genEmail(), genUUID(), genPassword()))
                 .when()
                 .post(API_URL + PASSWORD_UPDATE_FORGOTTEN_ENDPOINT)
                 .then()
@@ -105,10 +104,10 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void updateForgottenPassword_404_tokenNotFound() {
-        var email = mockUtil.savedAdmin().getEmail();
+        var email = utilUser.savedAdmin().getEmail();
         given()
                 .contentType(JSON)
-                .body(new ForgottenPasswordUpdateRequest(email, uuid(), genPassword()))
+                .body(new ForgottenPasswordUpdateRequest(email, genUUID(), genPassword()))
                 .when()
                 .post(API_URL + PASSWORD_UPDATE_FORGOTTEN_ENDPOINT)
                 .then()
@@ -119,8 +118,8 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Test
     public void updateForgottenPassword_200_ok() {
-        var email = mockUtil.savedAdmin().getEmail();
-        var token = mockUtil.doForgotPasswordRequest(email);
+        var email = utilUser.savedAdmin().getEmail();
+        var token = utilAuth.doForgotPasswordRequest(email);
         var password = genPassword();
         given()
                 .contentType(JSON)
@@ -137,7 +136,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
         var oldPassword = genPassword();
         var newPassword = genPassword();
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
                 .body(new KnownPasswordUpdateRequest(oldPassword, newPassword))
                 .when()
@@ -153,7 +152,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
         var oldPassword = genPassword();
         var newPassword = genPassword();
         given()
-                .header("Authorization", mockUtil.doAuthentication(oldPassword))
+                .header("Authorization", utilAuth.doAuthentication(oldPassword))
                 .contentType(JSON)
                 .body(new KnownPasswordUpdateRequest(oldPassword, newPassword))
                 .when()
@@ -166,7 +165,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
     @Test
     public void setNewPassword_200_ok() {
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
                 .body(new SetPasswordRequest(genPassword()))
                 .when()

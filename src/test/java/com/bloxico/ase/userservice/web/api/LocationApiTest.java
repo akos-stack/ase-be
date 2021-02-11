@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
 import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
 import org.junit.Test;
@@ -20,16 +19,16 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 @Transactional(propagation = NOT_SUPPORTED)
 public class LocationApiTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
+    @Autowired private UtilAuth utilAuth;
+    @Autowired private UtilLocation utilLocation;
 
     @Test
     public void findAllCountries_200_ok() {
-        var c1 = mockUtil.savedCountryDto();
-        var c2 = mockUtil.savedCountryDto();
-        var c3 = mockUtil.savedCountryDto();
+        var c1 = utilLocation.savedCountryDto();
+        var c2 = utilLocation.savedCountryDto();
+        var c3 = utilLocation.savedCountryDto();
         var countries = given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .when()
                 .get(API_URL + COUNTRIES)
@@ -45,11 +44,11 @@ public class LocationApiTest extends AbstractSpringTest {
 
     @Test
     public void findAllCities_200_ok() {
-        var c1 = mockUtil.savedCityDto();
-        var c2 = mockUtil.savedCityDto();
-        var c3 = mockUtil.savedCityDto();
+        var c1 = utilLocation.savedCityDto();
+        var c2 = utilLocation.savedCityDto();
+        var c3 = utilLocation.savedCityDto();
         var cities = given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .when()
                 .get(API_URL + CITIES)

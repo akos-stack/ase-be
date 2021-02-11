@@ -1,14 +1,13 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import com.bloxico.ase.userservice.web.model.user.UserProfileDataResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_ENDPOINT;
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_UPDATE_ENDPOINT;
 import static io.restassured.RestAssured.given;
@@ -20,15 +19,15 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 @Transactional(propagation = NOT_SUPPORTED)
 public class UserProfileApiTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
+    @Autowired private UtilAuth utilAuth;
+    @Autowired private UtilUserProfile utilUserProfile;
 
     @Test
     public void accessMyProfile_200_ok() {
-        var registration = mockUtil.doConfirmedRegistration();
-        var userProfileDto1 = mockUtil.savedUserProfileDto(registration.getId());
+        var registration = utilAuth.doConfirmedRegistration();
+        var userProfileDto1 = utilUserProfile.savedUserProfileDto(registration.getId());
         var userProfileDto2 = given()
-                .header("Authorization", mockUtil.doAuthentication(registration))
+                .header("Authorization", utilAuth.doAuthentication(registration))
                 .when()
                 .get(API_URL + MY_PROFILE_ENDPOINT)
                 .then()
@@ -43,13 +42,13 @@ public class UserProfileApiTest extends AbstractSpringTest {
 
     @Test
     public void updateMyProfile_200_ok() {
-        var registration = mockUtil.doConfirmedRegistration();
-        mockUtil.savedUserProfileDto(registration.getId());
-        var firstName = uuid();
-        var lastName = uuid();
-        var phone = uuid();
+        var registration = utilAuth.doConfirmedRegistration();
+        utilUserProfile.savedUserProfileDto(registration.getId());
+        var firstName = genUUID();
+        var lastName = genUUID();
+        var phone = genUUID();
         var userProfileDto = given()
-                .header("Authorization", mockUtil.doAuthentication(registration))
+                .header("Authorization", utilAuth.doAuthentication(registration))
                 .contentType(JSON)
                 .body(new UpdateUserProfileRequest(firstName, lastName, phone))
                 .when()

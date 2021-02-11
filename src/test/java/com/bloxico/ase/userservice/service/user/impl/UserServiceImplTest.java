@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.UtilUser;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
 import org.junit.Test;
@@ -11,8 +11,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Set;
 
-import static com.bloxico.ase.testutil.MockUtil.genPassword;
-import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.testutil.Util.genPassword;
+import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.testutil.UtilUser.genUserDto;
 import static com.bloxico.ase.userservice.entity.user.Role.*;
 import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
@@ -21,17 +22,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserServiceImplTest extends AbstractSpringTest {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserServiceImpl userService;
+    @Autowired private UtilUser utilUser;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private UserRepository userRepository;
+    @Autowired private UserServiceImpl userService;
 
     @Test
     public void findUserById_notFound() {
@@ -42,7 +36,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findUserById() {
-        var userDto = mockUtil.savedUserDto();
+        var userDto = utilUser.savedUserDto();
         assertEquals(
                 userDto,
                 userService.findUserById(userDto.getId()));
@@ -59,12 +53,12 @@ public class UserServiceImplTest extends AbstractSpringTest {
     public void findUserByEmail_notFound() {
         assertThrows(
                 UserException.class,
-                () -> userService.findUserByEmail(uuid()));
+                () -> userService.findUserByEmail(genUUID()));
     }
 
     @Test
     public void findUserByEmail() {
-        var userDto = mockUtil.savedUserDto();
+        var userDto = utilUser.savedUserDto();
         assertEquals(
                 userDto,
                 userService.findUserByEmail(userDto.getEmail()));
@@ -78,9 +72,9 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findUsersByEmailOrRole_byEmail() {
-        var u1 = mockUtil.savedUserDto();
-        var u2 = mockUtil.savedUserDto();
-        var u3 = mockUtil.savedUserDto();
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedUserDto();
+        var u3 = utilUser.savedUserDto();
         assertThat(
                 userService
                         .findUsersByEmailOrRole(u1.getEmail(), null, 0, MAX_VALUE, "name")
@@ -92,9 +86,9 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findUsersByEmailOrRole_byRole() {
-        var u1 = mockUtil.savedUserDto();
-        var u2 = mockUtil.savedAdminDto();
-        var u3 = mockUtil.savedAdminDto();
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedAdminDto();
+        var u3 = utilUser.savedAdminDto();
         assertThat(
                 userService
                         .findUsersByEmailOrRole("", ADMIN, 0, MAX_VALUE, "name")
@@ -106,9 +100,9 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findUsersByEmailOrRole_byRoleAndEmail() {
-        var u1 = mockUtil.savedUserDto();
-        var u2 = mockUtil.savedAdminDto();
-        var u3 = mockUtil.savedAdminDto();
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedAdminDto();
+        var u3 = utilUser.savedAdminDto();
         assertThat(
                 userService
                         .findUsersByEmailOrRole(u3.getEmail(), ADMIN, 0, MAX_VALUE, "name")
@@ -127,7 +121,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void saveUser_userAlreadyExists() {
-        var userDto = mockUtil.genUserDto();
+        var userDto = genUserDto();
         userService.saveUser(userDto);
         assertThrows(
                 UserException.class,
@@ -136,8 +130,8 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void saveUser_invalidAspirationName() {
-        var userDto = mockUtil.genUserDto();
-        userDto.setAspirationNames(Set.of(uuid()));
+        var userDto = genUserDto();
+        userDto.setAspirationNames(Set.of(genUUID()));
         assertThrows(
                 UserException.class,
                 () -> userService.saveUser(userDto));
@@ -145,7 +139,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void saveUser_withoutAspirations() {
-        var userDto = mockUtil.genUserDto();
+        var userDto = genUserDto();
         var user = userService.saveUser(userDto);
         assertNotNull(user.getId());
         assertEquals(userDto.getEmail(), user.getEmail());
@@ -154,7 +148,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void saveUser_withAspirations() {
-        var userDto = mockUtil.genUserDto();
+        var userDto = genUserDto();
         userDto.setAspirationNames(Set.of(USER, EVALUATOR));
         var savedUserDto = userService.saveUser(userDto);
         assertNotNull(savedUserDto.getId());
@@ -167,13 +161,13 @@ public class UserServiceImplTest extends AbstractSpringTest {
     public void enableUser_notFound() {
         assertThrows(
                 UserException.class,
-                () -> userService.enableUser(-1, mockUtil.savedAdmin().getId()));
+                () -> userService.enableUser(-1, utilUser.savedAdmin().getId()));
     }
 
     @Test
     public void enableUser() {
-        var principalId = mockUtil.savedAdmin().getId();
-        var regUser = userService.saveUser(mockUtil.genUserDto());
+        var principalId = utilUser.savedAdmin().getId();
+        var regUser = userService.saveUser(genUserDto());
         assertFalse(regUser.getEnabled());
         userService.enableUser(regUser.getId(), principalId);
         var ebdUser = userRepository.findById(regUser.getId()).orElseThrow();
@@ -182,7 +176,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void disableUser_notFound() {
-        var adminId = mockUtil.savedAdmin().getId();
+        var adminId = utilUser.savedAdmin().getId();
         assertThrows(
                 UserException.class,
                 () -> userService.disableUser(-1, adminId));
@@ -190,8 +184,8 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void disableUser() {
-        var adminId = mockUtil.savedAdmin().getId();
-        var userId = mockUtil.savedUser().getId();
+        var adminId = utilUser.savedAdmin().getId();
+        var userId = utilUser.savedUser().getId();
         assertTrue(userService.findUserById(userId).getEnabled());
         userService.disableUser(userId, adminId);
         assertFalse(userService.findUserById(userId).getEnabled());
@@ -211,10 +205,10 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void deleteDisabledUsersWithIds() {
-        var user1 = userService.saveUser(mockUtil.genUserDto());
-        var user2 = userService.saveUser(mockUtil.genUserDto());
-        var user3 = userService.saveUser(mockUtil.genUserDto());
-        userService.enableUser(user1.getId(), mockUtil.savedAdmin().getId());
+        var user1 = userService.saveUser(genUserDto());
+        var user2 = userService.saveUser(genUserDto());
+        var user3 = userService.saveUser(genUserDto());
+        userService.enableUser(user1.getId(), utilUser.savedAdmin().getId());
         var regIds = Set.of(user1.getId(), user2.getId(), user3.getId());
         var delIds = Set.copyOf(userService.deleteDisabledUsersWithIds(regIds));
         assertEquals(Set.of(user2.getId(), user3.getId()), delIds);
@@ -250,7 +244,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void updatePassword_oldPasswordMismatch() {
-        var user = mockUtil.savedAdmin();
+        var user = utilUser.savedAdmin();
         var oldPassword = genPassword();
         var newPassword = genPassword();
         assertThrows(
@@ -261,7 +255,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
     @Test
     public void updatePassword() {
         var oldPassword = genPassword();
-        var user = mockUtil.savedAdmin(oldPassword);
+        var user = utilUser.savedAdmin(oldPassword);
         var newPassword = genPassword();
         userService.updatePassword(user.getId(), oldPassword, newPassword);
         assertTrue(passwordEncoder.matches(
@@ -285,7 +279,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void setNewPassword() {
-        var user = mockUtil.savedUser();
+        var user = utilUser.savedUser();
         var newPassword = genPassword();
         userService.setNewPassword(user.getId(), newPassword);
         assertTrue(passwordEncoder.matches(

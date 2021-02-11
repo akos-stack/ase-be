@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import org.junit.Test;
@@ -9,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.hasItems;
@@ -20,28 +19,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LocationServiceImplTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Autowired
-    private LocationRepository repository;
-
-    @Autowired
-    private LocationServiceImpl service;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilLocation utilLocation;
+    @Autowired private LocationRepository repository;
+    @Autowired private LocationServiceImpl service;
 
     @Test
     public void findAllCountries() {
-        var c1 = mockUtil.savedCountryDto();
+        var c1 = utilLocation.savedCountryDto();
         assertThat(service.findAllCountries(), hasItems(c1));
-        var c2 = mockUtil.savedCountryDto();
+        var c2 = utilLocation.savedCountryDto();
         assertThat(service.findAllCountries(), hasItems(c1, c2));
     }
 
     @Test
     public void findAllCities() {
-        var c1 = mockUtil.savedCityDto();
+        var c1 = utilLocation.savedCityDto();
         assertThat(service.findAllCities(), hasItems(c1));
-        var c2 = mockUtil.savedCityDto();
+        var c2 = utilLocation.savedCityDto();
         assertThat(service.findAllCities(), hasItems(c1, c2));
     }
 
@@ -54,9 +49,9 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findOrSaveCountry_saved() {
-        var principalId = mockUtil.savedAdmin().getId();
+        var principalId = utilUser.savedAdmin().getId();
         var country = new CountryDto();
-        country.setName(uuid());
+        country.setName(genUUID());
         assertThat(service.findAllCountries(), not(hasItems(country)));
         service.findOrSaveCountry(country, principalId);
         assertThat(service.findAllCountries(), hasItems(country));
@@ -64,8 +59,8 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findOrSaveCountry_found() {
-        var principalId = mockUtil.savedAdmin().getId();
-        var country = mockUtil.savedCountryDto();
+        var principalId = utilUser.savedAdmin().getId();
+        var country = utilLocation.savedCountryDto();
         assertThat(service.findAllCountries(), hasItems(country));
         assertEquals(country, service.findOrSaveCountry(country, principalId));
         assertEquals(
@@ -85,10 +80,10 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findOrSaveCity_saved() {
-        var principalId = mockUtil.savedAdmin().getId();
+        var principalId = utilUser.savedAdmin().getId();
         var city = new CityDto();
-        city.setCountry(mockUtil.savedCountryDto());
-        city.setName(uuid());
+        city.setCountry(utilLocation.savedCountryDto());
+        city.setName(genUUID());
         assertThat(service.findAllCities(), not(hasItems(city)));
         service.findOrSaveCity(city, principalId);
         assertThat(service.findAllCities(), hasItems(city));
@@ -96,8 +91,8 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findOrSaveCity_found() {
-        var principalId = mockUtil.savedAdmin().getId();
-        var city = mockUtil.savedCityDto();
+        var principalId = utilUser.savedAdmin().getId();
+        var city = utilLocation.savedCityDto();
         assertThat(service.findAllCities(), hasItems(city));
         assertEquals(city, service.findOrSaveCity(city, principalId));
         assertEquals(
@@ -117,10 +112,10 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void saveLocation() {
-        var principalId = mockUtil.savedAdmin().getId();
+        var principalId = utilUser.savedAdmin().getId();
         var location = new LocationDto();
-        location.setCity(mockUtil.savedCityDto());
-        location.setAddress(uuid());
+        location.setCity(utilLocation.savedCityDto());
+        location.setAddress(genUUID());
         assertThat(
                 repository
                         .findAll()

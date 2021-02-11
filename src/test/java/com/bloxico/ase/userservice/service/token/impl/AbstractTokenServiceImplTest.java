@@ -1,14 +1,13 @@
 package com.bloxico.ase.userservice.service.token.impl;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.testutil.Util.genUUID;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -20,15 +19,13 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
 
     protected abstract AbstractTokenServiceImpl tokenService();
 
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Autowired
-    private TokenRepository tokenRepository;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilToken utilToken;
+    @Autowired private TokenRepository tokenRepository;
 
     @Test
     public void createTokenForUser() {
-        var userId = mockUtil.savedAdmin().getId();
+        var userId = utilUser.savedAdmin().getId();
         assertThat(tokenRepository
                         .findAll()
                         .stream()
@@ -49,7 +46,7 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void refreshToken_tokenNotFound() {
-        var token = uuid();
+        var token = genUUID();
         assertThrows(
                 TokenException.class,
                 () -> tokenService().refreshToken(token));
@@ -57,7 +54,7 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void refreshToken() {
-        var userId = mockUtil.savedAdmin().getId();
+        var userId = utilUser.savedAdmin().getId();
         var oldToken = tokenService().createTokenForUser(userId);
         var updToken = tokenService().refreshToken(oldToken.getValue());
         assertNotEquals(oldToken.getValue(), updToken.getValue());
@@ -76,12 +73,12 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
     public void consumeToken_tokenNotFound() {
         assertThrows(
                 TokenException.class,
-                () -> tokenService().consumeToken(uuid()));
+                () -> tokenService().consumeToken(genUUID()));
     }
 
     @Test
     public void consumeToken_expiredToken() {
-        var token = mockUtil.savedExpiredToken(tokenType()).getValue();
+        var token = utilToken.savedExpiredToken(tokenType()).getValue();
         assertThrows(
                 TokenException.class,
                 () -> tokenService().consumeToken(token));
@@ -89,7 +86,7 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void consumeToken() {
-        var userId = mockUtil.savedAdmin().getId();
+        var userId = utilUser.savedAdmin().getId();
         var token = tokenService().createTokenForUser(userId).getValue();
         assertTrue(tokenRepository.findByValue(token).isPresent());
         tokenService().consumeToken(token);
@@ -98,7 +95,7 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void getOrCreateTokenForUser() {
-        var userId = mockUtil.savedAdmin().getId();
+        var userId = utilUser.savedAdmin().getId();
         var count1 = tokenRepository.findAll().size();
         var token1 = tokenService().getOrCreateTokenForUser(userId);
         var count2 = tokenRepository.findAll().size();
@@ -112,7 +109,7 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void getOrCreateTokenForUser_expiredToken() {
-        var token1 = mockUtil.savedExpiredTokenDto(tokenType());
+        var token1 = utilToken.savedExpiredTokenDto(tokenType());
         var userId = token1.getUserId();
         var count1 = tokenRepository.findAll().size();
         var token2 = tokenService().getOrCreateTokenForUser(userId);
@@ -124,7 +121,7 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void getTokenByUserId_tokenNotFound() {
-        var userId = mockUtil.savedAdmin().getId();
+        var userId = utilUser.savedAdmin().getId();
         assertThrows(
                 TokenException.class,
                 () -> tokenService().getTokenByUserId(userId));
@@ -132,20 +129,20 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void getTokenByUserId_expiredToken() {
-        var userId = mockUtil.savedExpiredToken(tokenType()).getUserId();
+        var userId = utilToken.savedExpiredToken(tokenType()).getUserId();
         assertNotNull(tokenService().getTokenByUserId(userId));
     }
 
     @Test
     public void getTokenByUserId() {
-        var userId = mockUtil.savedToken(tokenType()).getUserId();
+        var userId = utilToken.savedToken(tokenType()).getUserId();
         assertNotNull(tokenService().getTokenByUserId(userId));
     }
 
     @Test
     public void deleteExpiredTokens() {
-        var valid = mockUtil.savedToken(tokenType());
-        var expired = mockUtil.savedExpiredToken(tokenType());
+        var valid = utilToken.savedToken(tokenType());
+        var expired = utilToken.savedExpiredToken(tokenType());
         assertThat(
                 tokenRepository.findAll(),
                 hasItems(valid, expired));

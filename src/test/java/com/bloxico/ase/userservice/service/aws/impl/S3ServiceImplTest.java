@@ -7,8 +7,8 @@ import com.bloxico.ase.userservice.util.FileCategory;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.bloxico.ase.testutil.MockUtil.genMultipartFile;
-import static com.bloxico.ase.testutil.MockUtil.randOtherEnumConst;
+import static com.bloxico.ase.testutil.Util.genMultipartFile;
+import static com.bloxico.ase.testutil.Util.randOtherEnumConst;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

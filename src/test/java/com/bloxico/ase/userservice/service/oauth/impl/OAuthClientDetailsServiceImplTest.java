@@ -8,17 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityNotFoundException;
 
-import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.testutil.Util.genUUID;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class OAuthClientDetailsServiceImplTest extends AbstractSpringTest {
 
-    @Autowired
-    private OAuthClientDetailsRepository repository;
-
-    @Autowired
-    private OAuthClientDetailsServiceImpl service;
+    @Autowired private OAuthClientDetailsRepository repository;
+    @Autowired private OAuthClientDetailsServiceImpl service;
 
     @Test
     public void findOAuthClientDetailsByClientId_null() {
@@ -29,7 +26,7 @@ public class OAuthClientDetailsServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findOAuthClientDetailsByClientId_notFound() {
-        var id = uuid();
+        var id = genUUID();
         assertThrows(
                 EntityNotFoundException.class,
                 () -> service.findOAuthClientDetailsByClientId(id));
@@ -37,7 +34,7 @@ public class OAuthClientDetailsServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findOAuthClientDetailsByClientId() {
-        var id = uuid();
+        var id = genUUID();
         var oAuthClientDetails = new OAuthClientDetails();
         oAuthClientDetails.setClientId(id);
         repository.save(oAuthClientDetails);
