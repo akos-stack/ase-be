@@ -428,9 +428,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
         assertEquals(evaluator.getUserProfile().getPhone(), request.getPhone());
         assertEquals(evaluator.getUserProfile().getBirthday(), request.getBirthday());
         assertEquals(evaluator.getUserProfile().getGender(), request.getGender());
-        assertEquals(evaluator.getUserProfile().getLocation().getCity().getCountry().getName(), request.getCountry());
-        assertEquals(evaluator.getUserProfile().getLocation().getCity().getZipCode(), request.getZipCode());
-        assertEquals(evaluator.getUserProfile().getLocation().getCity().getName(), request.getCity());
+        assertEquals(evaluator.getUserProfile().getLocation().getCountry().getName(), request.getCountry());
         assertEquals(evaluator.getUserProfile().getLocation().getAddress(), request.getAddress());
     }
 
@@ -476,9 +474,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
         assertEquals(artOwner.getUserProfile().getPhone(), request.getPhone());
         assertEquals(artOwner.getUserProfile().getBirthday(), request.getBirthday());
         assertEquals(artOwner.getUserProfile().getGender(), request.getGender());
-        assertEquals(artOwner.getUserProfile().getLocation().getCity().getCountry().getName(), request.getCountry());
-        assertEquals(artOwner.getUserProfile().getLocation().getCity().getZipCode(), request.getZipCode());
-        assertEquals(artOwner.getUserProfile().getLocation().getCity().getName(), request.getCity());
+        assertEquals(artOwner.getUserProfile().getLocation().getCountry().getName(), request.getCountry());
         assertEquals(artOwner.getUserProfile().getLocation().getAddress(), request.getAddress());
     }
 

@@ -41,12 +41,12 @@ public class LocationServiceImpl implements ILocationService {
 
     @Override
     public List<CountryTotalOfEvaluatorsProj> findAllCountries() {
-        log.debug("CountryServiceImpl.findAllCountries - start");
+        log.debug("LocationServiceImpl.findAllCountries - start");
         var countries = countryRepository
                 .findAllIncludeEvaluatorsCount()
                 .stream()
                 .collect(toUnmodifiableList());
-        log.debug("CountryServiceImpl.findAllCountries - end");
+        log.debug("LocationServiceImpl.findAllCountries - end");
         return countries;
     }
 
@@ -64,14 +64,14 @@ public class LocationServiceImpl implements ILocationService {
 
     @Override
     public CountryDto findOrSaveCountry(CountryDto dto, long principalId) {
-        log.debug("CountryServiceImpl.findOrSaveCountry - start | dto: {}, principalId: {}", dto, principalId);
+        log.debug("LocationServiceImpl.findOrSaveCountry - start | dto: {}, principalId: {}", dto, principalId);
         requireNonNull(dto);
         var countryDto = countryRepository
                 .findByNameIgnoreCase(dto.getName())
                 .map(MAPPER::toDto)
                 .filter(dto::equals)
                 .orElseGet(() -> saveCountry(dto, principalId));
-        log.debug("CountryServiceImpl.findOrSaveCountry - end | dto: {}, principalId: {}", dto, principalId);
+        log.debug("LocationServiceImpl.findOrSaveCountry - end | dto: {}, principalId: {}", dto, principalId);
         return countryDto;
     }
 
