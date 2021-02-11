@@ -39,7 +39,7 @@ public class UtilArtworkMetadata {
     public Material savedMaterial(ArtworkMetadataStatus status) {
         var adminId = utilUser.savedAdmin().getId();
         var material = new Material();
-        material.setStatus(APPROVED);
+        material.setStatus(status);
         material.setName(genUUID());
         material.setCreatorId(adminId);
         materialRepository.saveAndFlush(material);
@@ -53,7 +53,7 @@ public class UtilArtworkMetadata {
     public Medium savedMedium(ArtworkMetadataStatus status) {
         var adminId = utilUser.savedAdmin().getId();
         var medium = new Medium();
-        medium.setStatus(APPROVED);
+        medium.setStatus(status);
         medium.setName(genUUID());
         medium.setCreatorId(adminId);
         mediumRepository.saveAndFlush(medium);
@@ -67,7 +67,7 @@ public class UtilArtworkMetadata {
     public Style savedStyle(ArtworkMetadataStatus status) {
         var adminId = utilUser.savedAdmin().getId();
         var style = new Style();
-        style.setStatus(APPROVED);
+        style.setStatus(status);
         style.setName(genUUID());
         style.setCreatorId(adminId);
         styleRepository.saveAndFlush(style);
