@@ -381,10 +381,11 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void requestEvaluatorRegistration_200_ok() {
         var registration = utilAuth.doConfirmedRegistration();
         var cvBytes = getTestCVBytes();
+        var name = genUUID() + ".txt";
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParam("email", registration.getEmail())
-                .multiPart("cv", "cv.txt", cvBytes)
+                .multiPart("cv", name, cvBytes)
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
                 .then()
@@ -531,10 +532,11 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     public void downloadEvaluatorResume_200_ok() {
         var registration = utilAuth.doConfirmedRegistration();
+        var name = genUUID() + ".txt";
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParam("email", registration.getEmail())
-                .multiPart("cv", "cv.txt", getTestCVBytes())
+                .multiPart("cv", name, getTestCVBytes())
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
                 .then()

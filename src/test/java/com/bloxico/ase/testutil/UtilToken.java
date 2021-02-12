@@ -13,6 +13,7 @@ import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import com.bloxico.ase.userservice.repository.token.*;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
+import com.bloxico.ase.userservice.web.model.token.EvaluatorRegistrationRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.util.SupportedFileExtension.pdf;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 
@@ -147,7 +149,18 @@ public class UtilToken {
     public PendingEvaluatorDto savedInvitedPendingEvaluatorDto(String email) {
         var principal = utilUser.savedAdmin().getId();
         var request = new EvaluatorInvitationRequest(email);
-        return pendingEvaluatorService.createPendingEvaluator(request, principal);
+        return pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principal);
+    }
+
+    public String savedRequestedPendingEvaluatorDto() {
+        return savedRequestedPendingEvaluatorDto(genEmail());
+    }
+
+    public String savedRequestedPendingEvaluatorDto(String email) {
+        var principal = utilUser.savedAdmin().getId();
+        var request = new EvaluatorRegistrationRequest(email, genMultipartFile(pdf));
+        userRegistrationFacade.requestEvaluatorRegistration(request, principal);
+        return email;
     }
 
     public SubmitEvaluatorRequest submitInvitedEvaluatorRequest() {

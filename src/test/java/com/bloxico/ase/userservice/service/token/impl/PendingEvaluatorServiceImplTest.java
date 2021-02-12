@@ -367,11 +367,11 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void getEvaluatorResume() {
-        var user = utilUser.savedUser();
         var admin = utilUser.savedAdmin();
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
-        service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), user.getId());
-        assertNotNull(service.getEvaluatorResume(user.getEmail(), admin.getId()));
+        var pendingEvaluatorEmail = utilToken.savedRequestedPendingEvaluatorDto();
+        var resume = service.getEvaluatorResume(pendingEvaluatorEmail, admin.getId());
+        assertNotNull(resume);
+        assertEquals(resume.getEmail(), pendingEvaluatorEmail);
     }
 
 }
