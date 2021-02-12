@@ -463,11 +463,21 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
                         not(hasItems(pe3))));
     }
 
-    // TODO-TEST downloadEvaluatorResume_nullEmail
+    @Test
+    public void downloadEvaluatorResume_nullEmail() {
+        var admin = utilUser.savedAdmin();
+        assertThrows(
+                NullPointerException.class,
+                () -> userRegistrationFacade.downloadEvaluatorResume(null, admin.getId()));
+    }
 
-    // TODO-TEST downloadEvaluatorResume_pendingEvaluatorNotFound
-
-    // TODO-TEST downloadEvaluatorResume_resumeNotFound
+    @Test
+    public void downloadEvaluatorResume_resumeNotFound() {
+        var admin = utilUser.savedAdmin();
+        assertThrows(
+                UserException.class,
+                () -> userRegistrationFacade.downloadEvaluatorResume(genEmail(), admin.getId()));
+    }
 
     @Test
     public void downloadEvaluatorResume() {

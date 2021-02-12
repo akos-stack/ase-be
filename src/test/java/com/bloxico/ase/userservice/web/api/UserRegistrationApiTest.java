@@ -523,11 +523,19 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                         not(hasItems(pe3))));
     }
 
-    // TODO-tests downloadEvaluatorResume_404_evaluatorNotPending
-
-    // TODO-tests downloadEvaluatorResume_404_resumeNotFound
-
-    // TODO-tests downloadEvaluatorResume_400_downloadFailed
+    @Test
+    public void downloadEvaluatorResume_404_resumeNotFound() {
+        var registration = utilAuth.doConfirmedRegistration();
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .queryParam("email", registration.getEmail())
+                .when()
+                .get(API_URL + REGISTRATION_EVALUATOR_RESUME_DOWNLOAD)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.User.RESUME_NOT_FOUND.getCode()));
+    }
 
     @Test
     public void downloadEvaluatorResume_200_ok() {
