@@ -44,6 +44,16 @@ public class LocationFacadeImpl implements ILocationFacade {
     }
 
     @Override
+    public SearchRegionsResponse findAllRegions(SearchRegionsRequest request) {
+        log.info("LocationFacadeImpl.findAllRegions - start | request: {}", request);
+        requireNonNull(request);
+        var page = locationService.findAllRegions(request);
+        var response = new SearchRegionsResponse(page.getContent(), page.getTotalElements());
+        log.info("LocationFacadeImpl.findAllRegions - end | request: {}", request);
+        return response;
+    }
+
+    @Override
     public RegionDataResponse createRegion(CreateRegionRequest request, long principalId) {
         log.debug("LocationFacadeImpl.createRegion - start | request: {}, principalId: {}", request, principalId);
         requireNonNull(request);

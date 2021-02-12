@@ -9,6 +9,7 @@ import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import com.bloxico.ase.userservice.web.model.address.CreateCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
 import com.bloxico.ase.userservice.web.model.address.EditCountryRequest;
+import com.bloxico.ase.userservice.web.model.address.SearchRegionsRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,6 +40,22 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
         assertThat(facade.findAllCities().getCities(), hasItems(c1));
         var c2 = utilLocation.savedCityDto();
         assertThat(facade.findAllCities().getCities(), hasItems(c1, c2));
+    }
+
+    @Test
+    public void findAllRegions_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> facade.findAllRegions(null));
+    }
+
+    @Test
+    public void findAllRegions() {
+        var request = new SearchRegionsRequest();
+        var r1 = utilLocation.savedRegionProj();
+        assertThat(facade.findAllRegions(request).getRegions(), hasItems(r1));
+        var r2 = utilLocation.savedRegionProj();
+        assertThat(facade.findAllRegions(request).getRegions(), hasItems(r1, r2));
     }
 
     @Test

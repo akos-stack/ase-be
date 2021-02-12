@@ -4,10 +4,16 @@ import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.entity.address.Country;
 import com.bloxico.ase.userservice.entity.address.Region;
 import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
+import com.bloxico.ase.userservice.projection.RegionDetailsProj;
 import com.bloxico.ase.userservice.repository.address.*;
 import com.bloxico.ase.userservice.service.address.ILocationService;
+import com.bloxico.ase.userservice.web.model.address.SearchRegionsRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -99,6 +105,15 @@ public class LocationServiceImpl implements ILocationService {
         var locationDto = MAPPER.toDto(locationRepository.saveAndFlush(location));
         log.debug("LocationServiceImpl.saveLocation - end | dto: {}, principalId: {}", dto, principalId);
         return locationDto;
+    }
+
+    @Override
+    public Page<RegionDetailsProj> findAllRegions(SearchRegionsRequest request) {
+        log.debug("LocationServiceImpl.findAllRegions - start | request: {}", request);
+        requireNonNull(request);
+        var page = regionRepository.findAll(request);
+        log.debug("LocationServiceImpl.findAllRegions - end | request: {}", request);
+        return page;
     }
 
     @Override

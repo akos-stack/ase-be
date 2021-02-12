@@ -10,8 +10,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bloxico.ase.testutil.Util.ERROR_CODE;
-import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.web.api.LocationApi.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.*;
 import static io.restassured.RestAssured.given;
@@ -68,6 +67,28 @@ public class LocationApiTest extends AbstractSpringTest {
                 .as(SearchCitiesResponse.class)
                 .getCities();
         assertThat(cities, hasItems(c1, c2, c3));
+    }
+
+    @Test
+    public void findAllRegions_200_ok() {
+        var searchTerm = genUUID();
+        var r1 = utilLocation.savedRegionProjWithName(genEmail(searchTerm));
+        var r2 = utilLocation.savedRegionProjWithName(genEmail(searchTerm.toUpperCase()));
+        var r3 = utilLocation.savedRegionProjWithName(genEmail(searchTerm.toLowerCase()));
+        var r4 = utilLocation.savedRegionProjWithName(genEmail("fooBar"));
+        var regions = given()
+                .header("Authorization", utilAuth.doAuthentication())
+                .queryParam("search", searchTerm)
+                .when()
+                .get(API_URL + REGIONS)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SearchRegionsResponse.class)
+                .getRegions();
+        assertThat(regions, allOf(hasItems(r1, r2, r3), not(hasItems(r4))));
     }
 
     @Test

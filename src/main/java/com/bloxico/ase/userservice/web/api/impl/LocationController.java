@@ -32,6 +32,11 @@ public class LocationController implements LocationApi {
     }
 
     @Override
+    public ResponseEntity<SearchRegionsResponse> findAllRegions(@Valid SearchRegionsRequest request) {
+        return ResponseEntity.ok(locationFacade.findAllRegions(request));
+    }
+
+    @Override
     public ResponseEntity<RegionDataResponse> createRegion(
             @Valid @RequestBody CreateRegionRequest request, Principal principal) {
 
@@ -42,7 +47,6 @@ public class LocationController implements LocationApi {
 
     @Override
     public ResponseEntity<Void> deleteRegion(@Valid @PathVariable("id") Integer regionId, Principal principal) {
-
         var id = extractId(principal);
         locationFacade.deleteRegion(regionId, id);
         return new ResponseEntity<>(HttpStatus.OK);

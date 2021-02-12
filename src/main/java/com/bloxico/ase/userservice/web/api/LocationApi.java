@@ -16,6 +16,7 @@ public interface LocationApi {
     String COUNTRIES_CREATE     = "/countries/create";
     String COUNTRIES_EDIT       = "/countries/edit/{id}";
     String CITIES               = "/cities";
+    String REGIONS              = "/regions";
     String REGIONS_CREATE       = "/regions/create";
     String REGIONS_DELETE       = "/regions/delete/{id}";
 
@@ -32,6 +33,13 @@ public interface LocationApi {
             @ApiResponse(code = 200, message = "Cities successfully retrieved.")
     })
     ResponseEntity<SearchCitiesResponse> findAllCities();
+
+    @GetMapping(value = REGIONS)
+    @ApiOperation(value = "Fetch regions.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Regions successfully retrieved.")
+    })
+    ResponseEntity<SearchRegionsResponse> findAllRegions(@Valid SearchRegionsRequest request);
 
     @PostMapping(
             value = REGIONS_CREATE,

@@ -6,6 +6,7 @@ import com.bloxico.ase.userservice.dto.entity.address.CountryEvaluationDetailsDt
 import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
 import com.bloxico.ase.userservice.entity.address.*;
 import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
+import com.bloxico.ase.userservice.projection.RegionDetailsProj;
 import com.bloxico.ase.userservice.repository.address.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -31,8 +32,20 @@ public class UtilLocation {
         return regionRepository.saveAndFlush(region);
     }
 
+    public Region savedRegionWithName(String name) {
+        var creatorId = utilUser.savedAdmin().getId();
+        var region = new Region();
+        region.setName(name);
+        region.setCreatorId(creatorId);
+        return regionRepository.saveAndFlush(region);
+    }
+
     public RegionDto savedRegionDto() {
         return MAPPER.toDto(savedRegion());
+    }
+
+    public RegionDto savedRegionDtoWithName(String name) {
+        return MAPPER.toDto(savedRegionWithName(name));
     }
 
     public RegionDto genRegionDto() {
@@ -45,6 +58,22 @@ public class UtilLocation {
         var regionDto = new RegionDto();
         regionDto.setName(name);
         return regionDto;
+    }
+
+    public RegionDetailsProj savedRegionProj() {
+        var regionDto = savedRegionDto();
+        return new RegionDetailsProj(
+                regionDto.getId(), regionDto.getName(),
+                0, 0
+        );
+    }
+
+    public RegionDetailsProj savedRegionProjWithName(String name) {
+        var regionDto = savedRegionDtoWithName(name);
+        return new RegionDetailsProj(
+                regionDto.getId(), regionDto.getName(),
+                0, 0
+        );
     }
 
     public Country savedCountry() {

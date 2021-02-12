@@ -8,6 +8,8 @@ public interface ILocationFacade {
 
     SearchCitiesResponse findAllCities();
 
+    SearchRegionsResponse findAllRegions(SearchRegionsRequest request);
+
     RegionDataResponse createRegion(CreateRegionRequest request, long principalId);
 
     void deleteRegion(int regionId, long principalId);

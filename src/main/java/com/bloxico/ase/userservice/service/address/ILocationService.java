@@ -2,6 +2,9 @@ package com.bloxico.ase.userservice.service.address;
 
 import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
+import com.bloxico.ase.userservice.projection.RegionDetailsProj;
+import com.bloxico.ase.userservice.web.model.address.SearchRegionsRequest;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -16,6 +19,8 @@ public interface ILocationService {
     CityDto findOrSaveCity(CityDto cityDto, long principalId);
 
     LocationDto saveLocation(LocationDto locationDto, long principalId);
+
+    Page<RegionDetailsProj> findAllRegions(SearchRegionsRequest request);
 
     RegionDto createRegion(RegionDto dto, long principalId);
 
