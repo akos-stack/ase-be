@@ -1,52 +1,32 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
-import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
-import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
+import com.bloxico.ase.testutil.UtilLocation;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.Assert.assertThat;
 
 public class LocationFacadeImplTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Autowired
-    private LocationFacadeImpl facade;
+    @Autowired private UtilLocation utilLocation;
+    @Autowired private LocationFacadeImpl facade;
 
     @Test
     public void findAllCountries() {
-        assertEquals(
-                new SearchCountriesResponse(List.of()),
-                facade.findAllCountries());
-        var country1 = mockUtil.savedCountryDto();
-        assertEquals(
-                new SearchCountriesResponse(List.of(country1)),
-                facade.findAllCountries());
-        var country2 = mockUtil.savedCountryDto();
-        assertEquals(
-                new SearchCountriesResponse(List.of(country1, country2)),
-                facade.findAllCountries());
+        var c1 = utilLocation.savedCountryDto();
+        assertThat(facade.findAllCountries().getCountries(), hasItems(c1));
+        var c2 = utilLocation.savedCountryDto();
+        assertThat(facade.findAllCountries().getCountries(), hasItems(c1, c2));
     }
 
     @Test
     public void findAllCities() {
-        assertEquals(
-                new SearchCitiesResponse(List.of()),
-                facade.findAllCities());
-        var city1 = mockUtil.savedCityDto();
-        assertEquals(
-                new SearchCitiesResponse(List.of(city1)),
-                facade.findAllCities());
-        var city2 = mockUtil.savedCityDto();
-        assertEquals(
-                new SearchCitiesResponse(List.of(city1, city2)),
-                facade.findAllCities());
+        var c1 = utilLocation.savedCityDto();
+        assertThat(facade.findAllCities().getCities(), hasItems(c1));
+        var c2 = utilLocation.savedCityDto();
+        assertThat(facade.findAllCities().getCities(), hasItems(c1, c2));
     }
 
 }

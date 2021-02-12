@@ -104,7 +104,8 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     public Page<PendingEvaluatorDto> searchPendingEvaluators(String email, int page, int size, String sort) {
         log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - start | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
-        var pendingEvaluatorsDto = pendingEvaluatorRepository.findAllByEmailContaining(email, pageable)
+        var pendingEvaluatorsDto = pendingEvaluatorRepository
+                .findAllByEmailContaining(email, pageable)
                 .map(MAPPER::toDto);
         log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - end | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
         return pendingEvaluatorsDto;

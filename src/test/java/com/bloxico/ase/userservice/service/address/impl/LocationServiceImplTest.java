@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import org.junit.Test;
@@ -9,121 +8,129 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.stream.Collectors.toList;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LocationServiceImplTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Autowired
-    private LocationRepository repository;
-
-    @Autowired
-    private LocationServiceImpl service;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilLocation utilLocation;
+    @Autowired private LocationRepository repository;
+    @Autowired private LocationServiceImpl service;
 
     @Test
     public void findAllCountries() {
-        assertEquals(
-                List.of(),
-                service.findAllCountries());
-        var country1 = mockUtil.savedCountryDto();
-        assertEquals(
-                List.of(country1),
-                service.findAllCountries());
-        var country2 = mockUtil.savedCountryDto();
-        assertEquals(
-                List.of(country1, country2),
-                service.findAllCountries());
+        var c1 = utilLocation.savedCountryDto();
+        assertThat(service.findAllCountries(), hasItems(c1));
+        var c2 = utilLocation.savedCountryDto();
+        assertThat(service.findAllCountries(), hasItems(c1, c2));
     }
 
     @Test
     public void findAllCities() {
-        assertEquals(
-                List.of(),
-                service.findAllCities());
-        var city1 = mockUtil.savedCityDto();
-        assertEquals(
-                List.of(city1),
-                service.findAllCities());
-        var city2 = mockUtil.savedCityDto();
-        assertEquals(
-                List.of(city1, city2),
-                service.findAllCities());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void findOrSaveCountry_nullCountry() {
-        service.findOrSaveCountry(null, 1);
+        var c1 = utilLocation.savedCityDto();
+        assertThat(service.findAllCities(), hasItems(c1));
+        var c2 = utilLocation.savedCityDto();
+        assertThat(service.findAllCities(), hasItems(c1, c2));
     }
 
     @Test
-    public void findOrSaveCountry_notFound() {
-        var principalId = mockUtil.savedAdmin().getId();
+    public void findOrSaveCountry_nullCountry() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.findOrSaveCountry(null, 1));
+    }
+
+    @Test
+    public void findOrSaveCountry_saved() {
+        var principalId = utilUser.savedAdmin().getId();
         var country = new CountryDto();
-        country.setName(uuid());
-        assertEquals(List.of(), service.findAllCountries());
+        country.setName(genUUID());
+        assertThat(service.findAllCountries(), not(hasItems(country)));
         service.findOrSaveCountry(country, principalId);
-        assertEquals(List.of(country), service.findAllCountries());
+        assertThat(service.findAllCountries(), hasItems(country));
     }
 
     @Test
     public void findOrSaveCountry_found() {
-        var principalId = mockUtil.savedAdmin().getId();
-        var country = mockUtil.savedCountryDto();
-        assertEquals(List.of(country), service.findAllCountries());
+        var principalId = utilUser.savedAdmin().getId();
+        var country = utilLocation.savedCountryDto();
+        assertThat(service.findAllCountries(), hasItems(country));
         assertEquals(country, service.findOrSaveCountry(country, principalId));
-        assertEquals(List.of(country), service.findAllCountries());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void findOrSaveCity_nullCity() {
-        service.findOrSaveCity(null, 1);
+        assertEquals(
+                List.of(country),
+                service.findAllCountries()
+                        .stream()
+                        .filter(country::equals)
+                        .collect(toList()));
     }
 
     @Test
-    public void findOrSaveCity_notFound() {
-        var principalId = mockUtil.savedAdmin().getId();
+    public void findOrSaveCity_nullCity() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.findOrSaveCity(null, 1));
+    }
+
+    @Test
+    public void findOrSaveCity_saved() {
+        var principalId = utilUser.savedAdmin().getId();
         var city = new CityDto();
-        city.setCountry(mockUtil.savedCountryDto());
-        city.setName(uuid());
-        assertEquals(List.of(), service.findAllCities());
+        city.setCountry(utilLocation.savedCountryDto());
+        city.setName(genUUID());
+        assertThat(service.findAllCities(), not(hasItems(city)));
         service.findOrSaveCity(city, principalId);
-        assertEquals(List.of(city), service.findAllCities());
+        assertThat(service.findAllCities(), hasItems(city));
     }
 
     @Test
     public void findOrSaveCity_found() {
-        var principalId = mockUtil.savedAdmin().getId();
-        var city = mockUtil.savedCityDto();
-        assertEquals(List.of(city), service.findAllCities());
+        var principalId = utilUser.savedAdmin().getId();
+        var city = utilLocation.savedCityDto();
+        assertThat(service.findAllCities(), hasItems(city));
         assertEquals(city, service.findOrSaveCity(city, principalId));
-        assertEquals(List.of(city), service.findAllCities());
+        assertEquals(
+                List.of(city),
+                service.findAllCities()
+                        .stream()
+                        .filter(city::equals)
+                        .collect(toList()));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void saveLocation_nullLocation() {
-        service.saveLocation(null, 1);
+        assertThrows(
+                NullPointerException.class,
+                () -> service.saveLocation(null, 1));
     }
 
     @Test
     public void saveLocation() {
-        var principalId = mockUtil.savedAdmin().getId();
+        var principalId = utilUser.savedAdmin().getId();
         var location = new LocationDto();
-        location.setCity(mockUtil.savedCityDto());
-        location.setAddress(uuid());
-        assertEquals(List.of(), repository.findAll());
-        service.saveLocation(location, principalId);
-        assertEquals(
-                List.of(location),
+        location.setCity(utilLocation.savedCityDto());
+        location.setAddress(genUUID());
+        assertThat(
                 repository
                         .findAll()
                         .stream()
                         .map(MAPPER::toDto)
-                        .collect(toList()));
+                        .collect(toList()),
+                not(hasItems(location)));
+        service.saveLocation(location, principalId);
+        assertThat(
+                repository
+                        .findAll()
+                        .stream()
+                        .map(MAPPER::toDto)
+                        .collect(toList()),
+                hasItems(location));
     }
 
 }

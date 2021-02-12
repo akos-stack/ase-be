@@ -1,36 +1,35 @@
 package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.UtilArtworkMetadata;
+import com.bloxico.ase.testutil.UtilAuth;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus;
 import com.bloxico.ase.userservice.web.model.artwork.ArtworkMetadataCreateRequest;
 import com.bloxico.ase.userservice.web.model.artwork.ArtworkMetadataUpdateRequest;
+import com.bloxico.ase.userservice.web.model.artwork.PagedArtworkMetadataResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.userservice.util.ArtworkMetadataType.*;
 import static com.bloxico.ase.userservice.web.api.ArtworkMetadataManagementApi.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
-@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
+    @Autowired private UtilAuth utilAuth;
+    @Autowired private UtilArtworkMetadata utilArtworkMetadata;
 
     @Test
     public void createCategory_NotAuthorized() {
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
                 .body(new ArtworkMetadataCreateRequest("category", CATEGORY))
                 .when()
@@ -43,7 +42,7 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
     @Test
     public void createCategory_success() {
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(new ArtworkMetadataCreateRequest("category", CATEGORY))
                 .when()
@@ -55,20 +54,12 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void updateCategoryStatus_success() {
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
-                .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("category", CATEGORY))
-                .when()
-                .post(API_URL + CREATE_METADATA)
-                .then()
-                .assertThat()
-                .statusCode(200);
+        var metadataDto = utilArtworkMetadata.savedCategoryDto();
 
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .body(new ArtworkMetadataUpdateRequest("category", ArtworkMetadataStatus.PENDING, CATEGORY))
+                .body(new ArtworkMetadataUpdateRequest(metadataDto.getName(), ArtworkMetadataStatus.PENDING, CATEGORY))
                 .when()
                 .post(API_URL + UPDATE_METADATA_STATUS)
                 .then()
@@ -78,21 +69,13 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void deleteCategory_success() {
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
-                .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("category", CATEGORY))
-                .when()
-                .post(API_URL + CREATE_METADATA)
-                .then()
-                .assertThat()
-                .statusCode(200);
+        var metadataDto = utilArtworkMetadata.savedCategoryDto();
 
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("name", "category")
-                .param("type", CATEGORY)
+                .param("name", metadataDto.getName())
+                .param("type", CATEGORY.name())
                 .when()
                 .delete(API_URL + DELETE_METADATA)
                 .then()
@@ -103,9 +86,9 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
     @Test
     public void fetchCategories_notAuthorized() {
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
-                .param("type", CATEGORY)
+                .param("type", CATEGORY.name())
                 .when()
                 .get(API_URL + SEARCH_METADATA)
                 .then()
@@ -115,32 +98,30 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void fetchCategories_success() {
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
-                .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("category", CATEGORY))
-                .when()
-                .post(API_URL + CREATE_METADATA)
-                .then()
-                .assertThat()
-                .statusCode(200);
+        var dto1 = utilArtworkMetadata.savedCategoryDto();
+        var dto2 = utilArtworkMetadata.savedCategoryDto();
+        var dto3 = utilArtworkMetadata.savedCategoryDto();
 
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+        var response = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("type", CATEGORY)
+                .param("type", CATEGORY.name())
                 .when()
                 .get(API_URL + SEARCH_METADATA)
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("entries", not(isEmptyOrNullString()));
+                .extract()
+                .body()
+                .as(PagedArtworkMetadataResponse.class)
+                .getEntries();
+        assertThat(response, hasItems(dto1, dto2, dto3));
     }
 
     @Test
     public void createMaterial_NotAuthorized() {
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
                 .body(new ArtworkMetadataCreateRequest("material", MATERIAL))
                 .when()
@@ -153,7 +134,7 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
     @Test
     public void createMaterial_success() {
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(new ArtworkMetadataCreateRequest("material", MATERIAL))
                 .when()
@@ -165,20 +146,12 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void updateMaterialStatus_success() {
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
-                .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("material", MATERIAL))
-                .when()
-                .post(API_URL + CREATE_METADATA)
-                .then()
-                .assertThat()
-                .statusCode(200);
+        var metadataDto = utilArtworkMetadata.savedMaterialDto();
 
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .body(new ArtworkMetadataUpdateRequest("material", ArtworkMetadataStatus.PENDING, MATERIAL))
+                .body(new ArtworkMetadataUpdateRequest(metadataDto.getName(), ArtworkMetadataStatus.PENDING, MATERIAL))
                 .when()
                 .post(API_URL + UPDATE_METADATA_STATUS)
                 .then()
@@ -188,21 +161,13 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void deleteMaterial_success() {
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
-                .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("material", MATERIAL))
-                .when()
-                .post(API_URL + CREATE_METADATA)
-                .then()
-                .assertThat()
-                .statusCode(200);
+        var metadataDto = utilArtworkMetadata.savedMaterialDto();
 
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("name", "material")
-                .param("type", MATERIAL)
+                .param("name", metadataDto.getName())
+                .param("type", MATERIAL.name())
                 .when()
                 .delete(API_URL + DELETE_METADATA)
                 .then()
@@ -213,9 +178,9 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
     @Test
     public void fetchMaterials_notAuthorized() {
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
-                .param("type", MATERIAL)
+                .param("type", MATERIAL.name())
                 .when()
                 .get(API_URL + SEARCH_METADATA)
                 .then()
@@ -225,32 +190,30 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void fetchMaterials_success() {
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
-                .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("material", MATERIAL))
-                .when()
-                .post(API_URL + CREATE_METADATA)
-                .then()
-                .assertThat()
-                .statusCode(200);
+        var dto1 = utilArtworkMetadata.savedMaterialDto();
+        var dto2 = utilArtworkMetadata.savedMaterialDto();
+        var dto3 = utilArtworkMetadata.savedMaterialDto();
 
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+        var response = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("type", MATERIAL)
+                .param("type", MATERIAL.name())
                 .when()
                 .get(API_URL + SEARCH_METADATA)
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("entries", not(isEmptyOrNullString()));
+                .extract()
+                .body()
+                .as(PagedArtworkMetadataResponse.class)
+                .getEntries();
+        assertThat(response, hasItems(dto1, dto2, dto3));
     }
 
     @Test
     public void createMedium_NotAuthorized() {
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
                 .body(new ArtworkMetadataCreateRequest("medium", MEDIUM))
                 .when()
@@ -263,7 +226,7 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
     @Test
     public void createMedium_success() {
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(new ArtworkMetadataCreateRequest("medium", MEDIUM))
                 .when()
@@ -275,20 +238,12 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void updateMediumStatus_success() {
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
-                .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("medium", MEDIUM))
-                .when()
-                .post(API_URL + CREATE_METADATA)
-                .then()
-                .assertThat()
-                .statusCode(200);
+        var metadataDto = utilArtworkMetadata.savedMediumDto();
 
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .body(new ArtworkMetadataUpdateRequest("medium", ArtworkMetadataStatus.PENDING, MEDIUM))
+                .body(new ArtworkMetadataUpdateRequest(metadataDto.getName(), ArtworkMetadataStatus.PENDING, MEDIUM))
                 .when()
                 .post(API_URL + UPDATE_METADATA_STATUS)
                 .then()
@@ -298,21 +253,13 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void deleteMedium_success() {
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
-                .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("medium", MEDIUM))
-                .when()
-                .post(API_URL + CREATE_METADATA)
-                .then()
-                .assertThat()
-                .statusCode(200);
+        var metadataDto = utilArtworkMetadata.savedMediumDto();
 
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("name", "medium")
-                .param("type", MEDIUM)
+                .param("name", metadataDto.getName())
+                .param("type", MEDIUM.name())
                 .when()
                 .delete(API_URL + DELETE_METADATA)
                 .then()
@@ -323,9 +270,9 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
     @Test
     public void fetchMediums_notAuthorized() {
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
-                .param("type", MEDIUM)
+                .param("type", MEDIUM.name())
                 .when()
                 .get(API_URL + SEARCH_METADATA)
                 .then()
@@ -335,32 +282,30 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void fetchMediums_success() {
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
-                .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("medium", MEDIUM))
-                .when()
-                .post(API_URL + CREATE_METADATA)
-                .then()
-                .assertThat()
-                .statusCode(200);
+        var dto1 = utilArtworkMetadata.savedMediumDto();
+        var dto2 = utilArtworkMetadata.savedMediumDto();
+        var dto3 = utilArtworkMetadata.savedMediumDto();
 
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+        var response = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("type", MEDIUM)
+                .param("type", MEDIUM.name())
                 .when()
                 .get(API_URL + SEARCH_METADATA)
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("entries", not(isEmptyOrNullString()));
+                .extract()
+                .body()
+                .as(PagedArtworkMetadataResponse.class)
+                .getEntries();
+        assertThat(response, hasItems(dto1, dto2, dto3));
     }
 
     @Test
     public void createStyle_NotAuthorized() {
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
                 .body(new ArtworkMetadataCreateRequest("style", STYLE))
                 .when()
@@ -373,7 +318,7 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
     @Test
     public void createStyle_success() {
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(new ArtworkMetadataCreateRequest("style", STYLE))
                 .when()
@@ -385,20 +330,12 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void updateStyleStatus_success() {
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
-                .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("style", STYLE))
-                .when()
-                .post(API_URL + CREATE_METADATA)
-                .then()
-                .assertThat()
-                .statusCode(200);
+        var metadataDto = utilArtworkMetadata.savedStyleDto();
 
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .body(new ArtworkMetadataUpdateRequest("style", ArtworkMetadataStatus.PENDING, STYLE))
+                .body(new ArtworkMetadataUpdateRequest(metadataDto.getName(), ArtworkMetadataStatus.PENDING, STYLE))
                 .when()
                 .post(API_URL + UPDATE_METADATA_STATUS)
                 .then()
@@ -408,21 +345,13 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void deleteStyle_success() {
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
-                .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("style", STYLE))
-                .when()
-                .post(API_URL + CREATE_METADATA)
-                .then()
-                .assertThat()
-                .statusCode(200);
+        var metadataDto = utilArtworkMetadata.savedStyleDto();
 
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("name", "style")
-                .param("type", STYLE)
+                .param("name", metadataDto.getName())
+                .param("type", STYLE.name())
                 .when()
                 .delete(API_URL + DELETE_METADATA)
                 .then()
@@ -433,9 +362,9 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
     @Test
     public void fetchStyles_notAuthorized() {
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
-                .param("type", STYLE)
+                .param("type", STYLE.name())
                 .when()
                 .get(API_URL + SEARCH_METADATA)
                 .then()
@@ -445,25 +374,23 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void fetchStyles_success() {
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
-                .contentType(JSON)
-                .body(new ArtworkMetadataCreateRequest("style", STYLE))
-                .when()
-                .post(API_URL + CREATE_METADATA)
-                .then()
-                .assertThat()
-                .statusCode(200);
+        var dto1 = utilArtworkMetadata.savedStyleDto();
+        var dto2 = utilArtworkMetadata.savedStyleDto();
+        var dto3 = utilArtworkMetadata.savedStyleDto();
 
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+        var response = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("type", STYLE)
+                .param("type", STYLE.name())
                 .when()
                 .get(API_URL + SEARCH_METADATA)
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("entries", not(isEmptyOrNullString()));
+                .extract()
+                .body()
+                .as(PagedArtworkMetadataResponse.class)
+                .getEntries();
+        assertThat(response, hasItems(dto1, dto2, dto3));
     }
 }

@@ -176,7 +176,10 @@ public interface UserRegistrationApi {
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'download_user_resume')")
     @ApiOperation(value = "Download pending evaluator cv.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "CV successfully downloaded.")
+            @ApiResponse(code = 200, message = "CV successfully downloaded."),
+            @ApiResponse(code = 404, message = "Evaluator with given email is not pending."),
+            @ApiResponse(code = 404, message = "Pending evaluator with given email doesn't have a resume."),
+            @ApiResponse(code = 400, message = "Download resume failed for some reason.")
     })
     ResponseEntity<Resource> downloadEvaluatorResume(@Valid @RequestParam("email") String email, Principal principal);
 

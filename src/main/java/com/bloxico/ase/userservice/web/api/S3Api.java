@@ -25,7 +25,7 @@ public interface S3Api {
     @ApiResponses({
             @ApiResponse(code = 200, message = "File successfully uploaded.")
     })
-    ResponseEntity<Void> validateFile(@RequestParam(name = "fileCategory") FileCategory fileCategory,
+    ResponseEntity<Void> validateFile(@RequestParam(name = "fileCategory") FileCategory category,
                                       @RequestPart(value = "file") MultipartFile file);
 
     @GetMapping(
@@ -36,7 +36,7 @@ public interface S3Api {
     @ApiResponses({
             @ApiResponse(code = 200, message = "File successfully downloaded.")
     })
-    ResponseEntity<Resource> downloadFile(@RequestParam(value = "fileName") String fileName);
+    ResponseEntity<Resource> downloadFile(@RequestParam(value = "fileName") String path);
 
     @DeleteMapping(
             value = S3_DELETE,
@@ -47,5 +47,6 @@ public interface S3Api {
     @ApiResponses({
             @ApiResponse(code = 200, message = "File successfully deleted.")
     })
-    ResponseEntity<Void> deleteFile(@RequestParam(value = "fileName") String fileName);
+    ResponseEntity<Void> deleteFile(@RequestParam(value = "fileName") String path);
+
 }

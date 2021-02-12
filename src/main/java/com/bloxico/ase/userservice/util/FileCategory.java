@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.util;
 
+import lombok.Getter;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,25 +30,27 @@ public enum FileCategory {
 
     private final String pathProperty, maxSizeProperty;
     private final UnaryOperator<String> generateFilePathFn;
-    private final Set<SupportedFileExtension> supportedTypes;
+
+    @Getter
+    private final Set<SupportedFileExtension> supportedFileExtensions;
 
     FileCategory(String pathProperty,
                  String maxSizeProperty,
                  UnaryOperator<String> generateFilePathFn,
-                 SupportedFileExtension... types)
+                 SupportedFileExtension... extensions)
     {
         this.pathProperty = pathProperty;
         this.maxSizeProperty = maxSizeProperty;
         this.generateFilePathFn = generateFilePathFn;
-        supportedTypes = Set.of(types);
+        supportedFileExtensions = Set.of(extensions);
     }
 
-    public String generateFilePath(Environment environment) {
+    public String genFilePath(Environment environment) {
         return generateFilePathFn.apply(environment.getProperty(pathProperty));
     }
 
     public void validate(MultipartFile file, Environment environment) {
-        if (!supportedTypes.contains(getByExtension(getExtension(file.getOriginalFilename()))))
+        if (!supportedFileExtensions.contains(getByExtension(getExtension(file.getOriginalFilename()))))
             throw FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY.newException();
         long maxFileSizeKb = Long.parseLong(requireNonNull(environment.getProperty(maxSizeProperty)));
         if ((file.getSize() / 1024) > maxFileSizeKb)

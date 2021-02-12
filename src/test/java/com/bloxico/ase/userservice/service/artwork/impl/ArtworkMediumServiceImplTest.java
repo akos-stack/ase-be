@@ -1,58 +1,88 @@
 package com.bloxico.ase.userservice.service.artwork.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.UtilArtworkMetadata;
+import com.bloxico.ase.testutil.UtilUser;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus;
 import com.bloxico.ase.userservice.repository.artwork.MediumRepository;
-import com.bloxico.ase.userservice.util.AseMapper;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-
-import static com.bloxico.ase.testutil.MockUtil.uuid;
-import static org.junit.Assert.assertEquals;
+import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus.APPROVED;
+import static com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus.PENDING;
+import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class ArtworkMediumServiceImplTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Autowired
-    private MediumServiceImpl service;
-
-    @Autowired
-    private MediumRepository mediumRepository;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilArtworkMetadata utilArtworkMetadata;
+    @Autowired private MediumServiceImpl service;
+    @Autowired private MediumRepository mediumRepository;
 
     @Test
     public void findOrSaveMedium_notFound() {
-        var principalId = mockUtil.savedAdmin().getId();
+        var principalId = utilUser.savedAdmin().getId();
         var dto = new ArtworkMetadataDto();
-        dto.setName(uuid());
+        dto.setName(genUUID());
         dto.setStatus(ArtworkMetadataStatus.APPROVED);
-        assertEquals(List.of(), mediumRepository.findAll());
+        assertThat(mediumRepository.findAll(), not(hasItems(MAPPER.toMediumEntity(dto))));
         service.findOrSaveArtworkMetadata(dto, principalId);
-        assertEquals(List.of(AseMapper.MAPPER.toMediumEntity(dto)), mediumRepository.findAll());
+        assertThat(mediumRepository.findAll(), hasItems(MAPPER.toMediumEntity(dto)));
     }
 
     @Test
     public void findOrSaveMedium_found() {
-        var principalId = mockUtil.savedAdmin().getId();
-        var dto = mockUtil.savedMediumDto();
-        assertEquals(List.of(AseMapper.MAPPER.toMediumEntity(dto)), mediumRepository.findAll());
+        var principalId = utilUser.savedAdmin().getId();
+        var dto = utilArtworkMetadata.savedMediumDto();
+        assertThat(mediumRepository.findAll(), hasItems(MAPPER.toMediumEntity(dto)));
         assertEquals(dto, service.findOrSaveArtworkMetadata(dto, principalId));
-        assertEquals(List.of(AseMapper.MAPPER.toMediumEntity(dto)), mediumRepository.findAll());
+    }
+
+    @Test
+    public void updateMediumStatus() {
+        var principalId = utilUser.savedAdmin().getId();
+        var dto = utilArtworkMetadata.savedMediumDto();
+
+        assertTrue(mediumRepository.findByNameIgnoreCase(dto.getName()).get().getStatus() == APPROVED);
+
+        dto.setStatus(PENDING);
+        service.updateArtworkMetadataStatus(dto, principalId);
+
+        assertTrue(mediumRepository.findByNameIgnoreCase(dto.getName()).get().getStatus() == PENDING);
+    }
+
+    @Test
+    public void deleteMedium() {
+        var dto = utilArtworkMetadata.savedMediumDto();
+        assertNotNull(mediumRepository.findByNameIgnoreCase(dto.getName()));
+
+        service.deleteArtworkMetadata(dto.getName());
+        assertTrue(mediumRepository.findByNameIgnoreCase(dto.getName()).isEmpty());
+    }
+
+    @Test
+    public void fetchApprovedMediums() {
+        var dto = utilArtworkMetadata.savedMediumDto();
+        var dto2 = utilArtworkMetadata.savedMediumDto(PENDING);
+        assertThat(
+                service.searchApprovedArtworkMetadata(""),
+                allOf(hasItems(dto), not(hasItems(dto2))));
     }
 
     @Test
     public void fetchMediums() {
-        assertEquals(
-                List.of(),
-                service.searchArtworkMetadata(null, "", 0, 10, "name").getContent());
-        var dto = mockUtil.savedMediumDto();
-        assertEquals(
-                List.of(dto),
-                service.searchArtworkMetadata(null, "", 0, 10, "name").getContent());
+        var dto = utilArtworkMetadata.savedMediumDto();
+        assertThat(
+                service.searchArtworkMetadata(null, "", 0, 10, "name").getContent(),
+                hasItems(dto));
+        var dto2 = utilArtworkMetadata.savedMediumDto();
+        assertThat(
+                service.searchArtworkMetadata(null, "", 0, 10, "name").getContent(),
+                hasItems(dto, dto2));
     }
 }

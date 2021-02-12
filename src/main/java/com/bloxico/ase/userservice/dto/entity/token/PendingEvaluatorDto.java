@@ -8,11 +8,11 @@ import lombok.Value;
 @Value
 public class PendingEvaluatorDto {
 
-    @JsonProperty("token")
-    String token;
-
     @JsonProperty("email")
     String email;
+
+    @JsonProperty("token")
+    String token;
 
     @JsonProperty("status")
     Status status;

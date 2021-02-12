@@ -1,37 +1,33 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
-import com.bloxico.ase.userservice.web.model.user.BlacklistTokensRequest;
-import com.bloxico.ase.userservice.web.model.user.DisableUserRequest;
+import com.bloxico.ase.userservice.web.model.user.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bloxico.ase.testutil.MockUtil.ERROR_CODE;
+import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.web.api.UserManagementApi.*;
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_ENDPOINT;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
-@DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class UserManagementApiTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
+    @Autowired private UtilAuth utilAuth;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilUserProfile utilUserProfile;
 
     @Test
-    public void searchUsers_notAuthorized() {
+    public void searchUsers_403_forbidden() {
         given()
-                .header("Authorization", mockUtil.doAuthentication())
+                .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
                 .param("email", "user1")
                 .param("role", "")
@@ -43,12 +39,12 @@ public class UserManagementApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void searchUsers_badRequest() {
+    public void searchUsers_404_roleNotExists() {
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .param("email", "user1")
-                .param("role", "nonExistingRole")
+                .param("role", genUUID())
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()
@@ -57,26 +53,38 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .body(ERROR_CODE, is(ErrorCodes.User.ROLE_NOT_FOUND.getCode()));
     }
 
+    // TODO-TEST searchUsers_nothingFound_200_ok
+
     @Test
-    public void searchUsers_200_ok() {
-        mockUtil.saveUsers();
-        given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+    public void searchUsers_byEmail_200_ok() {
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u3 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var users = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("email", "user1")
+                .param("email", "fooBar")
                 .param("role", "")
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("users", notNullValue());
+                .extract()
+                .body()
+                .as(PagedUserDataResponse.class)
+                .getUsers();
+        assertThat(users, allOf(hasItems(u1, u2), not(hasItems(u3))));
     }
+
+    // TODO-TEST searchUsers_byRole_200_ok
+
+    // TODO-TEST searchUsers_byEmailAndRole_200_ok
 
     @Test
     public void disableUser_404_userNotFound() {
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(new DisableUserRequest(-1L))
                 .when()
@@ -89,9 +97,9 @@ public class UserManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void disableUser_200_ok() {
-        var registration = mockUtil.doConfirmedRegistration();
-        var userToken = mockUtil.doAuthentication(registration);
-        mockUtil.savedUserProfile(registration.getId());
+        var registration = utilAuth.doConfirmedRegistration();
+        var userToken = utilAuth.doAuthentication(registration);
+        utilUserProfile.savedUserProfile(registration.getId());
         // User can access secured endpoints
         given()
                 .header("Authorization", userToken)
@@ -102,7 +110,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .statusCode(200);
         // Disable user
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(new DisableUserRequest(registration.getId()))
                 .when()
@@ -119,7 +127,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .assertThat()
                 .statusCode(403);
         // User can't authenticate and obtain a new token
-        mockUtil.doAuthenticationRequest(registration)
+        utilAuth.doAuthenticationRequest(registration)
                 .then()
                 .assertThat()
                 .statusCode(400)
@@ -131,7 +139,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
     @Test
     public void blacklistTokens_404_userNotFound() {
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(new BlacklistTokensRequest(-1L))
                 .when()
@@ -144,9 +152,9 @@ public class UserManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void blacklistTokens_200_ok() {
-        var registration = mockUtil.doConfirmedRegistration();
-        var userToken = mockUtil.doAuthentication(registration);
-        mockUtil.savedUserProfile(registration.getId());
+        var registration = utilAuth.doConfirmedRegistration();
+        var userToken = utilAuth.doAuthentication(registration);
+        utilUserProfile.savedUserProfile(registration.getId());
         // User can access secured endpoints
         given()
                 .header("Authorization", userToken)
@@ -157,7 +165,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .statusCode(200);
         // Blacklist user's tokens
         given()
-                .header("Authorization", mockUtil.doAdminAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(new BlacklistTokensRequest(registration.getId()))
                 .when()
@@ -174,7 +182,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .assertThat()
                 .statusCode(403);
         // User can authenticate and obtain a new token
-        var newUserToken = mockUtil.doAuthentication(registration);
+        var newUserToken = utilAuth.doAuthentication(registration);
         // User can access secured endpoints with the new token
         given()
                 .header("Authorization", newUserToken)

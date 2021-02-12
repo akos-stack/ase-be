@@ -1,279 +1,255 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.MockUtil;
+import com.bloxico.ase.testutil.UtilArtworkMetadata;
+import com.bloxico.ase.testutil.UtilUser;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus;
 import com.bloxico.ase.userservice.repository.artwork.CategoryRepository;
 import com.bloxico.ase.userservice.repository.artwork.MaterialRepository;
 import com.bloxico.ase.userservice.repository.artwork.MediumRepository;
 import com.bloxico.ase.userservice.repository.artwork.StyleRepository;
-import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkMetadataResponse;
 import com.bloxico.ase.userservice.web.model.artwork.ArtworkMetadataCreateRequest;
 import com.bloxico.ase.userservice.web.model.artwork.ArtworkMetadataUpdateRequest;
-import com.bloxico.ase.userservice.web.model.artwork.PagedArtworkMetadataResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
-
-import static com.bloxico.ase.testutil.MockUtil.uuid;
+import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus.APPROVED;
 import static com.bloxico.ase.userservice.util.ArtworkMetadataType.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.Assert.*;
 
 public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
 
-    @Autowired
-    private MockUtil mockUtil;
-
-    @Autowired
-    private AbstractArtworkMetadataFacadeImpl facade;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Autowired
-    private MaterialRepository materialRepository;
-
-    @Autowired
-    private MediumRepository mediumRepository;
-
-    @Autowired
-    private StyleRepository styleRepository;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilArtworkMetadata utilArtworkMetadata;
+    @Autowired private AbstractArtworkMetadataFacadeImpl facade;
+    @Autowired private CategoryRepository categoryRepository;
+    @Autowired private MaterialRepository materialRepository;
+    @Autowired private MediumRepository mediumRepository;
+    @Autowired private StyleRepository styleRepository;
 
     @Test
     public void createCategory() {
-        var admin = mockUtil.savedAdmin();
-        var request = new ArtworkMetadataCreateRequest(uuid(), CATEGORY);
-        var response = facade.createArtworkMetadata(request, admin.getId());
-        assertEquals(request.getName(), response.getName());
+        var admin = utilUser.savedAdmin();
+        var name = genUUID();
+        var request = new ArtworkMetadataCreateRequest(name, CATEGORY);
+        facade.createArtworkMetadata(request, admin.getId());
+
+        var newlyCreated = categoryRepository.findByNameIgnoreCase(name).orElseThrow();
+        assertEquals(newlyCreated.getName(), name);
+        assertEquals(newlyCreated.getStatus(), APPROVED);
     }
 
     @Test
     public void updateCategoryStatus() {
-        var admin = mockUtil.savedAdmin();
-        var request = new ArtworkMetadataCreateRequest(uuid(), CATEGORY);
-        var response = facade.createArtworkMetadata(request, admin.getId());
-        assertEquals(request.getStatus(), response.getStatus());
+        var savedCategory = utilArtworkMetadata.savedCategory(APPROVED);
+        var updateRequest = new ArtworkMetadataUpdateRequest(savedCategory.getName(), ArtworkMetadataStatus.PENDING, CATEGORY);
+        facade.updateArtworkMetadataStatus(updateRequest, savedCategory.getCreatorId());
 
-        var updateRequest = new ArtworkMetadataUpdateRequest(request.getName(), ArtworkMetadataStatus.PENDING, CATEGORY);
-        facade.updateArtworkMetadataStatus(updateRequest, admin.getId());
-
-        assertEquals(categoryRepository.findByNameIgnoreCase(request.getName()).get().getStatus(), ArtworkMetadataStatus.PENDING);
+        var updated = categoryRepository.findByNameIgnoreCase(savedCategory.getName()).orElseThrow();
+        assertEquals(updated.getStatus(), ArtworkMetadataStatus.PENDING);
     }
 
     @Test
     public void deleteCategory() {
-        var admin = mockUtil.savedAdmin();
-        var request = new ArtworkMetadataCreateRequest(uuid(), CATEGORY);
-        var response = facade.createArtworkMetadata(request, admin.getId());
-        assertEquals(request.getStatus(), response.getStatus());
+        var savedCategory = utilArtworkMetadata.savedCategory(APPROVED);
+        facade.deleteArtworkMetadata(savedCategory.getName(), CATEGORY);
 
-        facade.deleteArtworkMetadata(request.getName(), CATEGORY);
-
-        assertTrue(categoryRepository.findByNameIgnoreCase(request.getName()).isEmpty());
+        assertTrue(categoryRepository.findByNameIgnoreCase(savedCategory.getName()).isEmpty());
     }
 
     @Test
     public void fetchCategories() {
-        assertEquals(
-                new PagedArtworkMetadataResponse(List.of(), 0, 0, 0),
-                facade.searchArtworkMetadata(CATEGORY, null, "", 0, 10, "name"));
-        var dto = mockUtil.savedCategoryDto();
-        assertEquals(
-                new PagedArtworkMetadataResponse(List.of(dto), 1, 1, 1),
-                facade.searchArtworkMetadata(CATEGORY, null, "", 0, 10, "name"));
+        assertThat(
+                facade.searchArtworkMetadata(CATEGORY, null, "", 0, 10, "name").getEntries(),
+                hasItems());
+        var dto = utilArtworkMetadata.savedCategoryDto(APPROVED);
+        assertThat(
+                facade.searchArtworkMetadata(CATEGORY, null, "", 0, 10, "name").getEntries(),
+                hasItems(dto));
     }
 
     @Test
     public void createMaterials() {
-        var admin = mockUtil.savedAdmin();
-        var request = new ArtworkMetadataCreateRequest(uuid(), MATERIAL);
-        var response = facade.createArtworkMetadata(request, admin.getId());
-        assertEquals(request.getName(), response.getName());
+        var admin = utilUser.savedAdmin();
+        var name = genUUID();
+        var request = new ArtworkMetadataCreateRequest(name, MATERIAL);
+        facade.createArtworkMetadata(request, admin.getId());
+
+        var newlyCreated = materialRepository.findByNameIgnoreCase(name).orElseThrow();
+        assertEquals(newlyCreated.getName(), name);
+        assertEquals(newlyCreated.getStatus(), APPROVED);
     }
 
     @Test
     public void updateMaterialStatus() {
-        var admin = mockUtil.savedAdmin();
-        var request = new ArtworkMetadataCreateRequest(uuid(), MATERIAL);
-        var response = facade.createArtworkMetadata(request, admin.getId());
-        assertEquals(request.getStatus(), response.getStatus());
+        var savedMaterial = utilArtworkMetadata.savedMaterial(APPROVED);
+        var updateRequest = new ArtworkMetadataUpdateRequest(savedMaterial.getName(), ArtworkMetadataStatus.PENDING, MATERIAL);
+        facade.updateArtworkMetadataStatus(updateRequest, savedMaterial.getCreatorId());
 
-        var updateRequest = new ArtworkMetadataUpdateRequest(request.getName(), ArtworkMetadataStatus.PENDING, MATERIAL);
-        facade.updateArtworkMetadataStatus(updateRequest, admin.getId());
-
-        assertEquals(materialRepository.findByNameIgnoreCase(request.getName()).get().getStatus(), ArtworkMetadataStatus.PENDING);
+        var updated = materialRepository.findByNameIgnoreCase(savedMaterial.getName()).orElseThrow();
+        assertEquals(updated.getStatus(), ArtworkMetadataStatus.PENDING);
     }
 
     @Test
     public void deleteMaterial() {
-        var admin = mockUtil.savedAdmin();
-        var request = new ArtworkMetadataCreateRequest(uuid(), MATERIAL);
-        var response = facade.createArtworkMetadata(request, admin.getId());
-        assertEquals(request.getStatus(), response.getStatus());
+        var savedMaterial = utilArtworkMetadata.savedMaterial(APPROVED);
+        facade.deleteArtworkMetadata(savedMaterial.getName(), MATERIAL);
 
-        facade.deleteArtworkMetadata(request.getName(), MATERIAL);
-
-        assertTrue(materialRepository.findByNameIgnoreCase(request.getName()).isEmpty());
+        assertTrue(materialRepository.findByNameIgnoreCase(savedMaterial.getName()).isEmpty());
     }
 
     @Test
     public void fetchMaterials() {
-        assertEquals(
-                new PagedArtworkMetadataResponse(List.of(), 0, 0, 0),
-                facade.searchArtworkMetadata(MATERIAL, null, "", 0, 10, "name"));
-        var dto = mockUtil.savedMaterialDto();
-        assertEquals(
-                new PagedArtworkMetadataResponse(List.of(dto), 1, 1, 1),
-                facade.searchArtworkMetadata(MATERIAL, null, "", 0, 10, "name"));
+        assertThat(
+                facade.searchArtworkMetadata(MATERIAL, null, "", 0, 10, "name").getEntries(),
+                hasItems());
+        var dto = utilArtworkMetadata.savedMaterialDto();
+        assertThat(
+                facade.searchArtworkMetadata(MATERIAL, null, "", 0, 10, "name").getEntries(),
+                hasItems(dto));
     }
 
     @Test
     public void createMediums() {
-        var admin = mockUtil.savedAdmin();
-        var request = new ArtworkMetadataCreateRequest(uuid(), MEDIUM);
-        var response = facade.createArtworkMetadata(request, admin.getId());
-        assertEquals(request.getName(), response.getName());
+        var admin = utilUser.savedAdmin();
+        var name = genUUID();
+        var request = new ArtworkMetadataCreateRequest(name, MEDIUM);
+        facade.createArtworkMetadata(request, admin.getId());
+
+        var newlyCreated = mediumRepository.findByNameIgnoreCase(name).orElseThrow();
+        assertEquals(newlyCreated.getName(), name);
+        assertEquals(newlyCreated.getStatus(), APPROVED);
     }
 
     @Test
     public void updateMediumStatus() {
-        var admin = mockUtil.savedAdmin();
-        var request = new ArtworkMetadataCreateRequest(uuid(), MEDIUM);
-        var response = facade.createArtworkMetadata(request, admin.getId());
-        assertEquals(request.getStatus(), response.getStatus());
+        var savedMedium = utilArtworkMetadata.savedMedium(APPROVED);
+        var updateRequest = new ArtworkMetadataUpdateRequest(savedMedium.getName(), ArtworkMetadataStatus.PENDING, MEDIUM);
+        facade.updateArtworkMetadataStatus(updateRequest, savedMedium.getCreatorId());
 
-        var updateRequest = new ArtworkMetadataUpdateRequest(request.getName(), ArtworkMetadataStatus.PENDING, MEDIUM);
-        facade.updateArtworkMetadataStatus(updateRequest, admin.getId());
-
-        assertEquals(mediumRepository.findByNameIgnoreCase(request.getName()).get().getStatus(), ArtworkMetadataStatus.PENDING);
+        var updated = mediumRepository.findByNameIgnoreCase(savedMedium.getName()).orElseThrow();
+        assertEquals(updated.getStatus(), ArtworkMetadataStatus.PENDING);
     }
 
     @Test
     public void deleteMedium() {
-        var admin = mockUtil.savedAdmin();
-        var request = new ArtworkMetadataCreateRequest(uuid(), MEDIUM);
-        var response = facade.createArtworkMetadata(request, admin.getId());
-        assertEquals(request.getStatus(), response.getStatus());
+        var savedMedium = utilArtworkMetadata.savedMedium(APPROVED);
+        facade.deleteArtworkMetadata(savedMedium.getName(), MEDIUM);
 
-        facade.deleteArtworkMetadata(request.getName(), MEDIUM);
-
-        assertTrue(mediumRepository.findByNameIgnoreCase(request.getName()).isEmpty());
+        assertTrue(mediumRepository.findByNameIgnoreCase(savedMedium.getName()).isEmpty());
     }
 
     @Test
     public void fetchMediums() {
-        assertEquals(
-                new PagedArtworkMetadataResponse(List.of(), 0, 0, 0),
-                facade.searchArtworkMetadata(MEDIUM, null, "", 0, 10, "name"));
-        var dto = mockUtil.savedMediumDto();
-        assertEquals(
-                new PagedArtworkMetadataResponse(List.of(dto), 1, 1, 1),
-                facade.searchArtworkMetadata(MEDIUM, null, "", 0, 10, "name"));
+        assertThat(
+                facade.searchArtworkMetadata(MEDIUM, null, "", 0, 10, "name").getEntries(),
+                hasItems());
+        var dto = utilArtworkMetadata.savedMediumDto();
+        assertThat(
+                facade.searchArtworkMetadata(MEDIUM, null, "", 0, 10, "name").getEntries(),
+                hasItems(dto));
     }
 
     @Test
     public void createStyle() {
-        var admin = mockUtil.savedAdmin();
-        var request = new ArtworkMetadataCreateRequest(uuid(), STYLE);
-        var response = facade.createArtworkMetadata(request, admin.getId());
-        assertEquals(request.getName(), response.getName());
+        var admin = utilUser.savedAdmin();
+        var name = genUUID();
+        var request = new ArtworkMetadataCreateRequest(name, STYLE);
+        facade.createArtworkMetadata(request, admin.getId());
+
+        var newlyCreated = styleRepository.findByNameIgnoreCase(name).orElseThrow();
+        assertEquals(newlyCreated.getName(), name);
+        assertEquals(newlyCreated.getStatus(), APPROVED);
     }
 
     @Test
     public void updateStyleStatus() {
-        var admin = mockUtil.savedAdmin();
-        var request = new ArtworkMetadataCreateRequest(uuid(), STYLE);
-        var response = facade.createArtworkMetadata(request, admin.getId());
-        assertEquals(request.getStatus(), response.getStatus());
+        var savedStyle = utilArtworkMetadata.savedStyle(APPROVED);
+        var updateRequest = new ArtworkMetadataUpdateRequest(savedStyle.getName(), ArtworkMetadataStatus.PENDING, STYLE);
+        facade.updateArtworkMetadataStatus(updateRequest, savedStyle.getCreatorId());
 
-        var updateRequest = new ArtworkMetadataUpdateRequest(request.getName(), ArtworkMetadataStatus.PENDING, STYLE);
-        facade.updateArtworkMetadataStatus(updateRequest, admin.getId());
-
-        assertEquals(styleRepository.findByNameIgnoreCase(request.getName()).get().getStatus(), ArtworkMetadataStatus.PENDING);
+        var updated = styleRepository.findByNameIgnoreCase(savedStyle.getName()).orElseThrow();
+        assertEquals(updated.getStatus(), ArtworkMetadataStatus.PENDING);
     }
 
     @Test
     public void deleteStyle() {
-        var admin = mockUtil.savedAdmin();
-        var request = new ArtworkMetadataCreateRequest(uuid(), STYLE);
-        var response = facade.createArtworkMetadata(request, admin.getId());
-        assertEquals(request.getStatus(), response.getStatus());
+        var savedStyle = utilArtworkMetadata.savedStyle(APPROVED);
+        facade.deleteArtworkMetadata(savedStyle.getName(), STYLE);
 
-        facade.deleteArtworkMetadata(request.getName(), STYLE);
-
-        assertTrue(styleRepository.findByNameIgnoreCase(request.getName()).isEmpty());
+        assertTrue(materialRepository.findByNameIgnoreCase(savedStyle.getName()).isEmpty());
     }
 
     @Test
     public void fetchStyles() {
-        assertEquals(
-                new PagedArtworkMetadataResponse(List.of(), 0, 0, 0),
-                facade.searchArtworkMetadata(STYLE, null, "", 0, 10, "name"));
-        var dto = mockUtil.savedStyleDto();
-        assertEquals(
-                new PagedArtworkMetadataResponse(List.of(dto), 1, 1, 1),
-                facade.searchArtworkMetadata(STYLE, null, "", 0, 10, "name"));
+        assertThat(
+                facade.searchArtworkMetadata(STYLE, null, "", 0, 10, "name").getEntries(),
+                hasItems());
+        var dto = utilArtworkMetadata.savedStyleDto();
+        assertThat(
+                facade.searchArtworkMetadata(STYLE, null, "", 0, 10, "name").getEntries(),
+                hasItems(dto));
     }
 
         @Test
     public void findApprovedCategories() {
-        assertEquals(
-                new SearchArtworkMetadataResponse(List.of()),
-                facade.searchApprovedArtworkMetadata("", CATEGORY));
-        var dto = mockUtil.savedCategoryDto();
-        assertEquals(
-                new SearchArtworkMetadataResponse(List.of(dto)),
-                facade.searchApprovedArtworkMetadata("", CATEGORY));
-        var dto2 = mockUtil.savedCategoryDto();
-        assertEquals(
-                new SearchArtworkMetadataResponse(List.of(dto, dto2)),
-                facade.searchApprovedArtworkMetadata("", CATEGORY));
+        assertThat(
+                facade.searchApprovedArtworkMetadata("", CATEGORY).getEntries(),
+                hasItems());
+        var dto = utilArtworkMetadata.savedCategoryDto(APPROVED);
+        assertThat(
+                facade.searchApprovedArtworkMetadata("", CATEGORY).getEntries(),
+                hasItems(dto));
+        var dto2 = utilArtworkMetadata.savedCategoryDto(APPROVED);
+        assertThat(
+                facade.searchApprovedArtworkMetadata("", CATEGORY).getEntries(),
+                hasItems(dto, dto2));
     }
 
     @Test
     public void findApprovedMaterials() {
-        assertEquals(
-                new SearchArtworkMetadataResponse(List.of()),
-                facade.searchApprovedArtworkMetadata("", MATERIAL));
-        var dto = mockUtil.savedMaterialDto();
-        assertEquals(
-                new SearchArtworkMetadataResponse(List.of(dto)),
-                facade.searchApprovedArtworkMetadata("", MATERIAL));
-        var dto2 = mockUtil.savedMaterialDto();
-        assertEquals(
-                new SearchArtworkMetadataResponse(List.of(dto, dto2)),
-                facade.searchApprovedArtworkMetadata("", MATERIAL));
+        assertThat(
+                facade.searchApprovedArtworkMetadata("", MATERIAL).getEntries(),
+                hasItems());
+        var dto = utilArtworkMetadata.savedMaterialDto();
+        assertThat(
+                facade.searchApprovedArtworkMetadata("", MATERIAL).getEntries(),
+                hasItems(dto));
+        var dto2 = utilArtworkMetadata.savedMaterialDto();
+        assertThat(
+                facade.searchApprovedArtworkMetadata("", MATERIAL).getEntries(),
+                hasItems(dto, dto2));
     }
 
     @Test
     public void findApprovedMediums() {
-        assertEquals(
-                new SearchArtworkMetadataResponse(List.of()),
-                facade.searchApprovedArtworkMetadata("", MEDIUM));
-        var dto = mockUtil.savedMediumDto();
-        assertEquals(
-                new SearchArtworkMetadataResponse(List.of(dto)),
-                facade.searchApprovedArtworkMetadata("", MEDIUM));
-        var dto2 = mockUtil.savedMediumDto();
-        assertEquals(
-                new SearchArtworkMetadataResponse(List.of(dto, dto2)),
-                facade.searchApprovedArtworkMetadata("", MEDIUM));
+        assertThat(
+                facade.searchApprovedArtworkMetadata("", MEDIUM).getEntries(),
+                hasItems());
+        var dto = utilArtworkMetadata.savedMediumDto();
+        assertThat(
+                facade.searchApprovedArtworkMetadata("", MEDIUM).getEntries(),
+                hasItems(dto));
+        var dto2 = utilArtworkMetadata.savedMediumDto();
+        assertThat(
+                facade.searchApprovedArtworkMetadata("", MEDIUM).getEntries(),
+                hasItems(dto, dto2));
     }
 
     @Test
     public void findApprovedStyles() {
-        assertEquals(
-                new SearchArtworkMetadataResponse(List.of()),
-                facade.searchApprovedArtworkMetadata("", STYLE));
-        var dto = mockUtil.savedStyleDto();
-        assertEquals(
-                new SearchArtworkMetadataResponse(List.of(dto)),
-                facade.searchApprovedArtworkMetadata("", STYLE));
-        var dto2 = mockUtil.savedStyleDto();
-        assertEquals(
-                new SearchArtworkMetadataResponse(List.of(dto, dto2)),
-                facade.searchApprovedArtworkMetadata("", STYLE));
+        assertThat(
+                facade.searchApprovedArtworkMetadata("", STYLE).getEntries(),
+                hasItems());
+        var dto = utilArtworkMetadata.savedStyleDto();
+        assertThat(
+                facade.searchApprovedArtworkMetadata("", STYLE).getEntries(),
+                hasItems(dto));
+        var dto2 = utilArtworkMetadata.savedStyleDto();
+        assertThat(
+                facade.searchApprovedArtworkMetadata("", STYLE).getEntries(),
+                hasItems(dto, dto2));
     }
 }
