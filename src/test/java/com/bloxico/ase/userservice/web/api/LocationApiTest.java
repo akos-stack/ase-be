@@ -31,12 +31,15 @@ public class LocationApiTest extends AbstractSpringTest {
 
     @Test
     public void findAllCountries_200_ok() {
-        var c1 = utilLocation.savedCountryProj();
-        var c2 = utilLocation.savedCountryProj();
-        var c3 = utilLocation.savedCountryProj();
+        var searchTerm = genUUID();
+        var c1 = utilLocation.savedCountryProjWithName(genEmail(searchTerm));
+        var c2 = utilLocation.savedCountryProjWithName(genEmail(searchTerm.toUpperCase()));
+        var c3 = utilLocation.savedCountryProjWithName(genEmail(searchTerm.toLowerCase()));
+        var c4 = utilLocation.savedCountryProjWithName("fooBar");
         var countries = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
+                .queryParam("search", searchTerm)
                 .when()
                 .get(API_URL + COUNTRIES)
                 .then()
@@ -46,7 +49,7 @@ public class LocationApiTest extends AbstractSpringTest {
                 .body()
                 .as(SearchCountriesResponse.class)
                 .getCountries();
-        assertThat(countries, hasItems(c1, c2, c3));
+        assertThat(countries, allOf(hasItems(c1, c2, c3), not(hasItems(c4))));
     }
 
     @Test
@@ -78,6 +81,7 @@ public class LocationApiTest extends AbstractSpringTest {
         var r4 = utilLocation.savedRegionProjWithName(genEmail("fooBar"));
         var regions = given()
                 .header("Authorization", utilAuth.doAuthentication())
+                .contentType(JSON)
                 .queryParam("search", searchTerm)
                 .when()
                 .get(API_URL + REGIONS)

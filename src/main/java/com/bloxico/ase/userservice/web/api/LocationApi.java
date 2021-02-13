@@ -25,7 +25,7 @@ public interface LocationApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Countries successfully retrieved.")
     })
-    ResponseEntity<SearchCountriesResponse> findAllCountries();
+    ResponseEntity<SearchCountriesResponse> findAllCountries(@Valid SearchCountriesRequest request);
 
     @GetMapping(value = CITIES)
     @ApiOperation(value = "Fetch all cities.")

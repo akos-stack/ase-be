@@ -26,11 +26,11 @@ public class LocationFacadeImpl implements ILocationFacade {
     }
 
     @Override
-    public SearchCountriesResponse findAllCountries() {
-        log.info("LocationFacadeImpl.findAllCountries - start");
-        var countries = locationService.findAllCountries();
-        var response = new SearchCountriesResponse(countries);
-        log.info("LocationFacadeImpl.findAllCountries - end");
+    public SearchCountriesResponse findAllCountries(SearchCountriesRequest request) {
+        log.info("LocationFacadeImpl.findAllCountries - start | request: {}", request);
+        var page = locationService.findAllCountries(request);
+        var response = new SearchCountriesResponse(page.getContent(), page.getTotalElements());
+        log.info("LocationFacadeImpl.findAllCountries - end | request: {}", request);
         return response;
     }
 

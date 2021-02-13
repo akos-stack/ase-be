@@ -89,11 +89,52 @@ public class UtilLocation {
         return country;
     }
 
+    public Country savedCountryWithName(String name) {
+        var creatorId = utilUser.savedAdmin().getId();
+        var region = savedRegion();
+        var country = new Country();
+        country.setName(name);
+        country.setRegion(region);
+        country.setCreatorId(creatorId);
+        countryRepository.saveAndFlush(country);
+        var evaluationDetails = savedCountryEvaluationDetails(country);
+        country.setCountryEvaluationDetails(evaluationDetails);
+        return country;
+    }
+
+    public CountryDto savedCountryDto() {
+        return MAPPER.toDto(savedCountry());
+    }
+
+    public CountryDto savedCountryDtoWithName(String name) {
+        return MAPPER.toDto(savedCountryWithName(name));
+    }
+
     public CountryDto genCountryDtoWithRegionDto(RegionDto regionDto) {
         var countryDto = new CountryDto();
         countryDto.setName(genUUID());
         countryDto.setRegion(regionDto);
         return countryDto;
+    }
+
+    public CountryTotalOfEvaluatorsProj savedCountryProj() {
+        var countryDto = savedCountryDto();
+        return new CountryTotalOfEvaluatorsProj(
+                countryDto.getId(), countryDto.getName(), countryDto.getRegion().getName(),
+                countryDto.getCountryEvaluationDetails().getPricePerEvaluation(),
+                countryDto.getCountryEvaluationDetails().getAvailabilityPercentage(),
+                0
+        );
+    }
+
+    public CountryTotalOfEvaluatorsProj savedCountryProjWithName(String name) {
+        var countryDto = savedCountryDtoWithName(name);
+        return new CountryTotalOfEvaluatorsProj(
+                countryDto.getId(), countryDto.getName(), countryDto.getRegion().getName(),
+                countryDto.getCountryEvaluationDetails().getPricePerEvaluation(),
+                countryDto.getCountryEvaluationDetails().getAvailabilityPercentage(),
+                0
+        );
     }
 
     public CountryEvaluationDetails savedCountryEvaluationDetails(Country country) {
@@ -118,20 +159,6 @@ public class UtilLocation {
         evaluationDetailsDto.setPricePerEvaluation(price);
         evaluationDetailsDto.setAvailabilityPercentage(availability);
         return evaluationDetailsDto;
-    }
-
-    public CountryTotalOfEvaluatorsProj savedCountryProj() {
-        var countryDto = savedCountryDto();
-        return new CountryTotalOfEvaluatorsProj(
-                countryDto.getId(), countryDto.getName(), countryDto.getRegion().getName(),
-                countryDto.getCountryEvaluationDetails().getPricePerEvaluation(),
-                countryDto.getCountryEvaluationDetails().getAvailabilityPercentage(),
-                0
-        );
-    }
-
-    public CountryDto savedCountryDto() {
-        return MAPPER.toDto(savedCountry());
     }
 
     public City savedCity() {

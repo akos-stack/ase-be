@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
 import com.bloxico.ase.userservice.projection.RegionDetailsProj;
 import com.bloxico.ase.userservice.repository.address.*;
 import com.bloxico.ase.userservice.service.address.ILocationService;
+import com.bloxico.ase.userservice.web.model.address.SearchCountriesRequest;
 import com.bloxico.ase.userservice.web.model.address.SearchRegionsRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,14 +49,11 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public List<CountryTotalOfEvaluatorsProj> findAllCountries() {
-        log.debug("LocationServiceImpl.findAllCountries - start");
-        var countries = countryRepository
-                .findAllIncludeEvaluatorsCount()
-                .stream()
-                .collect(toUnmodifiableList());
-        log.debug("LocationServiceImpl.findAllCountries - end");
-        return countries;
+    public Page<CountryTotalOfEvaluatorsProj> findAllCountries(SearchCountriesRequest request) {
+        log.debug("LocationServiceImpl.findAllCountries - start | request: {}", request);
+        var page = countryRepository.findAll(request);
+        log.debug("LocationServiceImpl.findAllCountries - end | request: {}", request);
+        return page;
     }
 
     @Override

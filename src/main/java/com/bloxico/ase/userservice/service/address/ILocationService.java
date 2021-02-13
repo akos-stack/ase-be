@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.service.address;
 import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
 import com.bloxico.ase.userservice.projection.RegionDetailsProj;
+import com.bloxico.ase.userservice.web.model.address.SearchCountriesRequest;
 import com.bloxico.ase.userservice.web.model.address.SearchRegionsRequest;
 import org.springframework.data.domain.Page;
 
@@ -10,7 +11,7 @@ import java.util.List;
 
 public interface ILocationService {
 
-    List<CountryTotalOfEvaluatorsProj> findAllCountries();
+    Page<CountryTotalOfEvaluatorsProj> findAllCountries(SearchCountriesRequest request);
 
     List<CityDto> findAllCities();
 

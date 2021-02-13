@@ -22,8 +22,8 @@ public class LocationController implements LocationApi {
     private ILocationFacade locationFacade;
 
     @Override
-    public ResponseEntity<SearchCountriesResponse> findAllCountries() {
-        return ResponseEntity.ok(locationFacade.findAllCountries());
+    public ResponseEntity<SearchCountriesResponse> findAllCountries(@Valid SearchCountriesRequest request) {
+        return ResponseEntity.ok(locationFacade.findAllCountries(request));
     }
 
     @Override

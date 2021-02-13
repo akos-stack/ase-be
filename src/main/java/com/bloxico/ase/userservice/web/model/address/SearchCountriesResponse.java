@@ -16,4 +16,7 @@ public class SearchCountriesResponse {
     @JsonProperty("countries")
     List<CountryTotalOfEvaluatorsProj> countries;
 
+    @JsonProperty("total_elements")
+    long totalElements;
+
 }

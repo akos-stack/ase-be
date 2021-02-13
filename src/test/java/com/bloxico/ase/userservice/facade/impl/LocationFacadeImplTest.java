@@ -6,10 +6,7 @@ import com.bloxico.ase.testutil.UtilUser;
 import com.bloxico.ase.userservice.exception.LocationException;
 import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
-import com.bloxico.ase.userservice.web.model.address.CreateCountryRequest;
-import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
-import com.bloxico.ase.userservice.web.model.address.EditCountryRequest;
-import com.bloxico.ase.userservice.web.model.address.SearchRegionsRequest;
+import com.bloxico.ase.userservice.web.model.address.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,10 +25,11 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void findAllCountries() {
+        var request = new SearchCountriesRequest();
         var c1 = utilLocation.savedCountryProj();
-        assertThat(facade.findAllCountries().getCountries(), hasItems(c1));
+        assertThat(facade.findAllCountries(request).getCountries(), hasItems(c1));
         var c2 = utilLocation.savedCountryProj();
-        assertThat(facade.findAllCountries().getCountries(), hasItems(c1, c2));
+        assertThat(facade.findAllCountries(request).getCountries(), hasItems(c1, c2));
     }
 
     @Test

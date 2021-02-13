@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.repository.address.CountryEvaluationDetailsRe
 import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
+import com.bloxico.ase.userservice.web.model.address.SearchCountriesRequest;
 import com.bloxico.ase.userservice.web.model.address.SearchRegionsRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +34,11 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findAllCountries() {
+        var request = new SearchCountriesRequest();
         var c1 = utilLocation.savedCountryProj();
-        assertThat(service.findAllCountries(), hasItems(c1));
+        assertThat(service.findAllCountries(request), hasItems(c1));
         var c2 = utilLocation.savedCountryProj();
-        assertThat(service.findAllCountries(), hasItems(c1, c2));
+        assertThat(service.findAllCountries(request), hasItems(c1, c2));
     }
 
     @Test
