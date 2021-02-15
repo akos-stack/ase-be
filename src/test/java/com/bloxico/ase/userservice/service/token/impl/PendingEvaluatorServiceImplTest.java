@@ -367,7 +367,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
                 NullPointerException.class,
                 () -> service.getEvaluatorResume(null, admin.getId()));
     }
-    
+
     @Test
     public void getEvaluatorResume_resumeNotFound() {
         var admin = utilUser.savedAdmin();
