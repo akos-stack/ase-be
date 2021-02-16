@@ -32,8 +32,8 @@ public class LocationController implements LocationApi {
     }
 
     @Override
-    public ResponseEntity<SearchRegionsResponse> findAllRegions(@Valid SearchRegionsRequest request) {
-        return ResponseEntity.ok(locationFacade.findAllRegions(request));
+    public ResponseEntity<SearchRegionsResponse> searchRegions(@Valid SearchRegionsRequest request) {
+        return ResponseEntity.ok(locationFacade.searchRegions(request));
     }
 
     @Override

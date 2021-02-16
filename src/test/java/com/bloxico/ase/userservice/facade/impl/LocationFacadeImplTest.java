@@ -10,8 +10,10 @@ import com.bloxico.ase.userservice.web.model.address.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.bloxico.ase.testutil.Util.genEmail;
 import static com.bloxico.ase.testutil.Util.genUUID;
-import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -44,16 +46,54 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     public void findAllRegions_nullRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> facade.findAllRegions(null));
+                () -> facade.searchRegions(null));
     }
 
     @Test
     public void findAllRegions() {
-        var request = new SearchRegionsRequest();
+        var request = utilLocation.newDefaultSearchRegionRequest();
         var r1 = utilLocation.savedRegionProj();
-        assertThat(facade.findAllRegions(request).getRegions(), hasItems(r1));
+        assertThat(facade.searchRegions(request).getRegions(), hasItems(r1));
         var r2 = utilLocation.savedRegionProj();
-        assertThat(facade.findAllRegions(request).getRegions(), hasItems(r1, r2));
+        assertThat(facade.searchRegions(request).getRegions(), hasItems(r1, r2));
+    }
+
+    @Test
+    public void findAllRegions_applySearch() {
+        var search = genUUID();
+        var r1 = utilLocation.savedRegionProjWithName(genEmail(search));
+        var r2 = utilLocation.savedRegionProjWithName(genEmail(search));
+        var r3 = utilLocation.savedRegionProj();
+        var r4 = utilLocation.savedRegionProj();
+
+        var request1 = new SearchRegionsRequest(search, 0, 10, false, "name", "asc");
+        assertThat(
+                facade.searchRegions(request1).getRegions(),
+                allOf(hasItems(r1, r2), not(hasItems(r3, r4))));
+
+        var request2 = new SearchRegionsRequest(genUUID(), 0, 10, false, "name", "asc");
+        assertThat(
+                facade.searchRegions(request2).getRegions(),
+                not(hasItems(r1, r2, r3, r4)));
+    }
+
+    @Test
+    public void findAllRegions_applyPagination() {
+        var search = genUUID();
+        var r1 = utilLocation.savedRegionProjWithName(genEmail(search));
+        var r2 = utilLocation.savedRegionProjWithName(genEmail(search));
+        var r3 = utilLocation.savedRegionProjWithName(genEmail(search));
+        var r4 = utilLocation.savedRegionProjWithName(genEmail(search));
+
+        var request1 = new SearchRegionsRequest(search, 0, 2, true, "id", "asc");
+        assertThat(
+                facade.searchRegions(request1).getRegions(),
+                allOf(hasItems(r1, r2), not(hasItems(r3, r4))));
+
+        var request2 = new SearchRegionsRequest(search, 1, 2, true, "id", "asc");
+        assertThat(
+                facade.searchRegions(request2).getRegions(),
+                allOf(hasItems(r3, r4), not(hasItems(r1, r2))));
     }
 
     @Test

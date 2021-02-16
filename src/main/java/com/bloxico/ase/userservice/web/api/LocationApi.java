@@ -35,11 +35,11 @@ public interface LocationApi {
     ResponseEntity<SearchCitiesResponse> findAllCities();
 
     @GetMapping(value = REGIONS)
-    @ApiOperation(value = "Fetch regions.")
+    @ApiOperation(value = "Search regions.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Regions successfully retrieved.")
     })
-    ResponseEntity<SearchRegionsResponse> findAllRegions(@Valid SearchRegionsRequest request);
+    ResponseEntity<SearchRegionsResponse> searchRegions(@Valid SearchRegionsRequest request);
 
     @PostMapping(
             value = REGIONS_CREATE,

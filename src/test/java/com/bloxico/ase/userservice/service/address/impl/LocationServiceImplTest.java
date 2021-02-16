@@ -14,11 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static com.bloxico.ase.testutil.Util.genEmail;
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -146,11 +146,49 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findAllRegions() {
-        var request = new SearchRegionsRequest();
+        var request = utilLocation.newDefaultSearchRegionRequest();
         var r1 = utilLocation.savedRegionProj();
         assertThat(service.findAllRegions(request), hasItems(r1));
         var r2 = utilLocation.savedRegionProj();
         assertThat(service.findAllRegions(request), hasItems(r1, r2));
+    }
+
+    @Test
+    public void findAllRegions_applySearch() {
+        var search = genUUID();
+        var r1 = utilLocation.savedRegionProjWithName(genEmail(search));
+        var r2 = utilLocation.savedRegionProjWithName(genEmail(search));
+        var r3 = utilLocation.savedRegionProj();
+        var r4 = utilLocation.savedRegionProj();
+
+        var request1 = new SearchRegionsRequest(search, 0, 10, false, "name", "asc");
+        assertThat(
+                service.findAllRegions(request1),
+                allOf(hasItems(r1, r2), not(hasItems(r3, r4))));
+
+        var request2 = new SearchRegionsRequest(genUUID(), 0, 10, false, "name", "asc");
+        assertThat(
+                service.findAllRegions(request2),
+                not(hasItems(r1, r2, r3, r4)));
+    }
+
+    @Test
+    public void findAllRegions_applyPagination() {
+        var search = genUUID();
+        var r1 = utilLocation.savedRegionProjWithName(genEmail(search));
+        var r2 = utilLocation.savedRegionProjWithName(genEmail(search));
+        var r3 = utilLocation.savedRegionProjWithName(genEmail(search));
+        var r4 = utilLocation.savedRegionProjWithName(genEmail(search));
+
+        var request1 = new SearchRegionsRequest(search, 0, 2, true, "id", "asc");
+        assertThat(
+                service.findAllRegions(request1),
+                allOf(hasItems(r1, r2), not(hasItems(r3))));
+
+        var request2 = new SearchRegionsRequest(search, 1, 2, true, "id", "asc");
+        assertThat(
+                service.findAllRegions(request2),
+                allOf(hasItems(r3, r4), not(hasItems(r1, r2))));
     }
 
     @Test

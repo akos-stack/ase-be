@@ -18,19 +18,16 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
 
     @Query(
             value =
-                    "select " +
-                            "new com.bloxico.ase.userservice.projection.RegionDetailsProj " +
-                            "(r.id, r.name, count(c.id) as number_of_countries, count(e.id) as number_of_evaluators) " +
-                            "from Evaluator e " +
-                            "right join e.userProfile.location.country c " +
-                            "right join c.region r " +
-                            "where lower(r.name) like lower(concat('%', :search, '%')) " +
-                            "group by r.id",
+            "SELECT new com.bloxico.ase.userservice.projection.RegionDetailsProj( " +
+            "r.id, r.name, COUNT(c.id) AS number_of_countries, COUNT(e.id) AS number_of_evaluators) " +
+            "FROM Evaluator e " +
+            "RIGHT JOIN e.userProfile.location.country c " +
+            "RIGHT JOIN c.region r " +
+            "WHERE LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
+            "GROUP BY r.id",
             countQuery =
-                    "select " +
-                            "count(r.id) " +
-                            "from Region r " +
-                            "where lower(r.name) like lower(concat('%', :search, '%'))")
+            "SELECT COUNT(r.id) FROM Region r " +
+            "WHERE LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%'))")
     Page<RegionDetailsProj> findAllIncludeCountriesAndEvaluatorsCount(String search, Pageable pageable);
 
     default Page<RegionDetailsProj> findAll(SearchRegionsRequest request) {
@@ -38,21 +35,23 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
     }
 
     private Pageable getPageable(SearchRegionsRequest request) {
-        if (request.getSort().equals("name")) {
-            request.setSort("r.name");
+        var sortProperty = request.getSort();
+
+        if (sortProperty.equals("name")) {
+            sortProperty = "r.name";
         }
 
-        if (request.getSort().equals("id")) {
-            request.setSort("r.id");
+        if (sortProperty.equals("id")) {
+            sortProperty = "r.id";
         }
 
         var sort = request.getOrder().equals("asc") ?
-                Sort.by(request.getSort()).ascending()
-                : Sort.by(request.getSort()).descending();
+                Sort.by(sortProperty).ascending() :
+                Sort.by(sortProperty).descending();
 
         return request.isPaginated() ?
-                PageRequest.of(request.getPage(), request.getSize(), sort)
-                : PageRequest.of(0, Integer.MAX_VALUE, sort);
+                PageRequest.of(request.getPage(), request.getSize(), sort) :
+                PageRequest.of(0, Integer.MAX_VALUE, sort);
     }
 
 }

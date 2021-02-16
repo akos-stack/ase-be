@@ -8,7 +8,7 @@ public interface ILocationFacade {
 
     SearchCitiesResponse findAllCities();
 
-    SearchRegionsResponse findAllRegions(SearchRegionsRequest request);
+    SearchRegionsResponse searchRegions(SearchRegionsRequest request);
 
     RegionDataResponse createRegion(CreateRegionRequest request, long principalId);
 

@@ -8,6 +8,7 @@ import com.bloxico.ase.userservice.entity.address.*;
 import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
 import com.bloxico.ase.userservice.projection.RegionDetailsProj;
 import com.bloxico.ase.userservice.repository.address.*;
+import com.bloxico.ase.userservice.web.model.address.SearchRegionsRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -54,12 +55,6 @@ public class UtilLocation {
         return regionDto;
     }
 
-    public RegionDto genRegionDtoWithName(String name) {
-        var regionDto = new RegionDto();
-        regionDto.setName(name);
-        return regionDto;
-    }
-
     public RegionDetailsProj savedRegionProj() {
         var regionDto = savedRegionDto();
         return new RegionDetailsProj(
@@ -74,6 +69,10 @@ public class UtilLocation {
                 regionDto.getId(), regionDto.getName(),
                 0, 0
         );
+    }
+
+    public SearchRegionsRequest newDefaultSearchRegionRequest() {
+        return new SearchRegionsRequest("", 0, 10, false, "name", "asc");
     }
 
     public Country savedCountry() {

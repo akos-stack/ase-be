@@ -3,8 +3,12 @@ package com.bloxico.ase.userservice.web.model.address;
 import com.bloxico.ase.userservice.validator.ValidSearchRegionsRequest;
 import io.swagger.annotations.ApiParam;
 import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @ValidSearchRegionsRequest
 public class SearchRegionsRequest {
 
