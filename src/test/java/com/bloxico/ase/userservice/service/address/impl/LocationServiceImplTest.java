@@ -33,12 +33,57 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     @Autowired private RegionRepository regionRepository;
 
     @Test
+    public void findAllCountries_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.findAllCountries(null));
+    }
+
+    @Test
     public void findAllCountries() {
-        var request = new SearchCountriesRequest();
+        var request = utilLocation.newDefaultSearchCountriesRequest();
         var c1 = utilLocation.savedCountryProj();
         assertThat(service.findAllCountries(request), hasItems(c1));
         var c2 = utilLocation.savedCountryProj();
         assertThat(service.findAllCountries(request), hasItems(c1, c2));
+    }
+
+    @Test
+    public void findAllCountries_applySearch() {
+        var search = genUUID();
+        var c1 = utilLocation.savedCountryProjWithName(genEmail(search));
+        var c2 = utilLocation.savedCountryProjWithName(genEmail(search));
+        var c3 = utilLocation.savedCountryProj();
+        var c4 = utilLocation.savedCountryProj();
+
+        var request1 = new SearchCountriesRequest(null, search, 0, 10, false, "name", "asc");
+        assertThat(
+                service.findAllCountries(request1),
+                allOf(hasItems(c1, c2), not(hasItems(c3, c4))));
+
+        var request2 = new SearchCountriesRequest(null, genUUID(), 0, 10, false, "name", "asc");
+        assertThat(
+                service.findAllCountries(request2),
+                not(hasItems(c1, c2, c3, c4)));
+    }
+
+    @Test
+    public void findAllCountries_applyPagination() {
+        var search = genUUID();
+        var r1 = utilLocation.savedCountryProjWithName(genEmail(search));
+        var r2 = utilLocation.savedCountryProjWithName(genEmail(search));
+        var r3 = utilLocation.savedCountryProjWithName(genEmail(search));
+        var r4 = utilLocation.savedCountryProjWithName(genEmail(search));
+
+        var request1 = new SearchCountriesRequest(null, search, 0, 2, true, "id", "asc");
+        assertThat(
+                service.findAllCountries(request1),
+                allOf(hasItems(r1, r2), not(hasItems(r3))));
+
+        var request2 = new SearchCountriesRequest(null, search, 1, 2, true, "id", "asc");
+        assertThat(
+                service.findAllCountries(request2),
+                allOf(hasItems(r3, r4), not(hasItems(r1, r2))));
     }
 
     @Test

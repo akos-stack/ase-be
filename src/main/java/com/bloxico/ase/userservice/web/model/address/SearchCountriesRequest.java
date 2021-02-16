@@ -3,10 +3,14 @@ package com.bloxico.ase.userservice.web.model.address;
 import com.bloxico.ase.userservice.validator.ValidSearchCountriesRequest;
 import io.swagger.annotations.ApiParam;
 import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @ValidSearchCountriesRequest
 public class SearchCountriesRequest {
 

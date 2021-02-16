@@ -4,7 +4,7 @@ import com.bloxico.ase.userservice.web.model.address.*;
 
 public interface ILocationFacade {
 
-    SearchCountriesResponse findAllCountries(SearchCountriesRequest request);
+    SearchCountriesResponse searchCountries(SearchCountriesRequest request);
 
     SearchCitiesResponse findAllCities();
 

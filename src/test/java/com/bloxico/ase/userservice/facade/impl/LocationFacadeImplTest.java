@@ -26,12 +26,57 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     @Autowired private RegionRepository regionRepository;
 
     @Test
-    public void findAllCountries() {
-        var request = new SearchCountriesRequest();
+    public void searchCountries_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> facade.searchCountries(null));
+    }
+
+    @Test
+    public void searchCountries() {
+        var request = utilLocation.newDefaultSearchCountriesRequest();
         var c1 = utilLocation.savedCountryProj();
-        assertThat(facade.findAllCountries(request).getCountries(), hasItems(c1));
+        assertThat(facade.searchCountries(request).getCountries(), hasItems(c1));
         var c2 = utilLocation.savedCountryProj();
-        assertThat(facade.findAllCountries(request).getCountries(), hasItems(c1, c2));
+        assertThat(facade.searchCountries(request).getCountries(), hasItems(c1, c2));
+    }
+
+    @Test
+    public void searchCountries_applySearch() {
+        var search = genUUID();
+        var c1 = utilLocation.savedCountryProjWithName(genEmail(search));
+        var c2 = utilLocation.savedCountryProjWithName(genEmail(search));
+        var c3 = utilLocation.savedCountryProj();
+        var c4 = utilLocation.savedCountryProj();
+
+        var request1 = new SearchCountriesRequest(null, search, 0, 10, false, "name", "asc");
+        assertThat(
+                facade.searchCountries(request1).getCountries(),
+                allOf(hasItems(c1, c2), not(hasItems(c3, c4))));
+
+        var request2 = new SearchCountriesRequest(null, genUUID(), 0, 10, false, "name", "asc");
+        assertThat(
+                facade.searchCountries(request2).getCountries(),
+                not(hasItems(c1, c2, c3, c4)));
+    }
+
+    @Test
+    public void searchCountries_applyPagination() {
+        var search = genUUID();
+        var r1 = utilLocation.savedCountryProjWithName(genEmail(search));
+        var r2 = utilLocation.savedCountryProjWithName(genEmail(search));
+        var r3 = utilLocation.savedCountryProjWithName(genEmail(search));
+        var r4 = utilLocation.savedCountryProjWithName(genEmail(search));
+
+        var request1 = new SearchCountriesRequest(null, search, 0, 2, true, "id", "asc");
+        assertThat(
+                facade.searchCountries(request1).getCountries(),
+                allOf(hasItems(r1, r2), not(hasItems(r3))));
+
+        var request2 = new SearchCountriesRequest(null, search, 1, 2, true, "id", "asc");
+        assertThat(
+                facade.searchCountries(request2).getCountries(),
+                allOf(hasItems(r3, r4), not(hasItems(r1, r2))));
     }
 
     @Test
@@ -43,14 +88,14 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
-    public void findAllRegions_nullRequest() {
+    public void searchRegions_nullRequest() {
         assertThrows(
                 NullPointerException.class,
                 () -> facade.searchRegions(null));
     }
 
     @Test
-    public void findAllRegions() {
+    public void searchRegions() {
         var request = utilLocation.newDefaultSearchRegionRequest();
         var r1 = utilLocation.savedRegionProj();
         assertThat(facade.searchRegions(request).getRegions(), hasItems(r1));
@@ -59,7 +104,7 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
-    public void findAllRegions_applySearch() {
+    public void searchRegions_applySearch() {
         var search = genUUID();
         var r1 = utilLocation.savedRegionProjWithName(genEmail(search));
         var r2 = utilLocation.savedRegionProjWithName(genEmail(search));
@@ -78,7 +123,7 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
-    public void findAllRegions_applyPagination() {
+    public void searchRegions_applyPagination() {
         var search = genUUID();
         var r1 = utilLocation.savedRegionProjWithName(genEmail(search));
         var r2 = utilLocation.savedRegionProjWithName(genEmail(search));

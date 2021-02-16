@@ -21,11 +21,11 @@ public interface LocationApi {
     String REGIONS_DELETE       = "/regions/delete/{id}";
 
     @GetMapping(value = COUNTRIES)
-    @ApiOperation(value = "Fetch all countries.")
+    @ApiOperation(value = "Search countries.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Countries successfully retrieved.")
     })
-    ResponseEntity<SearchCountriesResponse> findAllCountries(@Valid SearchCountriesRequest request);
+    ResponseEntity<SearchCountriesResponse> searchCountries(@Valid SearchCountriesRequest request);
 
     @GetMapping(value = CITIES)
     @ApiOperation(value = "Fetch all cities.")

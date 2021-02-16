@@ -21,25 +21,22 @@ public interface CountryRepository extends JpaRepository<Country, Integer> {
 
     @Query(
             value =
-                    "select " +
-                            "new com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj " +
-                            "(c.id, c.name, c.region.name, " +
-                            "c.countryEvaluationDetails.pricePerEvaluation, c.countryEvaluationDetails.availabilityPercentage, " +
-                            "count(e.id) as total_of_evaluators) " +
-                            "from Evaluator e " +
-                            "right join e.userProfile.location.country c " +
-                            "where (c.region.name in :regions or :regions is null) " +
-                            "and (lower(c.name) like lower(concat('%', :search, '%')) " +
-                            "or lower(c.region.name) like lower(concat('%', :search, '%'))) " +
-                            "group by c.id, c.region.name, c.countryEvaluationDetails.pricePerEvaluation, " +
-                            "c.countryEvaluationDetails.availabilityPercentage",
+            "SELECT new com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj( " +
+            "c.id, c.name, r.name, ced.pricePerEvaluation, ced.availabilityPercentage, COUNT(e.id) AS total_of_evaluators) " +
+            "FROM Evaluator e " +
+            "RIGHT JOIN e.userProfile.location.country c " +
+            "RIGHT JOIN c.region r " +
+            "RIGHT JOIN c.countryEvaluationDetails ced " +
+            "WHERE (r.name IN :regions OR :regions IS NULL) " +
+            "AND (LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
+            "OR LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+            "GROUP BY c.id, r.id, ced.id",
             countQuery =
-                    "select " +
-                            "count(c.id) " +
-                            "from Country c " +
-                            "where (c.region.name in :regions or :regions is null) " +
-                            "and (lower(c.name) like lower(concat('%', :search, '%')) " +
-                            "or lower(c.region.name) like lower(concat('%', :search, '%')))")
+            "SELECT COUNT(c.id) FROM Country c " +
+            "RIGHT JOIN c.region r " +
+            "WHERE (r.name IN :regions OR :regions IS NULL) " +
+            "AND (LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
+            "OR LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<CountryTotalOfEvaluatorsProj> findAllIncludeEvaluatorsCount(String search, List<String> regions, Pageable pageable);
 
     int countByRegionId(int id);
@@ -49,33 +46,35 @@ public interface CountryRepository extends JpaRepository<Country, Integer> {
     }
 
     private Pageable getPageable(SearchCountriesRequest request) {
-        if (request.getSort().equals("availability_percentage")) {
-            request.setSort("c.countryEvaluationDetails.availabilityPercentage");
+        var sortProperty = request.getSort();
+
+        if (sortProperty.equals("availability_percentage")) {
+            sortProperty = "ced.availabilityPercentage";
         }
 
-        if (request.getSort().equals("price_per_evaluation")) {
-            request.setSort("c.countryEvaluationDetails.pricePerEvaluation");
+        if (sortProperty.equals("price_per_evaluation")) {
+            sortProperty = "ced.pricePerEvaluation";
         }
 
-        if (request.getSort().equals("region")) {
-            request.setSort("c.region.name");
+        if (sortProperty.equals("region")) {
+            sortProperty = "r.name";
         }
 
-        if (request.getSort().equals("name")) {
-            request.setSort("c.name");
+        if (sortProperty.equals("name")) {
+            sortProperty = "c.name";
         }
 
-        if (request.getSort().equals("id")) {
-            request.setSort("c.id");
+        if (sortProperty.equals("id")) {
+            sortProperty = "c.id";
         }
 
         var sort = request.getOrder().equals("asc") ?
-                Sort.by(request.getSort()).ascending()
-                : Sort.by(request.getSort()).descending();
+                Sort.by(sortProperty).ascending() :
+                Sort.by(sortProperty).descending();
 
         return request.isPaginated() ?
-                PageRequest.of(request.getPage(), request.getSize(), sort)
-                : PageRequest.of(0, Integer.MAX_VALUE, sort);
+                PageRequest.of(request.getPage(), request.getSize(), sort) :
+                PageRequest.of(0, Integer.MAX_VALUE, sort);
     }
 
 }

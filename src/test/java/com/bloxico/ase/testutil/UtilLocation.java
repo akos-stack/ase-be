@@ -8,6 +8,7 @@ import com.bloxico.ase.userservice.entity.address.*;
 import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
 import com.bloxico.ase.userservice.projection.RegionDetailsProj;
 import com.bloxico.ase.userservice.repository.address.*;
+import com.bloxico.ase.userservice.web.model.address.SearchCountriesRequest;
 import com.bloxico.ase.userservice.web.model.address.SearchRegionsRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -158,6 +159,10 @@ public class UtilLocation {
         evaluationDetailsDto.setPricePerEvaluation(price);
         evaluationDetailsDto.setAvailabilityPercentage(availability);
         return evaluationDetailsDto;
+    }
+
+    public SearchCountriesRequest newDefaultSearchCountriesRequest() {
+        return new SearchCountriesRequest(null, "", 0, 10, false, "name", "asc");
     }
 
     public City savedCity() {
