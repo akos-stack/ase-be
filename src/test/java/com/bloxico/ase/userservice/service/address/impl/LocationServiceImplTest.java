@@ -37,7 +37,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     public void saveRegion_alreadyExists() {
         var principalId = utilUser.savedAdmin().getId();
         var region = utilLocation.savedRegionDto();
-        assertTrue(countryRepository.findById(region.getId()).isPresent());
+        assertTrue(regionRepository.findById(region.getId()).isPresent());
         assertThrows(
                 LocationException.class,
                 () -> service.saveRegion(region, principalId));
@@ -66,20 +66,6 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         var principalId = utilUser.savedAdmin().getId();
         var country = utilLocation.savedCountryDto();
         assertTrue(countryRepository.findById(country.getId()).isPresent());
-        assertThrows(
-                LocationException.class,
-                () -> service.saveCountry(country, principalId));
-    }
-
-    @Test
-    public void saveCountry_regionNotFound() {
-        var principalId = utilUser.savedAdmin().getId();
-        var country = new CountryDto();
-        country.setName(genUUID());
-        var region = new RegionDto();
-        region.setName(genUUID());
-        country.setRegion(region);
-        assertTrue(countryRepository.findByNameIgnoreCase(country.getName()).isEmpty());
         assertThrows(
                 LocationException.class,
                 () -> service.saveCountry(country, principalId));

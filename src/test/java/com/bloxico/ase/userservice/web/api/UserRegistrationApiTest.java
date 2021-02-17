@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Set;
 
 import static com.bloxico.ase.testutil.Util.*;
-import static com.bloxico.ase.testutil.UtilUserProfile.newSubmitArtOwnerRequest;
-import static com.bloxico.ase.testutil.UtilUserProfile.newSubmitUninvitedEvaluatorRequest;
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.entity.user.Role.USER;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.*;
@@ -32,6 +30,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilToken mockUtil;
+    @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private TokenRepository tokenRepository;
 
     @Test
@@ -396,7 +395,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void submitEvaluator_404_tokenNotFound() {
         given()
                 .contentType(JSON)
-                .body(newSubmitUninvitedEvaluatorRequest())
+                .body(utilUserProfile.newSubmitUninvitedEvaluatorRequest())
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
                 .then()
@@ -404,6 +403,8 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .statusCode(404)
                 .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
     }
+
+    // TODO-test submitEvaluator_404_countryNotFound
 
     // TODO-test submitEvaluator_409_userAlreadyExists
 
@@ -432,9 +433,11 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
         assertEquals(evaluator.getUserProfile().getLocation().getAddress(), request.getAddress());
     }
 
+    // TODO-test submitArtOwner_404_countryNotFound
+
     @Test
     public void submitArtOwner_409_userAlreadyExists() {
-        var request = newSubmitArtOwnerRequest();
+        var request = utilUserProfile.newSubmitArtOwnerRequest();
         given()
                 .contentType(JSON)
                 .body(request)
@@ -455,7 +458,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtOwner_200_ok() {
-        var request = newSubmitArtOwnerRequest();
+        var request = utilUserProfile.newSubmitArtOwnerRequest();
         var artOwner = given()
                 .contentType(JSON)
                 .body(request)
