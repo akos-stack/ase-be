@@ -4,7 +4,8 @@ import com.bloxico.ase.userservice.web.model.address.*;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -12,40 +13,32 @@ import java.security.Principal;
 @Api(value = "location")
 public interface LocationApi {
 
-    String COUNTRIES        = "/countries";
-    String COUNTRIES_CREATE = "/countries/create";
-    String REGIONS_CREATE   = "/regions/create";
-
-    @GetMapping(value = COUNTRIES)
-    @ApiOperation(value = "Fetch all countries.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Countries successfully retrieved.")
-    })
-    ResponseEntity<SearchCountriesResponse> findAllCountries();
+    String COUNTRY_SAVE = "/country/save";
+    String REGION_SAVE  = "/region/save";
 
     @PostMapping(
-            value = REGIONS_CREATE,
+            value = REGION_SAVE,
             produces = {"application/json"},
             consumes = {"application/json"})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'create_region')")
-    @ApiOperation(value = "Creates region in the database.")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'save_region')")
+    @ApiOperation(value = "Saves region in the database.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Region successfully created."),
+            @ApiResponse(code = 200, message = "Region successfully saved."),
             @ApiResponse(code = 409, message = "Region already exists.")
     })
-    ResponseEntity<RegionDataResponse> createRegion(@Valid @RequestBody CreateRegionRequest request, Principal principal);
+    ResponseEntity<SaveRegionResponse> saveRegion(@Valid @RequestBody SaveRegionRequest request, Principal principal);
 
     @PostMapping(
-            value = COUNTRIES_CREATE,
+            value = COUNTRY_SAVE,
             produces = {"application/json"},
             consumes = {"application/json"})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'create_country')")
-    @ApiOperation(value = "Creates country in the database.")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'save_country')")
+    @ApiOperation(value = "Saves country in the database.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Country successfully created."),
+            @ApiResponse(code = 200, message = "Country successfully saved."),
             @ApiResponse(code = 409, message = "Country already exists."),
             @ApiResponse(code = 404, message = "Specified region doesn't exist.")
     })
-    ResponseEntity<CountryDataResponse> createCountry(@Valid @RequestBody CreateCountryRequest request, Principal principal);
+    ResponseEntity<SaveCountryResponse> saveCountry(@Valid @RequestBody SaveCountryRequest request, Principal principal);
 
 }

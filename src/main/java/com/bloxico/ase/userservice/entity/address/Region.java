@@ -18,7 +18,7 @@ public class Region extends BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
-    @Column
+    @Column(name = "name")
     private String name;
 
 }

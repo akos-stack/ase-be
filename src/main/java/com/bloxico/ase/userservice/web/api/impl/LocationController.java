@@ -18,21 +18,16 @@ public class LocationController implements LocationApi {
     private ILocationFacade locationFacade;
 
     @Override
-    public ResponseEntity<SearchCountriesResponse> findAllCountries() {
-        return ResponseEntity.ok(locationFacade.findAllCountries());
-    }
-
-    @Override
-    public ResponseEntity<RegionDataResponse> createRegion(CreateRegionRequest request, Principal principal) {
+    public ResponseEntity<SaveRegionResponse> saveRegion(SaveRegionRequest request, Principal principal) {
         var id = extractId(principal);
-        var response = locationFacade.createRegion(request, id);
+        var response = locationFacade.saveRegion(request, id);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<CountryDataResponse> createCountry(CreateCountryRequest request, Principal principal) {
+    public ResponseEntity<SaveCountryResponse> saveCountry(SaveCountryRequest request, Principal principal) {
         var id = extractId(principal);
-        var response = locationFacade.createCountry(request, id);
+        var response = locationFacade.saveCountry(request, id);
         return ResponseEntity.ok(response);
     }
 

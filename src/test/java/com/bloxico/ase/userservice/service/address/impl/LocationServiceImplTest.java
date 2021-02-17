@@ -1,8 +1,7 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
 import com.bloxico.ase.testutil.*;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
+import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.exception.LocationException;
 import com.bloxico.ase.userservice.repository.address.*;
 import org.junit.Test;
@@ -13,7 +12,8 @@ import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LocationServiceImplTest extends AbstractSpringTest {
@@ -21,50 +21,87 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     @Autowired private UtilUser utilUser;
     @Autowired private UtilLocation utilLocation;
     @Autowired private LocationRepository locationRepository;
-    @Autowired private LocationServiceImpl service;
     @Autowired private CountryRepository countryRepository;
-    @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
     @Autowired private RegionRepository regionRepository;
+    @Autowired private LocationServiceImpl service;
 
     @Test
-    public void findAllCountries() {
-        var c1 = utilLocation.savedCountryProj();
-        assertThat(service.findAllCountries(), hasItems(c1));
-        var c2 = utilLocation.savedCountryProj();
-        assertThat(service.findAllCountries(), hasItems(c1, c2));
-    }
-
-    @Test
-    public void findOrSaveCountry_nullCountry() {
+    public void saveRegion_nullRegion() {
+        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> service.findOrSaveCountry(null, 1));
+                () -> service.saveRegion(null, principalId));
     }
 
     @Test
-    public void findOrSaveCountry_saved() {
+    public void saveRegion_alreadyExists() {
+        var principalId = utilUser.savedAdmin().getId();
+        var region = utilLocation.savedRegionDto();
+        assertTrue(countryRepository.findById(region.getId()).isPresent());
+        assertThrows(
+                LocationException.class,
+                () -> service.saveRegion(region, principalId));
+    }
+
+    @Test
+    public void saveRegion() {
+        var principalId = utilUser.savedAdmin().getId();
+        var region = new RegionDto();
+        region.setName(genUUID());
+        assertTrue(regionRepository.findByNameIgnoreCase(region.getName()).isEmpty());
+        service.saveRegion(region, principalId);
+        assertTrue(regionRepository.findByNameIgnoreCase(region.getName()).isPresent());
+    }
+
+    @Test
+    public void saveCountry_nullCountry() {
+        var principalId = utilUser.savedAdmin().getId();
+        assertThrows(
+                NullPointerException.class,
+                () -> service.saveCountry(null, principalId));
+    }
+
+    @Test
+    public void saveCountry_alreadyExists() {
+        var principalId = utilUser.savedAdmin().getId();
+        var country = utilLocation.savedCountryDto();
+        assertTrue(countryRepository.findById(country.getId()).isPresent());
+        assertThrows(
+                LocationException.class,
+                () -> service.saveCountry(country, principalId));
+    }
+
+    @Test
+    public void saveCountry_regionNotFound() {
         var principalId = utilUser.savedAdmin().getId();
         var country = new CountryDto();
         country.setName(genUUID());
+        var region = new RegionDto();
+        region.setName(genUUID());
+        country.setRegion(region);
         assertTrue(countryRepository.findByNameIgnoreCase(country.getName()).isEmpty());
-        service.findOrSaveCountry(country, principalId);
+        assertThrows(
+                LocationException.class,
+                () -> service.saveCountry(country, principalId));
+    }
+
+    @Test
+    public void saveCountry() {
+        var principalId = utilUser.savedAdmin().getId();
+        var country = new CountryDto();
+        country.setName(genUUID());
+        country.setRegion(utilLocation.savedRegionDto());
+        assertTrue(countryRepository.findByNameIgnoreCase(country.getName()).isEmpty());
+        service.saveCountry(country, principalId);
         assertTrue(countryRepository.findByNameIgnoreCase(country.getName()).isPresent());
     }
 
     @Test
-    public void findOrSaveCountry_found() {
-        var principalId = utilUser.savedAdmin().getId();
-        var country = utilLocation.savedCountryDto();
-        assertTrue(countryRepository.findById(country.getId()).isPresent());
-        assertEquals(country, service.findOrSaveCountry(country, principalId));
-        assertEquals(country, service.findOrSaveCountry(country, principalId));
-    }
-
-    @Test
     public void saveLocation_nullLocation() {
+        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> service.saveLocation(null, 1));
+                () -> service.saveLocation(null, principalId));
     }
 
     @Test
@@ -88,114 +125,6 @@ public class LocationServiceImplTest extends AbstractSpringTest {
                         .map(MAPPER::toDto)
                         .collect(toList()),
                 hasItems(location));
-    }
-
-    @Test
-    public void createRegion_nullRegion() {
-        assertThrows(
-                NullPointerException.class,
-                () -> service.createRegion(null, 1));
-    }
-
-    @Test
-    public void createRegion_regionAlreadyExists() {
-        var regionDto = utilLocation.genRegionDto();
-        service.createRegion(regionDto, 1);
-        assertThrows(
-                LocationException.class,
-                () -> service.createRegion(regionDto, 1));
-    }
-
-    @Test
-    public void createRegion() {
-        var principalId = utilUser.savedAdmin().getId();
-        var regionDto = service.createRegion(utilLocation.genRegionDto(), principalId);
-        var newlyCreatedRegion = regionRepository
-                .findByNameIgnoreCase(regionDto.getName())
-                .orElse(null);
-
-        assertNotNull(newlyCreatedRegion);
-        assertEquals(regionDto.getId(), newlyCreatedRegion.getId());
-        assertEquals(regionDto.getName(), newlyCreatedRegion.getName());
-        assertEquals(principalId, newlyCreatedRegion.getCreatorId());
-        assertEquals(0, regionDto.getNumberOfCountries().intValue());
-        assertEquals(0, regionDto.getNumberOfEvaluators().intValue());
-    }
-
-    @Test
-    public void createCountry_nullCountry() {
-        assertThrows(
-                NullPointerException.class,
-                () -> service.createCountry(null, 1));
-    }
-
-    @Test
-    public void createCountry_countryAlreadyExists() {
-        var countryDto = utilLocation.genCountryDtoWithRegionDto(utilLocation.savedRegionDto());
-        service.createCountry(countryDto, 1);
-        assertThrows(
-                LocationException.class,
-                () -> service.createCountry(countryDto, 1));
-    }
-
-    @Test
-    public void createCountry_regionNotFound() {
-        var countryDto = utilLocation.genCountryDtoWithRegionDto(utilLocation.genRegionDto());
-        assertThrows(
-                LocationException.class,
-                () -> service.createCountry(countryDto, 1));
-    }
-
-    @Test
-    public void createCountry() {
-        var principalId = utilUser.savedAdmin().getId();
-        var countryDto = utilLocation.genCountryDtoWithRegionDto(utilLocation.savedRegionDto());
-        countryDto = service.createCountry(countryDto, principalId);
-        var newlyCreatedCountry = countryRepository
-                .findByNameIgnoreCase(countryDto.getName())
-                .orElse(null);
-
-        assertNotNull(newlyCreatedCountry);
-        assertEquals(countryDto.getId(), newlyCreatedCountry.getId());
-        assertEquals(countryDto.getName(), newlyCreatedCountry.getName());
-        assertEquals(countryDto.getRegion().getName(), newlyCreatedCountry.getRegion().getName());
-        assertEquals(principalId, newlyCreatedCountry.getCreatorId());
-    }
-
-    @Test
-    public void createCountryEvaluationDetails_nullEvaluationDetails() {
-        var countryId = utilLocation.savedCountry().getId();
-        assertThrows(
-                NullPointerException.class,
-                () -> service.createCountryEvaluationDetails(null, countryId, 1));
-    }
-
-    @Test
-    public void createCountryEvaluationDetails_countryNotFound() {
-        var evaluationDetailsDto = utilLocation.genCountryEvaluationDetailsDto();
-        assertThrows(
-                LocationException.class,
-                () -> service.createCountryEvaluationDetails(evaluationDetailsDto, -1, 1));
-        ;
-    }
-
-    @Test
-    public void createCountryEvaluationDetails() {
-        var adminId = utilUser.savedAdmin().getId();
-        var countryDto = utilLocation.genCountryDtoWithRegionDto(utilLocation.savedRegionDto());
-        countryDto = service.createCountry(countryDto, adminId);
-        var evaluationDetailsDto = utilLocation.genCountryEvaluationDetailsDto();
-        evaluationDetailsDto = service.createCountryEvaluationDetails(evaluationDetailsDto, countryDto.getId(), adminId);
-
-        var newlyCreatedEvaluationDetails = countryEvaluationDetailsRepository
-                .findById(evaluationDetailsDto.getId())
-                .orElse(null);
-
-        assertNotNull(newlyCreatedEvaluationDetails);
-        assertEquals(countryDto.getId(), newlyCreatedEvaluationDetails.getCountry().getId());
-        assertEquals(evaluationDetailsDto.getPricePerEvaluation(), newlyCreatedEvaluationDetails.getPricePerEvaluation());
-        assertEquals(evaluationDetailsDto.getAvailabilityPercentage(), newlyCreatedEvaluationDetails.getAvailabilityPercentage());
-        assertEquals(adminId, newlyCreatedEvaluationDetails.getCreatorId());
     }
 
 }

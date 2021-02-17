@@ -2,24 +2,25 @@ package com.bloxico.ase.userservice.web.model.address;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 import static lombok.AccessLevel.PRIVATE;
 
 @Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
-public class CreateRegionRequest {
+public class SaveCountryRequest {
 
-    @NotNull
-    @NotEmpty
-    @JsonProperty("name")
+    @NotBlank
+    @JsonProperty("country")
     @ApiModelProperty(required = true)
-    String name;
+    String country;
+
+    @NotBlank
+    @JsonProperty("region")
+    @ApiModelProperty(required = true)
+    String region;
 
 }

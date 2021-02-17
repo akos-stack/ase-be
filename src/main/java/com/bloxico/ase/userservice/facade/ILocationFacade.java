@@ -4,10 +4,8 @@ import com.bloxico.ase.userservice.web.model.address.*;
 
 public interface ILocationFacade {
 
-    SearchCountriesResponse findAllCountries();
+    SaveRegionResponse saveRegion(SaveRegionRequest request, long principalId);
 
-    RegionDataResponse createRegion(CreateRegionRequest request, long principalId);
-
-    CountryDataResponse createCountry(CreateCountryRequest request, long principalId);
+    SaveCountryResponse saveCountry(SaveCountryRequest request, long principalId);
 
 }

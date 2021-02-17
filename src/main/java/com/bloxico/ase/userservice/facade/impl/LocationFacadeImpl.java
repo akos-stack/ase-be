@@ -1,7 +1,5 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryEvaluationDetailsDto;
 import com.bloxico.ase.userservice.facade.ILocationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.web.model.address.*;
@@ -11,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @Service
@@ -26,45 +23,24 @@ public class LocationFacadeImpl implements ILocationFacade {
     }
 
     @Override
-    public SearchCountriesResponse findAllCountries() {
-        log.info("LocationFacadeImpl.findAllCountries - start");
-        var countries = locationService.findAllCountries();
-        var response = new SearchCountriesResponse(countries);
-        log.info("LocationFacadeImpl.findAllCountries - end");
+    public SaveRegionResponse saveRegion(SaveRegionRequest request, long principalId) {
+        log.debug("LocationFacadeImpl.saveRegion - start | request: {}, principalId: {}", request, principalId);
+        var regionDto = MAPPER.toRegionDto(request);
+        regionDto = locationService.saveRegion(regionDto, principalId);
+        var response = new SaveRegionResponse(regionDto);
+        log.debug("LocationFacadeImpl.saveRegion - end | request: {}, principalId: {}", request, principalId);
         return response;
     }
 
     @Override
-    public RegionDataResponse createRegion(CreateRegionRequest request, long principalId) {
-        log.debug("LocationFacadeImpl.createRegion - start | request: {}, principalId: {}", request, principalId);
-        requireNonNull(request);
-        var dto = MAPPER.toRegionDto(request);
-        var regionDto= locationService.createRegion(dto, principalId);
-        log.debug("LocationFacadeImpl.createRegion - end | request: {}, principalId: {}", request, principalId);
-        return new RegionDataResponse(regionDto);
-    }
-
-    @Override
-    public CountryDataResponse createCountry(CreateCountryRequest request, long principalId) {
-        log.debug("LocationFacadeImpl.createCountry - start | request: {}, principalId: {}", request, principalId);
-        requireNonNull(request);
-        var countryDto= doCreateCountry(request, principalId);
-        log.debug("LocationFacadeImpl.createCountry - end | request: {}, principalId: {}", request, principalId);
-        return new CountryDataResponse(countryDto);
-    }
-
-    private CountryDto doCreateCountry(CreateCountryRequest request, long principalId) {
-        var dto = MAPPER.toCountryDto(request);
-        var countryDto = locationService.createCountry(dto, principalId);
-        var evaluationDetailsDto= doCreateCountryEvaluationDetails(request, countryDto.getId(), principalId);
-        countryDto.setCountryEvaluationDetails(evaluationDetailsDto);
-        return countryDto;
-    }
-
-    private CountryEvaluationDetailsDto doCreateCountryEvaluationDetails(
-            CreateCountryRequest request, int countryId, long principalId) {
-        var dto = MAPPER.toCountryEvaluationDetailsDto(request);
-        return locationService.createCountryEvaluationDetails(dto, countryId, principalId);
+    public SaveCountryResponse saveCountry(SaveCountryRequest request, long principalId) {
+        log.debug("LocationFacadeImpl.saveCountry - start | request: {}, principalId: {}", request, principalId);
+        var countryDto = MAPPER.toCountryDto(request);
+        countryDto.setRegion(locationService.findRegionByName(request.getRegion()));
+        countryDto = locationService.saveCountry(countryDto, principalId);
+        var response = new SaveCountryResponse(countryDto);
+        log.debug("LocationFacadeImpl.saveCountry - end | request: {}, principalId: {}", request, principalId);
+        return response;
     }
 
 }

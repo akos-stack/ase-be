@@ -11,13 +11,10 @@ public class CountryDto {
     @JsonProperty("id")
     private Integer id;
 
-    @JsonProperty("name")
-    private String name;
-
     @JsonProperty("region")
     private RegionDto region;
 
-    @JsonProperty("evaluation_details")
-    private CountryEvaluationDetailsDto countryEvaluationDetails;
+    @JsonProperty("name")
+    private String name;
 
 }

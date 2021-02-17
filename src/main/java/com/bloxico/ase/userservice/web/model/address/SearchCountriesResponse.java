@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.web.model.address;
 
-import com.bloxico.ase.userservice.projection.CountryTotalOfEvaluatorsProj;
+import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -14,6 +14,6 @@ import static lombok.AccessLevel.PRIVATE;
 public class SearchCountriesResponse {
 
     @JsonProperty("countries")
-    List<CountryTotalOfEvaluatorsProj> countries;
+    List<CountryDto> countries;
 
 }

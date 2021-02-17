@@ -1,18 +1,15 @@
-package com.bloxico.ase.userservice.projection;
+package com.bloxico.ase.userservice.proj;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
 @Value
-public class CountryTotalOfEvaluatorsProj {
+public class CountryEvaluationDetailsCountedProj {
 
-    @JsonProperty
-    int id;
+    @JsonProperty("country")
+    String country;
 
-    @JsonProperty
-    String name;
-
-    @JsonProperty
+    @JsonProperty("region")
     String region;
 
     @JsonProperty("price_per_evaluation")

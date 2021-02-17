@@ -2,16 +2,14 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.LocationException;
-import com.bloxico.ase.userservice.repository.address.CountryRepository;
-import com.bloxico.ase.userservice.repository.address.RegionRepository;
-import com.bloxico.ase.userservice.web.model.address.CreateCountryRequest;
-import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
+import com.bloxico.ase.userservice.web.model.address.SaveCountryRequest;
+import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.bloxico.ase.testutil.Util.genUUID;
-import static org.hamcrest.Matchers.hasItems;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LocationFacadeImplTest extends AbstractSpringTest {
@@ -19,105 +17,72 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     @Autowired private UtilUser utilUser;
     @Autowired private UtilLocation utilLocation;
     @Autowired private LocationFacadeImpl facade;
-    @Autowired private CountryRepository countryRepository;
-    @Autowired private RegionRepository regionRepository;
 
     @Test
-    public void findAllCountries() {
-        var c1 = utilLocation.savedCountryProj();
-        assertThat(facade.findAllCountries().getCountries(), hasItems(c1));
-        var c2 = utilLocation.savedCountryProj();
-        assertThat(facade.findAllCountries().getCountries(), hasItems(c1, c2));
-    }
-
-    @Test
-    public void createRegion_nullRequest() {
+    public void saveRegion_nullRequest() {
+        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> facade.createRegion(null, 1));
+                () -> facade.saveRegion(null, principalId));
     }
 
     @Test
-    public void createRegion_regionAlreadyExists() {
-        var regionName = utilLocation.savedRegion().getName();
-        var request = new CreateRegionRequest(regionName);
-        assertThrows(
-                LocationException.class,
-                () -> facade.createRegion(request, 1));
-    }
-
-    @Test
-    public void createRegion() {
+    public void saveRegion_alreadyExists() {
         var principalId = utilUser.savedAdmin().getId();
-        var regionName = genUUID();
-        var request = new CreateRegionRequest(regionName);
-        var response = facade.createRegion(request, principalId);
-
-        assertNotNull(response);
-        assertNotNull(response.getRegion());
-
-        var newlyCreatedRegion = regionRepository
-                .findByNameIgnoreCase(response.getRegion().getName())
-                .orElse(null);
-
-        assertNotNull(newlyCreatedRegion);
-        assertEquals(regionName, newlyCreatedRegion.getName());
-        assertEquals(principalId, newlyCreatedRegion.getCreatorId());
-        assertEquals(response.getRegion().getId(), newlyCreatedRegion.getId());
-        assertEquals(0, response.getRegion().getNumberOfCountries().intValue());
-        assertEquals(0, response.getRegion().getNumberOfEvaluators().intValue());
-    }
-
-    @Test
-    public void createCountry_requestIsNull() {
-        assertThrows(
-                NullPointerException.class,
-                () -> facade.createCountry(null, 1));
-    }
-
-    @Test
-    public void createCountry_countryAlreadyExists() {
-        var regionName = utilLocation.savedRegion().getName();
-        var request = new CreateCountryRequest(genUUID(), regionName, 10, 40);
-        facade.createCountry(request, 1);
-        assertThrows(
-                LocationException.class,
-                () -> facade.createCountry(request, 1));
-    }
-
-    @Test
-    public void createCountry_regionNotFound() {
-        var request = new CreateCountryRequest(genUUID(), genUUID(), 10, 40);
-        assertThrows(
-                LocationException.class,
-                () -> facade.createCountry(request, 1));
-    }
-
-    @Test
-    public void createCountry() {
-        var principalId = utilUser.savedAdmin().getId();
-        var name = genUUID();
         var region = utilLocation.savedRegion();
+        var request = new SaveRegionRequest(region.getName());
+        assertThrows(
+                LocationException.class,
+                () -> facade.saveRegion(request, principalId));
+    }
 
-        var request = new CreateCountryRequest(name, region.getName(), 10, 40);
-        var response = facade.createCountry(request, principalId);
+    @Test
+    public void saveRegion() {
+        var principalId = utilUser.savedAdmin().getId();
+        var request = new SaveRegionRequest(genUUID());
+        var region = facade.saveRegion(request, principalId).getRegion();
+        assertNotNull(region.getId());
+        assertEquals(request.getRegion(), region.getName());
+    }
 
-        assertNotNull(response);
-        assertNotNull(response.getCountry());
-        var countryResponse = response.getCountry();
+    @Test
+    public void saveCountry_requestIsNull() {
+        var principalId = utilUser.savedAdmin().getId();
+        assertThrows(
+                NullPointerException.class,
+                () -> facade.saveCountry(null, principalId));
+    }
 
-        var newlyCreatedCountry = countryRepository
-                .findByNameIgnoreCase(name)
-                .orElse(null);
+    @Test
+    public void saveCountry_alreadyExists() {
+        var principalId = utilUser.savedAdmin().getId();
+        var regionName = utilLocation.savedRegion().getName();
+        var request = new SaveCountryRequest(genUUID(), regionName);
+        facade.saveCountry(request, principalId);
+        assertThrows(
+                LocationException.class,
+                () -> facade.saveCountry(request, principalId));
+    }
 
-        assertNotNull(newlyCreatedCountry);
-        assertEquals(countryResponse.getId(), newlyCreatedCountry.getId());
-        assertEquals(countryResponse.getName(), newlyCreatedCountry.getName());
-        assertEquals(countryResponse.getRegion().getName(), newlyCreatedCountry.getRegion().getName());
-        assertEquals(principalId, newlyCreatedCountry.getCreatorId());
-        assertEquals(10, countryResponse.getCountryEvaluationDetails().getPricePerEvaluation());
-        assertEquals(40, countryResponse.getCountryEvaluationDetails().getAvailabilityPercentage());
-        assertEquals(0, countryResponse.getCountryEvaluationDetails().getTotalOfEvaluators());
+    @Test
+    public void saveCountry_regionNotFound() {
+        var principalId = utilUser.savedAdmin().getId();
+        var request = new SaveCountryRequest(genUUID(), genUUID());
+        assertThrows(
+                LocationException.class,
+                () -> facade.saveCountry(request, principalId));
+    }
+
+    @Test
+    public void saveCountry() {
+        var principalId = utilUser.savedAdmin().getId();
+        var region = utilLocation.savedRegionDto();
+        var request = new SaveCountryRequest(genUUID(), region.getName());
+        var country = facade.saveCountry(request, principalId).getCountry();
+        assertNotNull(country.getId());
+        assertNotNull(country.getRegion().getId());
+        assertEquals(region, country.getRegion());
+        assertEquals(request.getCountry(), country.getName());
     }
 
 }

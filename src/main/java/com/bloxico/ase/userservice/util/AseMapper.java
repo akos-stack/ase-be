@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.util;
 
 import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
@@ -14,8 +15,9 @@ import com.bloxico.ase.userservice.entity.token.*;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
 import com.bloxico.ase.userservice.entity.user.profile.*;
-import com.bloxico.ase.userservice.web.model.address.CreateCountryRequest;
-import com.bloxico.ase.userservice.web.model.address.CreateRegionRequest;
+import com.bloxico.ase.userservice.web.model.address.SaveCountryRequest;
+import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import com.bloxico.ase.userservice.web.model.user.*;
@@ -34,6 +36,8 @@ public interface AseMapper {
 
     RoleDto toDto(Role entity);
 
+    RegionDto toDto(Region entity);
+
     CountryDto toDto(Country entity);
 
     LocationDto toDto(Location entity);
@@ -49,8 +53,6 @@ public interface AseMapper {
     OAuthAccessTokenDto toDto(OAuthAccessToken entity);
 
     PendingEvaluatorDto toDto(PendingEvaluator entity);
-
-    RegionDto toDto(Region entity);
 
     CountryEvaluationDetailsDto toDto(CountryEvaluationDetails entity);
 
@@ -98,13 +100,16 @@ public interface AseMapper {
 
     PendingEvaluator toPendingEvaluator(IPendingEvaluatorRequest request);
 
-    RegionDto toRegionDto(CreateRegionRequest request);
+    @Mapping(target = "name", source = "region")
+    RegionDto toRegionDto(SaveRegionRequest request);
 
-    CountryDto toCountryDto(CreateCountryRequest request);
+    @Mapping(target = "name", source = "region")
+    RegionDto toRegionDto(SaveCountryRequest request);
 
-    @Mapping(target = "name")
-    RegionDto toRegionDto(String name);
+    @Mapping(target = "name", source = "country")
+    @Mapping(ignore = true, target = "region")
+    CountryDto toCountryDto(SaveCountryRequest request);
 
-    CountryEvaluationDetailsDto toCountryEvaluationDetailsDto(CreateCountryRequest request);
+    CountryEvaluationDetailsDto toCountryEvaluationDetailsDto(SaveCountryEvaluationDetailsRequest request);
 
 }

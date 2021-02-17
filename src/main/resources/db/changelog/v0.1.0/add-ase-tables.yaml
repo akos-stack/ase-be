@@ -252,7 +252,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - createTable:
-            tableName: countries_evaluation_details
+            tableName: country_evaluation_details
             columns:
               - column:
                   name: id
@@ -276,7 +276,7 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_countries_evaluation_details_country
+                    foreignKeyName: fk_country_evaluation_details_country
                     references: countries(id)
               # METADATA
               - column:
