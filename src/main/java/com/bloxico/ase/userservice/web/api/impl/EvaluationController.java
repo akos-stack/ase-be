@@ -6,11 +6,13 @@ import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDet
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
 import static com.bloxico.ase.userservice.util.Principals.extractId;
 
+@RestController
 public class EvaluationController implements EvaluationApi {
 
     @Autowired
