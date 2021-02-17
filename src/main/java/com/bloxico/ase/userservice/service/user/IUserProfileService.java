@@ -15,4 +15,5 @@ public interface IUserProfileService {
 
     ArtOwnerDto saveArtOwner(ArtOwnerDto artOwnerDto, long principalId);
 
+    ArtOwnerDto findArtOwnerByUserId(long id);
 }

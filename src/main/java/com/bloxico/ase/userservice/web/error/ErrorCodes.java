@@ -160,7 +160,27 @@ public interface ErrorCodes {
         ARTWORK_METADATA_TYPE_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "32",
-                "Artwork metadata type not found.");
+                "Artwork metadata type not found."),
+
+        ARTWORK_ARTIST_NOT_PROVIDED(
+                HttpStatus.BAD_REQUEST,
+                "33",
+                "Artwork artist name not provided."),
+
+        ARTWORK_MISSING_RESUME(
+                HttpStatus.BAD_REQUEST,
+                "34",
+                "Art Owner resume missing."),
+
+        ARTWORK_MISSING_CERTIFICATE(
+                HttpStatus.BAD_REQUEST,
+                "35",
+                "Artwork certificate not uploaded."),
+
+        ARTWORK_GROUP_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "36",
+                "Artwork group not found.");
 
         private final HttpStatus httpStatus;
         private final String code, description;

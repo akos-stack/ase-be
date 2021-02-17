@@ -3,7 +3,7 @@ package com.bloxico.ase.userservice.util;
 import com.bloxico.ase.userservice.dto.entity.address.CityDto;
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
-import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
+import com.bloxico.ase.userservice.dto.entity.artwork.*;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDocumentDto;
@@ -17,10 +17,7 @@ import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
 import com.bloxico.ase.userservice.entity.address.City;
 import com.bloxico.ase.userservice.entity.address.Country;
 import com.bloxico.ase.userservice.entity.address.Location;
-import com.bloxico.ase.userservice.entity.artwork.Category;
-import com.bloxico.ase.userservice.entity.artwork.Material;
-import com.bloxico.ase.userservice.entity.artwork.Medium;
-import com.bloxico.ase.userservice.entity.artwork.Style;
+import com.bloxico.ase.userservice.entity.artwork.*;
 import com.bloxico.ase.userservice.entity.document.Document;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
@@ -33,6 +30,7 @@ import com.bloxico.ase.userservice.entity.user.profile.ArtOwner;
 import com.bloxico.ase.userservice.entity.user.profile.Evaluator;
 import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
 import com.bloxico.ase.userservice.web.model.artwork.IArtworkMetadataRequest;
+import com.bloxico.ase.userservice.web.model.artwork.SubmitArtworkRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import com.bloxico.ase.userservice.web.model.user.ISubmitUserProfileRequest;
@@ -81,6 +79,14 @@ public interface AseMapper {
 
     DocumentDto toDto(Document document);
 
+    ArtistDto toDto(Artist artist);
+
+    ArtworkDto toDto(Artwork artwork);
+
+    ArtworkGroupDto toDto(ArtworkGroup artworkGroup);
+
+    ArtworkHistoryDto toDto(ArtworkHistory artworkHistory);
+
     @Mapping(target = "email", source = "pendingEvaluatorDocument.pendingEvaluatorDocumentId.email")
     @Mapping(target = "documentId", source = "pendingEvaluatorDocument.pendingEvaluatorDocumentId.documentId")
     PendingEvaluatorDocumentDto toDto(PendingEvaluatorDocument pendingEvaluatorDocument);
@@ -105,6 +111,14 @@ public interface AseMapper {
 
     PendingEvaluator toEntity(PendingEvaluatorDto pendingEvaluatorDto);
 
+    Artist toEntity(ArtistDto dto);
+
+    Artwork toEntity(ArtworkDto dto);
+
+    ArtworkGroup toEntity(ArtworkGroupDto dto);
+
+    ArtworkHistory toEntity(ArtworkHistoryDto dto);
+
     // OTHER
 
     @Mapping(target = "name", source = "username")
@@ -127,6 +141,16 @@ public interface AseMapper {
     @Mapping(ignore = true, target = "city")
     LocationDto toLocationDto(ISubmitUserProfileRequest request);
 
+    @Mapping(target = "name", source = "country")
+    CountryDto toCountryDto(SubmitArtworkRequest request);
+
+    @Mapping(ignore = true, target = "country")
+    @Mapping(target = "name", source = "city")
+    CityDto toCityDto(SubmitArtworkRequest request);
+
+    @Mapping(ignore = true, target = "city")
+    LocationDto toLocationDto(SubmitArtworkRequest request);
+
     UserProfileDto toUserProfileDto(ISubmitUserProfileRequest request);
 
     EvaluatorDto toEvaluatorDto(SubmitEvaluatorRequest request);
@@ -144,4 +168,15 @@ public interface AseMapper {
     Style toStyleEntity(ArtworkMetadataDto dto);
 
     PendingEvaluatorDto toPendingEvaluatorDto(IPendingEvaluatorRequest request);
+
+    @Mapping(ignore = true, target = "artist")
+    @Mapping(ignore = true, target = "owner")
+    @Mapping(ignore = true, target = "location")
+    @Mapping(ignore = true, target = "group")
+    @Mapping(ignore = true, target = "history")
+    @Mapping(ignore = true, target = "categories")
+    @Mapping(ignore = true, target = "materials")
+    @Mapping(ignore = true, target = "mediums")
+    @Mapping(ignore = true, target = "styles")
+    ArtworkDto toArtworkDto(SubmitArtworkRequest request);
 }

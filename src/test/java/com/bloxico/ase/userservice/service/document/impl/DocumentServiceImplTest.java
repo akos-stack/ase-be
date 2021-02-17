@@ -6,7 +6,6 @@ import com.bloxico.ase.testutil.UtilUser;
 import com.bloxico.ase.userservice.exception.AseRuntimeException;
 import com.bloxico.ase.userservice.repository.document.DocumentRepository;
 import com.bloxico.ase.userservice.service.aws.impl.S3ServiceImpl;
-import com.bloxico.ase.userservice.service.document.DocumentServiceImpl;
 import com.bloxico.ase.userservice.util.FileCategory;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

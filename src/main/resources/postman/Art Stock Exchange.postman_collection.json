@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "78255caa-36fd-4397-a71d-dd47ae43729f",
+		"_postman_id": "4475bc05-af2b-448c-bbf9-438d242b9e68",
 		"name": "Art Stock Exchange",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -551,7 +551,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/user/registration/evaluator/search?email=&page&size&sort",
+							"raw": "{{ase-endpoint}}/api/user/registration/evaluator/search?email=&page=&size=&sort=",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -958,6 +958,193 @@
 									"value": "<searchText>",
 									"disabled": true
 								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Artwork",
+			"item": [
+				{
+					"name": "Submit Artwork",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "images",
+									"type": "file",
+									"src": [
+										"/C:/Users/r103cr83/Downloads/x.png",
+										"/C:/Users/r103cr83/Downloads/koala.jpg",
+										"/C:/Users/r103cr83/Downloads/download.jpg"
+									]
+								},
+								{
+									"key": "principalPicture",
+									"type": "file",
+									"src": "/C:/Users/r103cr83/Downloads/koala.jpg"
+								},
+								{
+									"key": "title",
+									"value": "myTitle",
+									"type": "text"
+								},
+								{
+									"key": "categories",
+									"value": "cat1",
+									"type": "text"
+								},
+								{
+									"key": "categories",
+									"value": "cat2",
+									"type": "text"
+								},
+								{
+									"key": "artist",
+									"value": "Ivana Basic",
+									"type": "text"
+								},
+								{
+									"key": "iAmArtOwner",
+									"value": "false",
+									"type": "text"
+								},
+								{
+									"key": "year",
+									"value": "2010",
+									"type": "text"
+								},
+								{
+									"key": "materials",
+									"value": "mat1",
+									"type": "text"
+								},
+								{
+									"key": "materials",
+									"value": "mat2",
+									"type": "text"
+								},
+								{
+									"key": "mediums",
+									"value": "med1",
+									"type": "text"
+								},
+								{
+									"key": "styles",
+									"value": "sty1",
+									"type": "text"
+								},
+								{
+									"key": "certificate",
+									"type": "file",
+									"src": "/C:/Users/r103cr83/Downloads/sample.pdf"
+								},
+								{
+									"key": "weight",
+									"value": "23.4",
+									"type": "text"
+								},
+								{
+									"key": "height",
+									"value": "34.5",
+									"type": "text"
+								},
+								{
+									"key": "width",
+									"value": "15.1",
+									"type": "text"
+								},
+								{
+									"key": "depth",
+									"value": "2.5",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Knez Mihajlova",
+									"type": "text"
+								},
+								{
+									"key": "city",
+									"value": "Belgrade",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Serbia",
+									"type": "text"
+								},
+								{
+									"key": "region",
+									"value": "Vojvodina",
+									"type": "text"
+								},
+								{
+									"key": "zipCode",
+									"value": "11000",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "0644806595",
+									"type": "text"
+								},
+								{
+									"key": "appraisalHistory",
+									"value": "Some history",
+									"type": "text"
+								},
+								{
+									"key": "locationHistory",
+									"value": "Location history",
+									"type": "text"
+								},
+								{
+									"key": "runsHistory",
+									"value": "runs history",
+									"type": "text"
+								},
+								{
+									"key": "maintenanceRecords",
+									"value": "maintencace records",
+									"type": "text"
+								},
+								{
+									"key": "notes",
+									"value": "some notes",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "WAITING_FOR_EVALUATION",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork"
 							]
 						}
 					},
