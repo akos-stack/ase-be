@@ -11,6 +11,9 @@ public class CountryDto {
     @JsonProperty("id")
     private Integer id;
 
+    @JsonProperty("region")
+    private RegionDto region;
+
     @JsonProperty("name")
     private String name;
 

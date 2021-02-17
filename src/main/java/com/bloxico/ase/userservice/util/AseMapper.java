@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.util;
 
 import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
@@ -8,11 +9,15 @@ import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.entity.address.*;
+import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.*;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
 import com.bloxico.ase.userservice.entity.user.profile.*;
+import com.bloxico.ase.userservice.web.model.address.SaveCountryRequest;
+import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import com.bloxico.ase.userservice.web.model.user.*;
@@ -31,7 +36,7 @@ public interface AseMapper {
 
     RoleDto toDto(Role entity);
 
-    CityDto toDto(City entity);
+    RegionDto toDto(Region entity);
 
     CountryDto toDto(Country entity);
 
@@ -49,11 +54,11 @@ public interface AseMapper {
 
     PendingEvaluatorDto toDto(PendingEvaluator entity);
 
+    CountryEvaluationDetailsDto toDto(CountryEvaluationDetails entity);
+
     // DTO -> ENTITY
 
     User toEntity(UserDto dto);
-
-    City toEntity(CityDto dto);
 
     Country toEntity(CountryDto dto);
 
@@ -64,6 +69,10 @@ public interface AseMapper {
     Evaluator toEntity(EvaluatorDto dto);
 
     ArtOwner toEntity(ArtOwnerDto dto);
+
+    Region toEntity(RegionDto dto);
+
+    CountryEvaluationDetails toEntity(CountryEvaluationDetailsDto dto);
 
     // OTHER
 
@@ -81,10 +90,6 @@ public interface AseMapper {
     CountryDto toCountryDto(ISubmitUserProfileRequest request);
 
     @Mapping(ignore = true, target = "country")
-    @Mapping(target = "name", source = "city")
-    CityDto toCityDto(ISubmitUserProfileRequest request);
-
-    @Mapping(ignore = true, target = "city")
     LocationDto toLocationDto(ISubmitUserProfileRequest request);
 
     UserProfileDto toUserProfileDto(ISubmitUserProfileRequest request);
@@ -94,5 +99,17 @@ public interface AseMapper {
     ArtOwnerDto toArtOwnerDto(SubmitArtOwnerRequest request);
 
     PendingEvaluator toPendingEvaluator(IPendingEvaluatorRequest request);
+
+    @Mapping(target = "name", source = "region")
+    RegionDto toRegionDto(SaveRegionRequest request);
+
+    @Mapping(target = "name", source = "region")
+    RegionDto toRegionDto(SaveCountryRequest request);
+
+    @Mapping(target = "name", source = "country")
+    @Mapping(ignore = true, target = "region")
+    CountryDto toCountryDto(SaveCountryRequest request);
+
+    CountryEvaluationDetailsDto toCountryEvaluationDetailsDto(SaveCountryEvaluationDetailsRequest request);
 
 }

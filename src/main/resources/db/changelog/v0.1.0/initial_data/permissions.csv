@@ -10,3 +10,6 @@ upload_file
 download_file
 delete_file
 download_user_resume
+save_region
+save_country
+save_country_evaluation_details

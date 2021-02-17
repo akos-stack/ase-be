@@ -162,6 +162,45 @@ databaseChangeLog:
                     foreignKeyName: fk_aspiration_user
                     references: roles(id)
         - createTable:
+            tableName: regions
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createTable:
             tableName: countries
             columns:
               - column:
@@ -176,6 +215,13 @@ databaseChangeLog:
                   type: varchar(256)
                   constraints:
                     nullable: false
+              - column:
+                  name: region_id
+                  type: integer
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_region_country
+                    references: regions(id)
               # METADATA
               - column:
                   name: creator_id
@@ -206,7 +252,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - createTable:
-            tableName: cities
+            tableName: country_evaluation_details
             columns:
               - column:
                   name: id
@@ -216,27 +262,29 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
               - column:
+                  name: price_per_evaluation
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: availability_percentage
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
                   name: country_id
                   type: integer
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_city_country
+                    foreignKeyName: fk_country_evaluation_details_country
                     references: countries(id)
-              - column:
-                  name: name
-                  type: varchar(256)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: zip_code
-                  type: varchar(256)
               # METADATA
               - column:
                   name: creator_id
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_city_creator
+                    foreignKeyName: fk_country_creator
                     references: users(id)
               - column:
                   name: created_at
@@ -248,7 +296,7 @@ databaseChangeLog:
                   name: updater_id
                   type: bigint
                   constraints:
-                    foreignKeyName: fk_city_updater
+                    foreignKeyName: fk_country_updater
                     references: users(id)
               - column:
                   name: updated_at
@@ -270,12 +318,12 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
               - column:
-                  name: city_id
+                  name: country_id
                   type: integer
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_location_city
-                    references: cities(id)
+                    foreignKeyName: fk_location_country
+                    references: countries(id)
               - column:
                   name: address
                   type: varchar(256)
