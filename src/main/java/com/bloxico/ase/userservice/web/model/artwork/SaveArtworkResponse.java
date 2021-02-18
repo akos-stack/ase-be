@@ -12,7 +12,7 @@ import static lombok.AccessLevel.PRIVATE;
 @Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
-public class SubmitArtworkResponse {
+public class SaveArtworkResponse {
 
     @JsonProperty("artwork_group")
     @ApiModelProperty(required = true)

@@ -3,7 +3,6 @@ package com.bloxico.ase.userservice.dto.entity.artwork;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
-import com.bloxico.ase.userservice.entity.artwork.ArtworkStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -42,11 +41,11 @@ public class ArtworkDto {
     @JsonProperty("depth")
     private BigDecimal depth;
 
+    @JsonProperty("phone_number")
+    private String phone;
+
     @JsonProperty("location")
     private LocationDto location;
-
-    @JsonProperty("status")
-    private ArtworkStatus status;
 
     @JsonProperty("group")
     private ArtworkGroupDto group;

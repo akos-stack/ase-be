@@ -5,6 +5,8 @@ import lombok.Data;
 import javax.persistence.*;
 import java.io.Serializable;
 
+import static javax.persistence.FetchType.LAZY;
+
 @Data
 @Entity
 @Table(name = "artworks_history")
@@ -13,12 +15,11 @@ public class ArtworkHistory implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "artwork_id")
-    private Long artworkId;
+    private Long id;
 
-    @OneToOne
-    @PrimaryKeyJoinColumn(name = "artwork_id")
+    @MapsId
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "id")
     private Artwork artwork;
 
     @Column(name = "appraisal_history")

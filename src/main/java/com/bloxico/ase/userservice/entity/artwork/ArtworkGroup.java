@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.*;
 import java.util.Set;
 
+import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
@@ -21,6 +22,17 @@ public class ArtworkGroup extends BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy="group")
+    @Column(name = "status", nullable = false)
+    @Enumerated(STRING)
+    private Status status;
+
+    @OneToMany(mappedBy="group", fetch = FetchType.LAZY)
     private Set<Artwork> artworks;
+
+    public enum Status {
+
+        DRAFT,
+        WAITING_FOR_EVALUATION
+
+    }
 }

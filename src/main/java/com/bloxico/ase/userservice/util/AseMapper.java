@@ -38,7 +38,7 @@ import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
 import com.bloxico.ase.userservice.web.model.address.SaveCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
 import com.bloxico.ase.userservice.web.model.artwork.IArtworkMetadataRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SubmitArtworkRequest;
+import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
@@ -145,7 +145,7 @@ public interface AseMapper {
     LocationDto toLocationDto(ISubmitUserProfileRequest request);
 
     @Mapping(ignore = true, target = "country")
-    LocationDto toLocationDto(SubmitArtworkRequest request);
+    LocationDto toLocationDto(SaveArtworkRequest request);
 
     UserProfileDto toUserProfileDto(ISubmitUserProfileRequest request);
 
@@ -175,5 +175,10 @@ public interface AseMapper {
     @Mapping(ignore = true, target = "materials")
     @Mapping(ignore = true, target = "mediums")
     @Mapping(ignore = true, target = "styles")
-    ArtworkDto toArtworkDto(SubmitArtworkRequest request);
+    ArtworkDto toArtworkDto(SaveArtworkRequest request);
+
+    ArtworkHistoryDto toArtworkHistoryDto(SaveArtworkRequest request);
+
+    @Mapping(source = "groupId", target = "id")
+    ArtworkGroupDto toArtworkGroupDto(SaveArtworkRequest request);
 }

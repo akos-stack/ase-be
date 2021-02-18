@@ -20,9 +20,6 @@ public class Document extends BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(name = "name")
-    private String name;
-
     @Column(name = "path")
     private String path;
 

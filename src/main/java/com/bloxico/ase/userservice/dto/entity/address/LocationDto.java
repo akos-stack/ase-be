@@ -19,6 +19,15 @@ public class LocationDto {
     @JsonProperty("address")
     private String address;
 
+    @JsonProperty("address2")
+    private String address2;
+
+    @JsonProperty("city")
+    private String city;
+
+    @JsonProperty("zip_code")
+    private String zipCode;
+
     @JsonProperty("latitude")
     private BigDecimal latitude;
 

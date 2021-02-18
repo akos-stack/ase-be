@@ -330,6 +330,15 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: address2
+                  type: varchar(256)
+              - column:
+                  name: city
+                  type: varchar(256)
+              - column:
+                  name: zip_code
+                  type: varchar(256)
+              - column:
                   name: latitude
                   type: numeric
               - column:
@@ -892,11 +901,6 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
               - column:
-                  name: name
-                  type: varchar(256)
-                  constraints:
-                    nullable: false
-              - column:
                   name: type
                   type: varchar(256)
                   constraints:
@@ -1008,6 +1012,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
+              - column:
+                  name: status
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
               # METADATA
               - column:
                   name: creator_id
@@ -1092,17 +1101,17 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: phone_number
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
                   name: location_id
                   type: bigint
                   constraints:
                     nullable: false
                     foreignKeyName: fk_artworks_location
                     references: locations(id)
-              - column:
-                  name: status
-                  type: varchar(256)
-                  constraints:
-                    nullable: false
               - column:
                   name: group_id
                   type: bigint
@@ -1114,7 +1123,7 @@ databaseChangeLog:
             tableName: artworks_history
             columns:
               - column:
-                  name: artwork_id
+                  name: id
                   type: bigint
                   constraints:
                     nullable: false

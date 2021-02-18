@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.web.model.artwork.SubmitArtworkRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SubmitArtworkResponse;
+import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkRequest;
+import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -26,5 +26,5 @@ public interface ArtworkApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "User successfully submitted artwork.")
     })
-    ResponseEntity<SubmitArtworkResponse> submitArtwork(SubmitArtworkRequest request, Principal principal);
+    ResponseEntity<SaveArtworkResponse> submitArtwork(SaveArtworkRequest request, Principal principal);
 }

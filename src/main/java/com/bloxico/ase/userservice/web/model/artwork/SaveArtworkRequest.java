@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.web.model.artwork;
 
-import com.bloxico.ase.userservice.entity.artwork.ArtworkStatus;
+import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -20,7 +20,7 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor(force = true, access = PRIVATE)
 @Getter
 @Setter
-public class SubmitArtworkRequest {
+public class SaveArtworkRequest {
 
     @NotNull
     @NotEmpty
@@ -157,8 +157,8 @@ public class SubmitArtworkRequest {
     @JsonProperty("runs_history")
     String runsHistory;
 
-    @JsonProperty("maintenance_records")
-    String maintenanceRecords;
+    @JsonProperty("maintenance_history")
+    String maintenanceHistory;
 
     @JsonProperty("notes")
     String notes;
@@ -167,9 +167,9 @@ public class SubmitArtworkRequest {
     @NotEmpty
     @JsonProperty("status")
     @ApiModelProperty(required = true)
-    ArtworkStatus status;
+    ArtworkGroup.Status status;
 
-    @JsonProperty("group_id")
+    @JsonProperty("groupId")
     @ApiModelProperty
     Long groupId;
 }

@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static javax.persistence.CascadeType.MERGE;
-import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -56,13 +55,12 @@ public class Artwork implements Serializable {
     @Column(name = "depth", nullable = false)
     private BigDecimal depth;
 
+    @Column(name = "phone_number", nullable = false)
+    private String phone;
+
     @ManyToOne
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
-
-    @Column(name = "status", nullable = false)
-    @Enumerated(STRING)
-    private ArtworkStatus status;
 
     @ManyToOne
     @JoinColumn(name = "group_id", nullable = false)

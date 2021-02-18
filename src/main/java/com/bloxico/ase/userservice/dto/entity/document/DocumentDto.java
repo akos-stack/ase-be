@@ -12,9 +12,6 @@ public class DocumentDto {
     @JsonProperty("id")
     private Long id;
 
-    @JsonProperty("name")
-    private String name;
-
     @JsonProperty("path")
     private String path;
 

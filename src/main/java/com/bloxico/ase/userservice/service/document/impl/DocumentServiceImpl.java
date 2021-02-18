@@ -32,7 +32,6 @@ public class DocumentServiceImpl implements IDocumentService {
         log.info("DocumentServiceImpl.saveDocument - start | file: {}, fileCategory: {}, principalId: {} ", file, type, principalId);
         var path = s3Service.uploadFile(type, file);
         var document = new Document();
-        document.setName(file.getOriginalFilename());
         document.setPath(path);
         document.setType(type);
         document.setCreatorId(principalId);
