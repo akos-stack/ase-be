@@ -5,6 +5,7 @@ import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorRegistrationRequest;
+import javassist.NotFoundException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -361,10 +362,31 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     // TODO-TEST getEvaluatorResume_nullEmail
+    @Test
+    public void getEvaluatorResume_nullEmail() {
+        var user = utilUser.savedUser();
+        assertThrows(
+                NullPointerException.class,
+                () -> service.getEvaluatorResume(null, user.getId()));
+    }
 
     // TODO-TEST getEvaluatorResume_tokenNotFound
+    @Test
+    public void getEvaluatorResume_tokenNotFound() {
+        var user = utilUser.savedUser();
+        assertThrows(
+                TokenException.class,
+                () -> service.getEvaluatorResume(genUUID(), user.getId()));
+    }
 
     // TODO-TEST getEvaluatorResume_resumeNotFound
+    public void getEvaluatorResume_resumeNotFound() {
+        var user = utilUser.savedUser();
+        var cvPath = repository.findByEmailIgnoreCase(user.getEmail())
+                .orElseThrow().getCvPath();
+        service.getEvaluatorResume(user.getEmail(), user.getId());
+        assertThat(cvPath, isEmptyOrNullString());
+    }
 
     @Test
     public void getEvaluatorResume() {

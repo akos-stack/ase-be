@@ -1,0 +1,24 @@
+databaseChangeLog:
+- changeSet:
+    id: v0.1.0
+    author: milos.sekuloski@bloxico.com
+    changes:
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/region.csv
+        tableName: regions
+
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/role.csv
+        tableName: roles
+
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/service_client_details.csv
+        tableName: oauth_client_details
+        quotchar: '"'
+
+
+
+

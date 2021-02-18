@@ -10,8 +10,11 @@ import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import com.bloxico.ase.userservice.web.model.token.*;
+import javassist.NotFoundException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.orm.jpa.JpaSystemException;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.testutil.UtilUserProfile.newSubmitArtOwnerRequest;
@@ -448,8 +451,26 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     // TODO-TEST searchPendingEvaluators_nullEmail
+    @Test
+    public void searchPendingEvaluators_nullEmail() {
+        assertThrows(
+                InvalidDataAccessApiUsageException.class,
+                () -> userRegistrationFacade
+                        .searchPendingEvaluators(null, 0, 2, "email"));
+    }
 
     // TODO-TEST searchPendingEvaluators_emptyResultSet
+    @Test
+    public void searchPendingEvaluators_emptyResultSet() {
+        var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        assertThat(
+                userRegistrationFacade
+                        .searchPendingEvaluators("barFoo", 0, 2, "email")
+                        .getPendingEvaluators(),
+                        not(hasItems(pe1, pe2, pe3)));
+    }
 
     @Test
     public void searchPendingEvaluators() {

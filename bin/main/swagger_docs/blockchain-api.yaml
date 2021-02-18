@@ -1,0 +1,147 @@
+swagger: "2.0"
+info:
+  description: "This is a sample transaction handler."
+  version: "1.0.0"
+  title: "Transaction handler"
+  contact:
+    email: "jovan.cucic.19@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "172.28.0.2:5000"
+basePath: "/api/v1"
+schemes:
+- "http"
+paths:
+  /register:
+    post:
+      tags:
+        - partner
+      summary: "Register partner"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Partner data for registering"
+        required: true
+        schema:
+            $ref: "#/definitions/PartnerRequest"
+      responses:
+        200:
+          description: "Returns partner address and partner name"
+          schema:
+            $ref: "#/definitions/PartnerResponse"
+        400:
+          description: "Address has invalid format"
+        403:
+          description: "Forbidden"
+        405:
+          description: "Invalid input"
+        500:
+          description: "Internal server error"
+  /send-transaction:
+    post:
+      summary: "Create and send partner transaction to blockchain"
+      tags: 
+        - transactions
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Transaction data for creating and sending reward blockchain transaction to user"
+        required: true
+        schema:
+          $ref: "#/definitions/TransactionRequest"
+      responses:
+        200:
+          description: "Returns transaction data"
+          schema: 
+            $ref: "#/definitions/TransactionResponse"
+        400:
+          description: "Bad transaction format"
+        403:
+          description: "Forbidden"
+        405:
+          description: "Invalid input"
+        500:
+          description: "Internal server error"
+  /block-notify:
+    get:
+      summary: "Receives block notification from energycoin client whenever a new block is minted"
+      tags:
+        - transactions
+      description: 
+      - "In order to track the application transactions sent to the blockchain we need to 
+      to be notified every time a new block comes so we can track the status of transactions."
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "App has been notified"
+          schema: 
+            $ref: "#/definitions/NotifyResponse"
+        400:
+          description: "Bad request"
+        403:
+          description: "Forbidden"
+        500:
+          description: "Internal server error"
+
+definitions:
+  PartnerRequest:
+    type: "object"
+    properties:
+      partnerId:
+        type: "string"
+        description: "Partner id for interal recognition"
+  TransactionRequest:
+    type: "object"
+    properties:
+      partnerTx:
+        type: "string"
+        description: "Partner transaction stored in user-api database"
+      partnerId:
+        type: "string"
+        description: "Partner address used for wallet account identification"
+      amount:
+        type: "integer"
+        description: "Amount to be sent from partner to user"
+      userAddress:
+        type: "string"
+        description: "User reward address"
+  PartnerResponse:
+    type: object
+    properties:
+      partnerId:
+        type: string
+      address:
+        type: string
+    example:
+      partnerId: RingRing
+      address: eCgqKwJNiogNbFLonQr3ruRvAydKcYjoZL
+  TransactionResponse:
+    type: object
+    properties:
+      backendTxId:
+        type: string
+      blockchainTxId:
+        type: string
+      status:
+        type: string
+    example:
+      backendTxId: 1
+      blockchainTxId: 13e98f5140ce57520da5b9e03fb43f5fc5c523d8ee728e69d59b6b0b39cb09b2
+      status: pending
+  NotifyResponse:
+    type: object
+    properties:
+      notified:
+        type: boolean
+    example:
+      notified: true

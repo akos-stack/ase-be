@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages="org.graylog2.log4j2,io.sentry.log4j2">
+    <Properties>
+        <Property name="LOG_PATTERN">
+            ${hostName} %d{yyyy-MM-dd HH:mm:ss,SSS} reqId=%X{reqId} userAgent=%X{userAgent} %-5p %c{10} -> %L [%t] -
+            %m%n
+        </Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>${LOG_PATTERN}</Pattern>
+            </PatternLayout>
+        </Console>
+        <Socket name="syslog" host="localhost" port="514" protocol="UDP">
+            <PatternLayout>
+                <Pattern>${LOG_PATTERN}</Pattern>
+            </PatternLayout>
+        </Socket>
+        <!-- Rolling File Appender -->
+        <RollingFile name="FileAppender" fileName="logs/out.log"
+                     filePattern="logs/out-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout>
+                <Pattern>${LOG_PATTERN}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <TimeBasedTriggeringPolicy interval="1" modulate="false"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="100"/>
+        </RollingFile>
+        <!--<Sentry name="Sentry" />-->
+    </Appenders>
+
+    <Loggers>
+        <Logger name="com.bloxico" level="debug"/>
+        <Logger name="org.springframework" level="debug"/>
+        <Logger name="org.springframework.boot" level="debug"/>
+        <Logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="debug"/>
+
+        <Root level="info">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="gelfAppender"/>
+            <!--<AppenderRef ref="Sentry" level="error" />-->
+        </Root>
+    </Loggers>
+</Configuration>

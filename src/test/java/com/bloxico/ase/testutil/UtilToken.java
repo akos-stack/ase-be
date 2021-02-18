@@ -13,6 +13,7 @@ import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import com.bloxico.ase.userservice.repository.token.*;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
+import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -164,4 +165,9 @@ public class UtilToken {
                 genUUID(), genUUID(), ONE, TEN);
     }
 
+    public TokenValidationRequest registerEvaluator(String token) {
+        //var request = new TokenValidationRequest(token);
+        //userRegistrationFacade.handleTokenValidation(request);
+        return new TokenValidationRequest(token);
+    }
 }

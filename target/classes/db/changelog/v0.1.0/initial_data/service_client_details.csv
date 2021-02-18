@@ -1,0 +1,2 @@
+"client_id","resource_ids","client_secret","scope","authorized_grant_types","web_server_redirect_uri","authorities","access_token_validity","refresh_token_validity","additional_information","autoapprove"
+"appId","NULL","$2a$10$blYgz2l0NQB/Anfm535Wl.3J7tlwmuHjSWubP6TAwRo7GOha/04la","access_profile,access_fe_endpoints","password,refresh_token","NULL","access_profile,access_fe_endpoints",11120,"NULL","{}","NULL"

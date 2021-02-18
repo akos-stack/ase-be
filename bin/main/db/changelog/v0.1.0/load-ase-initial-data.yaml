@@ -1,0 +1,35 @@
+databaseChangeLog:
+- changeSet:
+    id: v0.1.0
+    author: milos.sekuloski@bloxico.com
+    changes:
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/roles.csv
+        tableName: roles
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/permissions.csv
+        tableName: permissions
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/roles_permissions.csv
+        tableName: roles_permissions
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/users.csv
+        tableName: users
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/users_roles.csv
+        tableName: users_roles
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/service_client_details.csv
+        tableName: oauth_client_details
+        quotchar: '"'
+#    - loadData:
+#        encoding: UTF-8
+#        file: db/changelog/v0.1.0/initial_data/oauth_client_registrations.csv
+#        tableName: oauth_client_registrations
+#        quotchar: '"'

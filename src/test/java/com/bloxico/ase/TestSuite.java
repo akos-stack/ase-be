@@ -11,6 +11,7 @@ import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImp
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
 import com.bloxico.ase.userservice.service.token.impl.*;
 import com.bloxico.ase.userservice.service.user.impl.*;
+import com.bloxico.ase.userservice.util.AWSUtilTest;
 import com.bloxico.ase.userservice.web.api.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -18,42 +19,43 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses(value = {
         // entity
-        BaseEntityTest.class,
+        //BaseEntityTest.class,
 
         // config
-        PersistentJwtTokenStoreTest.class,
-        AseSecurityServiceTest.class,
+        //PersistentJwtTokenStoreTest.class,
+        //AseSecurityServiceTest.class,
 
         // service
-        UserServiceImplTest.class,
-        UserProfileServiceImplTest.class,
-        RolePermissionServiceImplTest.class,
-        TokenBlacklistServiceImplTest.class,
-        OAuthAccessTokenServiceImplTest.class,
-        OAuthClientDetailsServiceImplTest.class,
-        RegistrationTokenServiceImplTest.class,
-        PasswordResetTokenServiceImplTest.class,
-        LocationServiceImplTest.class,
-        PendingEvaluatorServiceImplTest.class,
-        S3ServiceImplTest.class,
+        //UserServiceImplTest.class,
+        //UserProfileServiceImplTest.class,
+        //RolePermissionServiceImplTest.class,
+        //TokenBlacklistServiceImplTest.class,
+        //OAuthAccessTokenServiceImplTest.class,
+        //OAuthClientDetailsServiceImplTest.class,
+        //RegistrationTokenServiceImplTest.class,
+        //PasswordResetTokenServiceImplTest.class,
+        //LocationServiceImplTest.class,
+        //PendingEvaluatorServiceImplTest.class,
+        //S3ServiceImplTest.class,
+        //AWSUtilTest.class
 
         // facade
-        QuartzOperationsFacadeImplTest.class,
-        UserRegistrationFacadeImplTest.class,
-        UserPasswordFacadeImplTest.class,
-        UserProfileFacadeImplTest.class,
-        LocationFacadeImplTest.class,
-        UserManagementFacadeImplTest.class,
+        //QuartzOperationsFacadeImplTest.class,
+        //UserRegistrationFacadeImplTest.class,
+        //UserPasswordFacadeImplTest.class,
+        //UserProfileFacadeImplTest.class,
+        //LocationFacadeImplTest.class,
+        //UserManagementFacadeImplTest.class,
 
         // filter
-        JwtAuthorizationFilterTest.class,
+        //JwtAuthorizationFilterTest.class,
 
         // api
         UserRegistrationApiTest.class,
-        UserPasswordApiTest.class,
-        UserProfileApiTest.class,
-        LocationApiTest.class,
-        UserManagementApiTest.class,
+        //UserPasswordApiTest.class,
+        //UserProfileApiTest.class,
+        //LocationApiTest.class,
+        //UserManagementApiTest.class,
 })
 public class TestSuite {
 }

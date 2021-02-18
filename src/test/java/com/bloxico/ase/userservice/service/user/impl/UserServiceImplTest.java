@@ -4,6 +4,7 @@ import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilUser;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
+import javassist.NotFoundException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -65,10 +66,28 @@ public class UserServiceImplTest extends AbstractSpringTest {
     }
 
     // TODO-TEST findUsersByEmailOrRole_nullArgs
+    @Test
+    public void findUsersByEmailOrRole_nullArgs() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userService.findUsersByEmailOrRole(null, null, 0, 0, ""));
+    }
 
     // TODO-TEST findUsersByEmailOrRole_emptyArgs
+    @Test
+    public void findUsersByEmailOrRole_emptyArgs() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userService.findUsersByEmailOrRole("", "", 0, 0, ""));
+    }
 
     // TODO-TEST findUsersByEmailOrRole_notFound
+    @Test
+    public void findUsersByEmailOrRole_notFound() {
+        assertThrows(
+                NotFoundException.class,
+                () -> userService.findUsersByEmailOrRole(genUUID(), "", 0, 0, ""));
+    }
 
     @Test
     public void findUsersByEmailOrRole_byEmail() {

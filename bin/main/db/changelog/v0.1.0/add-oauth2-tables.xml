@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="v0.1.0" author="milos.sekuloski@bloxico.com" dbms="postgresql">
+        <sql>
+            create table ${database.defaultSchemaName}.oauth_client_details (
+            client_id VARCHAR(256) PRIMARY KEY,
+            resource_ids VARCHAR(256),
+            client_secret VARCHAR(256),
+            scope VARCHAR(256),
+            authorized_grant_types VARCHAR(256),
+            web_server_redirect_uri VARCHAR(256),
+            authorities VARCHAR(256),
+            access_token_validity INTEGER,
+            refresh_token_validity INTEGER,
+            additional_information VARCHAR(4096),
+            autoapprove VARCHAR(256)
+            );
+
+            create table ${database.defaultSchemaName}.oauth_client_token (
+            token_id VARCHAR(256),
+            token bytea,
+            authentication_id VARCHAR(256),
+            user_name VARCHAR(256),
+            client_id VARCHAR(256)
+            );
+
+            create table ${database.defaultSchemaName}.oauth_access_token (
+            authentication_id VARCHAR(256),
+            token_id VARCHAR,
+            token bytea,
+            user_name VARCHAR(256),
+            client_id VARCHAR(256),
+            authentication bytea,
+            expiration TIMESTAMP,
+            refresh_token VARCHAR
+            );
+
+            create table ${database.defaultSchemaName}.oauth_refresh_token (
+            token_id VARCHAR(256),
+            token bytea,
+            authentication bytea
+            );
+
+            create table ${database.defaultSchemaName}.oauth_code (
+            code VARCHAR(256), authentication bytea
+            );
+
+            create table ${database.defaultSchemaName}.oauth_approvals (
+            userId VARCHAR(256),
+            clientId VARCHAR(256),
+            scope VARCHAR(256),
+            status VARCHAR(10),
+            expiresAt TIMESTAMP,
+            lastModifiedAt TIMESTAMP
+            );
+        </sql>
+    </changeSet>
+
+
+</databaseChangeLog>

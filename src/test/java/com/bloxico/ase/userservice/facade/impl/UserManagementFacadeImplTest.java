@@ -22,8 +22,23 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
     @Autowired private UserManagementFacadeImpl userManagementFacade;
 
     // TODO-TEST searchUsers_nullArgs
+    @Test
+    public void searchUsers_nullArgs() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> userManagementFacade.searchUsers(null, null, 0, 0, null).getUsers().size());
+    }
 
     // TODO-TEST searchUsers_notFound
+    @Test
+    public void searchUsers_notFound() {
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedUserDto();
+        var u3 = utilUser.savedUserDto();
+        assertThat(
+                userManagementFacade.searchUsers("test", null, 0, MAX_VALUE, "name").getUsers(),
+                not(hasItems(u1, u2, u3)));
+    }
 
     @Test
     public void searchUsers_byEmail() {

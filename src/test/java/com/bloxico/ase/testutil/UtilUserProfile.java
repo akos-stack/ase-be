@@ -66,5 +66,4 @@ public class UtilUserProfile {
                 genUUID(), genUUID(), genUUID(),
                 genUUID(), genUUID(), ONE, TEN);
     }
-
 }

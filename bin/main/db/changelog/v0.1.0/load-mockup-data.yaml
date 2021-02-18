@@ -1,0 +1,30 @@
+databaseChangeLog:
+- changeSet:
+    id: v0.1.0
+    author: milos.sekuloski@bloxico.com
+    context: local or dev or test or stage
+    changes:
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/mockup_data/coin_user.csv
+        tableName: coin_users
+        columns:
+        - column:
+            name: enabled
+            type: boolean
+        - column:
+            name: deleted
+            type: boolean
+        - column:
+            name: locked
+            type: boolean
+
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/mockup_data/user_profile.csv
+        tableName: user_profiles
+
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/mockup_data/user_role.csv
+        tableName: users_roles

@@ -44,6 +44,10 @@ public class Util {
         return UUID.randomUUID().toString();
     }
 
+    public static Long genUUIDLong() {
+        return UUID.randomUUID().getLeastSignificantBits();
+    }
+
     public static LocalDateTime genExpiredLDT() {
         return LocalDateTime.now().minusHours(1);
     }
