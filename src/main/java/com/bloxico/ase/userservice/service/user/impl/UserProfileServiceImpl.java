@@ -1,7 +1,11 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
-import com.bloxico.ase.userservice.dto.entity.user.profile.*;
-import com.bloxico.ase.userservice.repository.user.profile.*;
+import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
+import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
+import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
+import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import lombok.extern.slf4j.Slf4j;

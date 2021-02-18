@@ -1,7 +1,7 @@
 package com.bloxico.ase.testutil;
 
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
+import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
 import com.bloxico.ase.userservice.entity.address.*;
 import com.bloxico.ase.userservice.repository.address.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,41 +15,42 @@ public class UtilLocation {
 
     @Autowired private UtilUser utilUser;
     @Autowired private CountryRepository countryRepository;
-    @Autowired private CityRepository cityRepository;
     @Autowired private LocationRepository locationRepository;
+    @Autowired private RegionRepository regionRepository;
+
+    public Region savedRegion() {
+        var creatorId = utilUser.savedAdmin().getId();
+        var region = new Region();
+        region.setName(genUUID());
+        region.setCreatorId(creatorId);
+        return regionRepository.saveAndFlush(region);
+    }
+
+    public RegionDto savedRegionDto() {
+        return MAPPER.toDto(savedRegion());
+    }
 
     public Country savedCountry() {
         var creatorId = utilUser.savedAdmin().getId();
+        var region = savedRegion();
         var country = new Country();
         country.setName(genUUID());
+        country.setRegion(region);
         country.setCreatorId(creatorId);
-        return countryRepository.saveAndFlush(country);
+        countryRepository.saveAndFlush(country);
+        return country;
     }
 
     public CountryDto savedCountryDto() {
         return MAPPER.toDto(savedCountry());
     }
 
-    public City savedCity() {
-        var country = savedCountry();
-        var city = new City();
-        city.setCountry(country);
-        city.setName(genUUID());
-        city.setZipCode(genUUID());
-        city.setCreatorId(country.getCreatorId());
-        return cityRepository.saveAndFlush(city);
-    }
-
-    public CityDto savedCityDto() {
-        return MAPPER.toDto(savedCity());
-    }
-
     public Location savedLocation() {
-        var city = savedCity();
+        var country = savedCountry();
         var location = new Location();
-        location.setCity(city);
+        location.setCountry(country);
         location.setAddress(genUUID());
-        location.setCreatorId(city.getCreatorId());
+        location.setCreatorId(country.getCreatorId());
         return locationRepository.saveAndFlush(location);
     }
 

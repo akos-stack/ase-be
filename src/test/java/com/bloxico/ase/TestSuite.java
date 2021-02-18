@@ -8,6 +8,7 @@ import com.bloxico.ase.userservice.filter.JwtAuthorizationFilterTest;
 import com.bloxico.ase.userservice.service.address.impl.LocationServiceImplTest;
 import com.bloxico.ase.userservice.service.artwork.impl.metadata.*;
 import com.bloxico.ase.userservice.service.aws.impl.S3ServiceImplTest;
+import com.bloxico.ase.userservice.service.evaluation.impl.EvaluationServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
 import com.bloxico.ase.userservice.service.token.impl.*;
@@ -41,6 +42,7 @@ import org.junit.runners.Suite;
         MaterialServiceImplTest.class,
         MediumServiceImplTest.class,
         StyleServiceImplTest.class,
+        EvaluationServiceImplTest.class,
 
         // facade
         QuartzOperationsFacadeImplTest.class,
@@ -50,6 +52,7 @@ import org.junit.runners.Suite;
         LocationFacadeImplTest.class,
         UserManagementFacadeImplTest.class,
         ArtworkMetadataFacadeImplTest.class,
+        EvaluationFacadeImplTest.class,
 
         // filter
         JwtAuthorizationFilterTest.class,
@@ -60,7 +63,8 @@ import org.junit.runners.Suite;
         UserProfileApiTest.class,
         LocationApiTest.class,
         UserManagementApiTest.class,
-        ArtworkMetadataManagementApiTest.class
+        ArtworkMetadataManagementApiTest.class,
+        EvaluationApiTest.class
 })
 public class TestSuite {
 }

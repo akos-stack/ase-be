@@ -7,14 +7,14 @@ import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
 
 @Data
-@EqualsAndHashCode(of = {"city", "address"})
+@EqualsAndHashCode(of = {"country", "address"})
 public class LocationDto {
 
     @JsonProperty("id")
     private Long id;
 
-    @JsonProperty("city")
-    private CityDto city;
+    @JsonProperty("country")
+    private CountryDto country;
 
     @JsonProperty("address")
     private String address;

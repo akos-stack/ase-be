@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
@@ -173,22 +173,9 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
 
     // HELPER METHODS
 
-    private CountryDto doSaveCountry(ISubmitUserProfileRequest request, long principalId) {
-        var countryDto = MAPPER.toCountryDto(request);
-        return locationService.findOrSaveCountry(countryDto, principalId);
-    }
-
-    private CityDto doSaveCity(CountryDto countryDto, ISubmitUserProfileRequest request, long principalId) {
-        var cityDto = MAPPER.toCityDto(request);
-        cityDto.setCountry(countryDto);
-        return locationService.findOrSaveCity(cityDto, principalId);
-    }
-
     private LocationDto doSaveLocation(ISubmitUserProfileRequest request, long principalId) {
-        var countryDto = doSaveCountry(request, principalId);
-        var cityDto = doSaveCity(countryDto, request, principalId);
         var locationDto = MAPPER.toLocationDto(request);
-        locationDto.setCity(cityDto);
+        locationDto.setCountry(locationService.findCountryByName(request.getCountry()));
         return locationService.saveLocation(locationDto, principalId);
     }
 

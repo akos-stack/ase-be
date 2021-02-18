@@ -1,6 +1,5 @@
 package com.bloxico.ase.userservice.entity.artwork.metadata;
 
-import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
