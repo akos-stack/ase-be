@@ -1,6 +1,10 @@
 package com.bloxico.ase.userservice.entity.artwork;
 
 import com.bloxico.ase.userservice.entity.address.Location;
+import com.bloxico.ase.userservice.entity.artwork.metadata.Category;
+import com.bloxico.ase.userservice.entity.artwork.metadata.Material;
+import com.bloxico.ase.userservice.entity.artwork.metadata.Medium;
+import com.bloxico.ase.userservice.entity.artwork.metadata.Style;
 import com.bloxico.ase.userservice.entity.document.Document;
 import com.bloxico.ase.userservice.entity.user.profile.ArtOwner;
 import lombok.Data;

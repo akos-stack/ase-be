@@ -1,23 +1,21 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkGroupDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
-import com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus;
+import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
 import com.bloxico.ase.userservice.facade.IArtworkFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.artwork.IArtistService;
 import com.bloxico.ase.userservice.service.artwork.IArtworkGroupService;
 import com.bloxico.ase.userservice.service.artwork.IArtworkMetadataService;
 import com.bloxico.ase.userservice.service.artwork.IArtworkService;
-import com.bloxico.ase.userservice.service.artwork.impl.CategoryServiceImpl;
-import com.bloxico.ase.userservice.service.artwork.impl.MaterialServiceImpl;
-import com.bloxico.ase.userservice.service.artwork.impl.MediumServiceImpl;
-import com.bloxico.ase.userservice.service.artwork.impl.StyleServiceImpl;
+import com.bloxico.ase.userservice.service.artwork.impl.metadata.CategoryServiceImpl;
+import com.bloxico.ase.userservice.service.artwork.impl.metadata.MaterialServiceImpl;
+import com.bloxico.ase.userservice.service.artwork.impl.metadata.MediumServiceImpl;
+import com.bloxico.ase.userservice.service.artwork.impl.metadata.StyleServiceImpl;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.util.FileCategory;
@@ -45,11 +43,11 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     private final IArtworkService artworkService;
     private final IArtistService artistService;
     private final IUserProfileService userProfileService;
+    private final IArtworkGroupService artworkGroupService;
     private final CategoryServiceImpl categoryService;
     private final MaterialServiceImpl materialService;
     private final MediumServiceImpl mediumService;
     private final StyleServiceImpl styleService;
-    private final IArtworkGroupService artworkGroupService;
 
     public ArtworkFacadeImpl(ILocationService locationService, IDocumentService documentService, IArtworkService artworkService, IArtistService artistService, IUserProfileService userProfileService, CategoryServiceImpl categoryService, MaterialServiceImpl materialService, MediumServiceImpl mediumService, StyleServiceImpl styleService, IArtworkGroupService artworkGroupService) {
         this.locationService = locationService;
@@ -114,7 +112,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         for(String s: artworkMetadataDtos) {
             var dto = new ArtworkMetadataDto();
             dto.setName(s);
-            dto.setStatus(ArtworkMetadataStatus.PENDING);
+            dto.setStatus(ArtworkMetadata.Status.PENDING);
             result.add(service.findOrSaveArtworkMetadata(dto, principalId));
         }
         return result;
@@ -161,22 +159,9 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         return artistService.saveArtist(artistDto, principalId);
     }
 
-    private CountryDto doSaveCountry(SubmitArtworkRequest request, long principalId) {
-        var countryDto = MAPPER.toCountryDto(request);
-        return locationService.findOrSaveCountry(countryDto, principalId);
-    }
-
-    private CityDto doSaveCity(CountryDto countryDto, SubmitArtworkRequest request, long principalId) {
-        var cityDto = MAPPER.toCityDto(request);
-        cityDto.setCountry(countryDto);
-        return locationService.findOrSaveCity(cityDto, principalId);
-    }
-
     private LocationDto doSaveLocation(SubmitArtworkRequest request, long principalId) {
-        var countryDto = doSaveCountry(request, principalId);
-        var cityDto = doSaveCity(countryDto, request, principalId);
         var locationDto = MAPPER.toLocationDto(request);
-        locationDto.setCity(cityDto);
+        locationDto.setCountry(locationService.findCountryByName(request.getCountry()));
         return locationService.saveLocation(locationDto, principalId);
     }
 }

@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.entity.artwork;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -9,6 +10,7 @@ import java.util.Set;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
+@EqualsAndHashCode(of = "id", callSuper = false)
 @Entity
 @Table(name = "artwork_groups")
 public class ArtworkGroup extends BaseEntity {
