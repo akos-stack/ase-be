@@ -1,6 +1,6 @@
-package com.bloxico.ase.userservice.repository.artwork;
+package com.bloxico.ase.userservice.repository.artwork.metadata;
 
-import com.bloxico.ase.userservice.entity.artwork.Material;
+import com.bloxico.ase.userservice.entity.artwork.metadata.Material;
 import org.springframework.stereotype.Repository;
 
 @Repository

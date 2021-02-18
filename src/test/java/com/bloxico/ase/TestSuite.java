@@ -6,10 +6,7 @@ import com.bloxico.ase.userservice.entity.BaseEntityTest;
 import com.bloxico.ase.userservice.facade.impl.*;
 import com.bloxico.ase.userservice.filter.JwtAuthorizationFilterTest;
 import com.bloxico.ase.userservice.service.address.impl.LocationServiceImplTest;
-import com.bloxico.ase.userservice.service.artwork.impl.ArtworkCategoryServiceImplTest;
-import com.bloxico.ase.userservice.service.artwork.impl.ArtworkMaterialServiceImplTest;
-import com.bloxico.ase.userservice.service.artwork.impl.ArtworkMediumServiceImplTest;
-import com.bloxico.ase.userservice.service.artwork.impl.ArtworkStyleServiceImplTest;
+import com.bloxico.ase.userservice.service.artwork.impl.metadata.*;
 import com.bloxico.ase.userservice.service.aws.impl.S3ServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
@@ -40,10 +37,10 @@ import org.junit.runners.Suite;
         LocationServiceImplTest.class,
         PendingEvaluatorServiceImplTest.class,
         S3ServiceImplTest.class,
-        ArtworkCategoryServiceImplTest.class,
-        ArtworkMaterialServiceImplTest.class,
-        ArtworkMediumServiceImplTest.class,
-        ArtworkStyleServiceImplTest.class,
+        CategoryServiceImplTest.class,
+        MaterialServiceImplTest.class,
+        MediumServiceImplTest.class,
+        StyleServiceImplTest.class,
 
         // facade
         QuartzOperationsFacadeImplTest.class,
@@ -63,8 +60,7 @@ import org.junit.runners.Suite;
         UserProfileApiTest.class,
         LocationApiTest.class,
         UserManagementApiTest.class,
-        ArtworkMetadataManagementApiTest.class,
-        ArtworkMetadataApiTest.class
+        ArtworkMetadataManagementApiTest.class
 })
 public class TestSuite {
 }

@@ -4,16 +4,14 @@ import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.util.List;
-
 import static lombok.AccessLevel.PRIVATE;
 
 @Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
-public class SearchArtworkMetadataResponse {
+public class SaveArtworkMetadataResponse {
 
-    @JsonProperty("entries")
-    List<ArtworkMetadataDto> entries;
+    @JsonProperty("artwork_metadata")
+    ArtworkMetadataDto artworkMetadata;
 
 }

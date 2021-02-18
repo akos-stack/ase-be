@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.dto.entity.artwork;
 
-import com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus;
+import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,6 +16,6 @@ public class ArtworkMetadataDto {
     private String name;
 
     @JsonProperty("status")
-    private ArtworkMetadataStatus status;
+    private Status status;
 
 }

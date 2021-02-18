@@ -1,12 +1,10 @@
 package com.bloxico.ase.userservice.web.model.artwork;
 
-import com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus;
-import com.bloxico.ase.userservice.util.ArtworkMetadataType;
+import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
+import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -16,7 +14,7 @@ import static lombok.AccessLevel.PRIVATE;
 @Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
-public class ArtworkMetadataUpdateRequest implements IArtworkMetadataRequest {
+public class UpdateArtworkMetadataRequest implements IArtworkMetadataRequest {
 
     @NotNull
     @NotEmpty
@@ -26,9 +24,10 @@ public class ArtworkMetadataUpdateRequest implements IArtworkMetadataRequest {
 
     @JsonProperty("status")
     @ApiModelProperty(required = true)
-    ArtworkMetadataStatus status;
+    Status status;
 
     @JsonProperty("type")
     @ApiModelProperty(required = true)
-    ArtworkMetadataType type;
+    Type type;
+
 }

@@ -14,15 +14,16 @@ public class PagedArtworkMetadataResponse {
     @ApiModelProperty(required = true)
     List<ArtworkMetadataDto> entries;
 
-    @JsonProperty("pageSize")
+    @JsonProperty("page_size")
     @ApiModelProperty(required = true)
     long pageElements;
 
-    @JsonProperty("totalElements")
+    @JsonProperty("total_elements")
     @ApiModelProperty(required = true)
     long totalElements;
 
-    @JsonProperty("totalPages")
+    @JsonProperty("total_pages")
     @ApiModelProperty(required = true)
     long totalPages;
+
 }
