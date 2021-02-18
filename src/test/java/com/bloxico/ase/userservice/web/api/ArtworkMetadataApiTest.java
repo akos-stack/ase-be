@@ -19,7 +19,7 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
-public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
+public class ArtworkMetadataApiTest extends AbstractSpringTest {
 
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilArtworkMetadata utilArtworkMetadata;
@@ -48,6 +48,8 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
         }
     }
 
+    // TODO-test updateArtworkMetadata_404_notFound
+
     @Test
     public void updateArtworkMetadata_200_ok() {
         for (var type : Type.values()) {
@@ -70,6 +72,8 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
             assertEquals(metadata.getName(), response.getArtworkMetadata().getName());
         }
     }
+
+    // TODO-test deleteArtworkMetadata_404_notFound
 
     @Test
     public void deleteArtworkMetadata_200_ok() {

@@ -26,9 +26,9 @@ public interface ArtworkMetadataApi {
             produces = {"application/json"},
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'manage_artwork_metadata')")
-    @ApiOperation(value = "Creates artwork metadata.")
+    @ApiOperation(value = "Saves artwork metadata in database.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Artwork metadata successfully submitted.")
+            @ApiResponse(code = 200, message = "Artwork metadata successfully saved.")
     })
     ResponseEntity<SaveArtworkMetadataResponse> saveArtworkMetadata(
             @Valid @RequestBody SaveArtworkMetadataRequest request, Principal principal);
