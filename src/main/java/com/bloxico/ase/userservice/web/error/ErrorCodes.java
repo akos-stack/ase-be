@@ -145,41 +145,75 @@ public interface ErrorCodes {
     }
 
     @Getter
-    enum Artworks implements ErrorCodes {
+    enum Location implements ErrorCodes {
 
-        METADATA_STATUS_NOT_FOUND(
-                HttpStatus.NOT_FOUND,
+        REGION_EXISTS(
+                HttpStatus.CONFLICT,
                 "30",
-                "Artwork metadata status not found."),
+                "Region already exists in the database."),
+
+        REGION_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "31",
+                "Region with specified name was not found."),
+
+        COUNTRY_EXISTS(
+                HttpStatus.CONFLICT,
+                "32",
+                "Country already exists in the database."),
+
+        COUNTRY_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "33",
+                "Country with specified name was not found.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        Location(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new LocationException(httpStatus, code, cause);
+        }
+
+    }
+
+    @Getter
+    enum Artworks implements ErrorCodes {
 
         ARTWORK_METADATA_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "31",
+                "40",
                 "Artwork metadata not found."),
 
         ARTWORK_METADATA_TYPE_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "32",
+                "41",
                 "Artwork metadata type not found."),
 
         ARTWORK_ARTIST_NOT_PROVIDED(
                 HttpStatus.BAD_REQUEST,
-                "33",
+                "42",
                 "Artwork artist name not provided."),
 
         ARTWORK_MISSING_RESUME(
                 HttpStatus.BAD_REQUEST,
-                "34",
+                "43",
                 "Art Owner resume missing."),
 
         ARTWORK_MISSING_CERTIFICATE(
                 HttpStatus.BAD_REQUEST,
-                "35",
+                "44",
                 "Artwork certificate not uploaded."),
 
         ARTWORK_GROUP_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "36",
+                "45",
                 "Artwork group not found.");
 
         private final HttpStatus httpStatus;
@@ -193,7 +227,31 @@ public interface ErrorCodes {
 
         @Override
         public AseRuntimeException newException(Throwable cause) {
-            return new ArtworksException(httpStatus, code, cause);
+            return new ArtworkException(httpStatus, code, cause);
+        }
+
+    }
+
+    @Getter
+    enum Evaluation implements ErrorCodes {
+
+        COUNTRY_EVALUATION_DETAILS_EXISTS(
+                HttpStatus.CONFLICT,
+                "50",
+                "Evaluation details already exists for specified country.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        Evaluation(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new EvaluationException(httpStatus, code, cause);
         }
 
     }
@@ -203,7 +261,7 @@ public interface ErrorCodes {
 
         DOCUMENT_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "40",
+                "60",
                 "Document not found.");
 
         private final HttpStatus httpStatus;
@@ -217,9 +275,8 @@ public interface ErrorCodes {
 
         @Override
         public AseRuntimeException newException(Throwable cause) {
-            return new ArtworksException(httpStatus, code, cause);
+            return new ArtworkException(httpStatus, code, cause);
         }
 
     }
-
 }

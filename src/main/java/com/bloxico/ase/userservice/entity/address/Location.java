@@ -10,8 +10,8 @@ import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
-@EqualsAndHashCode(of = {"city", "address"}, callSuper = false)
-@ToString(exclude = "city")
+@EqualsAndHashCode(of = {"country", "address"}, callSuper = false)
+@ToString(exclude = "country")
 @Entity
 @Table(name = "locations")
 public class Location extends BaseEntity {
@@ -21,8 +21,8 @@ public class Location extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "city_id")
-    private City city;
+    @JoinColumn(name = "country_id")
+    private Country country;
 
     @Column(name = "address")
     private String address;

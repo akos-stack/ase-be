@@ -1,12 +1,11 @@
 package com.bloxico.ase.userservice.facade;
 
-import com.bloxico.ase.userservice.web.model.address.SearchCitiesResponse;
-import com.bloxico.ase.userservice.web.model.address.SearchCountriesResponse;
+import com.bloxico.ase.userservice.web.model.address.*;
 
 public interface ILocationFacade {
 
-    SearchCountriesResponse findAllCountries();
+    SaveRegionResponse saveRegion(SaveRegionRequest request, long principalId);
 
-    SearchCitiesResponse findAllCities();
+    SaveCountryResponse saveCountry(SaveCountryRequest request, long principalId);
 
 }

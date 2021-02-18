@@ -1,28 +1,20 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.CityDto;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
 import com.bloxico.ase.userservice.service.token.ITokenService;
 import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImpl;
-import com.bloxico.ase.userservice.service.user.IRolePermissionService;
-import com.bloxico.ase.userservice.service.user.IUserProfileService;
-import com.bloxico.ase.userservice.service.user.IUserService;
+import com.bloxico.ase.userservice.service.user.*;
 import com.bloxico.ase.userservice.util.MailUtil;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
-import com.bloxico.ase.userservice.web.model.user.ISubmitUserProfileRequest;
-import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
-import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
+import com.bloxico.ase.userservice.web.model.user.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -188,22 +180,9 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
 
     // HELPER METHODS
 
-    private CountryDto doSaveCountry(ISubmitUserProfileRequest request, long principalId) {
-        var countryDto = MAPPER.toCountryDto(request);
-        return locationService.findOrSaveCountry(countryDto, principalId);
-    }
-
-    private CityDto doSaveCity(CountryDto countryDto, ISubmitUserProfileRequest request, long principalId) {
-        var cityDto = MAPPER.toCityDto(request);
-        cityDto.setCountry(countryDto);
-        return locationService.findOrSaveCity(cityDto, principalId);
-    }
-
     private LocationDto doSaveLocation(ISubmitUserProfileRequest request, long principalId) {
-        var countryDto = doSaveCountry(request, principalId);
-        var cityDto = doSaveCity(countryDto, request, principalId);
         var locationDto = MAPPER.toLocationDto(request);
-        locationDto.setCity(cityDto);
+        locationDto.setCountry(locationService.findCountryByName(request.getCountry()));
         return locationService.saveLocation(locationDto, principalId);
     }
 

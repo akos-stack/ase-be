@@ -1,13 +1,14 @@
 package com.bloxico.ase.userservice.web.model.artwork;
 
-import com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus;
-import com.bloxico.ase.userservice.util.ArtworkMetadataType;
+import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
+import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
 
 public interface IArtworkMetadataRequest {
 
     String getName();
 
-    ArtworkMetadataStatus getStatus();
+    Status getStatus();
 
-    ArtworkMetadataType getType();
+    Type getType();
+
 }

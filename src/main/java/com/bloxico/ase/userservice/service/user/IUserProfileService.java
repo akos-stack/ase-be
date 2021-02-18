@@ -1,6 +1,8 @@
 package com.bloxico.ase.userservice.service.user;
 
-import com.bloxico.ase.userservice.dto.entity.user.profile.*;
+import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 
 public interface IUserProfileService {

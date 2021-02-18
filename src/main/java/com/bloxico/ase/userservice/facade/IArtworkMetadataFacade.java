@@ -1,22 +1,20 @@
 package com.bloxico.ase.userservice.facade;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
-import com.bloxico.ase.userservice.entity.artwork.ArtworkMetadataStatus;
-import com.bloxico.ase.userservice.util.ArtworkMetadataType;
-import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkMetadataResponse;
-import com.bloxico.ase.userservice.web.model.artwork.ArtworkMetadataCreateRequest;
-import com.bloxico.ase.userservice.web.model.artwork.ArtworkMetadataUpdateRequest;
-import com.bloxico.ase.userservice.web.model.artwork.PagedArtworkMetadataResponse;
+import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
+import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
+import com.bloxico.ase.userservice.web.model.artwork.*;
 
 public interface IArtworkMetadataFacade {
 
-    ArtworkMetadataDto createArtworkMetadata(ArtworkMetadataCreateRequest request, long principalId);
+    ArtworkMetadataDto saveArtworkMetadata(SaveArtworkMetadataRequest request, long principalId);
 
-    void updateArtworkMetadataStatus(ArtworkMetadataUpdateRequest request, long principalId);
+    ArtworkMetadataDto updateArtworkMetadata(UpdateArtworkMetadataRequest request, long principalId);
 
-    void deleteArtworkMetadata(String name, ArtworkMetadataType type);
+    void deleteArtworkMetadata(String name, Type type);
 
-    PagedArtworkMetadataResponse searchArtworkMetadata(ArtworkMetadataType type, ArtworkMetadataStatus status, String name, int page, int size, String sort);
+    PagedArtworkMetadataResponse searchArtworkMetadata(Type type, Status status, String name, int page, int size, String sort);
 
-    SearchArtworkMetadataResponse searchApprovedArtworkMetadata(String name, ArtworkMetadataType type);
+    SearchArtworkMetadataResponse searchApprovedArtworkMetadata(String name, Type type);
+
 }

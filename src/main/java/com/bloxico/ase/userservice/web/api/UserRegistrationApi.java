@@ -145,6 +145,7 @@ public interface UserRegistrationApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Evaluator is created successfully."),
             @ApiResponse(code = 404, message = "Evaluator with given email is not invited."),
+            @ApiResponse(code = 404, message = "Specified country doesn't exist."),
             @ApiResponse(code = 409, message = "User with given email already exists.")
     })
     ResponseEntity<EvaluatorDto> submitEvaluator(@Valid @RequestBody SubmitEvaluatorRequest request);
@@ -156,6 +157,7 @@ public interface UserRegistrationApi {
     @ApiOperation(value = "Creates new art owner with given data.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Art owner is created successfully."),
+            @ApiResponse(code = 404, message = "Specified country doesn't exist."),
             @ApiResponse(code = 409, message = "User with given email already exists.")
     })
     ResponseEntity<ArtOwnerDto> submitArtOwner(@Valid @RequestBody SubmitArtOwnerRequest request);
