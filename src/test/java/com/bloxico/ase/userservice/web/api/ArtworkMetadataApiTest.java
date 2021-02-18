@@ -48,6 +48,8 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         }
     }
 
+    // TODO-test updateArtworkMetadata_404_notFound
+
     @Test
     public void updateArtworkMetadata_200_ok() {
         for (var type : Type.values()) {
@@ -70,6 +72,8 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
             assertEquals(metadata.getName(), response.getArtworkMetadata().getName());
         }
     }
+
+    // TODO-test deleteArtworkMetadata_404_notFound
 
     @Test
     public void deleteArtworkMetadata_200_ok() {
