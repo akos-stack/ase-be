@@ -405,7 +405,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
     }
 
-    // TODO-test submitEvaluator_409_userAlreadyExists ???
+    // TODO-test submitEvaluator_409_userAlreadyExists
     @Test
     public void submitEvaluator_409_userAlreadyExists() {
         var request = mockUtil.submitInvitedEvaluatorRequest();

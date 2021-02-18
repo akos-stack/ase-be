@@ -164,10 +164,4 @@ public class UtilToken {
                 genUUID(), genUUID(), genUUID(),
                 genUUID(), genUUID(), ONE, TEN);
     }
-
-    public TokenValidationRequest registerEvaluator(String token) {
-        //var request = new TokenValidationRequest(token);
-        //userRegistrationFacade.handleTokenValidation(request);
-        return new TokenValidationRequest(token);
-    }
 }
