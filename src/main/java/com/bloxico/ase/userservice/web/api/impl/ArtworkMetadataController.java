@@ -21,12 +21,6 @@ public class ArtworkMetadataController implements ArtworkMetadataApi {
     private IArtworkMetadataFacade artworkMetadataFacade;
 
     @Override
-    public ResponseEntity<SearchArtworkMetadataResponse> searchApprovedArtworkMetadata(Type type, String name) {
-        var response = artworkMetadataFacade.searchApprovedArtworkMetadata(name, type);
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
     public ResponseEntity<SaveArtworkMetadataResponse> saveArtworkMetadata(
             SaveArtworkMetadataRequest request, Principal principal)
     {
@@ -57,6 +51,12 @@ public class ArtworkMetadataController implements ArtworkMetadataApi {
             Type type, Status status, String name, int page, int size, String sort)
     {
         var response = artworkMetadataFacade.searchArtworkMetadata(type, status, name, page, size, sort);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<SearchArtworkMetadataResponse> searchApprovedArtworkMetadata(Type type, String name) {
+        var response = artworkMetadataFacade.searchApprovedArtworkMetadata(name, type);
         return ResponseEntity.ok(response);
     }
 

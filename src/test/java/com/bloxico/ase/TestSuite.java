@@ -65,7 +65,7 @@ import org.junit.runners.Suite;
         UserProfileApiTest.class,
         LocationApiTest.class,
         UserManagementApiTest.class,
-        ArtworkMetadataManagementApiTest.class,
+        ArtworkMetadataApiTest.class,
         EvaluationApiTest.class
 })
 public class TestSuite {

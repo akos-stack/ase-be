@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.web.api;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.user.*;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import static com.bloxico.ase.userservice.web.api.UserManagementApi.*;
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_ENDPOINT;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
+import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
@@ -55,9 +57,9 @@ public class UserManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void searchUsers_byRole_200_ok() {
-        var ad = utilUser.savedAdminDtoWithEmail(genEmail("adminFooBar"));
-        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar1"));
-        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar2"));
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var a1 = utilUser.savedAdminDtoWithEmail(genEmail("adminBarFoo"));
+        var a2 = utilUser.savedAdminDtoWithEmail(genEmail("adminFooBar"));
         var users = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
@@ -72,7 +74,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .body()
                 .as(PagedUserDataResponse.class)
                 .getUsers();
-        assertThat(users, allOf(hasItems(ad), not(hasItems(u1, u2))));
+        assertThat(users, allOf(hasItems(a1, a2), not(hasItems(u1))));
     }
 
     @Test
@@ -84,7 +86,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .param("email", "")
-                .param("role", "")
+                .param("role", "admin")
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()

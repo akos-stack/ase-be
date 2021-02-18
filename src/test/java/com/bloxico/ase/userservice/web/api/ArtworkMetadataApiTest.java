@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
+import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.PENDING;
 import static com.bloxico.ase.userservice.web.api.ArtworkMetadataApi.*;
+import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_ART_OWNER_SUBMIT;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.*;
@@ -19,7 +21,7 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
-public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
+public class ArtworkMetadataApiTest extends AbstractSpringTest {
 
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilArtworkMetadata utilArtworkMetadata;
@@ -49,6 +51,23 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
     }
 
     @Test
+    public void updateArtworkMetadata_404_notFound() {
+        for (var type : Type.values()) {
+            var status = randEnumConst(Status.class);
+            var newStatus = randOtherEnumConst(status);
+            given()
+                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .contentType(JSON)
+                    .body(new UpdateArtworkMetadataRequest(genUUID(), newStatus, type))
+                    .when()
+                    .post(API_URL + ARTWORK_METADATA_UPDATE)
+                    .then()
+                    .assertThat()
+                    .statusCode(404);
+        }
+    }
+
+    @Test
     public void updateArtworkMetadata_200_ok() {
         for (var type : Type.values()) {
             var status = randEnumConst(Status.class);
@@ -68,6 +87,23 @@ public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
                     .as(UpdateArtworkMetadataResponse.class);
             assertSame(newStatus, response.getArtworkMetadata().getStatus());
             assertEquals(metadata.getName(), response.getArtworkMetadata().getName());
+        }
+    }
+
+    @Test
+    public void deleteArtworkMetadata_404_notFound() {
+        for (var type : Type.values()) {
+            var status = randEnumConst(Status.class);
+            given()
+                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .contentType(JSON)
+                    .param("name", genUUID())
+                    .param("type", type.name())
+                    .when()
+                    .delete(API_URL + ARTWORK_METADATA_DELETE)
+                    .then()
+                    .assertThat()
+                    .statusCode(404);
         }
     }
 
