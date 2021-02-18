@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.util;
 
 import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
@@ -8,11 +9,13 @@ import com.bloxico.ase.userservice.dto.entity.user.RoleDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.entity.address.*;
+import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.*;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
 import com.bloxico.ase.userservice.entity.user.profile.*;
+import com.bloxico.ase.userservice.web.model.artwork.IArtworkMetadataRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import com.bloxico.ase.userservice.web.model.user.*;
@@ -48,6 +51,8 @@ public interface AseMapper {
     OAuthAccessTokenDto toDto(OAuthAccessToken entity);
 
     PendingEvaluatorDto toDto(PendingEvaluator entity);
+
+    ArtworkMetadataDto toDto(ArtworkMetadata entity);
 
     // DTO -> ENTITY
 
@@ -94,5 +99,7 @@ public interface AseMapper {
     ArtOwnerDto toArtOwnerDto(SubmitArtOwnerRequest request);
 
     PendingEvaluator toPendingEvaluator(IPendingEvaluatorRequest request);
+
+    ArtworkMetadataDto toArtworkMetadataDto(IArtworkMetadataRequest request);
 
 }

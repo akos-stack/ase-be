@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "0c8c4084-2ebf-4f77-ba85-93fff83e88d0",
+		"_postman_id": "78255caa-36fd-4397-a71d-dd47ae43729f",
 		"name": "Art Stock Exchange",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -517,12 +517,7 @@
 									"type": "file",
 									"src": []
 								}
-							],
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							]
 						},
 						"url": {
 							"raw": "{{ase-endpoint}}/api/user/registration/evaluator/request",
@@ -574,15 +569,15 @@
 								},
 								{
 									"key": "page",
-									"value": null
+									"value": ""
 								},
 								{
 									"key": "size",
-									"value": null
+									"value": ""
 								},
 								{
 									"key": "sort",
-									"value": null
+									"value": ""
 								}
 							]
 						}
@@ -740,6 +735,228 @@
 								{
 									"key": "fileName",
 									"value": "1610645577245-file-sample_100kB.doc"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Artwork Metadata Management",
+			"item": [
+				{
+					"name": "Create artwork metadata",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"categoryName\",\r\n    \"type\": \"CATEGORY\"\r\n}\r\n\r\n// type: CATEGORY | MATERIAL | MEDIUM | STYLE",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/create",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork",
+								"management",
+								"metadata",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search artwork metadata",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork/management/metadata?type=CATEGORY",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork",
+								"management",
+								"metadata"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "APPROVED",
+									"disabled": true
+								},
+								{
+									"key": "name",
+									"value": "5",
+									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "type",
+									"value": "CATEGORY"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update artwork metadata status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"categoryName\",\r\n    \"status\": \"PENDING\",\r\n    \"type\": \"CATEGORY\"\r\n}\r\n\r\n// status: APPROVED | PENDING\r\n// type: CATEGORY | MATERIAL | MEDIUM | STYLE",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/update",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork",
+								"management",
+								"metadata",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete artwork metadata",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/delete?name=categoryName&type=CATEGORY",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork",
+								"management",
+								"metadata",
+								"delete"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "categoryName"
+								},
+								{
+									"key": "type",
+									"value": "CATEGORY"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Artwork Metadata",
+			"item": [
+				{
+					"name": "Fetch approved metadata",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork/metadata?type=CATEGORY",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork",
+								"metadata"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "CATEGORY"
+								},
+								{
+									"key": "name",
+									"value": "<searchText>",
+									"disabled": true
 								}
 							]
 						}

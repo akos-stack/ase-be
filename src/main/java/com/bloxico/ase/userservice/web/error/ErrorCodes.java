@@ -144,4 +144,33 @@ public interface ErrorCodes {
 
     }
 
+    @Getter
+    enum Artworks implements ErrorCodes {
+
+        ARTWORK_METADATA_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "21",
+                "Artwork metadata not found."),
+
+        ARTWORK_METADATA_TYPE_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "22",
+                "Artwork metadata type not found.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        Artworks(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new ArtworkException(httpStatus, code, cause);
+        }
+
+    }
+
 }
