@@ -19,7 +19,7 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
-public class ArtworkMetadataManagementApiTest extends AbstractSpringTest {
+public class ArtworkMetadataApiTest extends AbstractSpringTest {
 
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilArtworkMetadata utilArtworkMetadata;
