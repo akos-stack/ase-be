@@ -50,16 +50,6 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
-    public void searchUsers_byRole() {
-        var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
-        var a1 = utilUser.savedAdminDtoWithEmail(genEmail("adminBarFoo"));
-        var a2 = utilUser.savedAdminDtoWithEmail(genEmail("adminFooBar"));
-        assertThat(
-                userManagementFacade.searchUsers("", "admin", 0, MAX_VALUE, "name").getUsers(),
-                allOf(hasItems(a1, a2), not(hasItems(u1))));
-    }
-
-    @Test
     public void searchUsers_byRoleAndEmail() {
         var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
         var a1 = utilUser.savedAdminDtoWithEmail(genEmail("adminBarFoo"));
@@ -67,6 +57,16 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
         assertThat(
                 userManagementFacade.searchUsers(a1.getEmail(), "admin", 0, MAX_VALUE, "name").getUsers(),
                 allOf(hasItems(a1), not(hasItems(u1, a2))));
+    }
+
+    @Test
+    public void searchUsers_byRole() {
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var a1 = utilUser.savedAdminDtoWithEmail(genEmail("adminBarFoo"));
+        var a2 = utilUser.savedAdminDtoWithEmail(genEmail("adminFooBar"));
+        assertThat(
+                userManagementFacade.searchUsers("", "admin", 0, MAX_VALUE, "name").getUsers(),
+                allOf(hasItems(a1, a2), not(hasItems(u1))));
     }
 
     @Test

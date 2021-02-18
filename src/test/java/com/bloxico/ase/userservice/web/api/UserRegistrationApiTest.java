@@ -417,6 +417,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .body(ERROR_CODE, is(ErrorCodes.Location.COUNTRY_NOT_FOUND.getCode()));
     }
 
+    //TODO FIX
     @Test
     public void submitEvaluator_409_userAlreadyExists() {
         var request = mockUtil.submitInvitedEvaluatorRequest();

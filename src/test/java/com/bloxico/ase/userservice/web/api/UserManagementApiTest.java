@@ -55,6 +55,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .body(ERROR_CODE, is(ErrorCodes.User.ROLE_NOT_FOUND.getCode()));
     }
 
+    //TODO FIX
     @Test
     public void searchUsers_byRole_200_ok() {
         var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
