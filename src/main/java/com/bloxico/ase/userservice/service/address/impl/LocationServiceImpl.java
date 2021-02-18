@@ -7,78 +7,75 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.*;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Slf4j
 @Service
 public class LocationServiceImpl implements ILocationService {
 
     private final CountryRepository countryRepository;
-    private final CityRepository cityRepository;
     private final LocationRepository locationRepository;
+    private final RegionRepository regionRepository;
 
     @Autowired
     public LocationServiceImpl(CountryRepository countryRepository,
-                               CityRepository cityRepository,
-                               LocationRepository locationRepository)
+                               LocationRepository locationRepository,
+                               RegionRepository regionRepository)
     {
         this.countryRepository = countryRepository;
-        this.cityRepository = cityRepository;
         this.locationRepository = locationRepository;
+        this.regionRepository = regionRepository;
     }
 
     @Override
-    public List<CountryDto> findAllCountries() {
-        log.debug("CountryServiceImpl.findAllCountries - start");
-        var countries = countryRepository
-                .findAll()
-                .stream()
+    public RegionDto findRegionByName(String region) {
+        log.debug("LocationServiceImpl.findRegionByName - start | region: {}", region);
+        var regionDto = regionRepository
+                .findByNameIgnoreCase(region)
                 .map(MAPPER::toDto)
-                .collect(toUnmodifiableList());
-        log.debug("CountryServiceImpl.findAllCountries - end");
-        return countries;
+                .orElseThrow(REGION_NOT_FOUND::newException);
+        log.debug("LocationServiceImpl.findRegionByName - end | region: {}", region);
+        return regionDto;
     }
 
     @Override
-    public List<CityDto> findAllCities() {
-        log.debug("LocationServiceImpl.findAllCities - start");
-        var cities = cityRepository
-                .findAll()
-                .stream()
+    public CountryDto findCountryByName(String country) {
+        log.debug("LocationServiceImpl.findCountryByName - start | country: {}", country);
+        var regionDto = countryRepository
+                .findByNameIgnoreCase(country)
                 .map(MAPPER::toDto)
-                .collect(toUnmodifiableList());
-        log.debug("LocationServiceImpl.findAllCities - end");
-        return cities;
+                .orElseThrow(COUNTRY_NOT_FOUND::newException);
+        log.debug("LocationServiceImpl.findCountryByName - end | country: {}", country);
+        return regionDto;
     }
 
+
     @Override
-    public CountryDto findOrSaveCountry(CountryDto dto, long principalId) {
-        log.debug("CountryServiceImpl.findOrSaveCountry - start | dto: {}, principalId: {}", dto, principalId);
+    public RegionDto saveRegion(RegionDto dto, long principalId) {
+        log.debug("LocationServiceImpl.saveRegion - start | dto: {}, principalId: {}", dto, principalId);
         requireNonNull(dto);
-        var countryDto = countryRepository
-                .findByNameIgnoreCase(dto.getName())
-                .map(MAPPER::toDto)
-                .filter(dto::equals)
-                .orElseGet(() -> saveCountry(dto, principalId));
-        log.debug("CountryServiceImpl.findOrSaveCountry - end | dto: {}, principalId: {}", dto, principalId);
+        requireNotExists(dto);
+        var region = MAPPER.toEntity(dto);
+        region.setCreatorId(principalId);
+        region = regionRepository.saveAndFlush(region);
+        var regionDto = MAPPER.toDto(region);
+        log.debug("LocationServiceImpl.saveRegion - end | dto: {}, principalId: {}", dto, principalId);
+        return regionDto;
+    }
+
+    @Override
+    public CountryDto saveCountry(CountryDto dto, long principalId) {
+        log.debug("LocationServiceImpl.saveCountry - start | dto: {}, principalId: {}", dto, principalId);
+        requireNonNull(dto);
+        requireNotExists(dto);
+        var country = MAPPER.toEntity(dto);
+        country.setCreatorId(principalId);
+        country = countryRepository.saveAndFlush(country);
+        var countryDto = MAPPER.toDto(country);
+        log.debug("LocationServiceImpl.saveCountry - end | dto: {}, principalId: {}", dto, principalId);
         return countryDto;
-    }
-
-    @Override
-    public CityDto findOrSaveCity(CityDto dto, long principalId) {
-        log.debug("LocationServiceImpl.findOrSaveCity - start | dto: {}, principalId: {}", dto, principalId);
-        requireNonNull(dto);
-        var cityDto = cityRepository
-                .findByNameIgnoreCase(dto.getName())
-                .map(MAPPER::toDto)
-                .filter(dto::equals)
-                .orElseGet(() -> saveCity(dto, principalId));
-        log.debug("LocationServiceImpl.findOrSaveCity - end | dto: {}, principalId: {}", dto, principalId);
-        return cityDto;
     }
 
     @Override
@@ -87,21 +84,20 @@ public class LocationServiceImpl implements ILocationService {
         requireNonNull(dto);
         var location = MAPPER.toEntity(dto);
         location.setCreatorId(principalId);
-        var locationDto = MAPPER.toDto(locationRepository.saveAndFlush(location));
+        location = locationRepository.saveAndFlush(location);
+        var locationDto = MAPPER.toDto(location);
         log.debug("LocationServiceImpl.saveLocation - end | dto: {}, principalId: {}", dto, principalId);
         return locationDto;
     }
 
-    private CountryDto saveCountry(CountryDto dto, long principalId) {
-        var country = MAPPER.toEntity(dto);
-        country.setCreatorId(principalId);
-        return MAPPER.toDto(countryRepository.saveAndFlush(country));
+    private void requireNotExists(RegionDto dto) {
+        if (regionRepository.findByNameIgnoreCase(dto.getName()).isPresent())
+            throw REGION_EXISTS.newException();
     }
 
-    private CityDto saveCity(CityDto dto, long principalId) {
-        var city = MAPPER.toEntity(dto);
-        city.setCreatorId(principalId);
-        return MAPPER.toDto(cityRepository.saveAndFlush(city));
+    private void requireNotExists(CountryDto dto) {
+        if (countryRepository.findByNameIgnoreCase(dto.getName()).isPresent())
+            throw COUNTRY_EXISTS.newException();
     }
 
 }

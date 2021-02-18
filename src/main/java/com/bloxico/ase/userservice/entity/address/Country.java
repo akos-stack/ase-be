@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
@@ -17,6 +18,10 @@ public class Country extends BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "region_id")
+    private Region region;
 
     @Column(name = "name")
     private String name;

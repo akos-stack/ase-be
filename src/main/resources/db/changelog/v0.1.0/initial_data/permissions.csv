@@ -10,3 +10,7 @@ upload_file
 download_file
 delete_file
 download_user_resume
+manage_artwork_metadata
+save_region
+save_country
+save_country_evaluation_details

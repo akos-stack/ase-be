@@ -65,27 +65,24 @@ public class UserServiceImplTest extends AbstractSpringTest {
                 userService.findUserByEmail(userDto.getEmail()));
     }
 
-    // TODO-TEST findUsersByEmailOrRole_nullArgs
     @Test
     public void findUsersByEmailOrRole_nullArgs() {
         assertThrows(
-                NullPointerException.class,
+                IllegalArgumentException.class,
                 () -> userService.findUsersByEmailOrRole(null, null, 0, 0, ""));
     }
 
-    // TODO-TEST findUsersByEmailOrRole_emptyArgs
     @Test
     public void findUsersByEmailOrRole_emptyArgs() {
         assertThrows(
-                NullPointerException.class,
+                IllegalArgumentException.class,
                 () -> userService.findUsersByEmailOrRole("", "", 0, 0, ""));
     }
 
-    // TODO-TEST findUsersByEmailOrRole_notFound
     @Test
     public void findUsersByEmailOrRole_notFound() {
         assertThrows(
-                NotFoundException.class,
+                IllegalArgumentException.class,
                 () -> userService.findUsersByEmailOrRole(genUUID(), "", 0, 0, ""));
     }
 

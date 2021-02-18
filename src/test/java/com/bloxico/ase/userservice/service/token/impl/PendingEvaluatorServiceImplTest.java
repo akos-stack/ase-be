@@ -361,7 +361,6 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
                         not(hasItems(p3))));
     }
 
-    // TODO-TEST getEvaluatorResume_nullEmail
     @Test
     public void getEvaluatorResume_nullEmail() {
         var user = utilUser.savedUser();
@@ -370,7 +369,6 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
                 () -> service.getEvaluatorResume(null, user.getId()));
     }
 
-    // TODO-TEST getEvaluatorResume_tokenNotFound
     @Test
     public void getEvaluatorResume_tokenNotFound() {
         var user = utilUser.savedUser();
@@ -379,7 +377,6 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
                 () -> service.getEvaluatorResume(genUUID(), user.getId()));
     }
 
-    // TODO-TEST getEvaluatorResume_resumeNotFound
     public void getEvaluatorResume_resumeNotFound() {
         var user = utilUser.savedUser();
         var cvPath = repository.findByEmailIgnoreCase(user.getEmail())

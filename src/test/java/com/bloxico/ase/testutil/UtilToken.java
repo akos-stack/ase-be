@@ -29,6 +29,7 @@ import static java.math.BigDecimal.TEN;
 public class UtilToken {
 
     @Autowired private UtilUser utilUser;
+    @Autowired private UtilLocation utilLocation;
     @Autowired private TokenRepository tokenRepository;
     @Autowired private OAuthAccessTokenRepository oAuthAccessTokenRepository;
     @Autowired private BlacklistedTokenRepository blacklistedTokenRepository;
@@ -157,11 +158,27 @@ public class UtilToken {
         var principalId = utilUser.savedAdmin().getId();
         userRegistrationFacade.sendEvaluatorInvitation(new EvaluatorInvitationRequest(email), principalId);
         var token = pendingEvaluatorRepository.findByEmailIgnoreCase(email).orElseThrow().getToken();
+        var country = utilLocation.savedCountry().getName();
         return new SubmitEvaluatorRequest(
                 token, genUUID(), password,
                 email, genUUID(), genUUID(),
                 genUUID(), LocalDate.now(),
-                genUUID(), genUUID(), genUUID(),
-                genUUID(), genUUID(), ONE, TEN);
+                genUUID(), country,
+                genUUID(), ONE, TEN);
+    }
+
+    public SubmitEvaluatorRequest newSubmitUninvitedEvaluatorRequestCountryNotFound() {
+        var email = genEmail();
+        var password = genPassword();
+        var principalId = utilUser.savedAdmin().getId();
+        userRegistrationFacade.sendEvaluatorInvitation(new EvaluatorInvitationRequest(email), principalId);
+        var token = pendingEvaluatorRepository.findByEmailIgnoreCase(email).orElseThrow().getToken();
+        var country = genUUID();
+        return new SubmitEvaluatorRequest(
+                token, genUUID(), password,
+                email, genUUID(), genUUID(),
+                genUUID(), LocalDate.now(),
+                genUUID(), country,
+                genUUID(), ONE, TEN);
     }
 }

@@ -43,7 +43,6 @@ public class AseSecurityServiceTest extends AbstractSpringTest {
                 service.loadUserByUsername(user.getEmail()));
     }
 
-    // TODO-TEST loadUser_null
     @Test
     public void loadUser_null() {
         assertThrows(
@@ -54,26 +53,11 @@ public class AseSecurityServiceTest extends AbstractSpringTest {
     // TODO-TEST loadUser_notExists (for each provider)
     @Test
     public void loadUser_notExists() {
-
-
-//        ClientRegistration clientRegistration = this.clientRegistrationBuilder.userInfoUri("/user").userInfoAuthenticationMethod(AuthenticationMethod.HEADER)
-//                .userNameAttributeName("name").build();
-//        OAuth2User user2 = service.loadUser(new OAuth2UserRequest(clientRegistration, this.accessToken));
-//        OAuth2User user = service.loadUser(new OAuth2UserRequest(clientRegistration, this.accessToken));
-//        var provider = clientRegistration.getRegistrationId();
-//        var extractor = ExternalUserDataExtractor.of(provider);
-//        var attributes = user2.getAttributes();
-//        var email = extractor.getEmail(attributes);
-//        var user3 = userRepository.findByEmailIgnoreCase(email);
-//        assertEquals(user2.getName(), user3.get().getName());
-
-
     }
 
     // TODO-TEST loadUser_exists (for each provider)
     @Test
     public void loadUser_exists() {
-        //OAuth2User user = service.loadUser(new OAuth2UserRequest(clientRegistration, this.accessToken));
     }
 
     @Test

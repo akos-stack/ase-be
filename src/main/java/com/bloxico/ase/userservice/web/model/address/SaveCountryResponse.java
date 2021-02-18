@@ -4,16 +4,14 @@ import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.util.List;
-
 import static lombok.AccessLevel.PRIVATE;
 
 @Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
-public class SearchCountriesResponse {
+public class SaveCountryResponse {
 
-    @JsonProperty("countries")
-    List<CountryDto> countries;
+    @JsonProperty("country")
+    CountryDto country;
 
 }

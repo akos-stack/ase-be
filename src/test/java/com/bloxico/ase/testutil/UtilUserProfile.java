@@ -47,23 +47,43 @@ public class UtilUserProfile {
         return savedUserProfileDto(utilUser.savedUser().getId());
     }
 
-    public static SubmitEvaluatorRequest newSubmitUninvitedEvaluatorRequest() {
+    public SubmitEvaluatorRequest newSubmitUninvitedEvaluatorRequest() {
         var email = genEmail();
         var password = genPassword();
+        var country = utilLocation.savedCountry().getName();
         return new SubmitEvaluatorRequest(
                 genUUID(), genUUID(), password,
                 email, genUUID(), genUUID(),
                 genUUID(), LocalDate.now(),
-                genUUID(), genUUID(), genUUID(),
-                genUUID(), genUUID(), ONE, TEN);
+                genUUID(), country, genUUID(), ONE, TEN);
     }
 
-    public static SubmitArtOwnerRequest newSubmitArtOwnerRequest() {
+    public SubmitEvaluatorRequest newSubmitUninvitedEvaluatorRequestCountryNotFound() {
+        var email = genEmail();
+        var password = genPassword();
+        var country = genUUID();
+        return new SubmitEvaluatorRequest(
+                genUUID(), genUUID(), password,
+                email, genUUID(), genUUID(),
+                genUUID(), LocalDate.now(),
+                genUUID(), country, genUUID(), ONE, TEN);
+    }
+
+    public SubmitArtOwnerRequest newSubmitArtOwnerRequest() {
+        var country = utilLocation.savedCountry().getName();
         return new SubmitArtOwnerRequest(
                 genUUID(), genPassword(),
                 genEmail(), genUUID(), genUUID(),
                 genUUID(), LocalDate.now(),
-                genUUID(), genUUID(), genUUID(),
-                genUUID(), genUUID(), ONE, TEN);
+                genUUID(), country, genUUID(), ONE, TEN);
+    }
+
+    public SubmitArtOwnerRequest newSubmitArtOwnerRequestCountryNotFound() {
+        var country = genUUID();
+        return new SubmitArtOwnerRequest(
+                genUUID(), genPassword(),
+                genEmail(), genUUID(), genUUID(),
+                genUUID(), LocalDate.now(),
+                genUUID(), country, genUUID(), ONE, TEN);
     }
 }

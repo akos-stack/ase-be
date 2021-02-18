@@ -19,7 +19,6 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
     @Autowired
     private S3ServiceImpl s3Service;
 
-    // TODO-TEST validateFile_nullArguments
     @Test
     public void validateFile_nullArguments() {
         assertThrows(
@@ -47,7 +46,6 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
                 s3Service.validateFile(category, genMultipartFile(extension));
     }
 
-    // TODO-TEST uploadFile_nullArguments
     @Test
     public void uploadFile_nullArguments() {
         assertThrows(
@@ -75,7 +73,6 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
                                 genMultipartFile(extension)));
     }
 
-    // TODO-TEST downloadFile_nullPath
     @Test
     public void downloadFile_nullPath() {
         assertThrows(
@@ -83,7 +80,6 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
                 () -> s3Service.downloadFile(null));
     }
 
-    // TODO-TEST downloadFile_notFound
     @Test
     public void downloadFile_notFound() {
         assertThrows(
@@ -100,7 +96,6 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
             }
     }
 
-    // TODO-TEST deleteFile_nullPath
     @Test
     public void deleteFile_nullPath() {
         assertThrows(
@@ -108,7 +103,6 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
                 () -> s3Service.deleteFile(null));
     }
 
-    // TODO-TEST deleteFile_notFound
     @Test
     public void deleteFile_notFound() {
         assertThrows(

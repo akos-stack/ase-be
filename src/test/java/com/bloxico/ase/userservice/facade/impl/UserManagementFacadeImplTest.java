@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.bloxico.ase.testutil.Util.genEmail;
 import static com.bloxico.ase.userservice.entity.user.Role.ADMIN;
 import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
@@ -21,7 +22,6 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
     @Autowired private UserServiceImpl userService;
     @Autowired private UserManagementFacadeImpl userManagementFacade;
 
-    // TODO-TEST searchUsers_nullArgs
     @Test
     public void searchUsers_nullArgs() {
         assertThrows(
@@ -29,14 +29,13 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
                 () -> userManagementFacade.searchUsers(null, null, 0, 0, null).getUsers().size());
     }
 
-    // TODO-TEST searchUsers_notFound
     @Test
     public void searchUsers_notFound() {
         var u1 = utilUser.savedUserDto();
         var u2 = utilUser.savedUserDto();
         var u3 = utilUser.savedUserDto();
         assertThat(
-                userManagementFacade.searchUsers("test", null, 0, MAX_VALUE, "name").getUsers(),
+                userManagementFacade.searchUsers(u1.getEmail(), "admin", 0, MAX_VALUE, "name").getUsers(),
                 not(hasItems(u1, u2, u3)));
     }
 
@@ -52,22 +51,22 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void searchUsers_byRole() {
-        var u1 = utilUser.savedUserDto();
-        var u2 = utilUser.savedAdminDto();
-        var u3 = utilUser.savedAdminDto();
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var a1 = utilUser.savedAdminDtoWithEmail(genEmail("adminBarFoo"));
+        var a2 = utilUser.savedAdminDtoWithEmail(genEmail("adminFooBar"));
         assertThat(
-                userManagementFacade.searchUsers("", ADMIN, 0, MAX_VALUE, "name").getUsers(),
-                allOf(hasItems(u2, u3), not(hasItems(u1))));
+                userManagementFacade.searchUsers("", "admin", 0, MAX_VALUE, "name").getUsers(),
+                allOf(hasItems(a1, a2), not(hasItems(u1))));
     }
 
     @Test
     public void searchUsers_byRoleAndEmail() {
-        var u1 = utilUser.savedUserDto();
-        var u2 = utilUser.savedAdminDto();
-        var u3 = utilUser.savedAdminDto();
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var a1 = utilUser.savedAdminDtoWithEmail(genEmail("adminBarFoo"));
+        var a2 = utilUser.savedAdminDtoWithEmail(genEmail("adminFooBar"));
         assertThat(
-                userManagementFacade.searchUsers(u3.getEmail(), ADMIN, 0, MAX_VALUE, "name").getUsers(),
-                allOf(hasItems(u3), not(hasItems(u1, u2))));
+                userManagementFacade.searchUsers(a1.getEmail(), "admin", 0, MAX_VALUE, "name").getUsers(),
+                allOf(hasItems(a1), not(hasItems(u1, a2))));
     }
 
     @Test

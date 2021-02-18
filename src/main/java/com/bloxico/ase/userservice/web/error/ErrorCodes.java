@@ -144,4 +144,96 @@ public interface ErrorCodes {
 
     }
 
+    @Getter
+    enum Location implements ErrorCodes {
+
+        REGION_EXISTS(
+                HttpStatus.CONFLICT,
+                "30",
+                "Region already exists in the database."),
+
+        REGION_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "31",
+                "Region with specified name was not found."),
+
+        COUNTRY_EXISTS(
+                HttpStatus.CONFLICT,
+                "32",
+                "Country already exists in the database."),
+
+        COUNTRY_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "33",
+                "Country with specified name was not found.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        Location(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new LocationException(httpStatus, code, cause);
+        }
+
+    }
+
+    @Getter
+    enum Artworks implements ErrorCodes {
+
+        ARTWORK_METADATA_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "21",
+                "Artwork metadata not found."),
+
+        ARTWORK_METADATA_TYPE_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "22",
+                "Artwork metadata type not found.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        Artworks(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new ArtworkException(httpStatus, code, cause);
+        }
+
+    }
+
+    @Getter
+    enum Evaluation implements ErrorCodes {
+
+        COUNTRY_EVALUATION_DETAILS_EXISTS(
+                HttpStatus.CONFLICT,
+                "40",
+                "Evaluation details already exists for specified country.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        Evaluation(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new EvaluationException(httpStatus, code, cause);
+        }
+
+    }
+
 }

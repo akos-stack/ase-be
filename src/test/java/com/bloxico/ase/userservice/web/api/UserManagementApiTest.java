@@ -53,7 +53,28 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .body(ERROR_CODE, is(ErrorCodes.User.ROLE_NOT_FOUND.getCode()));
     }
 
-    // TODO-TEST searchUsers_nothingFound_200_ok
+    @Test
+    public void searchUsers_byRole_200_ok() {
+        var ad = utilUser.savedAdminDtoWithEmail(genEmail("adminFooBar"));
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar1"));
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar2"));
+        var users = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .param("email", "")
+                .param("role", "admin")
+                .when()
+                .get(API_URL + USER_SEARCH_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PagedUserDataResponse.class)
+                .getUsers();
+        assertThat(users, allOf(hasItems(ad), not(hasItems(u1, u2))));
+    }
+
     @Test
     public void searchUsers_nothingFound_200_ok() {
         var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
@@ -62,7 +83,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
         var users = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("email", "fooBar")
+                .param("email", "")
                 .param("role", "")
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
@@ -84,7 +105,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
         var users = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("email", "fooBar")
+                .param("email", u1.getEmail())
                 .param("role", "")
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
@@ -95,33 +116,9 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .body()
                 .as(PagedUserDataResponse.class)
                 .getUsers();
-        assertThat(users, allOf(hasItems(u1, u2), not(hasItems(u3))));
+        assertThat(users, allOf(hasItems(u1), not(hasItems(u2, u3))));
     }
 
-    // TODO-TEST searchUsers_byRole_200_ok
-    @Test
-    public void searchUsers_byRole_200_ok() {
-        var ad = utilUser.savedAdminDtoWithEmail(genEmail("adminFooBar"));
-        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar1"));
-        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar2"));
-        var users = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
-                .contentType(JSON)
-                .param("email", "")
-                .param("role", "user")
-                .when()
-                .get(API_URL + USER_SEARCH_ENDPOINT)
-                .then()
-                .assertThat()
-                .statusCode(200)
-                .extract()
-                .body()
-                .as(PagedUserDataResponse.class)
-                .getUsers();
-        assertThat(users, allOf(hasItems(u1, u2), not(hasItems(ad))));
-    }
-
-    // TODO-TEST searchUsers_byEmailAndRole_200_ok
     @Test
     public void searchUsers_byEmailAndRole_200_ok() {
         var admin = utilUser.savedAdminDtoWithEmail(genEmail("adFooBar"));
@@ -130,7 +127,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
         var users = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("email", "adFooBar")
+                .param("email", admin.getEmail())
                 .param("role", "admin")
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)

@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.userservice.exception.LocationException;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
@@ -17,8 +18,6 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.orm.jpa.JpaSystemException;
 
 import static com.bloxico.ase.testutil.Util.*;
-import static com.bloxico.ase.testutil.UtilUserProfile.newSubmitArtOwnerRequest;
-import static com.bloxico.ase.testutil.UtilUserProfile.newSubmitUninvitedEvaluatorRequest;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
@@ -26,6 +25,7 @@ import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.entity.user.Role.USER;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.SupportedFileExtension.pdf;
+import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,6 +35,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilUser utilUser;
     @Autowired private UtilToken utilToken;
+    @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private TokenRepository tokenRepository;
     @Autowired private UserServiceImpl userService;
     @Autowired private PendingEvaluatorServiceImpl pendingEvaluatorService;
@@ -358,7 +359,15 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitEvaluator_evaluatorNotPending() {
-        var request = newSubmitUninvitedEvaluatorRequest();
+        var request = utilUserProfile.newSubmitUninvitedEvaluatorRequest();
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.submitEvaluator(request));
+    }
+
+    @Test
+    public void submitEvaluator_countryNotFound() {
+        var request = utilUserProfile.newSubmitUninvitedEvaluatorRequestCountryNotFound();
         assertThrows(
                 TokenException.class,
                 () -> userRegistrationFacade.submitEvaluator(request));
@@ -367,7 +376,6 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Test
     public void submitEvaluator_evaluatorPending() {
         var request = utilToken.submitInvitedEvaluatorRequest();
-        assertTrue(evaluatorRepository.findAll().isEmpty());
         var evaluatorId = userRegistrationFacade.submitEvaluator(request).getId();
         assertTrue(evaluatorRepository.findById(evaluatorId).isPresent());
     }
@@ -380,8 +388,16 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    public void submitArtOwner_countryNotFound() {
+        var request = utilUserProfile.newSubmitArtOwnerRequestCountryNotFound();
+        assertThrows(
+                LocationException.class,
+                () -> userRegistrationFacade.submitArtOwner(request));
+    }
+
+    @Test
     public void submitArtOwner_userAlreadyExists() {
-        var request = newSubmitArtOwnerRequest();
+        var request = utilUserProfile.newSubmitArtOwnerRequest();
         userRegistrationFacade.submitArtOwner(request);
         assertThrows(
                 UserException.class,
@@ -390,7 +406,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtOwner() {
-        var request = newSubmitArtOwnerRequest();
+        var request = utilUserProfile.newSubmitArtOwnerRequest();
         assertTrue(artOwnerRepository.findAll().isEmpty());
         var artOwnerId = userRegistrationFacade.submitArtOwner(request).getId();
         assertTrue(artOwnerRepository.findById(artOwnerId).isPresent());
@@ -450,7 +466,6 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertSame(REQUESTED, newlyCreatedPendingEvaluator.getStatus());
     }
 
-    // TODO-TEST searchPendingEvaluators_nullEmail
     @Test
     public void searchPendingEvaluators_nullEmail() {
         assertThrows(
@@ -459,7 +474,6 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
                         .searchPendingEvaluators(null, 0, 2, "email"));
     }
 
-    // TODO-TEST searchPendingEvaluators_emptyResultSet
     @Test
     public void searchPendingEvaluators_emptyResultSet() {
         var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
@@ -479,7 +493,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
         assertThat(
                 userRegistrationFacade
-                        .searchPendingEvaluators("fooBar", 0, 2, "email")
+                        .searchPendingEvaluators("fooBar", 0, MAX_VALUE, "email")
                         .getPendingEvaluators(),
                 allOf(
                         hasItems(pe1, pe2),
