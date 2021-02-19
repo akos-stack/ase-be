@@ -38,6 +38,12 @@ public class LocationController implements LocationApi {
     }
 
     @Override
+    public ResponseEntity<SearchCountriesResponse> findAllCountries() {
+        var response = locationFacade.findAllCountries();
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
     public ResponseEntity<SaveCountryResponse> saveCountry(SaveCountryRequest request, Principal principal) {
         var id = extractId(principal);
         var response = locationFacade.saveCountry(request, id);

@@ -102,6 +102,18 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
+    public List<CountryDto> findAllCountries() {
+        log.debug("LocationServiceImpl.findAllCountries - start");
+        var countries = countryRepository
+                .findAll()
+                .stream()
+                .map(MAPPER::toDto)
+                .collect(toList());
+        log.debug("LocationServiceImpl.findAllCountries - end");
+        return countries;
+    }
+
+    @Override
     public CountryDto saveCountry(CountryDto dto, long principalId) {
         log.debug("LocationServiceImpl.saveCountry - start | dto: {}, principalId: {}", dto, principalId);
         requireNonNull(dto);

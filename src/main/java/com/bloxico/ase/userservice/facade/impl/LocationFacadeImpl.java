@@ -53,6 +53,15 @@ public class LocationFacadeImpl implements ILocationFacade {
     }
 
     @Override
+    public SearchCountriesResponse findAllCountries() {
+        log.debug("LocationFacadeImpl.findAllCountries - start");
+        var countries = locationService.findAllCountries();
+        var response = new SearchCountriesResponse(countries);
+        log.debug("LocationFacadeImpl.findAllCountries - end");
+        return response;
+    }
+
+    @Override
     public SaveCountryResponse saveCountry(SaveCountryRequest request, long principalId) {
         log.debug("LocationFacadeImpl.saveCountry - start | request: {}, principalId: {}", request, principalId);
         var countryDto = MAPPER.toCountryDto(request);

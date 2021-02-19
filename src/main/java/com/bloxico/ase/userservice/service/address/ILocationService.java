@@ -18,6 +18,8 @@ public interface ILocationService {
 
     RegionDto deleteRegion(RegionDto regionDto);
 
+    List<CountryDto> findAllCountries();
+
     CountryDto saveCountry(CountryDto countryDto, long principalId);
 
     CountryDto updateCountry(CountryDto countryDto, long principalId);
