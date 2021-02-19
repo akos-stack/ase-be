@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.web.model.address.*;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,10 +15,20 @@ import java.security.Principal;
 @Api(value = "location")
 public interface LocationApi {
 
+    String REGIONS          =     "/regions";
     String REGION_SAVE      =     "/region/save";
     String REGION_DELETE    =     "/region/delete/{id}";
     String COUNTRY_SAVE     =     "/country/save";
     String COUNTRY_UPDATE   =     "/country/update/{id}";
+
+    @GetMapping(
+            value = REGIONS,
+            produces = "application/json")
+    @ApiOperation(value = "Fetches all regions from the database.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Regions successfully fetched.")
+    })
+    ResponseEntity<SearchRegionsResponse> findAllRegions();
 
     @PostMapping(
             value = REGION_SAVE,

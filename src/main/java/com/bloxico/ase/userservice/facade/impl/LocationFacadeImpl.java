@@ -25,6 +25,15 @@ public class LocationFacadeImpl implements ILocationFacade {
     }
 
     @Override
+    public SearchRegionsResponse findAllRegions() {
+        log.debug("LocationFacadeImpl.findAllRegions - start");
+        var regions = locationService.findAllRegions();
+        var response = new SearchRegionsResponse(regions);
+        log.debug("LocationFacadeImpl.findAllRegions - end");
+        return response;
+    }
+
+    @Override
     public SaveRegionResponse saveRegion(SaveRegionRequest request, long principalId) {
         log.debug("LocationFacadeImpl.saveRegion - start | request: {}, principalId: {}", request, principalId);
         var regionDto = MAPPER.toRegionDto(request);

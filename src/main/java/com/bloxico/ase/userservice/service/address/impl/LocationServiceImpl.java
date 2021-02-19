@@ -7,9 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.*;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
@@ -60,6 +63,18 @@ public class LocationServiceImpl implements ILocationService {
                 .orElseThrow(COUNTRY_NOT_FOUND::newException);
         log.debug("LocationServiceImpl.findCountryByName - end | country: {}", country);
         return countryDto;
+    }
+
+    @Override
+    public List<RegionDto> findAllRegions() {
+        log.debug("LocationServiceImpl.findAllRegions - start");
+        var regions = regionRepository
+                .findAll()
+                .stream()
+                .map(MAPPER::toDto)
+                .collect(toList());
+        log.debug("LocationServiceImpl.findAllRegions - end");
+        return regions;
     }
 
     @Override
