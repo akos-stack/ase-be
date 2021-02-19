@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
 import com.bloxico.ase.userservice.facade.ILocationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.web.model.address.*;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.REGION_DELETE_OPERATION_NOT_SUPPORTED;
 
 @Slf4j
 @Service
@@ -30,6 +32,15 @@ public class LocationFacadeImpl implements ILocationFacade {
         var response = new SaveRegionResponse(regionDto);
         log.debug("LocationFacadeImpl.saveRegion - end | request: {}, principalId: {}", request, principalId);
         return response;
+    }
+
+    @Override
+    public void deleteRegion(int regionId) {
+        log.debug("LocationFacadeImpl.deleteRegion - start | regionId: {}", regionId);
+        var regionDto = locationService.findRegionById(regionId);
+        requireRegionHasNoCountries(regionDto);
+        locationService.deleteRegion(regionDto);
+        log.debug("LocationFacadeImpl.deleteRegion - end | regionId: {}", regionId);
     }
 
     @Override
@@ -55,6 +66,11 @@ public class LocationFacadeImpl implements ILocationFacade {
         log.debug("LocationFacadeImpl.updateCountry - end | request: {}, countryId: {}, principalId: {}",
                 request, countryId, principalId);
         return response;
+    }
+
+    private void requireRegionHasNoCountries(RegionDto dto) {
+        var countriesInRegion = locationService.countCountriesByRegionId(dto.getId());
+        if (countriesInRegion > 0) throw REGION_DELETE_OPERATION_NOT_SUPPORTED.newException();
     }
 
 }

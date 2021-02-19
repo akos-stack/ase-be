@@ -10,4 +10,6 @@ public interface ILocationFacade {
 
     UpdateCountryResponse updateCountry(UpdateCountryRequest request, int countryId, long principalId);
 
+    void deleteRegion(int regionId);
+
 }

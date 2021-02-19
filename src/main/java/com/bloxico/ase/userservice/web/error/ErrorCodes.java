@@ -157,14 +157,19 @@ public interface ErrorCodes {
                 "31",
                 "Region with specified name was not found."),
 
+        REGION_DELETE_OPERATION_NOT_SUPPORTED(
+                HttpStatus.BAD_REQUEST,
+                "32",
+                "One or more countries are tied down to the region. Region cannot be deleted."),
+
         COUNTRY_EXISTS(
                 HttpStatus.CONFLICT,
-                "32",
+                "33",
                 "Country already exists in the database."),
 
         COUNTRY_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "33",
+                "34",
                 "Country with specified name was not found.");
 
         private final HttpStatus httpStatus;

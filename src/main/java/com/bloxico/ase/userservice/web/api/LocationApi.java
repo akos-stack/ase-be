@@ -14,9 +14,10 @@ import java.security.Principal;
 @Api(value = "location")
 public interface LocationApi {
 
-    String REGION_SAVE  =       "/region/save";
-    String COUNTRY_SAVE =       "/country/save";
-    String COUNTRY_UPDATE =     "/country/update/{id}";
+    String REGION_SAVE      =     "/region/save";
+    String REGION_DELETE    =     "/region/delete/{id}";
+    String COUNTRY_SAVE     =     "/country/save";
+    String COUNTRY_UPDATE   =     "/country/update/{id}";
 
     @PostMapping(
             value = REGION_SAVE,
@@ -29,6 +30,16 @@ public interface LocationApi {
             @ApiResponse(code = 409, message = "Region already exists.")
     })
     ResponseEntity<SaveRegionResponse> saveRegion(@Valid @RequestBody SaveRegionRequest request, Principal principal);
+
+    @PostMapping(value = REGION_DELETE)
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'manage_region')")
+    @ApiOperation(value = "Deletes region in the database.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Region successfully deleted."),
+            @ApiResponse(code = 404, message = "Specified region doesn't exist."),
+            @ApiResponse(code = 400, message = "Region has one or more countries tied down to it.")
+    })
+    ResponseEntity<UpdateCountryResponse> deleteRegion(@Valid @PathVariable("id") Integer regionId);
 
     @PostMapping(
             value = COUNTRY_SAVE,

@@ -30,6 +30,17 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
+    public RegionDto findRegionById(int id) {
+        log.debug("LocationServiceImpl.findRegionById - start | id: {}", id);
+        var regionDto = regionRepository
+                .findById(id)
+                .map(MAPPER::toDto)
+                .orElseThrow(REGION_NOT_FOUND::newException);
+        log.debug("LocationServiceImpl.findRegionById - end | id: {}", id);
+        return regionDto;
+    }
+
+    @Override
     public RegionDto findRegionByName(String region) {
         log.debug("LocationServiceImpl.findRegionByName - start | region: {}", region);
         var regionDto = regionRepository
@@ -61,6 +72,17 @@ public class LocationServiceImpl implements ILocationService {
         region = regionRepository.saveAndFlush(region);
         var regionDto = MAPPER.toDto(region);
         log.debug("LocationServiceImpl.saveRegion - end | dto: {}, principalId: {}", dto, principalId);
+        return regionDto;
+    }
+
+    @Override
+    public RegionDto deleteRegion(RegionDto dto) {
+        log.debug("LocationServiceImpl.deleteRegion - start | dto: {}", dto);
+        requireNonNull(dto);
+        var region = MAPPER.toEntity(dto);
+        regionRepository.delete(region);
+        var regionDto = MAPPER.toDto(region);
+        log.debug("LocationServiceImpl.deleteRegion - end | dto: {}", dto);
         return regionDto;
     }
 
@@ -106,6 +128,14 @@ public class LocationServiceImpl implements ILocationService {
         var locationDto = MAPPER.toDto(location);
         log.debug("LocationServiceImpl.saveLocation - end | dto: {}, principalId: {}", dto, principalId);
         return locationDto;
+    }
+
+    @Override
+    public int countCountriesByRegionId(int regionId) {
+        log.debug("LocationServiceImpl.countCountriesByRegionId - start | regionId: {}", regionId);
+        var count = countryRepository.countByRegionId(regionId);
+        log.debug("LocationServiceImpl.countCountriesByRegionId - end | regionId: {}", regionId);
+        return count;
     }
 
     private void requireNotExists(RegionDto dto) {
