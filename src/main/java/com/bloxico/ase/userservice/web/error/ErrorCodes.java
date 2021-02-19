@@ -275,7 +275,7 @@ public interface ErrorCodes {
 
         @Override
         public AseRuntimeException newException(Throwable cause) {
-            return new ArtworkException(httpStatus, code, cause);
+            return new DocumentException(httpStatus, code, cause);
         }
 
     }
