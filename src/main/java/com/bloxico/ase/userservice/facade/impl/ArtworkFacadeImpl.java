@@ -82,9 +82,9 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         artworkDto.addMediums(doSaveMediums(request, principalId));
         artworkDto.addStyles(doSaveStyles(request, principalId));
         artworkDto.setHistory(doPrepareArtworkHistory(request));
+        artworkDto.addDocuments(Collections.singletonList(doSaveDocument(request, principalId)));
         artworkDto.addDocuments(doSaveImages(request, principalId));
         artworkDto.addDocuments(Collections.singletonList(doSavePrincipalImage(request, principalId)));
-        artworkDto.addDocuments(Collections.singletonList(doSaveDocument(request, principalId)));
         return artworkDto;
     }
 

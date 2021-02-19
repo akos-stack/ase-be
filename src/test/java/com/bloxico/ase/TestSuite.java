@@ -61,6 +61,7 @@ import org.junit.runners.Suite;
         UserManagementFacadeImplTest.class,
         ArtworkMetadataFacadeImplTest.class,
         EvaluationFacadeImplTest.class,
+        ArtworkFacadeImplTest.class,
 
         // filter
         JwtAuthorizationFilterTest.class,
