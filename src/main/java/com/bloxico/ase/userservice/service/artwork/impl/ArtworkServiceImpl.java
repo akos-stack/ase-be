@@ -24,7 +24,7 @@ public class ArtworkServiceImpl implements IArtworkService {
     }
 
     @Override
-    public ArtworkDto submitArtwork(ArtworkDto artworkDto, long principalId) {
+    public ArtworkDto saveArtwork(ArtworkDto artworkDto, long principalId) {
         log.info("ArtworkServiceImpl.submitArtwork - start | artworkDto: {}, principalId: {} ", artworkDto, principalId);
         requireNonNull(artworkDto);
         var artwork = artworkRepository.saveAndFlush(MAPPER.toEntity(artworkDto));

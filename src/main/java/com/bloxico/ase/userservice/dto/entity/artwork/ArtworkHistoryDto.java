@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 public class ArtworkHistoryDto {
 
-    @JsonProperty("artwork_id")
-    private Long artworkId;
+    @JsonProperty("id")
+    private Long id;
 
     @JsonProperty("appraisal_history")
     private String appraisalHistory;

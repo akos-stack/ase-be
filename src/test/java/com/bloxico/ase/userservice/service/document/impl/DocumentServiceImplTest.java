@@ -50,7 +50,7 @@ public class DocumentServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void getDocument() {
-        var documentDto = utilDocument.savedCVDocumentDto();
+        var documentDto = utilDocument.savedDocumentDto(FileCategory.CV);
         assertNotNull(documentService.getDocumentById(documentDto.getId()));
     }
 }

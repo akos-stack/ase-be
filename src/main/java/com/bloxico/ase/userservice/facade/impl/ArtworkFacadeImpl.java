@@ -64,7 +64,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     public SaveArtworkResponse submitArtwork(SaveArtworkRequest request, long principalId) {
         log.info("ArtworkFacadeImpl.submitArtwork - start | request: {}, principalId: {} ", request, principalId);
         var artworkDto = doPrepareArtworkDto(request, principalId);
-        artworkDto = artworkService.submitArtwork(artworkDto, principalId);
+        artworkDto = artworkService.saveArtwork(artworkDto, principalId);
         log.info("ArtworkFacadeImpl.submitArtwork - end | request: {}, principalId: {} ", request, principalId);
         return new SaveArtworkResponse(artworkDto.getGroup());
     }

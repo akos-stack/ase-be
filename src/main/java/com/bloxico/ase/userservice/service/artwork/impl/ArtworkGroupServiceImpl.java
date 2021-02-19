@@ -52,6 +52,7 @@ public class ArtworkGroupServiceImpl implements IArtworkGroupService {
     @Override
     public ArtworkGroupDto saveGroup(ArtworkGroupDto dto, long principalId) {
         log.info("ArtworkGroupServiceImpl.saveGroup - start | principalId: {} ", principalId);
+        requireNonNull(dto);
         var artworkGroup = MAPPER.toEntity(dto);
         artworkGroup.setCreatorId(principalId);
         log.info("ArtworkGroupServiceImpl.saveGroup - end | principalId: {} ", principalId);

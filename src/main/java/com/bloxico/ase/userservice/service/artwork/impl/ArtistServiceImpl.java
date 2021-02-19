@@ -11,11 +11,11 @@ import static java.util.Objects.requireNonNull;
 
 @Slf4j
 @Service
-public class ArtistService implements IArtistService {
+public class ArtistServiceImpl implements IArtistService {
 
     private final ArtistRepository artistRepository;
 
-    public ArtistService(ArtistRepository artistRepository) {
+    public ArtistServiceImpl(ArtistRepository artistRepository) {
         this.artistRepository = artistRepository;
     }
 
