@@ -48,7 +48,22 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         }
     }
 
-    // TODO-test updateArtworkMetadata_404_notFound
+    @Test
+    public void updateArtworkMetadata_404_notFound() {
+        for (var type : Type.values()) {
+            var status = randEnumConst(Status.class);
+            var newStatus = randOtherEnumConst(status);
+            given()
+                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .contentType(JSON)
+                    .body(new UpdateArtworkMetadataRequest(genUUID(), newStatus, type))
+                    .when()
+                    .post(API_URL + ARTWORK_METADATA_UPDATE)
+                    .then()
+                    .assertThat()
+                    .statusCode(404);
+        }
+    }
 
     @Test
     public void updateArtworkMetadata_200_ok() {
@@ -73,7 +88,22 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         }
     }
 
-    // TODO-test deleteArtworkMetadata_404_notFound
+    @Test
+    public void deleteArtworkMetadata_404_notFound() {
+        for (var type : Type.values()) {
+            var status = randEnumConst(Status.class);
+            given()
+                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .contentType(JSON)
+                    .param("name", genUUID())
+                    .param("type", type.name())
+                    .when()
+                    .delete(API_URL + ARTWORK_METADATA_DELETE)
+                    .then()
+                    .assertThat()
+                    .statusCode(404);
+        }
+    }
 
     @Test
     public void deleteArtworkMetadata_200_ok() {

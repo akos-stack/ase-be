@@ -53,7 +53,27 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .body(ERROR_CODE, is(ErrorCodes.User.ROLE_NOT_FOUND.getCode()));
     }
 
-    // TODO-TEST searchUsers_nothingFound_200_ok
+    @Test
+    public void searchUsers_nothingFound_200_ok() {
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var u3 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var users = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .param("email", "")
+                .param("role", "admin")
+                .when()
+                .get(API_URL + USER_SEARCH_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PagedUserDataResponse.class)
+                .getUsers();
+        assertThat(users, not(hasItems(u1, u2, u3)));
+    }
 
     @Test
     public void searchUsers_byEmail_200_ok() {
@@ -77,9 +97,50 @@ public class UserManagementApiTest extends AbstractSpringTest {
         assertThat(users, allOf(hasItems(u1, u2), not(hasItems(u3))));
     }
 
-    // TODO-TEST searchUsers_byRole_200_ok
+    //TODO FIX
+    @Test
+    public void searchUsers_byRole_200_ok() {
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var a1 = utilUser.savedAdminDtoWithEmail(genEmail("adminBarFoo"));
+        var a2 = utilUser.savedAdminDtoWithEmail(genEmail("adminFooBar"));
+        var users = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .param("email", "")
+                .param("role", "admin")
+                .when()
+                .get(API_URL + USER_SEARCH_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PagedUserDataResponse.class)
+                .getUsers();
+        assertThat(users, allOf(hasItems(a1, a2), not(hasItems(u1))));
+    }
 
-    // TODO-TEST searchUsers_byEmailAndRole_200_ok
+    @Test
+    public void searchUsers_byEmailAndRole_200_ok() {
+        var admin = utilUser.savedAdminDtoWithEmail(genEmail("adFooBar"));
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var users = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .param("email", admin.getEmail())
+                .param("role", "admin")
+                .when()
+                .get(API_URL + USER_SEARCH_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PagedUserDataResponse.class)
+                .getUsers();
+        assertThat(users, allOf(hasItems(admin), not(hasItems(u1, u2))));
+    }
 
     @Test
     public void disableUser_404_userNotFound() {

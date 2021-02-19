@@ -77,6 +77,14 @@ public class UtilUser {
         return userRepository.saveAndFlush(user);
     }
 
+    public UserDto savedAdminDtoWithEmail(String email) {
+        return MAPPER.toDto(savedAdminWithEmail(email));
+    }
+
+    public User savedAdminWithEmail(String email) {
+        return savedAdmin(email, genPassword());
+    }
+
     public UserDto savedUserDto() {
         return MAPPER.toDto(savedUser());
     }

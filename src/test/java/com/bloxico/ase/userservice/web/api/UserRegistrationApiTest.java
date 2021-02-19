@@ -404,9 +404,40 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
     }
 
-    // TODO-test submitEvaluator_404_countryNotFound
+    @Test
+    public void submitEvaluator_404_countryNotFound() {
+        given()
+                .contentType(JSON)
+                .body(mockUtil.newSubmitUninvitedEvaluatorRequestCountryNotFound())
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Location.COUNTRY_NOT_FOUND.getCode()));
+    }
 
-    // TODO-test submitEvaluator_409_userAlreadyExists
+    //TODO FIX
+    @Test
+    public void submitEvaluator_409_userAlreadyExists() {
+        var request = mockUtil.submitInvitedEvaluatorRequest();
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(409);
+    }
 
     @Test
     public void submitEvaluator_200_ok() {
@@ -433,7 +464,18 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
         assertEquals(evaluator.getUserProfile().getLocation().getAddress(), request.getAddress());
     }
 
-    // TODO-test submitArtOwner_404_countryNotFound
+    @Test
+    public void submitArtOwner_404_countryNotFound() {
+        var request = utilUserProfile.newSubmitArtOwnerRequestCountryNotFound();
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(404);
+    }
 
     @Test
     public void submitArtOwner_409_userAlreadyExists() {

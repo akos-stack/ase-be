@@ -68,6 +68,10 @@ public class Util {
         }
     }
 
+    public static Long genUUIDLong() {
+        return UUID.randomUUID().getLeastSignificantBits();
+    }
+
     public static <T> T randElt(Collection<? extends T> coll) {
         return List.copyOf(coll).get(current().nextInt(0, coll.size()));
     }

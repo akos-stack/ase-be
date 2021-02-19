@@ -166,4 +166,19 @@ public class UtilToken {
                 genUUID(), ONE, TEN);
     }
 
+    public SubmitEvaluatorRequest newSubmitUninvitedEvaluatorRequestCountryNotFound() {
+        var email = genEmail();
+        var password = genPassword();
+        var principalId = utilUser.savedAdmin().getId();
+        userRegistrationFacade.sendEvaluatorInvitation(new EvaluatorInvitationRequest(email), principalId);
+        var token = pendingEvaluatorRepository.findByEmailIgnoreCase(email).orElseThrow().getToken();
+        var country = genUUID();
+        return new SubmitEvaluatorRequest(
+                token, genUUID(), password,
+                email, genUUID(), genUUID(),
+                genUUID(), LocalDate.now(),
+                genUUID(), country,
+                genUUID(), ONE, TEN);
+    }
+
 }

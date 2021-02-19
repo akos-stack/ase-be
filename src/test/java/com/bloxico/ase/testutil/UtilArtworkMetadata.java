@@ -84,4 +84,14 @@ public class UtilArtworkMetadata {
                 .collect(toList());
     }
 
+    public ArtworkMetadataDto findArtworkMetadataDtoByStatus(Type type, Status status) {
+        var metadata = getRepository(type)
+                .findAll()
+                .stream()
+                .map(MAPPER::toDto)
+                .filter(m -> m.getStatus().equals(status))
+                .collect(toList());
+        assertTrue(metadata.size() < 2);
+        return metadata.isEmpty() ? null : metadata.get(0);
+    }
 }

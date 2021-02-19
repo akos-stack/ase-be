@@ -13,6 +13,7 @@ import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImp
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthClientDetailsServiceImplTest;
 import com.bloxico.ase.userservice.service.token.impl.*;
 import com.bloxico.ase.userservice.service.user.impl.*;
+import com.bloxico.ase.userservice.util.AWSUtilTest;
 import com.bloxico.ase.userservice.web.api.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -53,6 +54,7 @@ import org.junit.runners.Suite;
         UserManagementFacadeImplTest.class,
         ArtworkMetadataFacadeImplTest.class,
         EvaluationFacadeImplTest.class,
+        AWSUtilTest.class,
 
         // filter
         JwtAuthorizationFilterTest.class,

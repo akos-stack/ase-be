@@ -5,10 +5,13 @@ import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorRegistrationRequest;
+import javassist.NotFoundException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.mapping.PropertyReferenceException;
+
+import java.nio.charset.StandardCharsets;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
@@ -360,11 +363,28 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
                         not(hasItems(p3))));
     }
 
-    // TODO-TEST getEvaluatorResume_nullEmail
+    @Test
+    public void getEvaluatorResume_nullEmail() {
+        var user = utilUser.savedUser();
+        assertThrows(
+                NullPointerException.class,
+                () -> service.getEvaluatorResume(null, user.getId()));
+    }
 
-    // TODO-TEST getEvaluatorResume_tokenNotFound
+    @Test
+    public void getEvaluatorResume_tokenNotFound() {
+        var user = utilUser.savedUser();
+        assertThrows(
+                TokenException.class,
+                () -> service.getEvaluatorResume(genUUID(), user.getId()));
+    }
 
-    // TODO-TEST getEvaluatorResume_resumeNotFound
+    @Test
+    public void getEvaluatorResume_resumeNotFound() {
+        assertThrows(
+                TokenException.class,
+                () -> service.getEvaluatorResume(genEmail(), genUUIDLong()));
+    }
 
     @Test
     public void getEvaluatorResume() {

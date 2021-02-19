@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.userservice.exception.LocationException;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
@@ -12,6 +13,7 @@ import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import com.bloxico.ase.userservice.web.model.token.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
@@ -361,7 +363,13 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
                 () -> userRegistrationFacade.submitEvaluator(request));
     }
 
-    // TODO-test submitEvaluator_countryNotFound
+    @Test
+    public void submitEvaluator_countryNotFound() {
+        var request = utilUserProfile.newSubmitUninvitedEvaluatorRequestCountryNotFound();
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.submitEvaluator(request));
+    }
 
     @Test
     public void submitEvaluator_evaluatorPending() {
@@ -377,7 +385,13 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
                 () -> userRegistrationFacade.submitArtOwner(null));
     }
 
-    // TODO-test submitArtOwner_countryNotFound
+    @Test
+    public void submitArtOwner_countryNotFound() {
+        var request = utilUserProfile.newSubmitArtOwnerRequestCountryNotFound();
+        assertThrows(
+                LocationException.class,
+                () -> userRegistrationFacade.submitArtOwner(request));
+    }
 
     @Test
     public void submitArtOwner_userAlreadyExists() {
@@ -450,9 +464,25 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertSame(REQUESTED, newlyCreatedPendingEvaluator.getStatus());
     }
 
-    // TODO-TEST searchPendingEvaluators_nullEmail
+    @Test
+    public void searchPendingEvaluators_nullEmail() {
+        assertThrows(
+                InvalidDataAccessApiUsageException.class,
+                () -> userRegistrationFacade
+                        .searchPendingEvaluators(null, 0, 2, "email"));
+    }
 
-    // TODO-TEST searchPendingEvaluators_emptyResultSet
+    @Test
+    public void searchPendingEvaluators_emptyResultSet() {
+        var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        assertThat(
+                userRegistrationFacade
+                        .searchPendingEvaluators("barFoo", 0, 2, "email")
+                        .getPendingEvaluators(),
+                not(hasItems(pe1, pe2, pe3)));
+    }
 
     @Test
     public void searchPendingEvaluators() {
