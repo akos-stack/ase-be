@@ -4,6 +4,8 @@ import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.web.api.EvaluationApi;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsResponse;
+import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +26,15 @@ public class EvaluationController implements EvaluationApi {
     {
         var id = extractId(principal);
         var response = evaluationFacade.saveCountryEvaluationDetails(request, id);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<UpdateCountryEvaluationDetailsResponse> updateCountryEvaluationDetails(
+            UpdateCountryEvaluationDetailsRequest request, Integer evaluationDetailsId, Principal principal) {
+        var id = extractId(principal);
+        var response= evaluationFacade
+                .updateCountryEvaluationDetails(request, evaluationDetailsId, id);
         return ResponseEntity.ok(response);
     }
 

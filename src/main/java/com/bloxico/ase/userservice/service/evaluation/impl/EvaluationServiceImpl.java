@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.COUNTRY_EVALUATION_DETAILS_EXISTS;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.COUNTRY_EVALUATION_DETAILS_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -31,6 +32,21 @@ public class EvaluationServiceImpl implements IEvaluationService {
         details.setCreatorId(principalId);
         var detailsDto = MAPPER.toDto(countryEvaluationDetailsRepository.saveAndFlush(details));
         log.debug("EvaluationServiceImpl.saveCountryEvaluationDetails - end | dto: {}, principalId: {}", dto, principalId);
+        return detailsDto;
+    }
+
+    @Override
+    public CountryEvaluationDetailsDto updateCountryEvaluationDetails(CountryEvaluationDetailsDto dto, long principalId) {
+        log.debug("EvaluationServiceImpl.updateCountryEvaluationDetails - start | dto: {}, principalId: {}", dto, principalId);
+        requireNonNull(dto);
+        var details = countryEvaluationDetailsRepository
+                .findById(dto.getId())
+                .orElseThrow(COUNTRY_EVALUATION_DETAILS_NOT_FOUND::newException);
+        details.setUpdaterId(principalId);
+        details.setPricePerEvaluation(dto.getPricePerEvaluation());
+        details.setAvailabilityPercentage(dto.getAvailabilityPercentage());
+        var detailsDto = MAPPER.toDto(countryEvaluationDetailsRepository.saveAndFlush(details));
+        log.debug("EvaluationServiceImpl.updateCountryEvaluationDetails - end | dto: {}, principalId: {}", dto, principalId);
         return detailsDto;
     }
 

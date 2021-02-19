@@ -43,14 +43,13 @@ public class LocationServiceImpl implements ILocationService {
     @Override
     public CountryDto findCountryByName(String country) {
         log.debug("LocationServiceImpl.findCountryByName - start | country: {}", country);
-        var regionDto = countryRepository
+        var countryDto = countryRepository
                 .findByNameIgnoreCase(country)
                 .map(MAPPER::toDto)
                 .orElseThrow(COUNTRY_NOT_FOUND::newException);
         log.debug("LocationServiceImpl.findCountryByName - end | country: {}", country);
-        return regionDto;
+        return countryDto;
     }
-
 
     @Override
     public RegionDto saveRegion(RegionDto dto, long principalId) {
@@ -79,6 +78,25 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
+    public CountryDto updateCountry(CountryDto dto, long principalId) {
+        log.debug("LocationServiceImpl.updateCountry - start | dto: {}, principalId: {}", dto, principalId);
+        requireNonNull(dto);
+        var country = countryRepository
+                .findById(dto.getId())
+                .orElseThrow(COUNTRY_NOT_FOUND::newException);
+        country.setUpdaterId(principalId);
+        if (countryNameUpdateRequested(country.getName(), dto.getName())) {
+            requireNotExists(dto);
+            country.setName(dto.getName());
+        }
+        country.setRegion(MAPPER.toEntity(dto.getRegion()));
+        country = countryRepository.saveAndFlush(country);
+        var countryDto = MAPPER.toDto(country);
+        log.debug("LocationServiceImpl.updateCountry - end | dto: {}, principalId: {}", dto, principalId);
+        return countryDto;
+    }
+
+    @Override
     public LocationDto saveLocation(LocationDto dto, long principalId) {
         log.debug("LocationServiceImpl.saveLocation - start | dto: {}, principalId: {}", dto, principalId);
         requireNonNull(dto);
@@ -98,6 +116,10 @@ public class LocationServiceImpl implements ILocationService {
     private void requireNotExists(CountryDto dto) {
         if (countryRepository.findByNameIgnoreCase(dto.getName()).isPresent())
             throw COUNTRY_EXISTS.newException();
+    }
+
+    private boolean countryNameUpdateRequested(String name, String updatedName) {
+        return !name.equalsIgnoreCase(updatedName);
     }
 
 }

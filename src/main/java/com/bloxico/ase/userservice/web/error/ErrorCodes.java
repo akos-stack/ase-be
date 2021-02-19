@@ -218,7 +218,12 @@ public interface ErrorCodes {
         COUNTRY_EVALUATION_DETAILS_EXISTS(
                 HttpStatus.CONFLICT,
                 "40",
-                "Evaluation details already exists for specified country.");
+                "Evaluation details already exists for specified country."),
+
+        COUNTRY_EVALUATION_DETAILS_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "41",
+                "Specified evaluation details not found.");;
 
         private final HttpStatus httpStatus;
         private final String code, description;

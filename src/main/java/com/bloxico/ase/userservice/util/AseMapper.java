@@ -19,8 +19,10 @@ import com.bloxico.ase.userservice.entity.user.User;
 import com.bloxico.ase.userservice.entity.user.profile.*;
 import com.bloxico.ase.userservice.web.model.address.SaveCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
+import com.bloxico.ase.userservice.web.model.address.UpdateCountryRequest;
 import com.bloxico.ase.userservice.web.model.artwork.IArtworkMetadataRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import com.bloxico.ase.userservice.web.model.user.*;
@@ -117,6 +119,12 @@ public interface AseMapper {
     @Mapping(ignore = true, target = "region")
     CountryDto toCountryDto(SaveCountryRequest request);
 
+    @Mapping(target = "name", source = "country")
+    @Mapping(ignore = true, target = "region")
+    CountryDto toCountryDto(UpdateCountryRequest request);
+
     CountryEvaluationDetailsDto toCountryEvaluationDetailsDto(SaveCountryEvaluationDetailsRequest request);
+
+    CountryEvaluationDetailsDto toCountryEvaluationDetailsDto(UpdateCountryEvaluationDetailsRequest request);
 
 }

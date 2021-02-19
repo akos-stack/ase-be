@@ -43,4 +43,18 @@ public class LocationFacadeImpl implements ILocationFacade {
         return response;
     }
 
+    @Override
+    public UpdateCountryResponse updateCountry(UpdateCountryRequest request, int countryId, long principalId) {
+        log.debug("LocationFacadeImpl.updateCountry - start | request: {}, countryId: {}, principalId: {}",
+                request, countryId, principalId);
+        var countryDto = MAPPER.toCountryDto(request);
+        countryDto.setId(countryId);
+        countryDto.setRegion(locationService.findRegionByName(request.getRegion()));
+        countryDto = locationService.updateCountry(countryDto, principalId);
+        var response = new UpdateCountryResponse(countryDto);
+        log.debug("LocationFacadeImpl.updateCountry - end | request: {}, countryId: {}, principalId: {}",
+                request, countryId, principalId);
+        return response;
+    }
+
 }
