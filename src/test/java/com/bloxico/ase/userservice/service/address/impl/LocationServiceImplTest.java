@@ -12,8 +12,7 @@ import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LocationServiceImplTest extends AbstractSpringTest {
@@ -24,6 +23,14 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     @Autowired private CountryRepository countryRepository;
     @Autowired private RegionRepository regionRepository;
     @Autowired private LocationServiceImpl service;
+
+    @Test
+    public void findAllRegions() {
+        var r1 = utilLocation.savedRegionDto();
+        assertThat(service.findAllRegions(), hasItems(r1));
+        var r2 = utilLocation.savedRegionDto();
+        assertThat(service.findAllRegions(), hasItems(r1, r2));
+    }
 
     @Test
     public void saveRegion_nullRegion() {
@@ -51,6 +58,59 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         assertTrue(regionRepository.findByNameIgnoreCase(region.getName()).isEmpty());
         service.saveRegion(region, principalId);
         assertTrue(regionRepository.findByNameIgnoreCase(region.getName()).isPresent());
+    }
+
+    @Test
+    public void deleteRegion_nullRegion() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.deleteRegion(null)
+        );
+    }
+
+    @Test
+    public void deleteRegion() {
+        var regionDto = utilLocation.savedRegionDto();
+        service.deleteRegion(regionDto);
+        assertTrue(regionRepository.findById(regionDto.getId()).isEmpty());
+    }
+
+    @Test
+    public void findRegionById_regionNotFound() {
+        assertThrows(
+                LocationException.class,
+                () -> service.findRegionById(-1)
+        );
+    }
+
+    @Test
+    public void findRegionById() {
+        var regionDto = utilLocation.savedRegionDto();
+        var foundRegion = service.findRegionById(regionDto.getId());
+        assertEquals(foundRegion, regionDto);
+    }
+
+    @Test
+    public void findRegionByName_regionNotFound() {
+        assertThrows(
+                LocationException.class,
+                () -> service.findRegionByName(genUUID())
+        );
+    }
+
+    @Test
+    public void findRegionByName() {
+        var regionDto = utilLocation.savedRegionDto();
+        var foundRegion = service.findRegionByName(regionDto.getName());
+        assertEquals(foundRegion, regionDto);
+    }
+
+    @Test
+    public void countCountriesByRegion() {
+        var region = utilLocation.savedRegion();
+        assertEquals(0, service.countCountriesByRegionId(region.getId()));
+        var country = utilLocation.savedCountry();
+        assertEquals(1, service.countCountriesByRegionId(country.getRegion().getId()));
     }
 
     @Test

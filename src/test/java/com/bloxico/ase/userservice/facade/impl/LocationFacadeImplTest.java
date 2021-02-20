@@ -2,14 +2,15 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.LocationException;
+import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import com.bloxico.ase.userservice.web.model.address.SaveCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.bloxico.ase.testutil.Util.genUUID;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LocationFacadeImplTest extends AbstractSpringTest {
@@ -17,6 +18,15 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     @Autowired private UtilUser utilUser;
     @Autowired private UtilLocation utilLocation;
     @Autowired private LocationFacadeImpl facade;
+    @Autowired private RegionRepository regionRepository;
+
+    @Test
+    public void findAllRegions() {
+        var r1 = utilLocation.savedRegionDto();
+        assertThat(facade.findAllRegions().getRegions(), hasItems(r1));
+        var r2 = utilLocation.savedRegionDto();
+        assertThat(facade.findAllRegions().getRegions(), hasItems(r1, r2));
+    }
 
     @Test
     public void saveRegion_nullRequest() {
@@ -43,6 +53,30 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
         var region = facade.saveRegion(request, principalId).getRegion();
         assertNotNull(region.getId());
         assertEquals(request.getRegion(), region.getName());
+    }
+
+    @Test
+    public void deleteRegion_regionNotFound() {
+        assertThrows(
+                LocationException.class,
+                () -> facade.deleteRegion(-1)
+        );
+    }
+
+    @Test
+    public void deleteRegion_regionHasCountries() {
+        var country = utilLocation.savedCountry();
+        assertThrows(
+                LocationException.class,
+                () -> facade.deleteRegion(-country.getRegion().getId())
+        );
+    }
+
+    @Test
+    public void deleteRegion() {
+        var region = utilLocation.savedRegion();
+        facade.deleteRegion(region.getId());
+        assertTrue(regionRepository.findById(region.getId()).isEmpty());
     }
 
     @Test

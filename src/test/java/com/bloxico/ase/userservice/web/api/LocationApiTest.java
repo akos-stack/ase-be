@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import com.bloxico.ase.userservice.web.model.address.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,12 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.testutil.Util.ERROR_CODE;
 import static com.bloxico.ase.testutil.Util.genUUID;
-import static com.bloxico.ase.userservice.web.api.LocationApi.COUNTRY_SAVE;
-import static com.bloxico.ase.userservice.web.api.LocationApi.REGION_SAVE;
+import static com.bloxico.ase.userservice.web.api.LocationApi.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
@@ -24,6 +26,28 @@ public class LocationApiTest extends AbstractSpringTest {
 
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilLocation utilLocation;
+    @Autowired private RegionRepository regionRepository;
+
+    @Test
+    public void findAllRegions_200_ok() {
+        var r1 = utilLocation.savedRegionDto();
+        var r2 = utilLocation.savedRegionDto();
+        var r3 = utilLocation.savedRegionDto();
+
+        var regions = given()
+                .header("Authorization", utilAuth.doAuthentication())
+                .when()
+                .get(API_URL + REGIONS)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SearchRegionsResponse.class)
+                .getRegions();
+
+        assertThat(regions, hasItems(r1, r2, r3));
+    }
 
     @Test
     public void createRegion_409_regionAlreadyExists() {
@@ -68,6 +92,49 @@ public class LocationApiTest extends AbstractSpringTest {
                 .getRegion();
         assertNotNull(region.getId());
         assertEquals(regionName, region.getName());
+    }
+
+    @Test
+    public void deleteRegion_400_regionHasCountries() {
+        var country = utilLocation.savedCountry();
+        var regionThatHasCountry = country.getRegion();
+
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .when()
+                .pathParam("id", regionThatHasCountry.getId())
+                .post(API_URL + REGION_DELETE)
+                .then()
+                .assertThat()
+                .statusCode(400)
+                .body(ERROR_CODE, is(REGION_DELETE_OPERATION_NOT_SUPPORTED.getCode()));
+    }
+
+    @Test
+    public void deleteRegion_404_regionNotFound() {
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .when()
+                .pathParam("id", -1)
+                .post(API_URL + REGION_DELETE)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(REGION_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void deleteRegion_200_ok() {
+        var region = utilLocation.savedRegion();
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .when()
+                .pathParam("id", region.getId())
+                .post(API_URL + REGION_DELETE)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        assertTrue(regionRepository.findById(region.getId()).isEmpty());
     }
 
     @Test
