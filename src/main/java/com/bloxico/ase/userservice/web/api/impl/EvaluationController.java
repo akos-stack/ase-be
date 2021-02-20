@@ -2,10 +2,7 @@ package com.bloxico.ase.userservice.web.api.impl;
 
 import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.web.api.EvaluationApi;
-import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsResponse;
-import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsResponse;
+import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +16,13 @@ public class EvaluationController implements EvaluationApi {
 
     @Autowired
     private IEvaluationFacade evaluationFacade;
+
+    @Override
+    public ResponseEntity<PagedCountryEvaluationDetailsResponse> searchCountryEvaluationDetails(
+            SearchCountryEvaluationDetailsRequest request) {
+        var response = evaluationFacade.searchCountryEvaluationDetails(request);
+        return ResponseEntity.ok(response);
+    }
 
     @Override
     public ResponseEntity<SaveCountryEvaluationDetailsResponse> saveCountryEvaluationDetails(

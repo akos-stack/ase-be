@@ -55,7 +55,7 @@ public interface LocationApi {
 
     @GetMapping(
             value = COUNTRIES,
-            produces = "application/json")
+            produces = { "application/json" })
     @ApiOperation(value = "Fetches all countries from the database.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Countries successfully fetched.")

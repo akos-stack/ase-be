@@ -13,12 +13,12 @@ public class CountryEvaluationDetailsCountedProj {
     String region;
 
     @JsonProperty("price_per_evaluation")
-    int pricePerEvaluation;
+    Integer pricePerEvaluation;
 
     @JsonProperty("availability_percentage")
-    int availabilityPercentage;
+    Integer availabilityPercentage;
 
     @JsonProperty("total_of_evaluators")
-    long totalOfEvaluators;
+    Long totalOfEvaluators;
 
 }

@@ -1,12 +1,10 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsResponse;
-import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsResponse;
+import com.bloxico.ase.userservice.web.model.evaluation.*;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,8 +15,19 @@ import java.security.Principal;
 @Api(value = "evaluation")
 public interface EvaluationApi {
 
-    String EVALUATION_COUNTRY_DETAILS_SAVE = "/evaluation/country-details/save";
-    String EVALUATION_COUNTRY_DETAILS_UPDATE = "/evaluation/country-details/update/{id}";
+    String EVALUATION_COUNTRY_DETAILS           =   "/evaluation/country-details";
+    String EVALUATION_COUNTRY_DETAILS_SAVE      =   "/evaluation/country-details/save";
+    String EVALUATION_COUNTRY_DETAILS_UPDATE    =   "/evaluation/country-details/update/{id}";
+
+    @GetMapping(
+            value = EVALUATION_COUNTRY_DETAILS,
+            produces = {"application/json"})
+    @ApiOperation(value = "Search countries with evaluation details.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Paginated list of countries with evaluation details successfully retrieved.")
+    })
+    ResponseEntity<PagedCountryEvaluationDetailsResponse> searchCountryEvaluationDetails(
+            @Valid SearchCountryEvaluationDetailsRequest request);
 
     @PostMapping(
             value = EVALUATION_COUNTRY_DETAILS_SAVE,

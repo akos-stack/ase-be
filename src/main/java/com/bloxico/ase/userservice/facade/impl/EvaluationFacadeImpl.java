@@ -3,10 +3,7 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
-import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsResponse;
-import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsResponse;
+import com.bloxico.ase.userservice.web.model.evaluation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +24,16 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
                                 IEvaluationService evaluationService) {
         this.locationService = locationService;
         this.evaluationService = evaluationService;
+    }
+
+    @Override
+    public PagedCountryEvaluationDetailsResponse searchCountryEvaluationDetails(SearchCountryEvaluationDetailsRequest request) {
+        log.debug("EvaluationFacadeImpl.searchCountryEvaluationDetails - start | request: {}", request);
+        var page = evaluationService.findAll(request);
+        var response = new PagedCountryEvaluationDetailsResponse(page.getContent(),
+                page.getNumberOfElements(), page.getTotalElements(), page.getTotalPages());
+        log.debug("EvaluationFacadeImpl.searchCountryEvaluationDetails - end | request: {}", request);
+        return response;
     }
 
     @Override
