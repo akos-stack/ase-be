@@ -3,9 +3,12 @@ package com.bloxico.ase.userservice.service.evaluation.impl;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
 import com.bloxico.ase.userservice.exception.EvaluationException;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchCountryEvaluationDetailsRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EvaluationServiceImplTest extends AbstractSpringTest {
@@ -14,6 +17,23 @@ public class EvaluationServiceImplTest extends AbstractSpringTest {
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private EvaluationServiceImpl evaluationService;
+
+    @Test
+    public void findAll_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.findAll(null)
+        );
+    }
+
+    @Test
+    public void findAll() {
+        var request = utilEvaluation.genDefaultSearchCountryEvaluationDetailsRequest();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        assertThat(evaluationService.findAll(request), hasItems(c1));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        assertThat(evaluationService.findAll(request), hasItems(c1, c2));
+    }
 
     @Test
     public void saveCountryEvaluationDetails_nullDetails() {

@@ -34,6 +34,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
     @Override
     public Page<CountryEvaluationDetailsCountedProj> findAll(SearchCountryEvaluationDetailsRequest request) {
         log.debug("EvaluationServiceImpl.findAll - start | request: {}", request);
+        requireNonNull(request);
         var page = countryEvaluationDetailsRepository
                 .findAllCountryEvaluationDetailsWithEvaluatorsCount(
                         request.getSearch(), request.getRegions(), getPagination(request));

@@ -3,22 +3,24 @@ package com.bloxico.ase.userservice.web.api;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilAuth;
 import com.bloxico.ase.testutil.UtilEvaluation;
+import com.bloxico.ase.userservice.web.model.address.SearchRegionsResponse;
+import com.bloxico.ase.userservice.web.model.evaluation.PagedCountryEvaluationDetailsResponse;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsResponse;
 import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.bloxico.ase.testutil.Util.ERROR_CODE;
-import static com.bloxico.ase.testutil.Util.genUUID;
-import static com.bloxico.ase.userservice.web.api.EvaluationApi.EVALUATION_COUNTRY_DETAILS_SAVE;
-import static com.bloxico.ase.userservice.web.api.EvaluationApi.EVALUATION_COUNTRY_DETAILS_UPDATE;
+import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.web.api.EvaluationApi.*;
+import static com.bloxico.ase.userservice.web.api.LocationApi.REGIONS;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.COUNTRY_EVALUATION_DETAILS_EXISTS;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.COUNTRY_EVALUATION_DETAILS_NOT_FOUND;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.COUNTRY_NOT_FOUND;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
@@ -29,6 +31,30 @@ public class EvaluationApiTest extends AbstractSpringTest {
 
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilEvaluation utilEvaluation;
+
+    @Test
+    public void searchCountryEvaluationDetails_200_ok() {
+        var search = genUUID();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search));
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search));
+        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail("fooBar"));
+
+        var countedProjs = given()
+                .header("Authorization", utilAuth.doAuthentication())
+                .queryParam("search", search)
+                .when()
+                .get(API_URL + EVALUATION_COUNTRY_DETAILS)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PagedCountryEvaluationDetailsResponse.class)
+                .getCountryEvaluationDetails();
+
+        assertThat(countedProjs, allOf(hasItems(c1, c2, c3), not(hasItems(c4))));
+    }
 
     @Test
     public void saveCountryEvaluationDetails_404_countryNotFound() {

@@ -31,10 +31,14 @@ public class UtilLocation {
     }
 
     public Country savedCountry() {
+        return savedCountry(genUUID());
+    }
+
+    public Country savedCountry(String name) {
         var creatorId = utilUser.savedAdmin().getId();
         var region = savedRegion();
         var country = new Country();
-        country.setName(genUUID());
+        country.setName(name);
         country.setRegion(region);
         country.setCreatorId(creatorId);
         countryRepository.saveAndFlush(country);

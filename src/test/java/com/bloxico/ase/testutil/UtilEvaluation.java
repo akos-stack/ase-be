@@ -2,8 +2,10 @@ package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
 import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
+import com.bloxico.ase.userservice.proj.CountryEvaluationDetailsCountedProj;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,8 +51,31 @@ public class UtilEvaluation {
         return repository.saveAndFlush(details);
     }
 
+    public CountryEvaluationDetails savedCountryEvaluationDetails(int countryId) {
+        var principalId = utilUser.savedAdmin().getId();
+        var details = genCountryEvaluationDetails(countryId);
+        details.setCreatorId(principalId);
+        return repository.saveAndFlush(details);
+    }
+
     public CountryEvaluationDetailsDto savedCountryEvaluationDetailsDto() {
         return MAPPER.toDto(savedCountryEvaluationDetails());
+    }
+
+    public CountryEvaluationDetailsCountedProj savedCountryEvaluationDetailsCountedProj() {
+        var country = utilLocation.savedCountry();
+        var details = savedCountryEvaluationDetails(country.getId());
+        return new CountryEvaluationDetailsCountedProj(country.getName(),
+                country.getRegion().getName(), details.getPricePerEvaluation(),
+                details.getAvailabilityPercentage(), 0L);
+    }
+
+    public CountryEvaluationDetailsCountedProj savedCountryEvaluationDetailsCountedProj(String countryName) {
+        var country = utilLocation.savedCountry(countryName);
+        var details = savedCountryEvaluationDetails(country.getId());
+        return new CountryEvaluationDetailsCountedProj(country.getName(),
+                country.getRegion().getName(), details.getPricePerEvaluation(),
+                details.getAvailabilityPercentage(), 0L);
     }
 
     public SaveCountryEvaluationDetailsRequest genSaveCountryEvaluationDetailsRequest() {
@@ -65,4 +90,7 @@ public class UtilEvaluation {
         return new UpdateCountryEvaluationDetailsRequest(40, 15);
     }
 
+    public SearchCountryEvaluationDetailsRequest genDefaultSearchCountryEvaluationDetailsRequest() {
+        return new SearchCountryEvaluationDetailsRequest(null, "", 0, 10, "country", "asc");
+    }
 }

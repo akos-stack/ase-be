@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.bloxico.ase.testutil.Util.genUUID;
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -15,6 +17,23 @@ public class EvaluationFacadeImplTest extends AbstractSpringTest {
     @Autowired private UtilUser utilUser;
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private EvaluationFacadeImpl evaluationFacade;
+
+    @Test
+    public void searchCountryEvaluationDetails_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.searchCountryEvaluationDetails(null)
+        );
+    }
+
+    @Test
+    public void findAll() {
+        var request = utilEvaluation.genDefaultSearchCountryEvaluationDetailsRequest();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        assertThat(evaluationFacade.searchCountryEvaluationDetails(request).getCountryEvaluationDetails(), hasItems(c1));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        assertThat(evaluationFacade.searchCountryEvaluationDetails(request).getCountryEvaluationDetails(), hasItems(c1, c2));
+    }
 
     @Test
     public void saveCountryEvaluationDetails_nullRequest() {
