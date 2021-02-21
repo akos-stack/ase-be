@@ -84,7 +84,8 @@ public interface LocationApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Country successfully updated."),
             @ApiResponse(code = 409, message = "Country already exists."),
-            @ApiResponse(code = 404, message = "Specified region doesn't exist.")
+            @ApiResponse(code = 404, message = "Specified region doesn't exist."),
+            @ApiResponse(code = 404, message = "Specified country doesn't exist.")
     })
     ResponseEntity<UpdateCountryResponse> updateCountry(
             @Valid @RequestBody UpdateCountryRequest request, @Valid @PathVariable("id") Integer countryId, Principal principal);

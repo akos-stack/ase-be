@@ -102,7 +102,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     public void findRegionByName() {
         var regionDto = utilLocation.savedRegionDto();
         var foundRegion = service.findRegionByName(regionDto.getName());
-        assertEquals(foundRegion, regionDto);
+        assertEquals(regionDto, foundRegion);
     }
 
     @Test
@@ -111,6 +111,14 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         assertEquals(0, service.countCountriesByRegionId(region.getId()));
         var country = utilLocation.savedCountry();
         assertEquals(1, service.countCountriesByRegionId(country.getRegion().getId()));
+    }
+
+    @Test
+    public void findAllCountries() {
+        var c1 = utilLocation.savedCountryDto();
+        assertThat(service.findAllCountries(), hasItems(c1));
+        var c2 = utilLocation.savedCountryDto();
+        assertThat(service.findAllCountries(), hasItems(c1, c2));
     }
 
     @Test
@@ -140,6 +148,63 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         assertTrue(countryRepository.findByNameIgnoreCase(country.getName()).isEmpty());
         service.saveCountry(country, principalId);
         assertTrue(countryRepository.findByNameIgnoreCase(country.getName()).isPresent());
+    }
+
+    @Test
+    public void updateCountry_nullCountry() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.updateCountry(null, utilUser.savedAdmin().getId())
+        );
+    }
+
+    @Test
+    public void updateCountry_countryNotFound() {
+        var countryDto = utilLocation.savedCountryDto();
+        countryDto.setId(-1);
+        assertThrows(
+                LocationException.class,
+                () -> service.updateCountry(countryDto, utilUser.savedAdmin().getId())
+        );
+    }
+
+    @Test
+    public void updateCountry_countryAlreadyExists() {
+        var countryDto = utilLocation.savedCountryDto();
+        countryDto.setName(utilLocation.savedCountry().getName());
+        assertThrows(
+                LocationException.class,
+                () -> service.updateCountry(countryDto, utilUser.savedAdmin().getId())
+        );
+    }
+
+    @Test
+    public void updateCountry() {
+        var country = utilLocation.savedCountryDto();
+        var region = utilLocation.savedRegionDto();
+        var newCountryName = genUUID();
+        var dto = new CountryDto();
+        dto.setId(country.getId());
+        dto.setName(newCountryName);
+        dto.setRegion(region);
+        var updatedCountry = service.updateCountry(dto, utilUser.savedAdmin().getId());
+        assertEquals(newCountryName, updatedCountry.getName());
+        assertEquals(region, updatedCountry.getRegion());
+    }
+
+    @Test
+    public void findCountryByName_countryNotFound() {
+        assertThrows(
+                LocationException.class,
+                () -> service.findCountryByName(genUUID())
+        );
+    }
+
+    @Test
+    public void findCountryByName() {
+        var countryDto = utilLocation.savedCountryDto();
+        var foundCountry = service.findCountryByName(countryDto.getName());
+        assertEquals(countryDto, foundCountry);
     }
 
     @Test

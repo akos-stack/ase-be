@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetail
 import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +25,20 @@ public class UtilEvaluation {
         return details;
     }
 
+    public CountryEvaluationDetails genCountryEvaluationDetails(int countryId, int pricePerEvaluation, int availabilityPercentage) {
+        var details = new CountryEvaluationDetails();
+        details.setCountryId(countryId);
+        details.setPricePerEvaluation(pricePerEvaluation);
+        details.setAvailabilityPercentage(availabilityPercentage);
+        return details;
+    }
+
     public CountryEvaluationDetailsDto genCountryEvaluationDetailsDto(int countryId) {
         return MAPPER.toDto(genCountryEvaluationDetails(countryId));
+    }
+
+    public CountryEvaluationDetailsDto genCountryEvaluationDetailsDto(int countryId, int pricePerEvaluation, int availabilityPercentage) {
+        return MAPPER.toDto(genCountryEvaluationDetails(countryId, pricePerEvaluation, availabilityPercentage));
     }
 
     public CountryEvaluationDetails savedCountryEvaluationDetails() {
@@ -46,6 +59,10 @@ public class UtilEvaluation {
 
     public SaveCountryEvaluationDetailsRequest genSaveCountryEvaluationDetailsRequest(String country) {
         return new SaveCountryEvaluationDetailsRequest(country, 50, 25);
+    }
+
+    public UpdateCountryEvaluationDetailsRequest genUpdateCountryEvaluationDetailsRequest() {
+        return new UpdateCountryEvaluationDetailsRequest(40, 15);
     }
 
 }

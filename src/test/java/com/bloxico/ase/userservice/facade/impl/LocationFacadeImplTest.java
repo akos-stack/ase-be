@@ -5,6 +5,7 @@ import com.bloxico.ase.userservice.exception.LocationException;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import com.bloxico.ase.userservice.web.model.address.SaveCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
+import com.bloxico.ase.userservice.web.model.address.UpdateCountryRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -80,6 +81,14 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
+    public void findAllCountries() {
+        var c1 = utilLocation.savedCountryDto();
+        assertThat(facade.findAllCountries().getCountries(), hasItems(c1));
+        var c2 = utilLocation.savedCountryDto();
+        assertThat(facade.findAllCountries().getCountries(), hasItems(c1, c2));
+    }
+
+    @Test
     public void saveCountry_requestIsNull() {
         var principalId = utilUser.savedAdmin().getId();
         assertThrows(
@@ -117,6 +126,52 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
         assertNotNull(country.getRegion().getId());
         assertEquals(region, country.getRegion());
         assertEquals(request.getCountry(), country.getName());
+    }
+
+    @Test
+    public void updateCountry_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> facade.updateCountry(null,
+                        utilLocation.savedCountry().getId(),
+                        utilUser.savedAdmin().getId())
+        );
+    }
+
+    @Test
+    public void updateCountry_countryAlreadyExists() {
+        var country = utilLocation.savedCountry();
+        var request = new UpdateCountryRequest(country.getName(), country.getRegion().getName());
+        assertThrows(
+                LocationException.class,
+                () -> facade.updateCountry(request,
+                        utilLocation.savedCountry().getId(),
+                        utilUser.savedAdmin().getId())
+        );
+    }
+
+    @Test
+    public void updateCountry_regionNotFound() {
+        var request = new UpdateCountryRequest(genUUID(), genUUID());
+        assertThrows(
+                LocationException.class,
+                () -> facade.updateCountry(request,
+                        utilLocation.savedCountry().getId(),
+                        utilUser.savedAdmin().getId())
+        );
+    }
+
+    @Test
+    public void updateCountry() {
+        var adminId = utilUser.savedAdmin().getId();
+        var country = utilLocation.savedCountry();
+        var region = utilLocation.savedRegion();
+        var newCountryName = genUUID();
+        var newRegionName = region.getName();
+        var request = new UpdateCountryRequest(newCountryName, newRegionName);
+        var updatedCountry = facade.updateCountry(request, country.getId(), adminId).getCountry();
+        assertEquals(newCountryName, updatedCountry.getName());
+        assertEquals(newRegionName, updatedCountry.getRegion().getName());
     }
 
 }

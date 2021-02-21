@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.bloxico.ase.testutil.Util.genUUID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EvaluationFacadeImplTest extends AbstractSpringTest {
@@ -48,6 +49,38 @@ public class EvaluationFacadeImplTest extends AbstractSpringTest {
         var principalId = utilUser.savedAdmin().getId();
         var request = utilEvaluation.genSaveCountryEvaluationDetailsRequest();
         evaluationFacade.saveCountryEvaluationDetails(request, principalId);
+    }
+
+    @Test
+    public void updateCountryEvaluationDetails_nullRequest() {
+        var principalId = utilUser.savedAdmin().getId();
+        var detailsId = utilEvaluation.savedCountryEvaluationDetails().getId();
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.updateCountryEvaluationDetails(null, detailsId, principalId));
+    }
+
+    @Test
+    public void updateCountryEvaluationDetails_evaluationDetailsNotFound() {
+        var principalId = utilUser.savedAdmin().getId();
+        var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest();
+        assertThrows(
+                EvaluationException.class,
+                () -> evaluationFacade.updateCountryEvaluationDetails(request, -1, principalId));
+    }
+
+    @Test
+    public void updateCountryEvaluationDetails() {
+        var principalId = utilUser.savedAdmin().getId();
+        var details = utilEvaluation.savedCountryEvaluationDetails();
+        var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest();
+        var updatedDetails = evaluationFacade
+                .updateCountryEvaluationDetails(request, details.getId(), principalId)
+                .getCountryEvaluationDetails();
+        assertEquals(details.getId(), updatedDetails.getId());
+        assertEquals(details.getCountryId(), updatedDetails.getCountryId());
+        assertEquals(request.getPricePerEvaluation(), updatedDetails.getPricePerEvaluation());
+        assertEquals(request.getAvailabilityPercentage(), updatedDetails.getAvailabilityPercentage());
     }
 
 }

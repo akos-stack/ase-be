@@ -138,6 +138,27 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
+    public void findAllCountries_200_ok() {
+        var c1 = utilLocation.savedCountryDto();
+        var c2 = utilLocation.savedCountryDto();
+        var c3 = utilLocation.savedCountryDto();
+
+        var countries = given()
+                .header("Authorization", utilAuth.doAuthentication())
+                .when()
+                .get(API_URL + COUNTRIES)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SearchCountriesResponse.class)
+                .getCountries();
+
+        assertThat(countries, hasItems(c1, c2, c3));
+    }
+
+    @Test
     public void createCountry_409_countryAlreadyExists() {
         var auth = utilAuth.doAdminAuthentication();
         var region = utilLocation.savedRegion();
@@ -199,6 +220,79 @@ public class LocationApiTest extends AbstractSpringTest {
         assertEquals(countryName, country.getName());
         assertNotNull(region.getId());
         assertEquals(region, country.getRegion());
+    }
+
+    @Test
+    public void updateCountry_404_countryNotFound() {
+        var region = utilLocation.savedRegion();
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .pathParam("id", -1)
+                .body(new UpdateCountryRequest(genUUID(), region.getName()))
+                .when()
+                .post(API_URL + COUNTRY_UPDATE)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(COUNTRY_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void updateCountry_404_regionNotFound() {
+        var country = utilLocation.savedCountry();
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .pathParam("id", country.getId())
+                .body(new UpdateCountryRequest(genUUID(), genUUID()))
+                .when()
+                .post(API_URL + COUNTRY_UPDATE)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(REGION_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void updateCountry_409_countryAlreadyExists() {
+        var country1 = utilLocation.savedCountry();
+        var country2 = utilLocation.savedCountry();
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .pathParam("id", country1.getId())
+                .body(new UpdateCountryRequest(country2.getName(), country1.getRegion().getName()))
+                .when()
+                .post(API_URL + COUNTRY_UPDATE)
+                .then()
+                .assertThat()
+                .statusCode(409)
+                .body(ERROR_CODE, is(COUNTRY_EXISTS.getCode()));
+    }
+
+    @Test
+    public void updateCountry_200_ok() {
+        var country = utilLocation.savedCountry();
+        var region = utilLocation.savedRegion();
+        var newCountryName = genUUID();
+        var newRegionName = region.getName();
+        var updatedCountry = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .pathParam("id", country.getId())
+                .body(new UpdateCountryRequest(newCountryName, newRegionName))
+                .when()
+                .post(API_URL + COUNTRY_UPDATE)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(UpdateCountryResponse.class)
+                .getCountry();
+        assertEquals(newCountryName, updatedCountry.getName());
+        assertEquals(newRegionName, updatedCountry.getRegion().getName());
     }
 
 }
