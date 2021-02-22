@@ -27,7 +27,9 @@ public class ArtworkServiceImpl implements IArtworkService {
     public ArtworkDto saveArtwork(ArtworkDto artworkDto, long principalId) {
         log.info("ArtworkServiceImpl.submitArtwork - start | artworkDto: {}, principalId: {} ", artworkDto, principalId);
         requireNonNull(artworkDto);
-        var artwork = artworkRepository.saveAndFlush(MAPPER.toEntity(artworkDto));
+        var artwork = MAPPER.toEntity(artworkDto);
+        artwork.setCreatorId(principalId);
+        artwork = artworkRepository.saveAndFlush(artwork);
         if(artworkDto.getHistory() != null) saveArtworkHistory(artwork, artworkDto);
         log.info("ArtworkServiceImpl.submitArtwork - end | artworkDto: {}, principalId: {} ", artworkDto, principalId);
         return MAPPER.toDto(artwork);

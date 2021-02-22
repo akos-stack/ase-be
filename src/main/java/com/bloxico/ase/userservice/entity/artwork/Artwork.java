@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.entity.artwork;
 
+import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.address.Location;
 import com.bloxico.ase.userservice.entity.artwork.metadata.Category;
 import com.bloxico.ase.userservice.entity.artwork.metadata.Material;
@@ -10,7 +11,6 @@ import com.bloxico.ase.userservice.entity.user.profile.ArtOwner;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -21,9 +21,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Data
 @Entity
 @Table(name = "artworks")
-public class Artwork implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Artwork extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
