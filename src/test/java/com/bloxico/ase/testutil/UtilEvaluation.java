@@ -3,9 +3,11 @@ package com.bloxico.ase.testutil;
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
 import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
 import com.bloxico.ase.userservice.proj.CountryEvaluationDetailsCountedProj;
+import com.bloxico.ase.userservice.proj.RegionCountedProj;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchCountryEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -93,4 +95,19 @@ public class UtilEvaluation {
     public SearchCountryEvaluationDetailsRequest genDefaultSearchCountryEvaluationDetailsRequest() {
         return new SearchCountryEvaluationDetailsRequest(null, "", 0, 10, "country", "asc");
     }
+
+    public RegionCountedProj savedRegionCountedProj() {
+        var region = utilLocation.savedRegion();
+        return new RegionCountedProj(region.getId(), region.getName(), 0, 0);
+    }
+
+    public RegionCountedProj savedRegionCountedProj(String name) {
+        var region = utilLocation.savedRegion(name);
+        return new RegionCountedProj(region.getId(), region.getName(), 0, 0);
+    }
+
+    public SearchRegionsRequest genDefaultSearchRegionsRequest() {
+        return new SearchRegionsRequest("", 0, 10, "name", "asc");
+    }
+
 }

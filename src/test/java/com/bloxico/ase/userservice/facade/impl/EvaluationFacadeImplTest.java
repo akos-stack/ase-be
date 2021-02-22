@@ -27,7 +27,7 @@ public class EvaluationFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
-    public void findAll() {
+    public void searchCountryEvaluationDetails() {
         var request = utilEvaluation.genDefaultSearchCountryEvaluationDetailsRequest();
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
         assertThat(evaluationFacade.searchCountryEvaluationDetails(request).getCountryEvaluationDetails(), hasItems(c1));
@@ -100,6 +100,23 @@ public class EvaluationFacadeImplTest extends AbstractSpringTest {
         assertEquals(details.getCountryId(), updatedDetails.getCountryId());
         assertEquals(request.getPricePerEvaluation(), updatedDetails.getPricePerEvaluation());
         assertEquals(request.getAvailabilityPercentage(), updatedDetails.getAvailabilityPercentage());
+    }
+
+    @Test
+    public void searchRegions_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.searchRegions(null)
+        );
+    }
+
+    @Test
+    public void searchRegions() {
+        var request = utilEvaluation.genDefaultSearchRegionsRequest();
+        var c1 = utilEvaluation.savedRegionCountedProj();
+        assertThat(evaluationFacade.searchRegions(request).getRegions(), hasItems(c1));
+        var c2 = utilEvaluation.savedRegionCountedProj();
+        assertThat(evaluationFacade.searchRegions(request).getRegions(), hasItems(c1, c2));
     }
 
 }

@@ -2,8 +2,10 @@ package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
 import com.bloxico.ase.userservice.proj.CountryEvaluationDetailsCountedProj;
+import com.bloxico.ase.userservice.proj.RegionCountedProj;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchCountryEvaluationDetailsRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +34,14 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public Page<CountryEvaluationDetailsCountedProj> findAll(SearchCountryEvaluationDetailsRequest request) {
-        log.debug("EvaluationServiceImpl.findAll - start | request: {}", request);
+    public Page<CountryEvaluationDetailsCountedProj> findAllCountryEvaluationDetails(
+            SearchCountryEvaluationDetailsRequest request) {
+        log.debug("EvaluationServiceImpl.findAllCountryEvaluationDetails - start | request: {}", request);
         requireNonNull(request);
         var page = countryEvaluationDetailsRepository
                 .findAllCountryEvaluationDetailsWithEvaluatorsCount(
                         request.getSearch(), request.getRegions(), getPagination(request));
-        log.debug("EvaluationServiceImpl.findAll - end | request: {}", request);
+        log.debug("EvaluationServiceImpl.findAllCountryEvaluationDetails - end | request: {}", request);
         return page;
     }
 
@@ -69,12 +72,30 @@ public class EvaluationServiceImpl implements IEvaluationService {
         return detailsDto;
     }
 
+    @Override
+    public Page<RegionCountedProj> findAllRegions(SearchRegionsRequest request) {
+        log.debug("EvaluationServiceImpl.findAllRegions - start | request: {}", request);
+        requireNonNull(request);
+        var page = countryEvaluationDetailsRepository
+                .findAllIncludeCountriesAndEvaluatorsCount(request.getSearch(), getPagination(request));
+        log.debug("EvaluationServiceImpl.findAllRegions - end | request: {}", request);
+        return page;
+    }
+
     private void requireNotExists(CountryEvaluationDetailsDto dto) {
         if (countryEvaluationDetailsRepository.findByCountryId(dto.getCountryId()).isPresent())
             throw COUNTRY_EVALUATION_DETAILS_EXISTS.newException();
     }
 
     private Pageable getPagination(SearchCountryEvaluationDetailsRequest request) {
+        var unsafeSortProperty =  String.format("(%s)", request.getSort());
+        var sort = request.getOrder().equals("asc") ?
+                JpaSort.unsafe(ASC, unsafeSortProperty) :
+                JpaSort.unsafe(DESC, unsafeSortProperty);
+        return PageRequest.of(request.getPage(), request.getSize(), sort);
+    }
+
+    private Pageable getPagination(SearchRegionsRequest request) {
         var unsafeSortProperty =  String.format("(%s)", request.getSort());
         var sort = request.getOrder().equals("asc") ?
                 JpaSort.unsafe(ASC, unsafeSortProperty) :

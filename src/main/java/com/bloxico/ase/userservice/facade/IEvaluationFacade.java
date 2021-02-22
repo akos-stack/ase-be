@@ -1,5 +1,7 @@
 package com.bloxico.ase.userservice.facade;
 
+import com.bloxico.ase.userservice.web.model.evaluation.PagedRegionsResponse;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 
 public interface IEvaluationFacade {
@@ -12,5 +14,7 @@ public interface IEvaluationFacade {
 
     UpdateCountryEvaluationDetailsResponse updateCountryEvaluationDetails(
             UpdateCountryEvaluationDetailsRequest request, int evaluationDetails, long principalId);
+
+    PagedRegionsResponse searchRegions(SearchRegionsRequest request);
 
 }

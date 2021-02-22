@@ -2,6 +2,8 @@ package com.bloxico.ase.userservice.web.api.impl;
 
 import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.web.api.EvaluationApi;
+import com.bloxico.ase.userservice.web.model.evaluation.PagedRegionsResponse;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +41,12 @@ public class EvaluationController implements EvaluationApi {
         var id = extractId(principal);
         var response= evaluationFacade
                 .updateCountryEvaluationDetails(request, evaluationDetailsId, id);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<PagedRegionsResponse> searchRegions(SearchRegionsRequest request) {
+        var response = evaluationFacade.searchRegions(request);
         return ResponseEntity.ok(response);
     }
 

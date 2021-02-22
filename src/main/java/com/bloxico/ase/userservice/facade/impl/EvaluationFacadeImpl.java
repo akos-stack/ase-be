@@ -3,6 +3,8 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
+import com.bloxico.ase.userservice.web.model.evaluation.PagedRegionsResponse;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,7 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
     @Override
     public PagedCountryEvaluationDetailsResponse searchCountryEvaluationDetails(SearchCountryEvaluationDetailsRequest request) {
         log.debug("EvaluationFacadeImpl.searchCountryEvaluationDetails - start | request: {}", request);
-        var page = evaluationService.findAll(request);
+        var page = evaluationService.findAllCountryEvaluationDetails(request);
         var response = new PagedCountryEvaluationDetailsResponse(page.getContent(),
                 page.getNumberOfElements(), page.getTotalElements(), page.getTotalPages());
         log.debug("EvaluationFacadeImpl.searchCountryEvaluationDetails - end | request: {}", request);
@@ -60,6 +62,16 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
         var response = new UpdateCountryEvaluationDetailsResponse(evaluationDetailsDto);
         log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - end | " +
                 "request: {}, evaluationDetailsId {}, principalId: {}", request, evaluationDetailsId, principalId);
+        return response;
+    }
+
+    @Override
+    public PagedRegionsResponse searchRegions(SearchRegionsRequest request) {
+        log.info("EvaluationFacadeImpl.searchRegions - start | request: {}", request);
+        var page = evaluationService.findAllRegions(request);
+        var response = new PagedRegionsResponse(page.getContent(),
+                page.getNumberOfElements(), page.getTotalElements(), page.getTotalPages());
+        log.info("EvaluationFacadeImpl.searchRegions - end | request: {}", request);
         return response;
     }
 

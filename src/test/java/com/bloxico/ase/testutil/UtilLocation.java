@@ -19,9 +19,13 @@ public class UtilLocation {
     @Autowired private RegionRepository regionRepository;
 
     public Region savedRegion() {
+        return savedRegion(genUUID());
+    }
+
+    public Region savedRegion(String name) {
         var creatorId = utilUser.savedAdmin().getId();
         var region = new Region();
-        region.setName(genUUID());
+        region.setName(name);
         region.setCreatorId(creatorId);
         return regionRepository.saveAndFlush(region);
     }

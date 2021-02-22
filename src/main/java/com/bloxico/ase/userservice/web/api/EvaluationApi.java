@@ -1,5 +1,7 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.userservice.web.model.evaluation.PagedRegionsResponse;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +17,13 @@ import java.security.Principal;
 @Api(value = "evaluation")
 public interface EvaluationApi {
 
-    String EVALUATION_COUNTRY_DETAILS           =   "/evaluation/country-details";
+    String EVALUATION_COUNTRY_DETAILS_SEARCH    =   "/evaluation/country-details/search";
     String EVALUATION_COUNTRY_DETAILS_SAVE      =   "/evaluation/country-details/save";
     String EVALUATION_COUNTRY_DETAILS_UPDATE    =   "/evaluation/country-details/update/{id}";
+    String EVALUATION_REGIONS_SEARCH            =   "/evaluation/regions/search";
 
     @GetMapping(
-            value = EVALUATION_COUNTRY_DETAILS,
+            value = EVALUATION_COUNTRY_DETAILS_SEARCH,
             produces = {"application/json"})
     @ApiOperation(value = "Search countries with evaluation details.")
     @ApiResponses({
@@ -56,5 +59,14 @@ public interface EvaluationApi {
     ResponseEntity<UpdateCountryEvaluationDetailsResponse> updateCountryEvaluationDetails(
             @Valid @RequestBody UpdateCountryEvaluationDetailsRequest request,
             @Valid @PathVariable("id") Integer evaluationDetailsId, Principal principal);
+
+    @GetMapping(
+            value = EVALUATION_REGIONS_SEARCH,
+            produces = "application/json")
+    @ApiOperation(value = "Search regions with countries and evaluators counted.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Paginated list of regions successfully retrieved..")
+    })
+    ResponseEntity<PagedRegionsResponse> searchRegions(SearchRegionsRequest request);
 
 }

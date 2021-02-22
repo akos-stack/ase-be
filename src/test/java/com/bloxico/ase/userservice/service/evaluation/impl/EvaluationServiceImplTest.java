@@ -1,9 +1,7 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.testutil.*;
-import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
 import com.bloxico.ase.userservice.exception.EvaluationException;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchCountryEvaluationDetailsRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,20 +17,20 @@ public class EvaluationServiceImplTest extends AbstractSpringTest {
     @Autowired private EvaluationServiceImpl evaluationService;
 
     @Test
-    public void findAll_nullRequest() {
+    public void findAllCountryEvaluationDetails_nullRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationService.findAll(null)
+                () -> evaluationService.findAllCountryEvaluationDetails(null)
         );
     }
 
     @Test
-    public void findAll() {
+    public void findAllCountryEvaluationDetails() {
         var request = utilEvaluation.genDefaultSearchCountryEvaluationDetailsRequest();
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
-        assertThat(evaluationService.findAll(request), hasItems(c1));
+        assertThat(evaluationService.findAllCountryEvaluationDetails(request), hasItems(c1));
         var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
-        assertThat(evaluationService.findAll(request), hasItems(c1, c2));
+        assertThat(evaluationService.findAllCountryEvaluationDetails(request), hasItems(c1, c2));
     }
 
     @Test
@@ -96,6 +94,23 @@ public class EvaluationServiceImplTest extends AbstractSpringTest {
         assertEquals(details.getCountryId(), updatedDetails.getCountryId());
         assertEquals(15, updatedDetails.getPricePerEvaluation().intValue());
         assertEquals(40, updatedDetails.getAvailabilityPercentage().intValue());
+    }
+
+    @Test
+    public void findAllRegions_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.findAllRegions(null)
+        );
+    }
+
+    @Test
+    public void findAllRegions() {
+        var request = utilEvaluation.genDefaultSearchRegionsRequest();
+        var c1 = utilEvaluation.savedRegionCountedProj();
+        assertThat(evaluationService.findAllRegions(request), hasItems(c1));
+        var c2 = utilEvaluation.savedRegionCountedProj();
+        assertThat(evaluationService.findAllRegions(request), hasItems(c1, c2));
     }
 
 }
