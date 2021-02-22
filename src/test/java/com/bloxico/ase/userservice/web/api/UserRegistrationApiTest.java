@@ -380,10 +380,11 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void requestEvaluatorRegistration_200_ok() {
         var registration = utilAuth.doConfirmedRegistration();
         var cvBytes = getTestCVBytes();
+        var name = genUUID() + ".txt";
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParam("email", registration.getEmail())
-                .multiPart("cv", "cv.txt", cvBytes)
+                .multiPart("cv", name, cvBytes)
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
                 .then()
@@ -563,19 +564,28 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                         not(hasItems(pe3))));
     }
 
-    // TODO-tests downloadEvaluatorResume_404_evaluatorNotPending
-
-    // TODO-tests downloadEvaluatorResume_404_resumeNotFound
-
-    // TODO-tests downloadEvaluatorResume_400_downloadFailed
+    @Test
+    public void downloadEvaluatorResume_404_resumeNotFound() {
+        var registration = utilAuth.doConfirmedRegistration();
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .queryParam("email", registration.getEmail())
+                .when()
+                .get(API_URL + REGISTRATION_EVALUATOR_RESUME_DOWNLOAD)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.User.RESUME_NOT_FOUND.getCode()));
+    }
 
     @Test
     public void downloadEvaluatorResume_200_ok() {
         var registration = utilAuth.doConfirmedRegistration();
+        var name = genUUID() + ".txt";
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParam("email", registration.getEmail())
-                .multiPart("cv", "cv.txt", getTestCVBytes())
+                .multiPart("cv", name, getTestCVBytes())
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
                 .then()

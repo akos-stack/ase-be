@@ -188,13 +188,33 @@ public interface ErrorCodes {
 
         ARTWORK_METADATA_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "21",
+                "40",
                 "Artwork metadata not found."),
 
         ARTWORK_METADATA_TYPE_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "22",
-                "Artwork metadata type not found.");
+                "41",
+                "Artwork metadata type not found."),
+
+        ARTWORK_ARTIST_NOT_PROVIDED(
+                HttpStatus.BAD_REQUEST,
+                "42",
+                "Artwork artist name not provided."),
+
+        ARTWORK_MISSING_RESUME(
+                HttpStatus.BAD_REQUEST,
+                "43",
+                "Art Owner resume missing."),
+
+        ARTWORK_MISSING_CERTIFICATE(
+                HttpStatus.BAD_REQUEST,
+                "44",
+                "Artwork certificate not uploaded."),
+
+        ARTWORK_GROUP_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "45",
+                "Artwork group not found.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
@@ -217,7 +237,7 @@ public interface ErrorCodes {
 
         COUNTRY_EVALUATION_DETAILS_EXISTS(
                 HttpStatus.CONFLICT,
-                "40",
+                "50",
                 "Evaluation details already exists for specified country.");
 
         private final HttpStatus httpStatus;
@@ -236,4 +256,27 @@ public interface ErrorCodes {
 
     }
 
+    @Getter
+    enum Documents implements ErrorCodes {
+
+        DOCUMENT_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "60",
+                "Document not found.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        Documents(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new DocumentException(httpStatus, code, cause);
+        }
+
+    }
 }

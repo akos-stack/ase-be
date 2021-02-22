@@ -330,6 +330,15 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: address2
+                  type: varchar(256)
+              - column:
+                  name: city
+                  type: varchar(256)
+              - column:
+                  name: zip_code
+                  type: varchar(256)
+              - column:
                   name: latitude
                   type: numeric
               - column:
@@ -652,11 +661,6 @@ databaseChangeLog:
                   type: varchar(256)
                   constraints:
                     nullable: false
-              - column:
-                  name: cv_path
-                  type: varchar(256)
-                  constraints:
-                    nullable: true
               # METADATA
               - column:
                   name: creator_id
@@ -886,3 +890,353 @@ databaseChangeLog:
                   defaultValueNumeric: 0
                   constraints:
                     nullable: false
+        - createTable:
+            tableName: documents
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: type
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: path
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_document_creator
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_document_updater
+                    references: users(id)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: pending_evaluators_documents
+            columns:
+              - column:
+                  name: email
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_pending_evaluator_document
+                    references: pending_evaluators(email)
+              - column:
+                  name: document_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_document_pending_evaluator
+                    references: documents(id)
+        - createTable:
+            tableName: artists
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_artist_creator
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_artist_updater
+                    references: users(id)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: artwork_groups
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: status
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_artworks_group_creator
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_artworks_group_updater
+                    references: users(id)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: artworks
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: title
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: artist_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_artworks_artist
+                    references: artists(id)
+              - column:
+                  name: owner_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_artworks_art_owner
+                    references: art_owners(id)
+              - column:
+                  name: year
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: weight
+                  type: numeric
+                  constraints:
+                    nullable: false
+              - column:
+                  name: height
+                  type: numeric
+                  constraints:
+                    nullable: false
+              - column:
+                  name: width
+                  type: numeric
+                  constraints:
+                    nullable: false
+              - column:
+                  name: depth
+                  type: numeric
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone_number
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: location_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_artworks_location
+                    references: locations(id)
+              - column:
+                  name: group_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_artworks_artworks_group
+                    references: artwork_groups(id)
+        - createTable:
+            tableName: artworks_history
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_artworks_history
+                    references: artworks(id)
+              - column:
+                  name: appraisal_history
+                  type: varchar(256)
+              - column:
+                  name: location_history
+                  type: varchar(256)
+              - column:
+                  name: runs_history
+                  type: varchar(256)
+              - column:
+                  name: maintenance_history
+                  type: varchar(256)
+              - column:
+                  name: notes
+                  type: varchar(256)
+        - createTable:
+            tableName: artworks_categories
+            columns:
+              - column:
+                  name: artwork_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_artwork_categories
+                    references: artworks(id)
+              - column:
+                  name: category_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_category_artworks
+                    references: categories(id)
+        - createTable:
+            tableName: artworks_materials
+            columns:
+              - column:
+                  name: artwork_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_artwork_materials
+                    references: artworks(id)
+              - column:
+                  name: material_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_material_artworks
+                    references: materials(id)
+        - createTable:
+            tableName: artworks_mediums
+            columns:
+              - column:
+                  name: artwork_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_artwork_mediums
+                    references: artworks(id)
+              - column:
+                  name: medium_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_medium_artworks
+                    references: mediums(id)
+        - createTable:
+            tableName: artworks_styles
+            columns:
+              - column:
+                  name: artwork_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_artwork_styles
+                    references: artworks(id)
+              - column:
+                  name: style_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_style_artworks
+                    references: styles(id)
+        - createTable:
+            tableName: artworks_documents
+            columns:
+              - column:
+                  name: artwork_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_artworks_document
+                    references: artworks(id)
+              - column:
+                  name: document_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_document_artworks
+                    references: documents(id)

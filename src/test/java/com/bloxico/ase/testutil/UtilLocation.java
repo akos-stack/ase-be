@@ -1,6 +1,7 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
+import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
 import com.bloxico.ase.userservice.entity.address.*;
 import com.bloxico.ase.userservice.repository.address.*;
@@ -52,6 +53,10 @@ public class UtilLocation {
         location.setAddress(genUUID());
         location.setCreatorId(country.getCreatorId());
         return locationRepository.saveAndFlush(location);
+    }
+
+    public LocationDto savedLocationDto() {
+        return MAPPER.toDto(savedLocation());
     }
 
 }

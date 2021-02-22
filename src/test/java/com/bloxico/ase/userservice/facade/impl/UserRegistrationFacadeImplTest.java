@@ -232,7 +232,6 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
                 .orElseThrow();
 
         assertNotNull(newlyCreatedPendingEvaluator.getToken());
-        assertNull(newlyCreatedPendingEvaluator.getCvPath());
         assertEquals(user.getEmail(), newlyCreatedPendingEvaluator.getEmail());
         assertEquals(admin.getId(), newlyCreatedPendingEvaluator.getCreatorId());
         assertSame(INVITED, newlyCreatedPendingEvaluator.getStatus());
@@ -256,7 +255,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void checkEvaluatorInvitation_invitationTokenNotFound() {
         var principalId = utilUser.savedAdmin().getId();
         var request = new EvaluatorRegistrationRequest(genEmail(), genMultipartFile(pdf));
-        var pending = pendingEvaluatorService.createPendingEvaluator(request, principalId);
+        var pending = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principalId);
         assertThrows(
                 TokenException.class,
                 () -> userRegistrationFacade.checkEvaluatorInvitation(pending.getToken()));
@@ -266,7 +265,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void checkEvaluatorInvitation() {
         var principalId = utilUser.savedAdmin().getId();
         var request = new EvaluatorInvitationRequest(genEmail());
-        var pending = pendingEvaluatorService.createPendingEvaluator(request, principalId);
+        var pending = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principalId);
         userRegistrationFacade.checkEvaluatorInvitation(pending.getToken());
     }
 
@@ -460,7 +459,6 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertNotNull(newlyCreatedPendingEvaluator.getToken());
         assertEquals(user.getEmail(), newlyCreatedPendingEvaluator.getEmail());
         assertEquals(user.getId(), newlyCreatedPendingEvaluator.getCreatorId());
-        assertNotNull(newlyCreatedPendingEvaluator.getCvPath());
         assertSame(REQUESTED, newlyCreatedPendingEvaluator.getStatus());
     }
 
@@ -498,11 +496,21 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
                         not(hasItems(pe3))));
     }
 
-    // TODO-TEST downloadEvaluatorResume_nullEmail
+    @Test
+    public void downloadEvaluatorResume_nullEmail() {
+        var admin = utilUser.savedAdmin();
+        assertThrows(
+                NullPointerException.class,
+                () -> userRegistrationFacade.downloadEvaluatorResume(null, admin.getId()));
+    }
 
-    // TODO-TEST downloadEvaluatorResume_pendingEvaluatorNotFound
-
-    // TODO-TEST downloadEvaluatorResume_resumeNotFound
+    @Test
+    public void downloadEvaluatorResume_resumeNotFound() {
+        var admin = utilUser.savedAdmin();
+        assertThrows(
+                UserException.class,
+                () -> userRegistrationFacade.downloadEvaluatorResume(genEmail(), admin.getId()));
+    }
 
     @Test
     public void downloadEvaluatorResume() {

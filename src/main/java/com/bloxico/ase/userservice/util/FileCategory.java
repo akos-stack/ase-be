@@ -5,7 +5,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 import static com.bloxico.ase.userservice.util.SupportedFileExtension.*;
@@ -25,7 +24,19 @@ public enum FileCategory {
     IMAGE(
             "upload.image.file-path",
             "upload.file.max-image-size",
-            path -> path + UUID.randomUUID().toString() + "/",
+            path -> path,
+            jpg, png),
+
+    CERTIFICATE(
+            "upload.certificate.file-path",
+            "upload.file.max-certificate-size",
+            path -> path,
+            pdf, doc, txt),
+
+    PRINCIPAL_IMAGE(
+            "upload.image.file-path",
+            "upload.file.max-image-size",
+            path -> path,
             jpg, png);
 
     private final String pathProperty, maxSizeProperty;

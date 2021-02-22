@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.service.token.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.TokenException;
+import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorRegistrationRequest;
@@ -16,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
+import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.SupportedFileExtension.pdf;
 import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
@@ -43,12 +45,12 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         var admin = utilUser.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
-        service.createPendingEvaluator(request, admin.getId());
+        service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), admin.getId());
 
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
         assertThrows(
                 TokenException.class,
-                () -> service.createPendingEvaluator(request, admin.getId()));
+                () -> service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), admin.getId()));
     }
 
     @Test
@@ -56,12 +58,12 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         var user = utilUser.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
-        service.createPendingEvaluator(request, user.getId());
+        service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), user.getId());
 
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
         assertThrows(
                 TokenException.class,
-                () -> service.createPendingEvaluator(request, user.getId()));
+                () -> service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), user.getId()));
     }
 
     @Test
@@ -70,7 +72,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         var admin = utilUser.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
-        var pendingEvaluatorDto = service.createPendingEvaluator(request, admin.getId());
+        var pendingEvaluatorDto = service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), admin.getId());
 
         assertNotNull(pendingEvaluatorDto);
 
@@ -83,7 +85,6 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         assertEquals(admin.getId(), newPendingEvaluator.getCreatorId());
         assertEquals(pendingEvaluatorDto.getStatus(), newPendingEvaluator.getStatus());
 
-        assertNull(newPendingEvaluator.getCvPath());
         assertSame(INVITED, newPendingEvaluator.getStatus());
     }
 
@@ -92,7 +93,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         var user = utilUser.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
-        var pendingEvaluatorDto = service.createPendingEvaluator(request, user.getId());
+        var pendingEvaluatorDto = service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), user.getId());
 
         assertNotNull(pendingEvaluatorDto);
 
@@ -105,7 +106,6 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         assertEquals(user.getId(), newlyCreatedPendingEvaluator.getCreatorId());
         assertEquals(pendingEvaluatorDto.getStatus(), newlyCreatedPendingEvaluator.getStatus());
 
-        assertNotNull(newlyCreatedPendingEvaluator.getCvPath());
         assertSame(REQUESTED, newlyCreatedPendingEvaluator.getStatus());
     }
 
@@ -115,7 +115,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         var admin = utilUser.savedAdmin();
 
         var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
-        service.createPendingEvaluator(registrationRequest, user.getId());
+        service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(registrationRequest), user.getId());
 
         var pendingEvaluator = repository
                 .findByEmailIgnoreCase(user.getEmail())
@@ -125,7 +125,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         assertSame(REQUESTED, pendingEvaluator.getStatus());
 
         var invitationRequest = new EvaluatorInvitationRequest(user.getEmail());
-        service.createPendingEvaluator(invitationRequest, admin.getId());
+        service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(invitationRequest), admin.getId());
 
         assertNotNull(pendingEvaluator);
         assertEquals(admin.getId(), pendingEvaluator.getUpdaterId());
@@ -138,14 +138,14 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         var admin = utilUser.savedAdmin();
 
         var invitationRequest = new EvaluatorInvitationRequest(user.getEmail());
-        service.createPendingEvaluator(invitationRequest, admin.getId());
+        service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(invitationRequest), admin.getId());
 
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         assertThrows(
                 TokenException.class,
-                () -> service.createPendingEvaluator(registrationRequest, user.getId()));
+                () -> service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(registrationRequest), user.getId()));
     }
 
     @Test
@@ -168,7 +168,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         var admin = utilUser.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
-        var pendingEvaluator = service.createPendingEvaluator(request, admin.getId());
+        var pendingEvaluator = service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), admin.getId());
 
         assertNotNull(pendingEvaluator);
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
@@ -184,7 +184,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         var user = utilUser.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
-        var pendingEvaluator = service.createPendingEvaluator(request, user.getId());
+        var pendingEvaluator = service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), user.getId());
 
         assertNotNull(pendingEvaluator);
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
@@ -213,7 +213,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
     public void checkInvitationToken_invitationTokenNotFound() {
         var principalId = utilUser.savedAdmin().getId();
         var request = new EvaluatorRegistrationRequest(genEmail(), genMultipartFile(pdf));
-        var pending = service.createPendingEvaluator(request, principalId);
+        var pending = service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principalId);
         assertThrows(
                 TokenException.class,
                 () -> service.checkInvitationToken(pending.getToken()));
@@ -223,7 +223,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
     public void checkInvitationToken() {
         var principalId = utilUser.savedAdmin().getId();
         var request = new EvaluatorInvitationRequest(genEmail());
-        var pending = service.createPendingEvaluator(request, principalId);
+        var pending = service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principalId);
         service.checkInvitationToken(pending.getToken());
     }
 
@@ -247,7 +247,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         var admin = utilUser.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
-        service.createPendingEvaluator(request, admin.getId());
+        service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), admin.getId());
 
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
         service.deletePendingEvaluator(user.getEmail());
@@ -259,7 +259,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
         var user = utilUser.savedUser();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
-        service.createPendingEvaluator(request, user.getId());
+        service.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), user.getId());
 
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
         service.deletePendingEvaluator(user.getEmail());
@@ -294,7 +294,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
         var token = service
-                .createPendingEvaluator(request, admin.getId())
+                .createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), admin.getId())
                 .getToken();
 
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
@@ -365,10 +365,10 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void getEvaluatorResume_nullEmail() {
-        var user = utilUser.savedUser();
+        var admin = utilUser.savedAdmin();
         assertThrows(
                 NullPointerException.class,
-                () -> service.getEvaluatorResume(null, user.getId()));
+                () -> service.getEvaluatorResume(null, admin.getId()));
     }
 
     @Test
@@ -381,18 +381,19 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void getEvaluatorResume_resumeNotFound() {
+        var admin = utilUser.savedAdmin();
         assertThrows(
-                TokenException.class,
-                () -> service.getEvaluatorResume(genEmail(), genUUIDLong()));
+                UserException.class,
+                () -> service.getEvaluatorResume(genEmail(), admin.getId()));
     }
 
     @Test
     public void getEvaluatorResume() {
-        var user = utilUser.savedUser();
         var admin = utilUser.savedAdmin();
-        var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
-        service.createPendingEvaluator(request, user.getId());
-        assertNotNull(service.getEvaluatorResume(user.getEmail(), admin.getId()));
+        var pendingEvaluatorEmail = utilToken.savedRequestedPendingEvaluatorDto();
+        var resume = service.getEvaluatorResume(pendingEvaluatorEmail, admin.getId());
+        assertNotNull(resume);
+        assertEquals(resume.getEmail(), pendingEvaluatorEmail);
     }
 
 }
