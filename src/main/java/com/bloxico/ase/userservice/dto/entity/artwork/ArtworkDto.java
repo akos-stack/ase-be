@@ -8,9 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 public class ArtworkDto {
@@ -69,15 +67,24 @@ public class ArtworkDto {
     @JsonProperty("documents")
     private Set<DocumentDto> documents = new HashSet<>();
 
-    public void addDocuments(List<DocumentDto> documentDto) {
+    public void addDocuments(Collection<DocumentDto> documentDto) {
         documents.addAll(documentDto);
     }
 
-    public void addStyles(List<ArtworkMetadataDto> artworkMetadataDto) { styles.addAll(artworkMetadataDto); }
+    public void addStyles(Collection<ArtworkMetadataDto> artworkMetadataDto) {
+        styles.addAll(artworkMetadataDto);
+    }
 
-    public void addMediums(List<ArtworkMetadataDto> artworkMetadataDto) { mediums.addAll(artworkMetadataDto); }
+    public void addMediums(Collection<ArtworkMetadataDto> artworkMetadataDto) {
+        mediums.addAll(artworkMetadataDto);
+    }
 
-    public void addMaterials(List<ArtworkMetadataDto> artworkMetadataDto) { materials.addAll(artworkMetadataDto); }
+    public void addMaterials(Collection<ArtworkMetadataDto> artworkMetadataDto) {
+        materials.addAll(artworkMetadataDto);
+    }
 
-    public void addCategories(List<ArtworkMetadataDto> artworkMetadataDto) { categories.addAll(artworkMetadataDto); }
+    public void addCategories(Collection<ArtworkMetadataDto> artworkMetadataDto) {
+        categories.addAll(artworkMetadataDto);
+    }
+
 }

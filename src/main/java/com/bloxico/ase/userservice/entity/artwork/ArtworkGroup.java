@@ -16,7 +16,12 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Table(name = "artwork_groups")
 public class ArtworkGroup extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
+    public enum Status {
+
+        DRAFT,
+        WAITING_FOR_EVALUATION
+
+    }
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -26,13 +31,7 @@ public class ArtworkGroup extends BaseEntity {
     @Enumerated(STRING)
     private Status status;
 
-    @OneToMany(mappedBy="group", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private Set<Artwork> artworks;
 
-    public enum Status {
-
-        DRAFT,
-        WAITING_FOR_EVALUATION
-
-    }
 }
