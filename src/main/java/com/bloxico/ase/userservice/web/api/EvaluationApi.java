@@ -67,6 +67,6 @@ public interface EvaluationApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Paginated list of regions successfully retrieved..")
     })
-    ResponseEntity<PagedRegionsResponse> searchRegions(SearchRegionsRequest request);
+    ResponseEntity<PagedRegionsResponse> searchRegions(@Valid SearchRegionsRequest request);
 
 }

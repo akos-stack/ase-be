@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import java.util.Set;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -20,9 +23,9 @@ public class UpdateCountryRequest {
     @ApiModelProperty(required = true)
     String country;
 
-    @NotBlank
-    @JsonProperty("region")
+    @JsonProperty("regions")
     @ApiModelProperty(required = true)
-    String region;
+    @Size(min = 1)
+    Set<String> regions;
 
 }

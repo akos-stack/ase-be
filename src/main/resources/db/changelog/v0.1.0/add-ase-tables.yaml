@@ -215,13 +215,6 @@ databaseChangeLog:
                   type: varchar(256)
                   constraints:
                     nullable: false
-              - column:
-                  name: region_id
-                  type: integer
-                  constraints:
-                    nullable: true
-                    foreignKeyName: fk_region_country
-                    references: regions(id)
               # METADATA
               - column:
                   name: creator_id
@@ -251,6 +244,25 @@ databaseChangeLog:
                   defaultValueNumeric: 0
                   constraints:
                     nullable: false
+        - createTable:
+            tableName: countries_regions
+            columns:
+              - column:
+                  name: country_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_country_region
+                    references: countries(id)
+              - column:
+                  name: region_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_region_country
+                    references: regions(id)
         - createTable:
             tableName: country_evaluation_details
             columns:

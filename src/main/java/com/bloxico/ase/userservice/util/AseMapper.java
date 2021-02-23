@@ -112,15 +112,14 @@ public interface AseMapper {
     @Mapping(target = "name", source = "region")
     RegionDto toRegionDto(SaveRegionRequest request);
 
-    @Mapping(target = "name", source = "region")
     RegionDto toRegionDto(SaveCountryRequest request);
 
     @Mapping(target = "name", source = "country")
-    @Mapping(ignore = true, target = "region")
+    @Mapping(ignore = true, target = "regions")
     CountryDto toCountryDto(SaveCountryRequest request);
 
     @Mapping(target = "name", source = "country")
-    @Mapping(ignore = true, target = "region")
+    @Mapping(ignore = true, target = "regions")
     CountryDto toCountryDto(UpdateCountryRequest request);
 
     CountryEvaluationDetailsDto toCountryEvaluationDetailsDto(SaveCountryEvaluationDetailsRequest request);

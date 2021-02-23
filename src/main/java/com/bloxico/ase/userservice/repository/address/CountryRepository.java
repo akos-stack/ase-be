@@ -11,6 +11,6 @@ public interface CountryRepository extends JpaRepository<Country, Integer> {
 
     Optional<Country> findByNameIgnoreCase(String name);
 
-    int countByRegionId(int regionId);
+    int countByRegionsIdEquals(int regionId);
 
 }

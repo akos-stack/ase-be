@@ -7,6 +7,9 @@ import com.bloxico.ase.userservice.repository.address.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+import java.util.Set;
+
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.stream.Collectors.toList;
@@ -106,11 +109,28 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
+    public void findAllRegionsWithNames_nullNames() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.findAllRegionsWithNames(null)
+        );
+    }
+
+    @Test
+    public void findAllRegionsWithNames() {
+        var r1 = utilLocation.savedRegionDto();
+        var r2 = utilLocation.savedRegionDto();
+        var r3 = utilLocation.savedRegionDto();
+        var foundRegions = service.findAllRegionsWithNames(List.of(r1.getName(), r2.getName(), r3.getName()));
+        assertThat(foundRegions, hasItems(r1, r2, r3));
+    }
+
+    @Test
     public void countCountriesByRegion() {
         var region = utilLocation.savedRegion();
         assertEquals(0, service.countCountriesByRegionId(region.getId()));
-        var country = utilLocation.savedCountry();
-        assertEquals(1, service.countCountriesByRegionId(country.getRegion().getId()));
+        utilLocation.savedCountryWithRegion(region);
+        assertEquals(1, service.countCountriesByRegionId(region.getId()));
     }
 
     @Test
@@ -144,7 +164,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         var principalId = utilUser.savedAdmin().getId();
         var country = new CountryDto();
         country.setName(genUUID());
-        country.setRegion(utilLocation.savedRegionDto());
+        country.setRegions(Set.of(utilLocation.savedRegionDto()));
         assertTrue(countryRepository.findByNameIgnoreCase(country.getName()).isEmpty());
         service.saveCountry(country, principalId);
         assertTrue(countryRepository.findByNameIgnoreCase(country.getName()).isPresent());
@@ -186,10 +206,10 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         var dto = new CountryDto();
         dto.setId(country.getId());
         dto.setName(newCountryName);
-        dto.setRegion(region);
+        dto.setRegions(Set.of(region));
         var updatedCountry = service.updateCountry(dto, utilUser.savedAdmin().getId());
         assertEquals(newCountryName, updatedCountry.getName());
-        assertEquals(region, updatedCountry.getRegion());
+        assertThat(updatedCountry.getRegions(), hasItems(region));
     }
 
     @Test

@@ -1,11 +1,15 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.AbstractSpringTest;
+import com.bloxico.ase.testutil.UtilAuth;
+import com.bloxico.ase.testutil.UtilLocation;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import com.bloxico.ase.userservice.web.model.address.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 import static com.bloxico.ase.testutil.Util.ERROR_CODE;
 import static com.bloxico.ase.testutil.Util.genUUID;
@@ -15,7 +19,8 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
@@ -96,13 +101,13 @@ public class LocationApiTest extends AbstractSpringTest {
 
     @Test
     public void deleteRegion_400_regionHasCountries() {
-        var country = utilLocation.savedCountry();
-        var regionThatHasCountry = country.getRegion();
+        var region = utilLocation.savedRegion();
+        utilLocation.savedCountryWithRegion(region);
 
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .when()
-                .pathParam("id", regionThatHasCountry.getId())
+                .pathParam("id", region.getId())
                 .post(API_URL + REGION_DELETE)
                 .then()
                 .assertThat()
@@ -162,7 +167,7 @@ public class LocationApiTest extends AbstractSpringTest {
     public void createCountry_409_countryAlreadyExists() {
         var auth = utilAuth.doAdminAuthentication();
         var region = utilLocation.savedRegion();
-        var request = new SaveCountryRequest(genUUID(), region.getName());
+        var request = new SaveCountryRequest(genUUID(), Set.of(region.getName()));
         given()
                 .header("Authorization", auth)
                 .contentType(JSON)
@@ -189,7 +194,7 @@ public class LocationApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .body(new SaveCountryRequest(genUUID(), genUUID()))
+                .body(new SaveCountryRequest(genUUID(), Set.of(genUUID())))
                 .when()
                 .post(API_URL + COUNTRY_SAVE)
                 .then()
@@ -206,7 +211,7 @@ public class LocationApiTest extends AbstractSpringTest {
         var country = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .body(new SaveCountryRequest(countryName, regionName))
+                .body(new SaveCountryRequest(countryName, Set.of(regionName)))
                 .when()
                 .post(API_URL + COUNTRY_SAVE)
                 .then()
@@ -219,7 +224,7 @@ public class LocationApiTest extends AbstractSpringTest {
         assertNotNull(country.getId());
         assertEquals(countryName, country.getName());
         assertNotNull(region.getId());
-        assertEquals(region, country.getRegion());
+        assertThat(country.getRegions(), hasItems(region));
     }
 
     @Test
@@ -229,7 +234,7 @@ public class LocationApiTest extends AbstractSpringTest {
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .pathParam("id", -1)
-                .body(new UpdateCountryRequest(genUUID(), region.getName()))
+                .body(new UpdateCountryRequest(genUUID(), Set.of(region.getName())))
                 .when()
                 .post(API_URL + COUNTRY_UPDATE)
                 .then()
@@ -245,7 +250,7 @@ public class LocationApiTest extends AbstractSpringTest {
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .pathParam("id", country.getId())
-                .body(new UpdateCountryRequest(genUUID(), genUUID()))
+                .body(new UpdateCountryRequest(genUUID(), Set.of(genUUID())))
                 .when()
                 .post(API_URL + COUNTRY_UPDATE)
                 .then()
@@ -256,13 +261,14 @@ public class LocationApiTest extends AbstractSpringTest {
 
     @Test
     public void updateCountry_409_countryAlreadyExists() {
-        var country1 = utilLocation.savedCountry();
-        var country2 = utilLocation.savedCountry();
+        var region = utilLocation.savedRegion();
+        var country1 = utilLocation.savedCountryWithRegion(region);
+        var country2 = utilLocation.savedCountryWithRegion(region);
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .pathParam("id", country1.getId())
-                .body(new UpdateCountryRequest(country2.getName(), country1.getRegion().getName()))
+                .body(new UpdateCountryRequest(country2.getName(), Set.of(region.getName())))
                 .when()
                 .post(API_URL + COUNTRY_UPDATE)
                 .then()
@@ -274,14 +280,14 @@ public class LocationApiTest extends AbstractSpringTest {
     @Test
     public void updateCountry_200_ok() {
         var country = utilLocation.savedCountry();
-        var region = utilLocation.savedRegion();
+        var region = utilLocation.savedRegionDto();
         var newCountryName = genUUID();
         var newRegionName = region.getName();
         var updatedCountry = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .pathParam("id", country.getId())
-                .body(new UpdateCountryRequest(newCountryName, newRegionName))
+                .body(new UpdateCountryRequest(newCountryName, Set.of(newRegionName)))
                 .when()
                 .post(API_URL + COUNTRY_UPDATE)
                 .then()
@@ -292,7 +298,7 @@ public class LocationApiTest extends AbstractSpringTest {
                 .as(UpdateCountryResponse.class)
                 .getCountry();
         assertEquals(newCountryName, updatedCountry.getName());
-        assertEquals(newRegionName, updatedCountry.getRegion().getName());
+        assertThat(updatedCountry.getRegions(), hasItems(region));
     }
 
 }

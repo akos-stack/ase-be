@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
+import com.bloxico.ase.userservice.entity.address.Region;
 import com.bloxico.ase.userservice.proj.CountryEvaluationDetailsCountedProj;
 import com.bloxico.ase.userservice.proj.RegionCountedProj;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.COUNTRY_EVALUATION_DETAILS_EXISTS;
@@ -42,7 +45,13 @@ public class EvaluationServiceImpl implements IEvaluationService {
                 .findAllCountryEvaluationDetailsWithEvaluatorsCount(
                         request.getSearch(), request.getRegions(), getPagination(request));
         log.debug("EvaluationServiceImpl.findAllCountryEvaluationDetails - end | request: {}", request);
-        return page;
+        return page.map(transferProj -> new CountryEvaluationDetailsCountedProj(
+                transferProj.getCountry(),
+                transferProj.getC().getRegions().stream().map(Region::getName).collect(Collectors.toList()),
+                transferProj.getPricePerEvaluation(),
+                transferProj.getAvailabilityPercentage(),
+                transferProj.getTotalOfEvaluators()
+        ));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
 import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
@@ -42,11 +43,8 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
     public SaveCountryEvaluationDetailsResponse saveCountryEvaluationDetails(
             SaveCountryEvaluationDetailsRequest request, long principalId) {
         log.debug("EvaluationFacadeImpl.saveCountryEvaluationDetails - start | request: {}, principalId: {}", request, principalId);
-        var countryDto = locationService.findCountryByName(request.getCountry());
-        var evaluationDetailsDto = MAPPER.toCountryEvaluationDetailsDto(request);
-        evaluationDetailsDto.setCountryId(countryDto.getId());
-        evaluationDetailsDto = evaluationService.saveCountryEvaluationDetails(evaluationDetailsDto, principalId);
-        var response = new SaveCountryEvaluationDetailsResponse(evaluationDetailsDto);
+        var detailsDto = doSaveCountryEvaluationDetails(request, principalId);
+        var response = new SaveCountryEvaluationDetailsResponse(detailsDto);
         log.debug("EvaluationFacadeImpl.saveCountryEvaluationDetails - end | request: {}, principalId: {}", request, principalId);
         return response;
     }
@@ -56,13 +54,18 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
             UpdateCountryEvaluationDetailsRequest request, int evaluationDetailsId, long principalId) {
         log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - start | " +
                 "request: {}, evaluationDetailsId {}, principalId: {}", request, evaluationDetailsId, principalId);
-        var evaluationDetailsDto = MAPPER.toCountryEvaluationDetailsDto(request);
-        evaluationDetailsDto.setId(evaluationDetailsId);
-        evaluationDetailsDto = evaluationService.updateCountryEvaluationDetails(evaluationDetailsDto, principalId);
-        var response = new UpdateCountryEvaluationDetailsResponse(evaluationDetailsDto);
+        var detailsDto = doUpdateCountryEvaluationDetails(request, evaluationDetailsId, principalId);
+        var response = new UpdateCountryEvaluationDetailsResponse(detailsDto);
         log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - end | " +
                 "request: {}, evaluationDetailsId {}, principalId: {}", request, evaluationDetailsId, principalId);
         return response;
+    }
+
+    private CountryEvaluationDetailsDto doUpdateCountryEvaluationDetails(
+            UpdateCountryEvaluationDetailsRequest request, int evaluationDetailsId, long principalId) {
+        var evaluationDetailsDto = MAPPER.toCountryEvaluationDetailsDto(request);
+        evaluationDetailsDto.setId(evaluationDetailsId);
+        return evaluationService.updateCountryEvaluationDetails(evaluationDetailsDto, principalId);
     }
 
     @Override
@@ -73,6 +76,13 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
                 page.getNumberOfElements(), page.getTotalElements(), page.getTotalPages());
         log.info("EvaluationFacadeImpl.searchRegions - end | request: {}", request);
         return response;
+    }
+
+    private CountryEvaluationDetailsDto doSaveCountryEvaluationDetails(SaveCountryEvaluationDetailsRequest request, long principalId) {
+        var countryDto = locationService.findCountryByName(request.getCountry());
+        var evaluationDetailsDto = MAPPER.toCountryEvaluationDetailsDto(request);
+        evaluationDetailsDto.setCountryId(countryDto.getId());
+        return evaluationService.saveCountryEvaluationDetails(evaluationDetailsDto, principalId);
     }
 
 }

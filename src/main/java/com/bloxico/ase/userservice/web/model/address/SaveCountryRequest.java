@@ -2,9 +2,13 @@ package com.bloxico.ase.userservice.web.model.address;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Value;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import java.util.Set;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -18,9 +22,9 @@ public class SaveCountryRequest {
     @ApiModelProperty(required = true)
     String country;
 
-    @NotBlank
-    @JsonProperty("region")
+    @JsonProperty("regions")
     @ApiModelProperty(required = true)
-    String region;
+    @Size(min = 1)
+    Set<String> regions;
 
 }
