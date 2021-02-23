@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -14,10 +15,11 @@ import java.util.Set;
 
 import static lombok.AccessLevel.PRIVATE;
 
-@Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
 @ToString(exclude = {"password", "matchPassword"})
+@Setter
+@Getter
 public class RegistrationRequest {
 
     @JsonIgnore
@@ -56,6 +58,10 @@ public class RegistrationRequest {
     @JsonProperty("match_password")
     @ApiModelProperty(required = true)
     String matchPassword;
+
+    @JsonProperty("image")
+    @ApiModelProperty(required = true)
+    MultipartFile image;
 
     @JsonProperty("aspirations")
     Set<String> aspirationNames;

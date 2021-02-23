@@ -39,14 +39,14 @@ public interface UserRegistrationApi {
     @PostMapping(
             value = REGISTRATION_ENDPOINT,
             produces = {"application/json"},
-            consumes = {"application/json"})
+            consumes = {"multipart/form-data"})
     @ApiOperation(value = "Creates disabled user in the database and sends verification token to the provided email.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Registration successfully done."),
             @ApiResponse(code = 400, message = "Values `password` and `match_password` do not match."),
             @ApiResponse(code = 409, message = "User already exists.")
     })
-    ResponseEntity<RegistrationResponse> registration(@Valid @RequestBody RegistrationRequest request);
+    ResponseEntity<RegistrationResponse> registration(RegistrationRequest request);
 
     @PostMapping(
             value = REGISTRATION_CONFIRM_ENDPOINT,

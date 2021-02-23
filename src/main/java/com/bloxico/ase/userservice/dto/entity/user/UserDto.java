@@ -1,7 +1,9 @@
 package com.bloxico.ase.userservice.dto.entity.user;
 
+import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
 import java.util.Set;

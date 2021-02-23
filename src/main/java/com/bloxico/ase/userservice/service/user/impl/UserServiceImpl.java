@@ -1,8 +1,13 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluatorDocument;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluatorDocumentId;
+import com.bloxico.ase.userservice.entity.token.UserRegistrationDocument;
+import com.bloxico.ase.userservice.entity.token.UserRegistrationDocumentId;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
+import com.bloxico.ase.userservice.repository.token.UserRegistrationDocumentRepository;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
 import com.bloxico.ase.userservice.service.user.IUserService;
@@ -30,15 +35,18 @@ public class UserServiceImpl implements IUserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserRegistrationDocumentRepository userRegistrationDocumentRepository;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder)
+                           PasswordEncoder passwordEncoder,
+                           UserRegistrationDocumentRepository userRegistrationDocumentRepository)
     {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userRegistrationDocumentRepository = userRegistrationDocumentRepository;
     }
 
     @Override
@@ -176,6 +184,18 @@ public class UserServiceImpl implements IUserService {
         if (aspiredRoles.size() != names.size())
             throw ROLE_NOT_FOUND.newException();
         return aspiredRoles;
+    }
+
+    @Override
+    public void saveUserDocument(Long userId, long documentId) {
+        log.debug("UserServiceImpl.saveUserDocument - start | email: {}, documentId {}", userId, documentId);
+        var userRegistrationDocument = new UserRegistrationDocument();
+        var userRegistrationDocumentId = new UserRegistrationDocumentId();
+        userRegistrationDocumentId.setDocumentId(documentId);
+        userRegistrationDocumentId.setUserId(userId);
+        userRegistrationDocument.setUserRegistrationDocumentId(userRegistrationDocumentId);
+        userRegistrationDocumentRepository.saveAndFlush(userRegistrationDocument);
+        log.debug("UserServiceImpl.saveUserDocument - end | email: {}, documentId {}", userId, documentId);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.entity.user;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
+import com.bloxico.ase.userservice.entity.document.Document;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -81,5 +82,12 @@ public class User extends BaseEntity {
                 .map(Role::getName)
                 .collect(toSet());
     }
+
+    @OneToOne(fetch = EAGER, cascade = MERGE)
+    @JoinTable(
+            name = "user_profile_image_document",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "document_id"))
+    private Document document;
 
 }

@@ -959,6 +959,23 @@ databaseChangeLog:
                     foreignKeyName: fk_document_pending_evaluator
                     references: documents(id)
         - createTable:
+            tableName: user_profile_image_document
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: fk_user_document
+                    references: users(id)
+              - column:
+                  name: document_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: fk_document_user
+                    references: documents(id)
+        - createTable:
             tableName: artists
             columns:
               - column:

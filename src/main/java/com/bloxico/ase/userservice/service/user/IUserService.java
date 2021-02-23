@@ -26,4 +26,5 @@ public interface IUserService {
 
     void setNewPassword(long principalId, String password);
 
+    void saveUserDocument(Long userId, long id);
 }

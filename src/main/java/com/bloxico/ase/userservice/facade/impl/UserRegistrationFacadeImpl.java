@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.FileCategory.CV;
+import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.EVALUATOR_INVITATION;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.VERIFICATION;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
@@ -68,6 +69,8 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var userDto = MAPPER.toUserDto(request);
         userDto.addRole(rolePermissionService.findRoleByName(request.getRole()));
         userDto = userService.saveUser(userDto);
+        var documentDto = documentService.saveDocument(request.getImage(), IMAGE, userDto.getId());
+        userService.saveUserDocument(userDto.getId(), documentDto.getId());
         var tokenDto = registrationTokenService.createTokenForUser(userDto.getId());
         mailUtil.sendTokenEmail(VERIFICATION, userDto.getEmail(), tokenDto.getValue());
         var response = new RegistrationResponse(tokenDto.getValue());
