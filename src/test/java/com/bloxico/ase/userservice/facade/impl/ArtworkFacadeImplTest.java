@@ -31,8 +31,8 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     @Test
     public void submitArtwork_missingResume() {
         var artOwnerDto = utilArtwork.savedArtOwnerDto();
-        var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.WAITING_FOR_EVALUATION, true, null);
-        submitArtworkRequest.setCv(null);
+        var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
+        submitArtworkRequest.setIAmArtOwner(true);
         assertThrows(
                 ArtworkException.class,
                 () -> artworkFacade.submitArtwork(submitArtworkRequest, artOwnerDto.getUserProfile().getUserId()));
@@ -41,8 +41,8 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     @Test
     public void submitArtwork_missingCertificate() {
         var artOwnerDto = utilArtwork.savedArtOwnerDto();
-        var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
-        submitArtworkRequest.setCertificate(null);
+        var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.WAITING_FOR_EVALUATION, true, null);
+        submitArtworkRequest.setIAmArtOwner(false);
         assertThrows(
                 ArtworkException.class,
                 () -> artworkFacade.submitArtwork(submitArtworkRequest, artOwnerDto.getUserProfile().getUserId()));

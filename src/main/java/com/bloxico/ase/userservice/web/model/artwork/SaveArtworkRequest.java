@@ -1,12 +1,15 @@
 package com.bloxico.ase.userservice.web.model.artwork;
 
 import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
+import com.bloxico.ase.userservice.util.FileCategory;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
@@ -14,6 +17,8 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_MISSING_CERTIFICATE;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_MISSING_RESUME;
 import static lombok.AccessLevel.PRIVATE;
 
 @AllArgsConstructor
@@ -30,9 +35,9 @@ public class SaveArtworkRequest {
 
     @NotNull
     @NotEmpty
-    @JsonProperty("principal_picture")
+    @JsonProperty("principal_image")
     @ApiModelProperty(required = true)
-    MultipartFile principalPicture;
+    MultipartFile principalImage;
 
     @NotNull
     @NotEmpty
@@ -47,6 +52,7 @@ public class SaveArtworkRequest {
     String[] categories;
 
     @JsonProperty("artist")
+    @ApiModelProperty(required = true)
     String artist;
 
     @NotNull
@@ -79,11 +85,13 @@ public class SaveArtworkRequest {
     @ApiModelProperty(required = true)
     String[] styles;
 
-    @JsonProperty("cv")
-    MultipartFile cv;
+    @JsonProperty("document")
+    @ApiModelProperty(required = true)
+    MultipartFile document;
 
-    @JsonProperty("certificate")
-    MultipartFile certificate;
+    @JsonProperty("fileCategory")
+    @ApiModelProperty(required = true)
+    FileCategory fileCategory;
 
     @NotNull
     @NotEmpty
@@ -172,4 +180,22 @@ public class SaveArtworkRequest {
     @JsonProperty("groupId")
     @ApiModelProperty
     Long groupId;
+
+    @JsonIgnore
+    public void validateRequest() {
+        if(iAmArtOwner && fileCategory != FileCategory.CV) {
+            throw ARTWORK_MISSING_RESUME.newException();
+        } else if(!iAmArtOwner && fileCategory != FileCategory.CERTIFICATE) {
+            throw ARTWORK_MISSING_CERTIFICATE.newException();
+        }
+    }
+
+    @JsonIgnore
+    public boolean hasHistory() {
+        return !StringUtils.isEmpty(appraisalHistory)
+                || !StringUtils.isEmpty(locationHistory)
+                || !StringUtils.isEmpty(runsHistory)
+                || !StringUtils.isEmpty(maintenanceHistory)
+                || !StringUtils.isEmpty(notes);
+    }
 }

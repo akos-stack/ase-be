@@ -104,6 +104,9 @@ public class UtilArtwork {
 
     public SaveArtworkRequest genSaveArtworkRequest(ArtworkGroup.Status status, boolean artOwner, Long groupId) {
         var locationDto = utilLocation.savedLocationDto();
+        var document = artOwner ? genMultipartFile(FileCategory.CV.getSupportedFileExtensions().stream().findFirst().get()) :
+                genMultipartFile(FileCategory.CERTIFICATE.getSupportedFileExtensions().stream().findFirst().get());
+        var fileCategory = artOwner ? FileCategory.CV : FileCategory.CERTIFICATE;
         return new SaveArtworkRequest(
                 Arrays.asList(genMultipartFile(FileCategory.IMAGE.getSupportedFileExtensions().stream().findFirst().get())),    // images
                 genMultipartFile(FileCategory.PRINCIPAL_IMAGE.getSupportedFileExtensions().stream().findFirst().get()),         // principalImage
@@ -115,8 +118,8 @@ public class UtilArtwork {
                 new String[]{genUUID(), genUUID()},                                                                             // materials
                 new String[]{genUUID(), genUUID()},                                                                             // mediums
                 new String[]{genUUID(), genUUID()},                                                                             // styles
-                genMultipartFile(FileCategory.CV.getSupportedFileExtensions().stream().findFirst().get()),                      // cv
-                genMultipartFile(FileCategory.CERTIFICATE.getSupportedFileExtensions().stream().findFirst().get()),             // certificate
+                document,                                                                                                       // document
+                fileCategory,                                                                                                   // fileCategory
                 new BigDecimal(100),                                                                                        // weight
                 new BigDecimal(100),                                                                                        // height
                 new BigDecimal(100),                                                                                        // width

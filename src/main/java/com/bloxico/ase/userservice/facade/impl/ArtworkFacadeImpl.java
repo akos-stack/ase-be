@@ -1,7 +1,10 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
-import com.bloxico.ase.userservice.dto.entity.artwork.*;
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkGroupDto;
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkHistoryDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
@@ -23,14 +26,12 @@ import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.*;
 
 @Slf4j
 @Service
@@ -73,6 +74,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     // HELPER METHODS
 
     private ArtworkDto doPrepareArtworkDto(SaveArtworkRequest request, long principalId) {
+        request.validateRequest();
         var artworkDto = MAPPER.toArtworkDto(request);
         artworkDto.setGroup(doSaveGroup(request, principalId));
         artworkDto.setOwner(userProfileService.findArtOwnerByUserId(principalId));
@@ -90,11 +92,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     }
 
     private ArtworkHistoryDto doPrepareArtworkHistory(SaveArtworkRequest request) {
-        if(!StringUtils.isEmpty(request.getAppraisalHistory())
-                || !StringUtils.isEmpty(request.getRunsHistory())
-                || !StringUtils.isEmpty(request.getLocationHistory())
-                || !StringUtils.isEmpty(request.getMaintenanceHistory())
-                || !StringUtils.isEmpty(request.getNotes())) {
+        if(request.hasHistory()) {
             return MAPPER.toArtworkHistoryDto(request);
         } else return null;
     }
@@ -134,22 +132,11 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     }
 
     private DocumentDto doSavePrincipalImage(SaveArtworkRequest request, long principalId) {
-        return documentService.saveDocument(request.getPrincipalPicture(), FileCategory.PRINCIPAL_IMAGE, principalId);
+        return documentService.saveDocument(request.getPrincipalImage(), FileCategory.PRINCIPAL_IMAGE, principalId);
     }
 
     private DocumentDto doSaveDocument(SaveArtworkRequest request, long principalId) {
-        if(request.getIAmArtOwner()) {
-            if(request.getCv() == null) {
-                throw ARTWORK_MISSING_RESUME.newException();
-            }
-            return documentService.saveDocument(request.getCv(), FileCategory.CV, principalId);
-        } else {
-            if(request.getCertificate() == null) {
-                throw ARTWORK_MISSING_CERTIFICATE.newException();
-            }
-            return documentService.saveDocument(request.getCertificate(), FileCategory.CERTIFICATE, principalId);
-        }
-
+       return documentService.saveDocument(request.getDocument(), request.getFileCategory(), principalId);
     }
 
     private List<DocumentDto> doSaveImages(SaveArtworkRequest request, long principalId) {
@@ -163,14 +150,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
 
     private ArtistDto doSaveArtist(SaveArtworkRequest request, long principalId) {
         var artistDto = new ArtistDto();
-        if(request.getIAmArtOwner()) {
-            var artOwnerDto = userProfileService.findArtOwnerByUserId(principalId);
-            artistDto.setName(artOwnerDto.getUserProfile().getFirstName() + " " + artOwnerDto.getUserProfile().getLastName());
-        } else if(StringUtils.isEmpty(request.getArtist())){
-            throw ARTWORK_ARTIST_NOT_PROVIDED.newException();
-        } else {
-            artistDto.setName(request.getArtist());
-        }
+        artistDto.setName(request.getArtist());
         return artistService.saveArtist(artistDto, principalId);
     }
 
