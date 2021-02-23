@@ -8,6 +8,7 @@ import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.entity.artwork.Artist;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.repository.artwork.ArtistRepository;
 import com.bloxico.ase.userservice.repository.artwork.ArtworkGroupRepository;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 
 import static com.bloxico.ase.testutil.Util.genMultipartFile;
 import static com.bloxico.ase.testutil.Util.genUUID;
@@ -66,6 +68,16 @@ public class UtilArtwork {
         var artOwnerDto = new ArtOwnerDto();
         artOwnerDto.setUserProfile(userProfileDto);
         return userProfileService.saveArtOwner(artOwnerDto, principalId);
+    }
+
+    public ArtOwnerDto savedArtOwnerDto(UtilAuth.Registration registration) {
+        var userProfileDto = utilUserProfile.savedUserProfileDto(registration.getId());
+        var principalId = userProfileDto.getUserId();
+        var artOwnerDto = new ArtOwnerDto();
+        artOwnerDto.setUserProfile(userProfileDto);
+        var response = userProfileService.saveArtOwner(artOwnerDto, principalId);
+        utilUser.addRoleToUserWithId(Role.ART_OWNER, registration.getId());
+        return response;
     }
 
     public ArtworkHistoryDto genArtworkHistory() {
@@ -139,5 +151,38 @@ public class UtilArtwork {
                 status,                                                                                                         // status
                 groupId                                                                                                         // groupId
         );
+    }
+
+    public HashMap<String, String> genSaveArtworkFormParams(ArtworkGroup.Status status, boolean artOwner, Long groupId) {
+        var locationDto = utilLocation.savedLocationDto();
+        HashMap<String, String> formParams = new HashMap<>();
+        formParams.put("title", genUUID());
+        formParams.put("categories", genUUID());
+        formParams.put("artist", genUUID());
+        formParams.put("iAmArtOwner", Boolean.toString(artOwner));
+        formParams.put("year", Integer.toString(2010));
+        formParams.put("materials", genUUID());
+        formParams.put("mediums", genUUID());
+        formParams.put("styles", genUUID());
+        formParams.put("fileCategory", artOwner ? FileCategory.CV.name() : FileCategory.CERTIFICATE.name());
+        formParams.put("weight", String.valueOf(new BigDecimal(100)));
+        formParams.put("height", String.valueOf(new BigDecimal(100)));
+        formParams.put("width", String.valueOf(new BigDecimal(100)));
+        formParams.put("depth", String.valueOf(new BigDecimal(100)));
+        formParams.put("address", genUUID());
+        formParams.put("address2", genUUID());
+        formParams.put("city", genUUID());
+        formParams.put("country", locationDto.getCountry().getName());
+        formParams.put("region", locationDto.getCountry().getRegion().getName());
+        formParams.put("zipCode", genUUID());
+        formParams.put("phone", genUUID());
+        formParams.put("appraisalHistory", genUUID());
+        formParams.put("locationHistory", genUUID());
+        formParams.put("runsHistory", genUUID());
+        formParams.put("maintenanceHistory", genUUID());
+        formParams.put("notes", genUUID());
+        formParams.put("status", status.name());
+        formParams.put("groupId", groupId != null ? Long.toString(groupId) : null);
+        return formParams;
     }
 }

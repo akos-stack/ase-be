@@ -2,7 +2,6 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
 import com.bloxico.ase.testutil.UtilArtwork;
-import com.bloxico.ase.testutil.UtilUser;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
 import com.bloxico.ase.userservice.exception.ArtworkException;
 import com.bloxico.ase.userservice.service.artwork.impl.ArtworkGroupServiceImpl;
@@ -15,7 +14,6 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Autowired private ArtworkFacadeImpl artworkFacade;
     @Autowired private UtilArtwork utilArtwork;
-    @Autowired private UtilUser utilUser;
     @Autowired private ArtworkGroupServiceImpl artworkGroupService;
 
     @Test

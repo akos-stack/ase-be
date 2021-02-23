@@ -196,24 +196,19 @@ public interface ErrorCodes {
                 "41",
                 "Artwork metadata type not found."),
 
-        ARTWORK_ARTIST_NOT_PROVIDED(
-                HttpStatus.BAD_REQUEST,
-                "42",
-                "Artwork artist name not provided."),
-
         ARTWORK_MISSING_RESUME(
                 HttpStatus.BAD_REQUEST,
-                "43",
+                "42",
                 "Art Owner resume missing."),
 
         ARTWORK_MISSING_CERTIFICATE(
                 HttpStatus.BAD_REQUEST,
-                "44",
+                "43",
                 "Artwork certificate not uploaded."),
 
         ARTWORK_GROUP_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "45",
+                "44",
                 "Artwork group not found.");
 
         private final HttpStatus httpStatus;

@@ -68,6 +68,14 @@ public class Util {
         }
     }
 
+    public static byte[] getTestImageBytes() {
+        try {
+            return toByteArray(Util.class.getResourceAsStream("/testFiles/testImg.jpg"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static <T> T randElt(Collection<? extends T> coll) {
         return List.copyOf(coll).get(current().nextInt(0, coll.size()));
     }
