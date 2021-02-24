@@ -2,13 +2,11 @@ package com.bloxico.ase.userservice.entity.artwork;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.address.Location;
-import com.bloxico.ase.userservice.entity.artwork.metadata.Category;
-import com.bloxico.ase.userservice.entity.artwork.metadata.Material;
-import com.bloxico.ase.userservice.entity.artwork.metadata.Medium;
-import com.bloxico.ase.userservice.entity.artwork.metadata.Style;
+import com.bloxico.ase.userservice.entity.artwork.metadata.*;
 import com.bloxico.ase.userservice.entity.document.Document;
 import com.bloxico.ase.userservice.entity.user.profile.ArtOwner;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -19,6 +17,7 @@ import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
+@EqualsAndHashCode(exclude = "id", callSuper = false)
 @Entity
 @Table(name = "artworks")
 public class Artwork extends BaseEntity {
