@@ -19,6 +19,6 @@ public class QuotationPackage extends BaseEntity {
     private Long id;
 
     @Column(name = "artwork_id")
-    private Integer artworkId;
+    private Long artworkId;
 
 }

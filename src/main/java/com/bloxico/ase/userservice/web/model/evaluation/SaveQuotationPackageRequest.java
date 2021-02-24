@@ -35,7 +35,7 @@ public class SaveQuotationPackageRequest {
 
     @NotNull
     @JsonProperty("country_id")
-    Integer artworkId;
+    Long artworkId;
 
     @NotNull
     @JsonProperty("countries")

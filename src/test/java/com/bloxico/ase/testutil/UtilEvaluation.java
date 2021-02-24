@@ -56,7 +56,7 @@ public class UtilEvaluation {
     }
 
     public QuotationPackage genQuotationPackage() {
-        var artworkId = current().nextInt(1, Integer.MAX_VALUE); // TODO
+        var artworkId = current().nextLong(1, Integer.MAX_VALUE); // TODO
         var qPackage = new QuotationPackage();
         qPackage.setArtworkId(artworkId);
         return qPackage;
@@ -90,7 +90,7 @@ public class UtilEvaluation {
     }
 
     public SaveQuotationPackageRequest genSaveQuotationPackageRequest() {
-        var artworkId = current().nextInt(1, Integer.MAX_VALUE); // TODO
+        var artworkId = current().nextLong(1, Integer.MAX_VALUE); // TODO
         var c1 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));
         var c2 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));
         var c3 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));

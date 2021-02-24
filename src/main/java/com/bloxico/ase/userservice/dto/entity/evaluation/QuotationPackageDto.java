@@ -14,7 +14,7 @@ public class QuotationPackageDto {
     private Long id;
 
     @JsonProperty("country_id")
-    private Integer artworkId;
+    private Long artworkId;
 
     @JsonProperty("countries")
     private Set<QuotationPackageCountryDto> countries;

@@ -1281,10 +1281,11 @@ databaseChangeLog:
                     primaryKey: true
               - column:
                   name: artwork_id
-                  type: integer
-                  # TODO: add FK
+                  type: bigint
                   constraints:
                     nullable: false
+                    foreignKeyName: fk_quotation_package_artwork
+                    references: artworks(id)
               # METADATA
               - column:
                   name: creator_id

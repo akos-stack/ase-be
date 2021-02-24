@@ -9,6 +9,6 @@ import java.util.Optional;
 @Repository
 public interface QuotationPackageRepository extends JpaRepository<QuotationPackage, Long> {
 
-    Optional<QuotationPackage> findByArtworkId(Integer artworkId);
+    Optional<QuotationPackage> findByArtworkId(Long artworkId);
 
 }
