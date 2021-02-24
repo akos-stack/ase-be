@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Documents.DOCUMENT_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_EXISTS;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j

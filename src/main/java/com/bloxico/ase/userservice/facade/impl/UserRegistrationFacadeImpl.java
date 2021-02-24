@@ -69,8 +69,11 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var userDto = MAPPER.toUserDto(request);
         userDto.addRole(rolePermissionService.findRoleByName(request.getRole()));
         userDto = userService.saveUser(userDto);
-        var documentDto = documentService.saveDocument(request.getImage(), IMAGE, userDto.getId());
-        userService.saveUserDocument(userDto.getId(), documentDto.getId());
+//        if(request.getImage() != null){
+//            var documentDto = documentService.saveDocument(request.getImage(), IMAGE, userDto.getId());
+//            userService.saveUserDocument(userDto.getId(), documentDto.getId());
+//        }
+
         var tokenDto = registrationTokenService.createTokenForUser(userDto.getId());
         mailUtil.sendTokenEmail(VERIFICATION, userDto.getEmail(), tokenDto.getValue());
         var response = new RegistrationResponse(tokenDto.getValue());

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
@@ -20,7 +21,7 @@ import static lombok.AccessLevel.PRIVATE;
 @ToString(exclude = {"password", "matchPassword"})
 @Setter
 @Getter
-public class RegistrationRequest {
+public class RegistrationRequest{
 
     @JsonIgnore
     public String getRole() {
@@ -59,12 +60,13 @@ public class RegistrationRequest {
     @ApiModelProperty(required = true)
     String matchPassword;
 
-    @JsonProperty("image")
-    @ApiModelProperty(required = true)
-    MultipartFile image;
-
     @JsonProperty("aspirations")
     Set<String> aspirationNames;
+
+//    @Nullable
+//    @JsonProperty("image")
+//    @ApiModelProperty(required = false)
+//    MultipartFile image;
 
     @JsonIgnore
     public boolean isPasswordMatching() {
@@ -72,4 +74,12 @@ public class RegistrationRequest {
         return password.equals(matchPassword);
     }
 
+//    public RegistrationRequest(String email, String username,
+//                               String password, String matchPassword, Set<String> aspirationNames) {
+//        this.email = email;
+//        this.username = username;
+//        this.password = password;
+//        this.matchPassword = matchPassword;
+//        this.aspirationNames = aspirationNames;
+//    }
 }
