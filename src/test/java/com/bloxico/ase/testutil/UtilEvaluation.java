@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
-import static com.bloxico.ase.testutil.Util.genInt;
+import static com.bloxico.ase.testutil.Util.genPosInt;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.concurrent.ThreadLocalRandom.current;
 
@@ -52,7 +52,7 @@ public class UtilEvaluation {
     }
 
     public SaveCountryEvaluationDetailsRequest genSaveCountryEvaluationDetailsRequest(String country) {
-        return new SaveCountryEvaluationDetailsRequest(country, genInt(251), genInt(101));
+        return new SaveCountryEvaluationDetailsRequest(country, genPosInt(251), genPosInt(101));
     }
 
     public QuotationPackage genQuotationPackage() {
@@ -80,7 +80,7 @@ public class UtilEvaluation {
     public QuotationPackageCountry genQuotationPackageCountry(long packageId) {
         var countryId = utilLocation.savedCountry().getId();
         var qpCountry = new QuotationPackageCountry();
-        qpCountry.setNumberOfEvaluations(genInt(50));
+        qpCountry.setNumberOfEvaluations(genPosInt(50));
         qpCountry.setId(new QuotationPackageCountry.Id(packageId, countryId));
         return qpCountry;
     }
@@ -91,9 +91,9 @@ public class UtilEvaluation {
 
     public SaveQuotationPackageRequest genSaveQuotationPackageRequest() {
         var artworkId = current().nextInt(1, Integer.MAX_VALUE); // TODO
-        var c1 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genInt(50));
-        var c2 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genInt(50));
-        var c3 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genInt(50));
+        var c1 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));
+        var c2 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));
+        var c3 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));
         return new SaveQuotationPackageRequest(artworkId, Set.of(c1, c2, c3));
     }
 

@@ -3,8 +3,8 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkMetadataRequest;
-import com.bloxico.ase.userservice.web.model.artwork.UpdateArtworkMetadataRequest;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.SaveArtworkMetadataRequest;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.UpdateArtworkMetadataRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

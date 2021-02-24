@@ -40,8 +40,8 @@ public class Util {
         return LONG.incrementAndGet() + "_" + localPart + "@mail.com";
     }
 
-    public static int genInt(int bound) {
-        return current().nextInt(bound);
+    public static int genPosInt(int bound) {
+        return current().nextInt(1, bound);
     }
 
     public static String genUUID() {
@@ -67,6 +67,14 @@ public class Util {
     public static byte[] getTestCVBytes() {
         try {
             return toByteArray(Util.class.getResourceAsStream("/testFiles/testCv.txt"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static byte[] getTestImageBytes() {
+        try {
+            return toByteArray(Util.class.getResourceAsStream("/testFiles/testImg.jpg"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

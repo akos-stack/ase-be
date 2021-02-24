@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.dto.entity.token;
 
+import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
@@ -16,7 +17,6 @@ public class PendingEvaluatorDto {
     @JsonProperty("status")
     Status status;
 
-    @JsonProperty("cv_path")
-    String cvPath;
-
+    @JsonProperty("document")
+    DocumentDto document;
 }

@@ -95,4 +95,11 @@ public class UtilUser {
         userRepository.saveAndFlush(user);
     }
 
+    public void addRoleToUserWithId(String roleName, long userId) {
+        var user = userRepository.findById(userId).orElseThrow();
+        var role = roleRepository.getRole(roleName);
+        user.addRole(role);
+        userRepository.saveAndFlush(user);
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.bloxico.ase.userservice.dto.entity.artwork;
+package com.bloxico.ase.userservice.dto.entity.artwork.metadata;
 
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.fasterxml.jackson.annotation.JsonProperty;
