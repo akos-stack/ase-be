@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.service.token.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.TokenException;
+import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorRegistrationRequest;
@@ -375,15 +376,15 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
     public void getEvaluatorResume_tokenNotFound() {
         var user = utilUser.savedUser();
         assertThrows(
-                TokenException.class,
+                UserException.class,
                 () -> service.getEvaluatorResume(genUUID(), user.getId()));
     }
 
     @Test
     public void getEvaluatorResume_resumeNotFound() {
         assertThrows(
-                TokenException.class,
-                () -> service.getEvaluatorResume(genEmail(), genUUIDLong()));
+                UserException.class,
+                () -> service.getEvaluatorResume(genEmail(), -1));
     }
 
     @Test

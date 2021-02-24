@@ -1,16 +1,24 @@
 package com.bloxico.ase.userservice.web.api;
 
+import better.files.File;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
+import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.*;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
 import java.util.Set;
 
 import static com.bloxico.ase.testutil.Util.*;
@@ -257,7 +265,8 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .get(API_URL + REGISTRATION_EVALUATOR_INVITATION_CHECK)
                 .then()
                 .assertThat()
-                .statusCode(404);
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
     }
 
     @Test
@@ -354,7 +363,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void requestEvaluatorRegistration_409_evaluatorAlreadyPending() {
         var registration = utilAuth.doConfirmedRegistration();
         var bearerToken = utilAuth.doAuthentication(registration);
-        var cvBytes = getTestCVBytes();
+        var cvBytes = getFileCategoryTestBytes(FileCategory.CV);
         given()
                 .header("Authorization", bearerToken)
                 .formParam("email", registration.getEmail())
@@ -379,7 +388,8 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     public void requestEvaluatorRegistration_200_ok() {
         var registration = utilAuth.doConfirmedRegistration();
-        var cvBytes = getTestCVBytes();
+        var cvBytes = getFileCategoryTestBytes(FileCategory.CV);
+        var name = genUUID() + ".txt";
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParam("email", registration.getEmail())
@@ -395,7 +405,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void submitEvaluator_404_tokenNotFound() {
         given()
                 .contentType(JSON)
-                .body(utilUserProfile.newSubmitUninvitedEvaluatorRequest())
+                .body(utilUserProfile.submitEvaluatorRequest())
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
                 .then()
@@ -436,7 +446,9 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
                 .then()
                 .assertThat()
-                .statusCode(409);
+                .statusCode(409)
+                .body(ERROR_CODE, is(ErrorCodes.User.USER_EXISTS.getCode()));
+
     }
 
     @Test
@@ -466,7 +478,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtOwner_404_countryNotFound() {
-        var request = utilUserProfile.newSubmitArtOwnerRequestCountryNotFound();
+        var request = utilUserProfile.submitArtOwnerRequest(genUUID());
         given()
                 .contentType(JSON)
                 .body(request)
@@ -474,12 +486,14 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
                 .then()
                 .assertThat()
-                .statusCode(404);
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Location.COUNTRY_NOT_FOUND.getCode()));
+
     }
 
     @Test
     public void submitArtOwner_409_userAlreadyExists() {
-        var request = utilUserProfile.newSubmitArtOwnerRequest();
+        var request = utilUserProfile.submitArtOwnerRequest();
         given()
                 .contentType(JSON)
                 .body(request)
@@ -495,12 +509,13 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
                 .then()
                 .assertThat()
-                .statusCode(409);
+                .statusCode(409)
+                .body(ERROR_CODE, is(ErrorCodes.User.USER_EXISTS.getCode()));
     }
 
     @Test
     public void submitArtOwner_200_ok() {
-        var request = utilUserProfile.newSubmitArtOwnerRequest();
+        var request = utilUserProfile.submitArtOwnerRequest();
         var artOwner = given()
                 .contentType(JSON)
                 .body(request)
@@ -575,7 +590,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParam("email", registration.getEmail())
-                .multiPart("cv", "cv.txt", getTestCVBytes())
+                .multiPart("cv", getFileCategoryTestBytes(FileCategory.CV))
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
                 .then()

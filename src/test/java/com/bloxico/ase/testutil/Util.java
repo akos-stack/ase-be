@@ -1,6 +1,8 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
+import com.bloxico.ase.userservice.exception.S3Exception;
+import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.util.SupportedFileExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -60,16 +62,14 @@ public class Util {
                 genUUID().getBytes());
     }
 
-    public static byte[] getTestCVBytes() {
+    public static byte[] getFileCategoryTestBytes(FileCategory fileCategory) {
         try {
-            return toByteArray(Util.class.getResourceAsStream("/testFiles/testCv.txt"));
+            if (fileCategory.equals(FileCategory.CV))
+                return toByteArray(Util.class.getResourceAsStream("/testFiles/testCv.txt"));
+            return toByteArray(Util.class.getResourceAsStream("/testFiles/imagetest.jpg"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static Long genUUIDLong() {
-        return UUID.randomUUID().getLeastSignificantBits();
     }
 
     public static <T> T randElt(Collection<? extends T> coll) {

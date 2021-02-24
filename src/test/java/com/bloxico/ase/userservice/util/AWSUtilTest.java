@@ -9,8 +9,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 
-import static com.bloxico.ase.testutil.Util.genMultipartFile;
-import static com.bloxico.ase.testutil.Util.randOtherEnumConst;
+import static com.bloxico.ase.testutil.Util.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -28,9 +27,15 @@ public class AWSUtilTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void uploadFile_nullArguments() {
-        assertThrows(
-                S3Exception.class,
-                () -> awsUtil.uploadFile(null, null));
+        for (var category : FileCategory.values())
+            for (var extension : category.getSupportedFileExtensions()) {
+                assertThrows(
+                        S3Exception.class,
+                        () -> awsUtil.uploadFile(category, null));
+                assertThrows(
+                        S3Exception.class,
+                        () -> awsUtil.uploadFile(null, genMultipartFile(extension)));
+            }
     }
 
     @Test
@@ -63,7 +68,7 @@ public class AWSUtilTest extends AbstractSpringTestWithAWS {
     public void downloadFile_notFound() {
         assertThrows(
                 S3Exception.class,
-                () -> awsUtil.downloadFile(""));
+                () -> awsUtil.downloadFile(genUUID()));
     }
 
     @Test
@@ -86,7 +91,7 @@ public class AWSUtilTest extends AbstractSpringTestWithAWS {
     public void deleteFile_notFound() {
         assertThrows(
                 S3Exception.class,
-                () -> awsUtil.deleteFile("test_path"));
+                () -> awsUtil.deleteFile(genUUID()));
     }
 
     @Test

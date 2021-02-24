@@ -2,14 +2,15 @@ package com.bloxico.ase.userservice.service.aws.impl;
 
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
+import com.bloxico.ase.userservice.entity.artwork.metadata.Category;
 import com.bloxico.ase.userservice.exception.S3Exception;
 import com.bloxico.ase.userservice.util.FileCategory;
+import com.bloxico.ase.userservice.util.SupportedFileExtension;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import static com.bloxico.ase.testutil.Util.*;
+import static org.junit.Assert.*;
 
-import static com.bloxico.ase.testutil.Util.genMultipartFile;
-import static com.bloxico.ase.testutil.Util.randOtherEnumConst;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
@@ -19,22 +20,28 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void validateFile_nullArguments() {
-        assertThrows(
-                NullPointerException.class,
-                () -> s3Service.validateFile(
-                        randOtherEnumConst(null),
-                        genMultipartFile(null)));
+        for (var category : FileCategory.values())
+            for (var extension : category.getSupportedFileExtensions()) {
+                assertThrows(
+                        NullPointerException.class,
+                        () -> s3Service.validateFile(
+                                randOtherEnumConst(null),
+                                genMultipartFile(extension)));
+                assertThrows(
+                        NullPointerException.class,
+                        () -> s3Service.validateFile(
+                                randOtherEnumConst(category),
+                                genMultipartFile(null)));
+            }
     }
 
     @Test
     public void validateFile_typeNotSupportedForCategory() {
-        for (var category : FileCategory.values())
-            for (var extension : category.getSupportedFileExtensions())
-                assertThrows(
-                        S3Exception.class,
-                        () -> s3Service.validateFile(
-                                randOtherEnumConst(category),
-                                genMultipartFile(extension)));
+        assertThrows(
+                S3Exception.class,
+                () -> s3Service.validateFile(
+                        FileCategory.CV,
+                        genMultipartFile(SupportedFileExtension.png)));
     }
 
     @Test
@@ -62,13 +69,11 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void uploadFile_typeNotSupportedForCategory() {
-        for (var category : FileCategory.values())
-            for (var extension : category.getSupportedFileExtensions())
-                assertThrows(
-                        S3Exception.class,
-                        () -> s3Service.uploadFile(
-                                randOtherEnumConst(category),
-                                genMultipartFile(extension)));
+        assertThrows(
+                S3Exception.class,
+                () -> s3Service.uploadFile(
+                        FileCategory.CV,
+                        genMultipartFile(SupportedFileExtension.png)));
     }
 
     @Test
@@ -82,7 +87,7 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
     public void downloadFile_notFound() {
         assertThrows(
                 S3Exception.class,
-                () -> s3Service.downloadFile(""));
+                () -> s3Service.downloadFile(genUUID()));
     }
 
     @Test
@@ -105,7 +110,7 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
     public void deleteFile_notFound() {
         assertThrows(
                 S3Exception.class,
-                () -> s3Service.deleteFile("test_path"));
+                () -> s3Service.deleteFile(genUUID()));
     }
 
     @Test
@@ -122,4 +127,3 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
 }
-

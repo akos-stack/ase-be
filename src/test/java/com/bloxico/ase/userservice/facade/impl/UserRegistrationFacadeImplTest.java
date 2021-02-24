@@ -357,7 +357,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitEvaluator_evaluatorNotPending() {
-        var request = utilUserProfile.newSubmitUninvitedEvaluatorRequest();
+        var request = utilUserProfile.submitEvaluatorRequest();
         assertThrows(
                 TokenException.class,
                 () -> userRegistrationFacade.submitEvaluator(request));
@@ -365,7 +365,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitEvaluator_countryNotFound() {
-        var request = utilUserProfile.newSubmitUninvitedEvaluatorRequestCountryNotFound();
+        var request = utilUserProfile.submitEvaluatorRequest(genUUID());
         assertThrows(
                 TokenException.class,
                 () -> userRegistrationFacade.submitEvaluator(request));
@@ -387,7 +387,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtOwner_countryNotFound() {
-        var request = utilUserProfile.newSubmitArtOwnerRequestCountryNotFound();
+        var request = utilUserProfile.submitArtOwnerRequest(genUUID());
         assertThrows(
                 LocationException.class,
                 () -> userRegistrationFacade.submitArtOwner(request));
@@ -395,7 +395,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtOwner_userAlreadyExists() {
-        var request = utilUserProfile.newSubmitArtOwnerRequest();
+        var request = utilUserProfile.submitArtOwnerRequest();
         userRegistrationFacade.submitArtOwner(request);
         assertThrows(
                 UserException.class,
@@ -404,7 +404,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtOwner() {
-        var request = utilUserProfile.newSubmitArtOwnerRequest();
+        var request = utilUserProfile.submitArtOwnerRequest();
         assertTrue(artOwnerRepository.findAll().isEmpty());
         var artOwnerId = userRegistrationFacade.submitArtOwner(request).getId();
         assertTrue(artOwnerRepository.findById(artOwnerId).isPresent());

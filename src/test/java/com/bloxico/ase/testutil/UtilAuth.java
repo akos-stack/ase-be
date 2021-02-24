@@ -7,15 +7,22 @@ import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.TokenValidationRequest;
+import io.restassured.mapper.ObjectMapper;
+import io.restassured.mapper.ObjectMapperDeserializationContext;
+import io.restassured.mapper.ObjectMapperSerializationContext;
 import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-import static com.bloxico.ase.testutil.Util.genEmail;
-import static com.bloxico.ase.testutil.Util.genPassword;
+import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.PASSWORD_RESET;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_CONFIRM_ENDPOINT;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.REGISTRATION_ENDPOINT;
@@ -67,9 +74,9 @@ public class UtilAuth {
     public Registration doRegistration() {
         var email = genEmail();
         var password = genPassword();
+        var request = new RegistrationRequest(email, email, password, password, Set.of());
         var token = given()
-                .contentType(JSON)
-                .body(new RegistrationRequest(email, email, password, password, Set.of()))
+                .body(request)
                 .post(API_URL + REGISTRATION_ENDPOINT)
                 .body()
                 .as(RegistrationResponse.class)

@@ -6,7 +6,9 @@ import com.bloxico.ase.userservice.service.token.impl.TokenBlacklistServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 
+import static com.bloxico.ase.testutil.Util.genEmail;
 import static com.bloxico.ase.userservice.entity.user.Role.ADMIN;
 import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
@@ -23,9 +25,17 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void searchUsers_nullArgs() {
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u3 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        assertThat(userManagementFacade.searchUsers(u1.getEmail(), null, 0, MAX_VALUE, "name").getUsers(),
+                not(hasItems(u1, u2, u3)));
+        assertThrows(
+                InvalidDataAccessApiUsageException.class,
+                () -> userManagementFacade.searchUsers(null, "user", 0, MAX_VALUE, "name").getUsers());
         assertThrows(
                 IllegalArgumentException.class,
-                () -> userManagementFacade.searchUsers(null, null, 0, 0, null).getUsers().size());
+                () -> userManagementFacade.searchUsers(u1.getEmail(), "user", 0, MAX_VALUE, null).getUsers());
     }
 
     @Test

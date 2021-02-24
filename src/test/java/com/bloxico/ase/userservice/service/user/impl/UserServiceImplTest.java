@@ -6,13 +6,14 @@ import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Set;
 
-import static com.bloxico.ase.testutil.Util.genPassword;
-import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.testutil.Util.genEmail;
 import static com.bloxico.ase.testutil.UtilUser.genUserDto;
 import static com.bloxico.ase.userservice.entity.user.Role.*;
 import static java.lang.Integer.MAX_VALUE;
@@ -66,23 +67,40 @@ public class UserServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findUsersByEmailOrRole_nullArgs() {
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u3 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        assertThat(userService.findUsersByEmailOrRole(u1.getEmail(), null, 0, MAX_VALUE, "name").getContent(),
+                not(hasItems(u1, u2, u3)));
+        assertThrows(
+                InvalidDataAccessApiUsageException.class,
+                () -> userService.findUsersByEmailOrRole(null, "user", 0, MAX_VALUE, "name").getContent());
         assertThrows(
                 IllegalArgumentException.class,
-                () -> userService.findUsersByEmailOrRole(null, null, 0, 0, ""));
+                () -> userService.findUsersByEmailOrRole(u1.getEmail(), "user", 0, MAX_VALUE, null).getContent());
     }
 
     @Test
     public void findUsersByEmailOrRole_emptyArgs() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> userService.findUsersByEmailOrRole("", "", 0, 0, ""));
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var u3 = utilUser.savedUserDtoWithEmail(genEmail("fooBar2"));
+        assertThat(
+                userService.findUsersByEmailOrRole("", "user", 0, MAX_VALUE, "name").getContent(),
+                hasItems(u1, u2, u3));
+        assertThat(
+                userService.findUsersByEmailOrRole(u1.getEmail(), "", 0, MAX_VALUE, "name").getContent(),
+                allOf(hasItems(u1), not(hasItems(u2, u3))));
     }
 
     @Test
     public void findUsersByEmailOrRole_notFound() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> userService.findUsersByEmailOrRole(genUUID(), "", 0, 0, ""));
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedUserDto();
+        var u3 = utilUser.savedUserDto();
+        assertThat(
+                userService.findUsersByEmailOrRole("", "admin", 0, MAX_VALUE, "name").getContent(),
+                not(hasItems(u1, u2, u3)));
     }
 
     @Test
