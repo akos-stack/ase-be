@@ -3,7 +3,7 @@ package com.bloxico.ase.userservice.web.api;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
-import com.bloxico.ase.userservice.web.model.artwork.*;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;

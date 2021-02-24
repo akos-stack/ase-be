@@ -6,7 +6,7 @@ import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
 import com.bloxico.ase.userservice.facade.IArtworkMetadataFacade;
 import com.bloxico.ase.userservice.service.artwork.IArtworkMetadataService;
 import com.bloxico.ase.userservice.service.artwork.impl.metadata.*;
-import com.bloxico.ase.userservice.web.model.artwork.*;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

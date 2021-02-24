@@ -38,7 +38,7 @@ import com.bloxico.ase.userservice.entity.user.profile.Evaluator;
 import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
 import com.bloxico.ase.userservice.web.model.address.SaveCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
-import com.bloxico.ase.userservice.web.model.artwork.IArtworkMetadataRequest;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.IArtworkMetadataRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;

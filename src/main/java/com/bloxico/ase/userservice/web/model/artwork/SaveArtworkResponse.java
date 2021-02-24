@@ -17,4 +17,5 @@ public class SaveArtworkResponse {
     @JsonProperty("artwork_group")
     @ApiModelProperty(required = true)
     ArtworkGroupDto groupDto;
+
 }
