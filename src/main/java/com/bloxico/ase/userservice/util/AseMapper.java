@@ -2,7 +2,7 @@ package com.bloxico.ase.userservice.util;
 
 import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkMetadataDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.*;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
@@ -11,7 +11,7 @@ import com.bloxico.ase.userservice.dto.entity.user.UserDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.entity.address.*;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
-import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
+import com.bloxico.ase.userservice.entity.evaluation.*;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
 import com.bloxico.ase.userservice.entity.token.*;
 import com.bloxico.ase.userservice.entity.user.Role;
@@ -21,6 +21,7 @@ import com.bloxico.ase.userservice.web.model.address.SaveCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
 import com.bloxico.ase.userservice.web.model.artwork.IArtworkMetadataRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.SaveQuotationPackageRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import com.bloxico.ase.userservice.web.model.user.*;
@@ -61,6 +62,12 @@ public interface AseMapper {
 
     CountryEvaluationDetailsDto toDto(CountryEvaluationDetails entity);
 
+    QuotationPackageDto toDto(QuotationPackage entity);
+
+    @Mapping(target = "quotationPackageId", source = "id.quotationPackageId")
+    @Mapping(target = "countryId", source = "id.countryId")
+    QuotationPackageCountryDto toDto(QuotationPackageCountry entity);
+
     // DTO -> ENTITY
 
     User toEntity(UserDto dto);
@@ -78,6 +85,12 @@ public interface AseMapper {
     Region toEntity(RegionDto dto);
 
     CountryEvaluationDetails toEntity(CountryEvaluationDetailsDto dto);
+
+    QuotationPackage toEntity(QuotationPackageDto dto);
+
+    @Mapping(target = "id.quotationPackageId", source = "quotationPackageId")
+    @Mapping(target = "id.countryId", source = "countryId")
+    QuotationPackageCountry toEntity(QuotationPackageCountryDto dto);
 
     // OTHER
 
@@ -118,5 +131,7 @@ public interface AseMapper {
     CountryDto toCountryDto(SaveCountryRequest request);
 
     CountryEvaluationDetailsDto toCountryEvaluationDetailsDto(SaveCountryEvaluationDetailsRequest request);
+
+    QuotationPackageDto toQuotationPackageDto(SaveQuotationPackageRequest request);
 
 }

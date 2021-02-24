@@ -50,4 +50,31 @@ public class EvaluationFacadeImplTest extends AbstractSpringTest {
         evaluationFacade.saveCountryEvaluationDetails(request, principalId);
     }
 
+    @Test
+    public void saveQuotationPackage_nullRequest() {
+        var principalId = utilUser.savedAdmin().getId();
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.saveQuotationPackage(null, principalId));
+    }
+
+    // TODO test saveQuotationPackage_artworkNotFound
+
+    @Test
+    public void saveQuotationPackage_packageAlreadyExists() {
+        var principalId = utilUser.savedAdmin().getId();
+        var request = utilEvaluation.genSaveQuotationPackageRequest();
+        evaluationFacade.saveQuotationPackage(request, principalId);
+        assertThrows(
+                EvaluationException.class,
+                () -> evaluationFacade.saveQuotationPackage(request, principalId));
+    }
+
+    @Test
+    public void saveQuotationPackage() {
+        var principalId = utilUser.savedAdmin().getId();
+        var request = utilEvaluation.genSaveQuotationPackageRequest();
+        evaluationFacade.saveQuotationPackage(request, principalId);
+    }
+
 }

@@ -218,7 +218,17 @@ public interface ErrorCodes {
         COUNTRY_EVALUATION_DETAILS_EXISTS(
                 HttpStatus.CONFLICT,
                 "40",
-                "Evaluation details already exists for specified country.");
+                "Evaluation details already exists for specified country."),
+
+        QUOTATION_PACKAGE_EXISTS(
+                HttpStatus.CONFLICT,
+                "41",
+                "Quotation package already exists for specified artwork."),
+
+        QUOTATION_PACKAGE_COUNTRY_EXISTS(
+                HttpStatus.CONFLICT,
+                "42",
+                "Quotation package country already exists for specified country.");
 
         private final HttpStatus httpStatus;
         private final String code, description;

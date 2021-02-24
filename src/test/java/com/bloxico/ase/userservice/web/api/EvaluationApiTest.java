@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsResponse;
+import com.bloxico.ase.userservice.web.model.evaluation.SaveQuotationPackageResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.bloxico.ase.testutil.Util.ERROR_CODE;
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.userservice.web.api.EvaluationApi.EVALUATION_COUNTRY_DETAILS_SAVE;
+import static com.bloxico.ase.userservice.web.api.EvaluationApi.EVALUATION_QUOTATION_PACKAGE_SAVE;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.COUNTRY_EVALUATION_DETAILS_EXISTS;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.QUOTATION_PACKAGE_EXISTS;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.COUNTRY_NOT_FOUND;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -83,6 +86,53 @@ public class EvaluationApiTest extends AbstractSpringTest {
         assertNotNull(details.getCountryId());
         assertEquals(request.getPricePerEvaluation(), details.getPricePerEvaluation());
         assertEquals(request.getAvailabilityPercentage(), details.getAvailabilityPercentage());
+    }
+
+    // TODO test saveQuotationPackage_404_artworkNotFound()
+
+    @Test
+    public void saveQuotationPackage_409_packageAlreadyExists() {
+        var request = utilEvaluation.genSaveQuotationPackageRequest();
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + EVALUATION_QUOTATION_PACKAGE_SAVE)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + EVALUATION_QUOTATION_PACKAGE_SAVE)
+                .then()
+                .assertThat()
+                .statusCode(409)
+                .body(ERROR_CODE, is(QUOTATION_PACKAGE_EXISTS.getCode()));
+    }
+
+    @Test
+    public void saveQuotationPackage_200_ok() {
+        var request = utilEvaluation.genSaveQuotationPackageRequest();
+        var qPackage = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + EVALUATION_QUOTATION_PACKAGE_SAVE)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SaveQuotationPackageResponse.class)
+                .getQuotationPackage();
+        assertNotNull(qPackage.getId());
+        assertEquals(request.getArtworkId(), qPackage.getArtworkId());
+        assertEquals(request.getCountries().size(), qPackage.getCountries().size());
     }
 
 }

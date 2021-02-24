@@ -40,6 +40,10 @@ public class Util {
         return LONG.incrementAndGet() + "_" + localPart + "@mail.com";
     }
 
+    public static int genInt(int bound) {
+        return current().nextInt(bound);
+    }
+
     public static String genUUID() {
         return UUID.randomUUID().toString();
     }
