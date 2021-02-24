@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(of = "countryId")
 public class CountryEvaluationDetailsDto {
 
-    @JsonProperty
+    @JsonProperty("id")
     private Integer id;
 
     @JsonProperty("country_id")
