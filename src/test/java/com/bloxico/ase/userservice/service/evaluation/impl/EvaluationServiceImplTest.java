@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EvaluationServiceImplTest extends AbstractSpringTest {
+public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Autowired private UtilUser utilUser;
     @Autowired private UtilLocation utilLocation;

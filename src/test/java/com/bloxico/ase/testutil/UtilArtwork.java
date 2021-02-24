@@ -5,6 +5,7 @@ import com.bloxico.ase.userservice.entity.artwork.Artist;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
 import com.bloxico.ase.userservice.repository.artwork.ArtistRepository;
 import com.bloxico.ase.userservice.repository.artwork.ArtworkGroupRepository;
+import com.bloxico.ase.userservice.service.artwork.impl.ArtworkServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class UtilArtwork {
     @Autowired private UserProfileServiceImpl userProfileService;
     @Autowired private ArtworkGroupRepository artworkGroupRepository;
     @Autowired private ArtistRepository artistRepository;
+    @Autowired private ArtworkServiceImpl artworkService;
 
     public ArtworkGroup savedArtworkGroup(ArtworkGroup.Status status) {
         var creatorId = utilUser.savedAdmin().getId();
@@ -88,6 +90,12 @@ public class UtilArtwork {
         artworkDto.addDocuments(List.of(utilDocument.savedDocumentDto(PRINCIPAL_IMAGE)));
         artworkDto.addDocuments(List.of(utilDocument.savedDocumentDto(CERTIFICATE)));
         return artworkDto;
+    }
+
+    public ArtworkDto savedArtworkDto() {
+        var principalId = utilUser.savedAdmin().getId();
+        var artworkDto = genArtworkDto();
+        return artworkService.saveArtwork(artworkDto, principalId);
     }
 
     public SaveArtworkRequest genSaveArtworkRequest(ArtworkGroup.Status status, boolean artOwner, Long groupId) {

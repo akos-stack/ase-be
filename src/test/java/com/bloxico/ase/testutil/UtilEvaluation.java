@@ -13,13 +13,13 @@ import java.util.Set;
 
 import static com.bloxico.ase.testutil.Util.genPosInt;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static java.util.concurrent.ThreadLocalRandom.current;
 
 @Component
 public class UtilEvaluation {
 
     @Autowired private UtilUser utilUser;
     @Autowired private UtilLocation utilLocation;
+    @Autowired private UtilArtwork utilArtwork;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
     @Autowired private QuotationPackageRepository quotationPackageRepository;
 
@@ -56,7 +56,7 @@ public class UtilEvaluation {
     }
 
     public QuotationPackage genQuotationPackage() {
-        var artworkId = current().nextLong(1, Integer.MAX_VALUE); // TODO
+        var artworkId = utilArtwork.savedArtworkDto().getId();
         var qPackage = new QuotationPackage();
         qPackage.setArtworkId(artworkId);
         return qPackage;
@@ -90,7 +90,7 @@ public class UtilEvaluation {
     }
 
     public SaveQuotationPackageRequest genSaveQuotationPackageRequest() {
-        var artworkId = current().nextLong(1, Integer.MAX_VALUE); // TODO
+        var artworkId = utilArtwork.savedArtworkDto().getId();
         var c1 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));
         var c2 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));
         var c3 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));

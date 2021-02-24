@@ -16,6 +16,9 @@ public class UtilDocument {
 
     public DocumentDto savedDocumentDto(FileCategory fileCategory) {
         var creatorId = utilUser.savedAdmin().getId();
-        return documentsService.saveDocument(genMultipartFile(fileCategory.getSupportedFileExtensions().stream().findFirst().get()), fileCategory, creatorId);
+        return documentsService.saveDocument(
+                genMultipartFile(fileCategory),
+                fileCategory, creatorId);
     }
+
 }
