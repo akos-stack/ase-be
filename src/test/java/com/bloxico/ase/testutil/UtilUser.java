@@ -99,6 +99,7 @@ public class UtilUser {
         var user = userRepository.findById(userId).orElseThrow();
         var role = roleRepository.getRole(roleName);
         user.addRole(role);
+        user.setUpdaterId(userId);
         userRepository.saveAndFlush(user);
     }
 

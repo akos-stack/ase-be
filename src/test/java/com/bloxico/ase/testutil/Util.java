@@ -1,11 +1,13 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
+import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.util.SupportedFileExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -44,6 +46,10 @@ public class Util {
         return current().nextInt(1, bound);
     }
 
+    public static BigDecimal genPosBigDecimal(double bound) {
+        return BigDecimal.valueOf(current().nextDouble(1, bound));
+    }
+
     public static String genUUID() {
         return UUID.randomUUID().toString();
     }
@@ -54,6 +60,14 @@ public class Util {
 
     public static LocalDateTime genNonExpiredLDT() {
         return LocalDateTime.now().plusHours(1);
+    }
+
+    public static MultipartFile genMultipartFile() {
+        return genMultipartFile(randEnumConst(SupportedFileExtension.class));
+    }
+
+    public static MultipartFile genMultipartFile(FileCategory category) {
+        return genMultipartFile(randElt(category.getSupportedFileExtensions()));
     }
 
     public static MultipartFile genMultipartFile(SupportedFileExtension extension) {

@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
-import com.bloxico.ase.testutil.UtilArtwork;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
 import com.bloxico.ase.userservice.exception.ArtworkException;
 import com.bloxico.ase.userservice.service.artwork.impl.ArtworkGroupServiceImpl;
@@ -14,11 +13,12 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Autowired private ArtworkFacadeImpl artworkFacade;
     @Autowired private UtilArtwork utilArtwork;
+    @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private ArtworkGroupServiceImpl artworkGroupService;
 
     @Test
     public void submitArtwork_groupNotFound() {
-        var artOwnerDto = utilArtwork.savedArtOwnerDto();
+        var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.WAITING_FOR_EVALUATION, true, null);
         submitArtworkRequest.setGroupId(1024L);
         assertThrows(
@@ -28,7 +28,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtwork_missingResume() {
-        var artOwnerDto = utilArtwork.savedArtOwnerDto();
+        var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
         submitArtworkRequest.setIAmArtOwner(true);
         assertThrows(
@@ -38,7 +38,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtwork_missingCertificate() {
-        var artOwnerDto = utilArtwork.savedArtOwnerDto();
+        var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.WAITING_FOR_EVALUATION, true, null);
         submitArtworkRequest.setIAmArtOwner(false);
         assertThrows(
@@ -48,7 +48,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtwork_createNewGroup() {
-        var artOwnerDto = utilArtwork.savedArtOwnerDto();
+        var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.DRAFT, true, null);
         var saveArtworkResponse = artworkFacade.submitArtwork(submitArtworkRequest, artOwnerDto.getUserProfile().getUserId());
         assertNotNull(saveArtworkResponse);
@@ -57,7 +57,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtwork_saveToGroup_sameStatus() {
-        var artOwnerDto = utilArtwork.savedArtOwnerDto();
+        var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var artworkGroupDto = utilArtwork.savedArtworkGroupDto(ArtworkGroup.Status.DRAFT);
         var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.DRAFT, true, artworkGroupDto.getId());
         var saveArtworkResponse = artworkFacade.submitArtwork(submitArtworkRequest, artOwnerDto.getUserProfile().getUserId());
@@ -67,7 +67,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitArtwork_saveToGroup_updateStatus() {
-        var artOwnerDto = utilArtwork.savedArtOwnerDto();
+        var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var artworkGroupDto = utilArtwork.savedArtworkGroupDto(ArtworkGroup.Status.DRAFT);
         var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.WAITING_FOR_EVALUATION, true, artworkGroupDto.getId());
         var saveArtworkResponse = artworkFacade.submitArtwork(submitArtworkRequest, artOwnerDto.getUserProfile().getUserId());
