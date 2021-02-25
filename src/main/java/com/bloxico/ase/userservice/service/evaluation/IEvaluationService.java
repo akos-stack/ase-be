@@ -1,8 +1,8 @@
 package com.bloxico.ase.userservice.service.evaluation;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.proj.CountryEvaluationDetailsCountedProj;
-import com.bloxico.ase.userservice.proj.RegionCountedProj;
+import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsCountedProj;
+import com.bloxico.ase.userservice.proj.evaluation.RegionCountedProj;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchCountryEvaluationDetailsRequest;
 import org.springframework.data.domain.Page;

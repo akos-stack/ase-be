@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.web.model.evaluation;
 
-import com.bloxico.ase.userservice.proj.CountryEvaluationDetailsCountedProj;
+import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsCountedProj;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Value;

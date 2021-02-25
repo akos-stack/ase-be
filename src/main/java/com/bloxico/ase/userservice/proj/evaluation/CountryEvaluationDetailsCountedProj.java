@@ -1,4 +1,4 @@
-package com.bloxico.ase.userservice.proj;
+package com.bloxico.ase.userservice.proj.evaluation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;

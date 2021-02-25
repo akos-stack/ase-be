@@ -1,8 +1,8 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.proj.CountryEvaluationDetailsCountedProj;
-import com.bloxico.ase.userservice.proj.RegionCountedProj;
+import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsCountedProj;
+import com.bloxico.ase.userservice.proj.evaluation.RegionCountedProj;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchCountryEvaluationDetailsRequest;
