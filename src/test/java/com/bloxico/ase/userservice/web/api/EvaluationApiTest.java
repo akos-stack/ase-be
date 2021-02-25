@@ -23,7 +23,7 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
-public class EvaluationApiTest extends AbstractSpringTest {
+public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilEvaluation utilEvaluation;

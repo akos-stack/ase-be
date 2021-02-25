@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class EvaluationFacadeImplTest extends AbstractSpringTest {
+public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Autowired private UtilUser utilUser;
     @Autowired private UtilEvaluation utilEvaluation;
