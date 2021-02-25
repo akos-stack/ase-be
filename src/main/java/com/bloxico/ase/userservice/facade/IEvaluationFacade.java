@@ -6,7 +6,7 @@ import com.bloxico.ase.userservice.web.model.evaluation.*;
 
 public interface IEvaluationFacade {
 
-    PagedCountryEvaluationDetailsResponse searchCountryEvaluationDetails(
+    PagedCountryEvaluationDetailsResponse searchCountriesWithEvaluationDetails(
             SearchCountryEvaluationDetailsRequest request);
 
     SaveCountryEvaluationDetailsResponse saveCountryEvaluationDetails(
@@ -14,6 +14,8 @@ public interface IEvaluationFacade {
 
     UpdateCountryEvaluationDetailsResponse updateCountryEvaluationDetails(
             UpdateCountryEvaluationDetailsRequest request, int evaluationDetails, long principalId);
+
+    PagedCountryEvaluationDetailsResponse searchCountries(SearchCountryEvaluationDetailsRequest request);
 
     PagedRegionsResponse searchRegions(SearchRegionsRequest request);
 

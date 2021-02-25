@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.bloxico.ase.testutil.Util.genUUID;
-import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,20 +19,21 @@ public class EvaluationFacadeImplTest extends AbstractSpringTest {
     @Autowired private EvaluationFacadeImpl evaluationFacade;
 
     @Test
-    public void searchCountryEvaluationDetails_nullRequest() {
+    public void searchCountriesWithEvaluationDetails_nullRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationFacade.searchCountryEvaluationDetails(null)
+                () -> evaluationFacade.searchCountriesWithEvaluationDetails(null)
         );
     }
 
     @Test
-    public void searchCountryEvaluationDetails() {
+    public void searchCountriesWithEvaluationDetails() {
         var request = utilEvaluation.genDefaultSearchCountryEvaluationDetailsRequest();
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
-        assertThat(evaluationFacade.searchCountryEvaluationDetails(request).getCountryEvaluationDetails(), hasItems(c1));
-        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
-        assertThat(evaluationFacade.searchCountryEvaluationDetails(request).getCountryEvaluationDetails(), hasItems(c1, c2));
+        assertThat(evaluationFacade.searchCountriesWithEvaluationDetails(request).getCountryEvaluationDetails(), hasItems(c1));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails();
+        assertThat(evaluationFacade.searchCountriesWithEvaluationDetails(request).getCountryEvaluationDetails(),
+                allOf(hasItems(c1), not(hasItems(c2))));
     }
 
     @Test
@@ -100,6 +101,23 @@ public class EvaluationFacadeImplTest extends AbstractSpringTest {
         assertEquals(details.getCountryId(), updatedDetails.getCountryId());
         assertEquals(request.getPricePerEvaluation(), updatedDetails.getPricePerEvaluation());
         assertEquals(request.getAvailabilityPercentage(), updatedDetails.getAvailabilityPercentage());
+    }
+
+    @Test
+    public void searchCountries_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.searchCountries(null)
+        );
+    }
+
+    @Test
+    public void searchCountries() {
+        var request = utilEvaluation.genDefaultSearchCountryEvaluationDetailsRequest();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        assertThat(evaluationFacade.searchCountries(request).getCountryEvaluationDetails(), hasItems(c1));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails();
+        assertThat(evaluationFacade.searchCountries(request).getCountryEvaluationDetails(), hasItems(c1, c2));
     }
 
     @Test

@@ -1,13 +1,12 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.entity.address.Region;
 import com.bloxico.ase.userservice.proj.CountryEvaluationDetailsCountedProj;
 import com.bloxico.ase.userservice.proj.RegionCountedProj;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchCountryEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,8 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.stereotype.Service;
-
-import java.util.stream.Collectors;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.COUNTRY_EVALUATION_DETAILS_EXISTS;
@@ -37,21 +34,15 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public Page<CountryEvaluationDetailsCountedProj> findAllCountryEvaluationDetails(
+    public Page<CountryEvaluationDetailsCountedProj> findAllCountriesWithEvaluationDetails(
             SearchCountryEvaluationDetailsRequest request) {
-        log.debug("EvaluationServiceImpl.findAllCountryEvaluationDetails - start | request: {}", request);
+        log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - start | request: {}", request);
         requireNonNull(request);
         var page = countryEvaluationDetailsRepository
-                .findAllCountryEvaluationDetailsWithEvaluatorsCount(
-                        request.getSearch(), request.getRegions(), getPagination(request));
-        log.debug("EvaluationServiceImpl.findAllCountryEvaluationDetails - end | request: {}", request);
-        return page.map(transferProj -> new CountryEvaluationDetailsCountedProj(
-                transferProj.getCountry(),
-                transferProj.getC().getRegions().stream().map(Region::getName).collect(Collectors.toList()),
-                transferProj.getPricePerEvaluation(),
-                transferProj.getAvailabilityPercentage(),
-                transferProj.getTotalOfEvaluators()
-        ));
+                .findAllCountryEvaluationDetailsWithEvaluatorsCount(request.getSearch(),
+                        request.getRegions(),false, getPagination(request));
+        log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - end | request: {}", request);
+        return page.map(MAPPER::toCountedProj);
     }
 
     @Override
@@ -79,6 +70,18 @@ public class EvaluationServiceImpl implements IEvaluationService {
         var detailsDto = MAPPER.toDto(countryEvaluationDetailsRepository.saveAndFlush(details));
         log.debug("EvaluationServiceImpl.updateCountryEvaluationDetails - end | dto: {}, principalId: {}", dto, principalId);
         return detailsDto;
+    }
+
+    @Override
+    public Page<CountryEvaluationDetailsCountedProj> findAllCountries(
+            SearchCountryEvaluationDetailsRequest request) {
+        log.debug("EvaluationServiceImpl.findAllCountries - start | request: {}", request);
+        requireNonNull(request);
+        var page = countryEvaluationDetailsRepository
+                .findAllCountryEvaluationDetailsWithEvaluatorsCount(request.getSearch(),
+                        request.getRegions(),true, getPagination(request));
+        log.debug("EvaluationServiceImpl.findAllCountries - end | request: {}", request);
+        return page.map(MAPPER::toCountedProj);
     }
 
     @Override

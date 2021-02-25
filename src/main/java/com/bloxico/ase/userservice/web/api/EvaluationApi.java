@@ -17,10 +17,11 @@ import java.security.Principal;
 @Api(value = "evaluation")
 public interface EvaluationApi {
 
-    String EVALUATION_COUNTRY_DETAILS_SEARCH    =   "/evaluation/country-details/search";
-    String EVALUATION_COUNTRY_DETAILS_SAVE      =   "/evaluation/country-details/save";
-    String EVALUATION_COUNTRY_DETAILS_UPDATE    =   "/evaluation/country-details/update/{id}";
-    String EVALUATION_REGIONS_SEARCH            =   "/evaluation/regions/search";
+    String EVALUATION_COUNTRY_DETAILS_SEARCH                =   "/evaluation/country-details";
+    String EVALUATION_COUNTRY_DETAILS_SAVE                  =   "/evaluation/country-details/save";
+    String EVALUATION_COUNTRY_DETAILS_UPDATE                =   "/evaluation/country-details/update/{id}";
+    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH     =   "/evaluation/management/country-details";
+    String EVALUATION_MANAGEMENT_REGIONS_SEARCH             =   "/evaluation/management/regions";
 
     @GetMapping(
             value = EVALUATION_COUNTRY_DETAILS_SEARCH,
@@ -61,12 +62,24 @@ public interface EvaluationApi {
             @Valid @PathVariable("id") Integer evaluationDetailsId, Principal principal);
 
     @GetMapping(
-            value = EVALUATION_REGIONS_SEARCH,
+            value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH,
+            produces = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'manage_country_evaluation_details')")
+    @ApiOperation(value = "Search all countries.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Paginated list of countries successfully retrieved.")
+    })
+    ResponseEntity<PagedCountryEvaluationDetailsResponse> searchCountryEvaluationDetailsManagement(
+            @Valid SearchCountryEvaluationDetailsRequest request);
+
+    @GetMapping(
+            value = EVALUATION_MANAGEMENT_REGIONS_SEARCH,
             produces = "application/json")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'manage_region')")
     @ApiOperation(value = "Search regions with countries and evaluators counted.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Paginated list of regions successfully retrieved..")
+            @ApiResponse(code = 200, message = "Paginated list of regions successfully retrieved.")
     })
-    ResponseEntity<PagedRegionsResponse> searchRegions(@Valid SearchRegionsRequest request);
+    ResponseEntity<PagedRegionsResponse> searchRegionsManagement(@Valid SearchRegionsRequest request);
 
 }

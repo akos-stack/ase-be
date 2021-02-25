@@ -8,11 +8,17 @@ import java.util.List;
 @Value
 public class CountryEvaluationDetailsCountedProj {
 
+    @JsonProperty("country_id")
+    Integer countryId;
+
     @JsonProperty("country")
     String country;
 
     @JsonProperty("regions")
     List<String> regions;
+
+    @JsonProperty("evaluation_details_id")
+    Integer evaluationDetailsId;
 
     @JsonProperty("price_per_evaluation")
     Integer pricePerEvaluation;

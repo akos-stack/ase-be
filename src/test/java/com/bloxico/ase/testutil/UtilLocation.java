@@ -45,20 +45,17 @@ public class UtilLocation {
     }
 
     public Country savedCountry(String name) {
-        var creatorId = utilUser.savedAdmin().getId();
-        var region = savedRegion();
-        var country = new Country();
-        country.setName(name);
-        country.setRegions(Set.of(region));
-        country.setCreatorId(creatorId);
-        countryRepository.saveAndFlush(country);
-        return country;
+        return savedCountryWithNameAndRegion(name, savedRegion());
     }
 
     public Country savedCountryWithRegion(Region region) {
+        return savedCountryWithNameAndRegion(genUUID(), region);
+    }
+
+    public Country savedCountryWithNameAndRegion(String name, Region region) {
         var creatorId = utilUser.savedAdmin().getId();
         var country = new Country();
-        country.setName(genUUID());
+        country.setName(name);
         country.setRegions(Set.of(region));
         country.setCreatorId(creatorId);
         countryRepository.saveAndFlush(country);

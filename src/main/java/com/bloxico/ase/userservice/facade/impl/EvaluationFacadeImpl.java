@@ -30,12 +30,12 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
     }
 
     @Override
-    public PagedCountryEvaluationDetailsResponse searchCountryEvaluationDetails(SearchCountryEvaluationDetailsRequest request) {
-        log.debug("EvaluationFacadeImpl.searchCountryEvaluationDetails - start | request: {}", request);
-        var page = evaluationService.findAllCountryEvaluationDetails(request);
+    public PagedCountryEvaluationDetailsResponse searchCountriesWithEvaluationDetails(SearchCountryEvaluationDetailsRequest request) {
+        log.debug("EvaluationFacadeImpl.searchCountriesWithEvaluationDetails - start | request: {}", request);
+        var page = evaluationService.findAllCountriesWithEvaluationDetails(request);
         var response = new PagedCountryEvaluationDetailsResponse(page.getContent(),
                 page.getNumberOfElements(), page.getTotalElements(), page.getTotalPages());
-        log.debug("EvaluationFacadeImpl.searchCountryEvaluationDetails - end | request: {}", request);
+        log.debug("EvaluationFacadeImpl.searchCountriesWithEvaluationDetails - end | request: {}", request);
         return response;
     }
 
@@ -66,6 +66,17 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
         var evaluationDetailsDto = MAPPER.toCountryEvaluationDetailsDto(request);
         evaluationDetailsDto.setId(evaluationDetailsId);
         return evaluationService.updateCountryEvaluationDetails(evaluationDetailsDto, principalId);
+    }
+
+    @Override
+    public PagedCountryEvaluationDetailsResponse searchCountries(
+            SearchCountryEvaluationDetailsRequest request) {
+        log.debug("EvaluationFacadeImpl.searchCountries - start | request: {}", request);
+        var page = evaluationService.findAllCountries(request);
+        var response = new PagedCountryEvaluationDetailsResponse(page.getContent(),
+                page.getNumberOfElements(), page.getTotalElements(), page.getTotalPages());
+        log.debug("EvaluationFacadeImpl.searchCountries - end | request: {}", request);
+        return response;
     }
 
     @Override

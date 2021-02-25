@@ -19,22 +19,36 @@ public interface CountryEvaluationDetailsRepository extends JpaRepository<Countr
 
     // @formatter:off
     @Query(value =
-            "SELECT new com.bloxico.ase.userservice.proj.CountryEvaluationDetailsCountedTransferProj( " +
-            "         c1,                                                                             " +
-            "         c1.name as country,                                                             " +
-            "         ced.pricePerEvaluation AS price_per_evaluation,                                 " +
-            "         ced.availabilityPercentage AS availability_percentage,                          " +
-            "         (SELECT COUNT(*)                                                                " +
-            "            FROM Evaluator e                                                             " +
-            "            JOIN e.userProfile.location.country c2                                       " +
-            "           WHERE c2 = c1) AS total_of_evaluators)                                        " +
-            "  FROM CountryEvaluationDetails ced                                                      " +
-            "  RIGHT JOIN Country c1 ON ced.countryId = c1.id                                         " ,
+            "SELECT DISTINCT new com.bloxico.ase.userservice.proj.CountryEvaluationDetailsCountedTransferProj( " +
+            "         c1,                                                                                      " +
+            "         c1.id,                                                                                   " +
+            "         c1.name as country,                                                                      " +
+            "         ced.id,                                                                                  " +
+            "         ced.pricePerEvaluation AS price_per_evaluation,                                          " +
+            "         ced.availabilityPercentage AS availability_percentage,                                   " +
+            "         (SELECT COUNT(*)                                                                         " +
+            "            FROM Evaluator e                                                                      " +
+            "            JOIN e.userProfile.location.country c2                                                " +
+            "           WHERE c2 = c1) AS total_of_evaluators)                                                 " +
+            "  FROM CountryEvaluationDetails ced                                                               " +
+            "  RIGHT JOIN Country c1 ON ced.countryId = c1.id                                                  " +
+            "  JOIN c1.regions r                                                                               " +
+            "  WHERE (r.name IN :regions OR :regions IS NULL)                                                  " +
+            "  AND (LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%'))                                        " +
+            "  OR LOWER(c1.name) LIKE LOWER(CONCAT('%', :search, '%')))                                        " +
+            "  AND (ced IS NOT NULL OR :includeCountriesWithoutEvaluationDetails = TRUE)                       " ,
            countQuery =
-            "SELECT COUNT(*) FROM Country c                                                           " )
+            "SELECT COUNT(DISTINCT c)                                                                          " +
+            "  FROM CountryEvaluationDetails ced                                                               " +
+            "  RIGHT JOIN Country c ON ced.countryId = c.id                                                    " +
+            "  JOIN c.regions r                                                                                " +
+            "  WHERE (r.name IN :regions OR :regions IS NULL)                                                  " +
+            "  AND (LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%'))                                        " +
+            "  OR LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')))                                         " +
+            "  AND (ced IS NOT NULL OR :includeCountriesWithoutEvaluationDetails = TRUE)                       " )
     // @formatter:on
     Page<CountryEvaluationDetailsCountedTransferProj> findAllCountryEvaluationDetailsWithEvaluatorsCount(
-            String search, Collection<String> regions, Pageable pageable);
+            String search, Collection<String> regions, boolean includeCountriesWithoutEvaluationDetails, Pageable pageable);
 
     // @formatter:off
     @Query(value =

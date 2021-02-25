@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.security.Principal;
 
 import static com.bloxico.ase.userservice.util.Principals.extractId;
@@ -22,7 +23,7 @@ public class EvaluationController implements EvaluationApi {
     @Override
     public ResponseEntity<PagedCountryEvaluationDetailsResponse> searchCountryEvaluationDetails(
             SearchCountryEvaluationDetailsRequest request) {
-        var response = evaluationFacade.searchCountryEvaluationDetails(request);
+        var response = evaluationFacade.searchCountriesWithEvaluationDetails(request);
         return ResponseEntity.ok(response);
     }
 
@@ -45,7 +46,14 @@ public class EvaluationController implements EvaluationApi {
     }
 
     @Override
-    public ResponseEntity<PagedRegionsResponse> searchRegions(SearchRegionsRequest request) {
+    public ResponseEntity<PagedCountryEvaluationDetailsResponse> searchCountryEvaluationDetailsManagement(
+            @Valid SearchCountryEvaluationDetailsRequest request) {
+        var response = evaluationFacade.searchCountries(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<PagedRegionsResponse> searchRegionsManagement(SearchRegionsRequest request) {
         var response = evaluationFacade.searchRegions(request);
         return ResponseEntity.ok(response);
     }

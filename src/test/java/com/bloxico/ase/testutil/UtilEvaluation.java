@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 
 @Component
@@ -67,21 +68,28 @@ public class UtilEvaluation {
     }
 
     public CountryEvaluationDetailsCountedProj savedCountryEvaluationDetailsCountedProj() {
-        var region = utilLocation.savedRegion();
-        var country = utilLocation.savedCountryWithRegion(region);
-        var details = savedCountryEvaluationDetails(country.getId());
-        return new CountryEvaluationDetailsCountedProj(country.getName(),
-                List.of(region.getName()), details.getPricePerEvaluation(),
-                details.getAvailabilityPercentage(), 0L);
+        return savedCountryEvaluationDetailsCountedProj(genUUID());
     }
 
     public CountryEvaluationDetailsCountedProj savedCountryEvaluationDetailsCountedProj(String countryName) {
         var region = utilLocation.savedRegion();
-        var country = utilLocation.savedCountryWithRegion(region);
+        var country = utilLocation.savedCountryWithNameAndRegion(countryName, region);
         var details = savedCountryEvaluationDetails(country.getId());
-        return new CountryEvaluationDetailsCountedProj(country.getName(),
-                List.of(region.getName()), details.getPricePerEvaluation(),
+        return new CountryEvaluationDetailsCountedProj(country.getId(), country.getName(),
+                List.of(region.getName()), details.getId(), details.getPricePerEvaluation(),
                 details.getAvailabilityPercentage(), 0L);
+    }
+
+    public CountryEvaluationDetailsCountedProj savedCountryEvaluationDetailsCountedProjNoDetails() {
+        return savedCountryEvaluationDetailsCountedProjNoDetails(genUUID());
+    }
+
+    public CountryEvaluationDetailsCountedProj savedCountryEvaluationDetailsCountedProjNoDetails(String countryName) {
+        var region = utilLocation.savedRegion();
+        var country = utilLocation.savedCountryWithNameAndRegion(countryName, region);
+        return new CountryEvaluationDetailsCountedProj(country.getId(), country.getName(),
+                List.of(region.getName()), null,
+                null, null, 0L);
     }
 
     public SaveCountryEvaluationDetailsRequest genSaveCountryEvaluationDetailsRequest() {

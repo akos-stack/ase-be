@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.web.api;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilAuth;
 import com.bloxico.ase.testutil.UtilEvaluation;
+import com.bloxico.ase.testutil.UtilLocation;
 import com.bloxico.ase.userservice.web.model.evaluation.PagedCountryEvaluationDetailsResponse;
 import com.bloxico.ase.userservice.web.model.evaluation.PagedRegionsResponse;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsResponse;
@@ -30,13 +31,14 @@ public class EvaluationApiTest extends AbstractSpringTest {
 
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilEvaluation utilEvaluation;
+    @Autowired private UtilLocation utilLocation;
 
     @Test
     public void searchCountryEvaluationDetails_200_ok() {
         var search = genUUID();
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search));
-        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search.toUpperCase()));
-        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search.toLowerCase()));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search));
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails(genEmail(search));
         var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail("fooBar"));
 
         var countedProjs = given()
@@ -52,7 +54,7 @@ public class EvaluationApiTest extends AbstractSpringTest {
                 .as(PagedCountryEvaluationDetailsResponse.class)
                 .getCountryEvaluationDetails();
 
-        assertThat(countedProjs, allOf(hasItems(c1, c2, c3), not(hasItems(c4))));
+        assertThat(countedProjs, allOf(hasItems(c1, c2), not(hasItems(c3, c4))));
     }
 
     @Test
@@ -155,7 +157,31 @@ public class EvaluationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void searchRegions_200_ok() {
+    public void searchCountryEvaluationDetailsManagement_200_ok() {
+        var search = genUUID();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search));
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails(genEmail(search));
+        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail("fooBar"));
+
+        var countedProjs = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .queryParam("search", search)
+                .when()
+                .get(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PagedCountryEvaluationDetailsResponse.class)
+                .getCountryEvaluationDetails();
+
+        assertThat(countedProjs, allOf(hasItems(c1, c2, c3), not(hasItems(c4))));
+    }
+
+    @Test
+    public void searchRegionsManagement_200_ok() {
         var search = genUUID();
         var r1 = utilEvaluation.savedRegionCountedProj(genEmail(search));
         var r2 = utilEvaluation.savedRegionCountedProj(genEmail(search.toUpperCase()));
@@ -163,10 +189,10 @@ public class EvaluationApiTest extends AbstractSpringTest {
         var r4 = utilEvaluation.savedRegionCountedProj(genEmail("fooBar"));
 
         var countedProjs = given()
-                .header("Authorization", utilAuth.doAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .queryParam("search", search)
                 .when()
-                .get(API_URL + EVALUATION_REGIONS_SEARCH)
+                .get(API_URL + EVALUATION_MANAGEMENT_REGIONS_SEARCH)
                 .then()
                 .assertThat()
                 .statusCode(200)

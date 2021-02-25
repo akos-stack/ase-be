@@ -5,8 +5,10 @@ import lombok.Value;
 
 @Value
 public class CountryEvaluationDetailsCountedTransferProj {
-    Country c;
-    String country;
+    Country country;
+    Integer countryId;
+    String countryName;
+    Integer evaluationDetailsId;
     Integer pricePerEvaluation;
     Integer availabilityPercentage;
     Long totalOfEvaluators;

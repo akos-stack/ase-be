@@ -9,11 +9,15 @@ import org.springframework.data.domain.Page;
 
 public interface IEvaluationService {
 
-    Page<CountryEvaluationDetailsCountedProj> findAllCountryEvaluationDetails(SearchCountryEvaluationDetailsRequest request);
+    Page<CountryEvaluationDetailsCountedProj> findAllCountriesWithEvaluationDetails(
+            SearchCountryEvaluationDetailsRequest request);
 
     CountryEvaluationDetailsDto saveCountryEvaluationDetails(CountryEvaluationDetailsDto dto, long principalId);
 
     CountryEvaluationDetailsDto updateCountryEvaluationDetails(CountryEvaluationDetailsDto dto, long principalId);
+
+    Page<CountryEvaluationDetailsCountedProj> findAllCountries(
+            SearchCountryEvaluationDetailsRequest request);
 
     Page<RegionCountedProj> findAllRegions(SearchRegionsRequest request);
 

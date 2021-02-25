@@ -5,7 +5,7 @@ import com.bloxico.ase.userservice.exception.EvaluationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,20 +17,20 @@ public class EvaluationServiceImplTest extends AbstractSpringTest {
     @Autowired private EvaluationServiceImpl evaluationService;
 
     @Test
-    public void findAllCountryEvaluationDetails_nullRequest() {
+    public void findAllCountriesWithEvaluationDetails_nullRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationService.findAllCountryEvaluationDetails(null)
+                () -> evaluationService.findAllCountriesWithEvaluationDetails(null)
         );
     }
 
     @Test
-    public void findAllCountryEvaluationDetails() {
+    public void findAllCountriesWithEvaluationDetails() {
         var request = utilEvaluation.genDefaultSearchCountryEvaluationDetailsRequest();
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
-        assertThat(evaluationService.findAllCountryEvaluationDetails(request), hasItems(c1));
-        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
-        assertThat(evaluationService.findAllCountryEvaluationDetails(request), hasItems(c1, c2));
+        assertThat(evaluationService.findAllCountriesWithEvaluationDetails(request), hasItems(c1));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails();
+        assertThat(evaluationService.findAllCountriesWithEvaluationDetails(request), allOf(hasItems(c1), not(hasItems(c2))));
     }
 
     @Test
@@ -94,6 +94,23 @@ public class EvaluationServiceImplTest extends AbstractSpringTest {
         assertEquals(details.getCountryId(), updatedDetails.getCountryId());
         assertEquals(15, updatedDetails.getPricePerEvaluation().intValue());
         assertEquals(40, updatedDetails.getAvailabilityPercentage().intValue());
+    }
+
+    @Test
+    public void findAllCountries_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.findAllCountries(null)
+        );
+    }
+
+    @Test
+    public void findAllCountries() {
+        var request = utilEvaluation.genDefaultSearchCountryEvaluationDetailsRequest();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        assertThat(evaluationService.findAllCountries(request), hasItems(c1));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails();
+        assertThat(evaluationService.findAllCountries(request), hasItems(c1, c2));
     }
 
     @Test
