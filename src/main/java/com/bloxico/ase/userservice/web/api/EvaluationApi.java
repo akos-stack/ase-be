@@ -1,13 +1,13 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.web.model.evaluation.PagedRegionsResponse;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -19,7 +19,7 @@ public interface EvaluationApi {
 
     String EVALUATION_COUNTRY_DETAILS_SEARCH                =   "/evaluation/country-details";
     String EVALUATION_COUNTRY_DETAILS_SAVE                  =   "/evaluation/country-details/save";
-    String EVALUATION_COUNTRY_DETAILS_UPDATE                =   "/evaluation/country-details/update/{id}";
+    String EVALUATION_COUNTRY_DETAILS_UPDATE                =   "/evaluation/country-details/update";
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH     =   "/evaluation/management/country-details";
     String EVALUATION_MANAGEMENT_REGIONS_SEARCH             =   "/evaluation/management/regions";
 
@@ -58,8 +58,7 @@ public interface EvaluationApi {
             @ApiResponse(code = 404, message = "Specified evaluation details don't exist.")
     })
     ResponseEntity<UpdateCountryEvaluationDetailsResponse> updateCountryEvaluationDetails(
-            @Valid @RequestBody UpdateCountryEvaluationDetailsRequest request,
-            @Valid @PathVariable("id") Integer evaluationDetailsId, Principal principal);
+            @Valid @RequestBody UpdateCountryEvaluationDetailsRequest request, Principal principal);
 
     @GetMapping(
             value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH,

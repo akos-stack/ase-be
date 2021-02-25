@@ -38,10 +38,9 @@ public class EvaluationController implements EvaluationApi {
 
     @Override
     public ResponseEntity<UpdateCountryEvaluationDetailsResponse> updateCountryEvaluationDetails(
-            UpdateCountryEvaluationDetailsRequest request, Integer evaluationDetailsId, Principal principal) {
+            UpdateCountryEvaluationDetailsRequest request, Principal principal) {
         var id = extractId(principal);
-        var response= evaluationFacade
-                .updateCountryEvaluationDetails(request, evaluationDetailsId, id);
+        var response= evaluationFacade.updateCountryEvaluationDetails(request, id);
         return ResponseEntity.ok(response);
     }
 

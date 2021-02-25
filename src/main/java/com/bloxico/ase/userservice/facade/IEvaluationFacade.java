@@ -13,7 +13,7 @@ public interface IEvaluationFacade {
             SaveCountryEvaluationDetailsRequest request, long principalId);
 
     UpdateCountryEvaluationDetailsResponse updateCountryEvaluationDetails(
-            UpdateCountryEvaluationDetailsRequest request, int evaluationDetails, long principalId);
+            UpdateCountryEvaluationDetailsRequest request, long principalId);
 
     PagedCountryEvaluationDetailsResponse searchCountries(SearchCountryEvaluationDetailsRequest request);
 

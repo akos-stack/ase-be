@@ -18,6 +18,11 @@ import static lombok.AccessLevel.PRIVATE;
 public class UpdateCountryEvaluationDetailsRequest {
 
     @NotNull
+    @JsonProperty("id")
+    @ApiModelProperty(required = true)
+    Integer id;
+
+    @NotNull
     @Min(1)
     @JsonProperty("price_per_evaluation")
     @ApiModelProperty(required = true)

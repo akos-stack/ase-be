@@ -17,10 +17,10 @@ public interface LocationApi {
 
     String REGIONS          =     "/regions";
     String REGION_SAVE      =     "/region/save";
-    String REGION_DELETE    =     "/region/delete/{id}";
+    String REGION_DELETE    =     "/region/delete";
     String COUNTRIES        =     "/countries";
     String COUNTRY_SAVE     =     "/country/save";
-    String COUNTRY_UPDATE   =     "/country/update/{id}";
+    String COUNTRY_UPDATE   =     "/country/update";
 
     @GetMapping(
             value = REGIONS,
@@ -43,7 +43,10 @@ public interface LocationApi {
     })
     ResponseEntity<SaveRegionResponse> saveRegion(@Valid @RequestBody SaveRegionRequest request, Principal principal);
 
-    @PostMapping(value = REGION_DELETE)
+    @PostMapping(
+            value = REGION_DELETE,
+            produces = {"application/json"},
+            consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'manage_region')")
     @ApiOperation(value = "Deletes region in the database.")
     @ApiResponses({
@@ -51,7 +54,7 @@ public interface LocationApi {
             @ApiResponse(code = 404, message = "Specified region doesn't exist."),
             @ApiResponse(code = 400, message = "Region has one or more countries tied down to it.")
     })
-    ResponseEntity<UpdateCountryResponse> deleteRegion(@Valid @PathVariable("id") Integer regionId);
+    ResponseEntity<Void> deleteRegion(@Valid @RequestBody DeleteRegionRequest request);
 
     @GetMapping(
             value = COUNTRIES,
@@ -88,6 +91,6 @@ public interface LocationApi {
             @ApiResponse(code = 404, message = "Specified country doesn't exist.")
     })
     ResponseEntity<UpdateCountryResponse> updateCountry(
-            @Valid @RequestBody UpdateCountryRequest request, @Valid @PathVariable("id") Integer countryId, Principal principal);
+            @Valid @RequestBody UpdateCountryRequest request, Principal principal);
 
 }

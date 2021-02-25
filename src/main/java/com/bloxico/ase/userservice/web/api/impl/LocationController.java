@@ -32,8 +32,8 @@ public class LocationController implements LocationApi {
     }
 
     @Override
-    public ResponseEntity<UpdateCountryResponse> deleteRegion(Integer regionId) {
-        locationFacade.deleteRegion(regionId);
+    public ResponseEntity<Void> deleteRegion(DeleteRegionRequest request) {
+        locationFacade.deleteRegion(request.getId());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -52,9 +52,9 @@ public class LocationController implements LocationApi {
 
     @Override
     public ResponseEntity<UpdateCountryResponse> updateCountry(
-            UpdateCountryRequest request, Integer countryId, Principal principal) {
+            UpdateCountryRequest request, Principal principal) {
         var id = extractId(principal);
-        var response = locationFacade.updateCountry(request, countryId, id);
+        var response = locationFacade.updateCountry(request, id);
         return ResponseEntity.ok(response);
     }
 

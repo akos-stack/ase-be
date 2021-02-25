@@ -73,13 +73,11 @@ public class LocationFacadeImpl implements ILocationFacade {
     }
 
     @Override
-    public UpdateCountryResponse updateCountry(UpdateCountryRequest request, int countryId, long principalId) {
-        log.debug("LocationFacadeImpl.updateCountry - start | request: {}, countryId: {}, principalId: {}",
-                request, countryId, principalId);
-        var countryDto = doUpdateCountry(request, countryId, principalId);
+    public UpdateCountryResponse updateCountry(UpdateCountryRequest request, long principalId) {
+        log.debug("LocationFacadeImpl.updateCountry - start | request: {}, principalId: {}", request, principalId);
+        var countryDto = doUpdateCountry(request, principalId);
         var response = new UpdateCountryResponse(countryDto);
-        log.debug("LocationFacadeImpl.updateCountry - end | request: {}, countryId: {}, principalId: {}",
-                request, countryId, principalId);
+        log.debug("LocationFacadeImpl.updateCountry - end | request: {}, principalId: {}", request, principalId);
         return response;
     }
 
@@ -113,9 +111,8 @@ public class LocationFacadeImpl implements ILocationFacade {
         return locationService.saveCountry(countryDto, principalId);
     }
 
-    private CountryDto doUpdateCountry(UpdateCountryRequest request, int countryId, long principalId) {
+    private CountryDto doUpdateCountry(UpdateCountryRequest request, long principalId) {
         var countryDto = MAPPER.toCountryDto(request);
-        countryDto.setId(countryId);
         countryDto.addAllRegions(findAllRegionsByNames(request.getRegions()));
         return locationService.updateCountry(countryDto, principalId);
     }

@@ -122,8 +122,7 @@ public class EvaluationApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .pathParam("id", -1)
-                .body(utilEvaluation.genUpdateCountryEvaluationDetailsRequest())
+                .body(utilEvaluation.genUpdateCountryEvaluationDetailsRequest(-1))
                 .when()
                 .post(API_URL + EVALUATION_COUNTRY_DETAILS_UPDATE)
                 .then()
@@ -135,11 +134,10 @@ public class EvaluationApiTest extends AbstractSpringTest {
     @Test
     public void updateCountryEvaluationDetails_200_ok() {
         var details = utilEvaluation.savedCountryEvaluationDetails();
-        var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest();
+        var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest(details.getId());
         var updatedDetails = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .pathParam("id", details.getId())
                 .body(request)
                 .when()
                 .post(API_URL + EVALUATION_COUNTRY_DETAILS_UPDATE)

@@ -51,21 +51,12 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
 
     @Override
     public UpdateCountryEvaluationDetailsResponse updateCountryEvaluationDetails(
-            UpdateCountryEvaluationDetailsRequest request, int evaluationDetailsId, long principalId) {
-        log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - start | " +
-                "request: {}, evaluationDetailsId {}, principalId: {}", request, evaluationDetailsId, principalId);
-        var detailsDto = doUpdateCountryEvaluationDetails(request, evaluationDetailsId, principalId);
+            UpdateCountryEvaluationDetailsRequest request, long principalId) {
+        log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - start | request: {}, principalId: {}", request, principalId);
+        var detailsDto = doUpdateCountryEvaluationDetails(request, principalId);
         var response = new UpdateCountryEvaluationDetailsResponse(detailsDto);
-        log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - end | " +
-                "request: {}, evaluationDetailsId {}, principalId: {}", request, evaluationDetailsId, principalId);
+        log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - end | request: {}, principalId: {}", request, principalId);
         return response;
-    }
-
-    private CountryEvaluationDetailsDto doUpdateCountryEvaluationDetails(
-            UpdateCountryEvaluationDetailsRequest request, int evaluationDetailsId, long principalId) {
-        var evaluationDetailsDto = MAPPER.toCountryEvaluationDetailsDto(request);
-        evaluationDetailsDto.setId(evaluationDetailsId);
-        return evaluationService.updateCountryEvaluationDetails(evaluationDetailsDto, principalId);
     }
 
     @Override
@@ -94,6 +85,12 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
         var evaluationDetailsDto = MAPPER.toCountryEvaluationDetailsDto(request);
         evaluationDetailsDto.setCountryId(countryDto.getId());
         return evaluationService.saveCountryEvaluationDetails(evaluationDetailsDto, principalId);
+    }
+
+    private CountryEvaluationDetailsDto doUpdateCountryEvaluationDetails(
+            UpdateCountryEvaluationDetailsRequest request, long principalId) {
+        var evaluationDetailsDto = MAPPER.toCountryEvaluationDetailsDto(request);
+        return evaluationService.updateCountryEvaluationDetails(evaluationDetailsDto, principalId);
     }
 
 }

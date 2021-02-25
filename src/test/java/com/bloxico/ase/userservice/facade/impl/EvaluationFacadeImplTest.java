@@ -74,28 +74,27 @@ public class EvaluationFacadeImplTest extends AbstractSpringTest {
     @Test
     public void updateCountryEvaluationDetails_nullRequest() {
         var principalId = utilUser.savedAdmin().getId();
-        var detailsId = utilEvaluation.savedCountryEvaluationDetails().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationFacade.updateCountryEvaluationDetails(null, detailsId, principalId));
+                () -> evaluationFacade.updateCountryEvaluationDetails(null, principalId));
     }
 
     @Test
     public void updateCountryEvaluationDetails_evaluationDetailsNotFound() {
         var principalId = utilUser.savedAdmin().getId();
-        var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest();
+        var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest(-1);
         assertThrows(
                 EvaluationException.class,
-                () -> evaluationFacade.updateCountryEvaluationDetails(request, -1, principalId));
+                () -> evaluationFacade.updateCountryEvaluationDetails(request, principalId));
     }
 
     @Test
     public void updateCountryEvaluationDetails() {
         var principalId = utilUser.savedAdmin().getId();
         var details = utilEvaluation.savedCountryEvaluationDetails();
-        var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest();
+        var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest(details.getId());
         var updatedDetails = evaluationFacade
-                .updateCountryEvaluationDetails(request, details.getId(), principalId)
+                .updateCountryEvaluationDetails(request, principalId)
                 .getCountryEvaluationDetails();
         assertEquals(details.getId(), updatedDetails.getId());
         assertEquals(details.getCountryId(), updatedDetails.getCountryId());

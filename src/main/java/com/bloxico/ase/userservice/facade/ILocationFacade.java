@@ -14,6 +14,6 @@ public interface ILocationFacade {
 
     SaveCountryResponse saveCountry(SaveCountryRequest request, long principalId);
 
-    UpdateCountryResponse updateCountry(UpdateCountryRequest request, int countryId, long principalId);
+    UpdateCountryResponse updateCountry(UpdateCountryRequest request, long principalId);
 
 }

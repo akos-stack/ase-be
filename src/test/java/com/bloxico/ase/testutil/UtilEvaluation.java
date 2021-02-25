@@ -100,8 +100,8 @@ public class UtilEvaluation {
         return new SaveCountryEvaluationDetailsRequest(country, 50, 25);
     }
 
-    public UpdateCountryEvaluationDetailsRequest genUpdateCountryEvaluationDetailsRequest() {
-        return new UpdateCountryEvaluationDetailsRequest(40, 15);
+    public UpdateCountryEvaluationDetailsRequest genUpdateCountryEvaluationDetailsRequest(int id) {
+        return new UpdateCountryEvaluationDetailsRequest(id, 40, 15);
     }
 
     public SearchCountryEvaluationDetailsRequest genDefaultSearchCountryEvaluationDetailsRequest() {

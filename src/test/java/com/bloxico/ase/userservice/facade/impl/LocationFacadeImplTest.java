@@ -145,7 +145,6 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
         assertThrows(
                 NullPointerException.class,
                 () -> facade.updateCountry(null,
-                        utilLocation.savedCountry().getId(),
                         utilUser.savedAdmin().getId())
         );
     }
@@ -154,22 +153,20 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     public void updateCountry_countryAlreadyExists() {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithRegion(region);
-        var request = new UpdateCountryRequest(country.getName(), Set.of(region.getName()));
+        var request = new UpdateCountryRequest(utilLocation.savedCountry().getId(), country.getName(), Set.of(region.getName()));
         assertThrows(
                 LocationException.class,
                 () -> facade.updateCountry(request,
-                        utilLocation.savedCountry().getId(),
                         utilUser.savedAdmin().getId())
         );
     }
 
     @Test
     public void updateCountry_regionNotFound() {
-        var request = new UpdateCountryRequest(genUUID(), Set.of(genUUID()));
+        var request = new UpdateCountryRequest(utilLocation.savedCountry().getId(), genUUID(), Set.of(genUUID()));
         assertThrows(
                 LocationException.class,
                 () -> facade.updateCountry(request,
-                        utilLocation.savedCountry().getId(),
                         utilUser.savedAdmin().getId())
         );
     }
@@ -181,8 +178,8 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
         var region = utilLocation.savedRegionDto();
         var newCountryName = genUUID();
         var newRegionName = region.getName();
-        var request = new UpdateCountryRequest(newCountryName, Set.of(newRegionName));
-        var updatedCountry = facade.updateCountry(request, country.getId(), adminId).getCountry();
+        var request = new UpdateCountryRequest(country.getId(), newCountryName, Set.of(newRegionName));
+        var updatedCountry = facade.updateCountry(request, adminId).getCountry();
         assertEquals(newCountryName, updatedCountry.getName());
         assertThat(updatedCountry.getRegions(), hasItems(region));
     }
