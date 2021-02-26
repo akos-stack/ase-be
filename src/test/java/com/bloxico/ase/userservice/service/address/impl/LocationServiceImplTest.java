@@ -28,6 +28,72 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     @Autowired private LocationServiceImpl service;
 
     @Test
+    public void findRegionById_regionNotFound() {
+        assertThrows(
+                LocationException.class,
+                () -> service.findRegionById(-1));
+    }
+
+    @Test
+    public void findRegionById() {
+        var regionDto = utilLocation.savedRegionDto();
+        var foundRegion = service.findRegionById(regionDto.getId());
+        assertEquals(foundRegion, regionDto);
+    }
+
+    @Test
+    public void findRegionByName_regionNotFound() {
+        assertThrows(
+                LocationException.class,
+                () -> service.findRegionByName(genUUID()));
+    }
+
+    // TODO-test findRegionByName_nullName
+
+    // TODO-test findRegionByName_emptyName
+
+    @Test
+    public void findRegionByName() {
+        var regionDto = utilLocation.savedRegionDto();
+        var foundRegion = service.findRegionByName(regionDto.getName());
+        assertEquals(regionDto, foundRegion);
+    }
+
+    @Test
+    public void findAllRegionsWithNames_nullNames() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.findAllRegionsWithNames(null));
+    }
+
+    // TODO-test findAllRegionsWithNames_emptyNames
+
+    // TODO-test findAllRegionsWithNames_nothingFound
+
+    @Test
+    public void findAllRegionsWithNames() {
+        var r1 = utilLocation.savedRegionDto();
+        var r2 = utilLocation.savedRegionDto();
+        var r3 = utilLocation.savedRegionDto();
+        var foundRegions = service.findAllRegionsWithNames(List.of(r1.getName(), r2.getName(), r3.getName()));
+        assertThat(foundRegions, hasItems(r1, r2, r3));
+    }
+
+    @Test
+    public void findCountryByName_countryNotFound() {
+        assertThrows(
+                LocationException.class,
+                () -> service.findCountryByName(genUUID()));
+    }
+
+    @Test
+    public void findCountryByName() {
+        var countryDto = utilLocation.savedCountryDto();
+        var foundCountry = service.findCountryByName(countryDto.getName());
+        assertEquals(countryDto, foundCountry);
+    }
+
+    @Test
     public void findAllRegions() {
         var r1 = utilLocation.savedRegionDto();
         assertThat(service.findAllRegions(), hasItems(r1));
@@ -67,8 +133,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     public void deleteRegion_nullRegion() {
         assertThrows(
                 NullPointerException.class,
-                () -> service.deleteRegion(null)
-        );
+                () -> service.deleteRegion(null));
     }
 
     @Test
@@ -76,61 +141,6 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         var regionDto = utilLocation.savedRegionDto();
         service.deleteRegion(regionDto);
         assertTrue(regionRepository.findById(regionDto.getId()).isEmpty());
-    }
-
-    @Test
-    public void findRegionById_regionNotFound() {
-        assertThrows(
-                LocationException.class,
-                () -> service.findRegionById(-1)
-        );
-    }
-
-    @Test
-    public void findRegionById() {
-        var regionDto = utilLocation.savedRegionDto();
-        var foundRegion = service.findRegionById(regionDto.getId());
-        assertEquals(foundRegion, regionDto);
-    }
-
-    @Test
-    public void findRegionByName_regionNotFound() {
-        assertThrows(
-                LocationException.class,
-                () -> service.findRegionByName(genUUID())
-        );
-    }
-
-    @Test
-    public void findRegionByName() {
-        var regionDto = utilLocation.savedRegionDto();
-        var foundRegion = service.findRegionByName(regionDto.getName());
-        assertEquals(regionDto, foundRegion);
-    }
-
-    @Test
-    public void findAllRegionsWithNames_nullNames() {
-        assertThrows(
-                NullPointerException.class,
-                () -> service.findAllRegionsWithNames(null)
-        );
-    }
-
-    @Test
-    public void findAllRegionsWithNames() {
-        var r1 = utilLocation.savedRegionDto();
-        var r2 = utilLocation.savedRegionDto();
-        var r3 = utilLocation.savedRegionDto();
-        var foundRegions = service.findAllRegionsWithNames(List.of(r1.getName(), r2.getName(), r3.getName()));
-        assertThat(foundRegions, hasItems(r1, r2, r3));
-    }
-
-    @Test
-    public void countCountriesByRegion() {
-        var region = utilLocation.savedRegion();
-        assertEquals(0, service.countCountriesByRegionId(region.getId()));
-        utilLocation.savedCountryWithRegion(region);
-        assertEquals(1, service.countCountriesByRegionId(region.getId()));
     }
 
     @Test
@@ -174,8 +184,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     public void updateCountry_nullCountry() {
         assertThrows(
                 NullPointerException.class,
-                () -> service.updateCountry(null, utilUser.savedAdmin().getId())
-        );
+                () -> service.updateCountry(null, utilUser.savedAdmin().getId()));
     }
 
     @Test
@@ -184,8 +193,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         countryDto.setId(-1);
         assertThrows(
                 LocationException.class,
-                () -> service.updateCountry(countryDto, utilUser.savedAdmin().getId())
-        );
+                () -> service.updateCountry(countryDto, utilUser.savedAdmin().getId()));
     }
 
     @Test
@@ -194,9 +202,14 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         countryDto.setName(utilLocation.savedCountry().getName());
         assertThrows(
                 LocationException.class,
-                () -> service.updateCountry(countryDto, utilUser.savedAdmin().getId())
-        );
+                () -> service.updateCountry(countryDto, utilUser.savedAdmin().getId()));
     }
+
+    // TODO-test updateCountry_updateName
+
+    // TODO-test updateCountry_updateRegions
+
+    // TODO-test updateCountry_updateNameAndRegions
 
     @Test
     public void updateCountry() {
@@ -210,21 +223,6 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         var updatedCountry = service.updateCountry(dto, utilUser.savedAdmin().getId());
         assertEquals(newCountryName, updatedCountry.getName());
         assertThat(updatedCountry.getRegions(), hasItems(region));
-    }
-
-    @Test
-    public void findCountryByName_countryNotFound() {
-        assertThrows(
-                LocationException.class,
-                () -> service.findCountryByName(genUUID())
-        );
-    }
-
-    @Test
-    public void findCountryByName() {
-        var countryDto = utilLocation.savedCountryDto();
-        var foundCountry = service.findCountryByName(countryDto.getName());
-        assertEquals(countryDto, foundCountry);
     }
 
     @Test
@@ -256,6 +254,16 @@ public class LocationServiceImplTest extends AbstractSpringTest {
                         .map(MAPPER::toDto)
                         .collect(toList()),
                 hasItems(location));
+    }
+
+    // TODO-test countCountriesByRegionId_regionNotFound
+
+    @Test
+    public void countCountriesByRegionId() {
+        var region = utilLocation.savedRegion();
+        assertEquals(0, service.countCountriesByRegionId(region.getId()));
+        utilLocation.savedCountryWithRegion(region);
+        assertEquals(1, service.countCountriesByRegionId(region.getId()));
     }
 
 }
