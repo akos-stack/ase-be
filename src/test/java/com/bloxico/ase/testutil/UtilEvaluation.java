@@ -2,8 +2,8 @@ package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
 import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
-import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsCountedProj;
-import com.bloxico.ase.userservice.proj.evaluation.RegionCountedProj;
+import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
+import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchCountryEvaluationDetailsRequest;
@@ -67,27 +67,27 @@ public class UtilEvaluation {
         return MAPPER.toDto(savedCountryEvaluationDetails());
     }
 
-    public CountryEvaluationDetailsCountedProj savedCountryEvaluationDetailsCountedProj() {
+    public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProj() {
         return savedCountryEvaluationDetailsCountedProj(genUUID());
     }
 
-    public CountryEvaluationDetailsCountedProj savedCountryEvaluationDetailsCountedProj(String countryName) {
+    public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProj(String countryName) {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithNameAndRegion(countryName, region);
         var details = savedCountryEvaluationDetails(country.getId());
-        return new CountryEvaluationDetailsCountedProj(country.getId(), country.getName(),
+        return new CountryEvaluationDetailsWithEvaluatorsCountProj(country.getId(), country.getName(),
                 List.of(region.getName()), details.getId(), details.getPricePerEvaluation(),
                 details.getAvailabilityPercentage(), 0L);
     }
 
-    public CountryEvaluationDetailsCountedProj savedCountryEvaluationDetailsCountedProjNoDetails() {
+    public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProjNoDetails() {
         return savedCountryEvaluationDetailsCountedProjNoDetails(genUUID());
     }
 
-    public CountryEvaluationDetailsCountedProj savedCountryEvaluationDetailsCountedProjNoDetails(String countryName) {
+    public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProjNoDetails(String countryName) {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithNameAndRegion(countryName, region);
-        return new CountryEvaluationDetailsCountedProj(country.getId(), country.getName(),
+        return new CountryEvaluationDetailsWithEvaluatorsCountProj(country.getId(), country.getName(),
                 List.of(region.getName()), null,
                 null, null, 0L);
     }
@@ -108,14 +108,14 @@ public class UtilEvaluation {
         return new SearchCountryEvaluationDetailsRequest(null, "", 0, 10, "country", "asc");
     }
 
-    public RegionCountedProj savedRegionCountedProj() {
+    public RegionWithCountriesAndEvaluatorsCountProj savedRegionCountedProj() {
         var region = utilLocation.savedRegion();
-        return new RegionCountedProj(region.getId(), region.getName(), 0, 0);
+        return new RegionWithCountriesAndEvaluatorsCountProj(region.getId(), region.getName(), 0, 0);
     }
 
-    public RegionCountedProj savedRegionCountedProj(String name) {
+    public RegionWithCountriesAndEvaluatorsCountProj savedRegionCountedProj(String name) {
         var region = utilLocation.savedRegion(name);
-        return new RegionCountedProj(region.getId(), region.getName(), 0, 0);
+        return new RegionWithCountriesAndEvaluatorsCountProj(region.getId(), region.getName(), 0, 0);
     }
 
     public SearchRegionsRequest genDefaultSearchRegionsRequest() {

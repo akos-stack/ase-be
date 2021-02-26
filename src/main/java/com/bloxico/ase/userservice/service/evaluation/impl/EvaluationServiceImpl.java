@@ -1,8 +1,8 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsCountedProj;
-import com.bloxico.ase.userservice.proj.evaluation.RegionCountedProj;
+import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
+import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchCountryEvaluationDetailsRequest;
@@ -34,7 +34,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public Page<CountryEvaluationDetailsCountedProj> findAllCountriesWithEvaluationDetails(
+    public Page<CountryEvaluationDetailsWithEvaluatorsCountProj> findAllCountriesWithEvaluationDetails(
             SearchCountryEvaluationDetailsRequest request) {
         log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - start | request: {}", request);
         requireNonNull(request);
@@ -73,7 +73,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public Page<CountryEvaluationDetailsCountedProj> findAllCountries(
+    public Page<CountryEvaluationDetailsWithEvaluatorsCountProj> findAllCountries(
             SearchCountryEvaluationDetailsRequest request) {
         log.debug("EvaluationServiceImpl.findAllCountries - start | request: {}", request);
         requireNonNull(request);
@@ -85,7 +85,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public Page<RegionCountedProj> findAllRegions(SearchRegionsRequest request) {
+    public Page<RegionWithCountriesAndEvaluatorsCountProj> findAllRegions(SearchRegionsRequest request) {
         log.debug("EvaluationServiceImpl.findAllRegions - start | request: {}", request);
         requireNonNull(request);
         var page = countryEvaluationDetailsRepository

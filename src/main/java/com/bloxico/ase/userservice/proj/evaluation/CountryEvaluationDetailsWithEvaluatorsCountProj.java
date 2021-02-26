@@ -6,7 +6,7 @@ import lombok.Value;
 import java.util.List;
 
 @Value
-public class CountryEvaluationDetailsCountedProj {
+public class CountryEvaluationDetailsWithEvaluatorsCountProj {
 
     @JsonProperty("country_id")
     Integer countryId;

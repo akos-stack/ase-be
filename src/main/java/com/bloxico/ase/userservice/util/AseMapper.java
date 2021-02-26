@@ -17,7 +17,7 @@ import com.bloxico.ase.userservice.entity.token.*;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
 import com.bloxico.ase.userservice.entity.user.profile.*;
-import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsCountedProj;
+import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsCountedTransferProj;
 import com.bloxico.ase.userservice.web.model.address.SaveCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
@@ -130,7 +130,7 @@ public interface AseMapper {
 
     @Mapping(target = "regions", source = "country.regions")
     @Mapping(target = "country", source = "countryName")
-    CountryEvaluationDetailsCountedProj toCountedProj(CountryEvaluationDetailsCountedTransferProj transferProj);
+    CountryEvaluationDetailsWithEvaluatorsCountProj toCountedProj(CountryEvaluationDetailsCountedTransferProj transferProj);
 
     default String toString(Region region) {
         return region.getName();

@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.web.model.evaluation;
 
-import com.bloxico.ase.userservice.proj.evaluation.RegionCountedProj;
+import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Value;
@@ -12,7 +12,7 @@ public class PagedRegionsResponse {
 
     @JsonProperty("regions")
     @ApiModelProperty(required = true)
-    List<RegionCountedProj> regions;
+    List<RegionWithCountriesAndEvaluatorsCountProj> regions;
 
     @JsonProperty("page_size")
     @ApiModelProperty(required = true)
