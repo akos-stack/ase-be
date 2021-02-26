@@ -51,8 +51,7 @@ public class LocationController implements LocationApi {
     }
 
     @Override
-    public ResponseEntity<UpdateCountryResponse> updateCountry(
-            UpdateCountryRequest request, Principal principal) {
+    public ResponseEntity<UpdateCountryResponse> updateCountry(UpdateCountryRequest request, Principal principal) {
         var id = extractId(principal);
         var response = locationFacade.updateCountry(request, id);
         return ResponseEntity.ok(response);

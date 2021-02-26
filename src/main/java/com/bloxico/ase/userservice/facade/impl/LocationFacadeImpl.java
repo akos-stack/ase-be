@@ -1,6 +1,5 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
 import com.bloxico.ase.userservice.facade.ILocationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
@@ -41,7 +40,8 @@ public class LocationFacadeImpl implements ILocationFacade {
     @Override
     public SaveRegionResponse saveRegion(SaveRegionRequest request, long principalId) {
         log.debug("LocationFacadeImpl.saveRegion - start | request: {}, principalId: {}", request, principalId);
-        var regionDto = doSaveRegion(request, principalId);
+        var regionDto = MAPPER.toRegionDto(request);
+        regionDto = locationService.saveRegion(regionDto, principalId);
         var response = new SaveRegionResponse(regionDto);
         log.debug("LocationFacadeImpl.saveRegion - end | request: {}, principalId: {}", request, principalId);
         return response;
@@ -50,7 +50,9 @@ public class LocationFacadeImpl implements ILocationFacade {
     @Override
     public void deleteRegion(int regionId) {
         log.debug("LocationFacadeImpl.deleteRegion - start | regionId: {}", regionId);
-        doDeleteRegion(regionId);
+        var regionDto = locationService.findRegionById(regionId);
+        requireRegionHasNoCountries(regionDto);
+        locationService.deleteRegion(regionDto);
         log.debug("LocationFacadeImpl.deleteRegion - end | regionId: {}", regionId);
     }
 
@@ -66,7 +68,9 @@ public class LocationFacadeImpl implements ILocationFacade {
     @Override
     public SaveCountryResponse saveCountry(SaveCountryRequest request, long principalId) {
         log.debug("LocationFacadeImpl.saveCountry - start | request: {}, principalId: {}", request, principalId);
-        var countryDto = doSaveCountry(request, principalId);
+        var countryDto = MAPPER.toCountryDto(request);
+        countryDto.addAllRegions(findAllRegionsByNames(request.getRegions()));
+        countryDto = locationService.saveCountry(countryDto, principalId);
         var response = new SaveCountryResponse(countryDto);
         log.debug("LocationFacadeImpl.saveCountry - end | request: {}, principalId: {}", request, principalId);
         return response;
@@ -75,21 +79,12 @@ public class LocationFacadeImpl implements ILocationFacade {
     @Override
     public UpdateCountryResponse updateCountry(UpdateCountryRequest request, long principalId) {
         log.debug("LocationFacadeImpl.updateCountry - start | request: {}, principalId: {}", request, principalId);
-        var countryDto = doUpdateCountry(request, principalId);
+        var countryDto = MAPPER.toCountryDto(request);
+        countryDto.addAllRegions(findAllRegionsByNames(request.getRegions()));
+        countryDto = locationService.updateCountry(countryDto, principalId);
         var response = new UpdateCountryResponse(countryDto);
         log.debug("LocationFacadeImpl.updateCountry - end | request: {}, principalId: {}", request, principalId);
         return response;
-    }
-
-    private RegionDto doSaveRegion(SaveRegionRequest request, long principalId) {
-        var regionDto = MAPPER.toRegionDto(request);
-        return locationService.saveRegion(regionDto, principalId);
-    }
-
-    private void doDeleteRegion(int regionId) {
-        var regionDto = locationService.findRegionById(regionId);
-        requireRegionHasNoCountries(regionDto);
-        locationService.deleteRegion(regionDto);
     }
 
     private void requireRegionHasNoCountries(RegionDto dto) {
@@ -103,18 +98,6 @@ public class LocationFacadeImpl implements ILocationFacade {
         if (regions.size() != names.size())
             throw REGION_NOT_FOUND.newException();
         return regions;
-    }
-
-    private CountryDto doSaveCountry(SaveCountryRequest request, long principalId) {
-        var countryDto = MAPPER.toCountryDto(request);
-        countryDto.addAllRegions(findAllRegionsByNames(request.getRegions()));
-        return locationService.saveCountry(countryDto, principalId);
-    }
-
-    private CountryDto doUpdateCountry(UpdateCountryRequest request, long principalId) {
-        var countryDto = MAPPER.toCountryDto(request);
-        countryDto.addAllRegions(findAllRegionsByNames(request.getRegions()));
-        return locationService.updateCountry(countryDto, principalId);
     }
 
 }
