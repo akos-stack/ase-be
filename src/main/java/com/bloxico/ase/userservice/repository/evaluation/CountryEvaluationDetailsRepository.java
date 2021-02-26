@@ -69,6 +69,6 @@ public interface CountryEvaluationDetailsRepository extends JpaRepository<Countr
             "SELECT COUNT(r.id) FROM Region r                           " +
             " WHERE LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%')) " )
     // @formatter:on
-    Page<RegionCountedProj> findAllIncludeCountriesAndEvaluatorsCount(String search, Pageable pageable);
+    Page<RegionCountedProj> findAllRegionsWithCountriesAndEvaluatorsCount(String search, Pageable pageable);
 
 }

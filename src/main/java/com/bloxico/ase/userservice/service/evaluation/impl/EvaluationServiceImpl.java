@@ -89,7 +89,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
         log.debug("EvaluationServiceImpl.findAllRegions - start | request: {}", request);
         requireNonNull(request);
         var page = countryEvaluationDetailsRepository
-                .findAllIncludeCountriesAndEvaluatorsCount(request.getSearch(), getPagination(request));
+                .findAllRegionsWithCountriesAndEvaluatorsCount(request.getSearch(), getPagination(request));
         log.debug("EvaluationServiceImpl.findAllRegions - end | request: {}", request);
         return page;
     }
