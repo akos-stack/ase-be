@@ -55,7 +55,7 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void createRegion_409_regionAlreadyExists() {
+    public void saveRegion_409_regionAlreadyExists() {
         var auth = utilAuth.doAdminAuthentication();
         var request = new SaveRegionRequest(genUUID());
         given()
@@ -80,7 +80,7 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void createRegion_200_ok() {
+    public void saveRegion_200_ok() {
         var regionName = genUUID();
         var region = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
@@ -167,7 +167,7 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void createCountry_409_countryAlreadyExists() {
+    public void saveCountry_409_countryAlreadyExists() {
         var auth = utilAuth.doAdminAuthentication();
         var region = utilLocation.savedRegion();
         var request = new SaveCountryRequest(genUUID(), Set.of(region.getName()));
@@ -193,7 +193,7 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void createCountry_404_regionNotFound() {
+    public void saveCountry_404_regionNotFound() {
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
@@ -207,7 +207,7 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    public void createCountry_200_ok() {
+    public void saveCountry_200_ok() {
         var region = utilLocation.savedRegionDto();
         var regionName = region.getName();
         var countryName = genUUID();
