@@ -4,6 +4,7 @@ import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.exception.LocationException;
 import com.bloxico.ase.userservice.repository.address.*;
+import com.bloxico.ase.userservice.web.model.address.UpdateCountryRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,8 +14,8 @@ import java.util.Set;
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.not;
+import static java.util.stream.Collectors.toSet;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -48,9 +49,19 @@ public class LocationServiceImplTest extends AbstractSpringTest {
                 () -> service.findRegionByName(genUUID()));
     }
 
-    // TODO-test findRegionByName_nullName
+    @Test
+    public void findRegionByName_nullName() {
+        assertThrows(
+                LocationException.class,
+                () -> service.findRegionByName(null));
+    }
 
-    // TODO-test findRegionByName_emptyName
+    @Test
+    public void findRegionByName_emptyName() {
+        assertThrows(
+                LocationException.class,
+                () -> service.findRegionByName(""));
+    }
 
     @Test
     public void findRegionByName() {
@@ -66,9 +77,15 @@ public class LocationServiceImplTest extends AbstractSpringTest {
                 () -> service.findAllRegionsWithNames(null));
     }
 
-    // TODO-test findAllRegionsWithNames_emptyNames
+    @Test
+    public void findAllRegionsWithNames_emptyNames() {
+        assertThat(service.findAllRegionsWithNames(List.of()), hasSize(0));
+    }
 
-    // TODO-test findAllRegionsWithNames_nothingFound
+    @Test
+    public void findAllRegionsWithNames_nothingFound() {
+        assertThat(service.findAllRegionsWithNames(List.of(genUUID())), hasSize(0));
+    }
 
     @Test
     public void findAllRegionsWithNames() {
@@ -205,11 +222,44 @@ public class LocationServiceImplTest extends AbstractSpringTest {
                 () -> service.updateCountry(countryDto, utilUser.savedAdmin().getId()));
     }
 
-    // TODO-test updateCountry_updateName
+    @Test
+    public void updateCountry_updateName() {
+        var adminId = utilUser.savedAdmin().getId();
+        var country = utilLocation.savedCountryDto();
+        var newCountryName = genUUID();
+        var dto = utilLocation.genCountryDto(country.getId(), newCountryName, country.getRegions());
+        var updatedCountry = service.updateCountry(dto, adminId);
+        assertNotEquals(country.getName(), updatedCountry.getName());
+        assertEquals(country.getRegions(), updatedCountry.getRegions());
+    }
 
-    // TODO-test updateCountry_updateRegions
+    @Test
+    public void updateCountry_updateRegions() {
+        var adminId = utilUser.savedAdmin().getId();
+        var country = utilLocation.savedCountryDto();
+        var newRegion = utilLocation.savedRegionDto();
+        var dto = utilLocation.genCountryDto(country.getId(), country.getName(), Set.of(newRegion));
+        var updatedCountry = service.updateCountry(dto, adminId);
+        assertEquals(country.getName(), updatedCountry.getName());
+        assertThat(updatedCountry.getRegions(), hasItems(newRegion));
+        for (var oldRegion : country.getRegions())
+            assertThat(updatedCountry.getRegions(), not(hasItems(oldRegion)));
+    }
 
-    // TODO-test updateCountry_updateNameAndRegions
+    @Test
+    public void updateCountry_updateNameAndRegions() {
+        var adminId = utilUser.savedAdmin().getId();
+        var country = utilLocation.savedCountryDto();
+        var newRegion = utilLocation.savedRegionDto();
+        var newCountryName = genUUID();
+        var dto = utilLocation.genCountryDto(country.getId(), newCountryName, Set.of(newRegion));
+        var updatedCountry = service.updateCountry(dto, adminId);
+        assertEquals(newCountryName, updatedCountry.getName());
+        assertNotEquals(country.getName(), updatedCountry.getName());
+        assertThat(updatedCountry.getRegions(), hasItems(newRegion));
+        for (var oldRegion : country.getRegions())
+            assertThat(updatedCountry.getRegions(), not(hasItems(oldRegion)));
+    }
 
     @Test
     public void updateCountry() {
@@ -256,7 +306,10 @@ public class LocationServiceImplTest extends AbstractSpringTest {
                 hasItems(location));
     }
 
-    // TODO-test countCountriesByRegionId_regionNotFound
+    @Test
+    public void countCountriesByRegionId_regionNotFound() {
+        assertEquals(0, service.countCountriesByRegionId(-1));
+    }
 
     @Test
     public void countCountriesByRegionId() {

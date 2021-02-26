@@ -66,6 +66,13 @@ public class UtilLocation {
         return MAPPER.toDto(savedCountry());
     }
 
+    public CountryDto genCountryDto(int id, String name, Set<RegionDto> regions) {
+        var dto = new CountryDto();
+        dto.setId(id);
+        dto.setName(name);
+        dto.setRegions(regions);
+        return dto;
+    }
     public Location savedLocation() {
         var country = savedCountry();
         var location = new Location();
