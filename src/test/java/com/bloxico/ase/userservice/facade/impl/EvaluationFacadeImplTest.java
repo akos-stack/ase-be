@@ -12,7 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class EvaluationFacadeImplTest extends AbstractSpringTest {
+public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Autowired private UtilUser utilUser;
     @Autowired private UtilEvaluation utilEvaluation;
@@ -134,6 +134,33 @@ public class EvaluationFacadeImplTest extends AbstractSpringTest {
         assertThat(evaluationFacade.searchRegions(request).getRegions(), hasItems(c1));
         var c2 = utilEvaluation.savedRegionCountedProj();
         assertThat(evaluationFacade.searchRegions(request).getRegions(), hasItems(c1, c2));
+    }
+
+    @Test
+    public void saveQuotationPackage_nullRequest() {
+        var principalId = utilUser.savedAdmin().getId();
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.saveQuotationPackage(null, principalId));
+    }
+
+    // TODO test saveQuotationPackage_artworkNotFound
+
+    @Test
+    public void saveQuotationPackage_packageAlreadyExists() {
+        var principalId = utilUser.savedAdmin().getId();
+        var request = utilEvaluation.genSaveQuotationPackageRequest();
+        evaluationFacade.saveQuotationPackage(request, principalId);
+        assertThrows(
+                EvaluationException.class,
+                () -> evaluationFacade.saveQuotationPackage(request, principalId));
+    }
+
+    @Test
+    public void saveQuotationPackage() {
+        var principalId = utilUser.savedAdmin().getId();
+        var request = utilEvaluation.genSaveQuotationPackageRequest();
+        evaluationFacade.saveQuotationPackage(request, principalId);
     }
 
 }

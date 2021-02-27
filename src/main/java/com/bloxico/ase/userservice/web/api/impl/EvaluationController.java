@@ -57,4 +57,11 @@ public class EvaluationController implements EvaluationApi {
         return ResponseEntity.ok(response);
     }
 
+    public ResponseEntity<SaveQuotationPackageResponse> saveQuotationPackage(
+            SaveQuotationPackageRequest request, Principal principal) {
+        var id = extractId(principal);
+        var response = evaluationFacade.saveQuotationPackage(request, id);
+        return ResponseEntity.ok(response);
+    }
+
 }

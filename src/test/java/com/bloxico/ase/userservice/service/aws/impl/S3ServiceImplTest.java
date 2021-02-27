@@ -8,14 +8,13 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.bloxico.ase.testutil.Util.genMultipartFile;
-import static com.bloxico.ase.testutil.Util.randOtherEnumConst;
+import static com.bloxico.ase.testutil.UtilS3.findOtherCategory;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
 
-    @Autowired
-    private S3ServiceImpl s3Service;
+    @Autowired private S3ServiceImpl s3Service;
 
     // TODO-TEST validateFile_nullArguments
 
@@ -26,7 +25,7 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
                 assertThrows(
                         S3Exception.class,
                         () -> s3Service.validateFile(
-                                randOtherEnumConst(category),
+                                findOtherCategory(category),
                                 genMultipartFile(extension)));
     }
 
@@ -55,7 +54,7 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
                 assertThrows(
                         S3Exception.class,
                         () -> s3Service.uploadFile(
-                                randOtherEnumConst(category),
+                                findOtherCategory(category),
                                 genMultipartFile(extension)));
     }
 

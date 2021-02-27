@@ -10,7 +10,12 @@ public interface IEvaluationFacade {
             SearchCountryEvaluationDetailsRequest request);
 
     SaveCountryEvaluationDetailsResponse saveCountryEvaluationDetails(
-            SaveCountryEvaluationDetailsRequest request, long principalId);
+            SaveCountryEvaluationDetailsRequest request,
+            long principalId);
+
+    SaveQuotationPackageResponse saveQuotationPackage(
+            SaveQuotationPackageRequest request,
+            long principalId);
 
     UpdateCountryEvaluationDetailsResponse updateCountryEvaluationDetails(
             UpdateCountryEvaluationDetailsRequest request, long principalId);

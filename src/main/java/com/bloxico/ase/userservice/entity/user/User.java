@@ -44,7 +44,7 @@ public class User extends BaseEntity {
     @Column(name = "provider_id")
     private String providerId;
 
-    @ManyToMany(fetch = EAGER, cascade = MERGE)
+    @ManyToMany(fetch = EAGER)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),

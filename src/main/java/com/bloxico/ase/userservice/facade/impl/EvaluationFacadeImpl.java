@@ -93,4 +93,19 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
         return evaluationService.updateCountryEvaluationDetails(evaluationDetailsDto, principalId);
     }
 
+    @Override
+    public SaveQuotationPackageResponse saveQuotationPackage(SaveQuotationPackageRequest request, long principalId) {
+        log.debug("EvaluationFacadeImpl.saveQuotationPackage - start | request: {}, principalId: {}", request, principalId);
+        var quotationPackageDto = MAPPER.toQuotationPackageDto(request);
+        var quotationPackage = evaluationService.saveQuotationPackage(quotationPackageDto, principalId);
+        var countries = evaluationService.saveQuotationPackageCountries(
+                quotationPackage.getId(),
+                quotationPackageDto.getCountries(),
+                principalId);
+        quotationPackage.setCountries(countries);
+        var response = new SaveQuotationPackageResponse(quotationPackage);
+        log.debug("EvaluationFacadeImpl.saveQuotationPackage - start | request: {}, principalId: {}", request, principalId);
+        return response;
+    }
+
 }

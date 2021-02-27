@@ -11,9 +11,11 @@ download_file
 delete_file
 download_user_resume
 manage_artwork_metadata
+submit_artwork
 save_region
 save_country
 save_country_evaluation_details
 manage_region
 manage_country
 manage_country_evaluation_details
+save_quotation_package

@@ -1,19 +1,23 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
 import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
+import com.bloxico.ase.userservice.entity.evaluation.QuotationPackage;
+import com.bloxico.ase.userservice.entity.evaluation.QuotationPackageCountry;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
-import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchCountryEvaluationDetailsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageRepository;
+import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
+import static com.bloxico.ase.testutil.Util.genPosInt;
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 
@@ -22,7 +26,9 @@ public class UtilEvaluation {
 
     @Autowired private UtilUser utilUser;
     @Autowired private UtilLocation utilLocation;
-    @Autowired private CountryEvaluationDetailsRepository repository;
+    @Autowired private UtilArtwork utilArtwork;
+    @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
+    @Autowired private QuotationPackageRepository quotationPackageRepository;
 
     public CountryEvaluationDetails genCountryEvaluationDetails(int countryId) {
         var details = new CountryEvaluationDetails();
@@ -44,7 +50,8 @@ public class UtilEvaluation {
         return MAPPER.toDto(genCountryEvaluationDetails(countryId));
     }
 
-    public CountryEvaluationDetailsDto genCountryEvaluationDetailsDto(int countryId, int pricePerEvaluation, int availabilityPercentage) {
+    public CountryEvaluationDetailsDto genCountryEvaluationDetailsDto(
+            int countryId, int pricePerEvaluation, int availabilityPercentage) {
         return MAPPER.toDto(genCountryEvaluationDetails(countryId, pricePerEvaluation, availabilityPercentage));
     }
 
@@ -53,14 +60,14 @@ public class UtilEvaluation {
         var countryId = utilLocation.savedCountry().getId();
         var details = genCountryEvaluationDetails(countryId);
         details.setCreatorId(principalId);
-        return repository.saveAndFlush(details);
+        return countryEvaluationDetailsRepository.saveAndFlush(details);
     }
 
     public CountryEvaluationDetails savedCountryEvaluationDetails(int countryId) {
         var principalId = utilUser.savedAdmin().getId();
         var details = genCountryEvaluationDetails(countryId);
         details.setCreatorId(principalId);
-        return repository.saveAndFlush(details);
+        return countryEvaluationDetailsRepository.saveAndFlush(details);
     }
 
     public CountryEvaluationDetailsDto savedCountryEvaluationDetailsDto() {
@@ -97,7 +104,49 @@ public class UtilEvaluation {
     }
 
     public SaveCountryEvaluationDetailsRequest genSaveCountryEvaluationDetailsRequest(String country) {
-        return new SaveCountryEvaluationDetailsRequest(country, 50, 25);
+        return new SaveCountryEvaluationDetailsRequest(country, genPosInt(251), genPosInt(101));
+    }
+
+    public QuotationPackage genQuotationPackage() {
+        var artworkId = utilArtwork.savedArtworkDto().getId();
+        var qPackage = new QuotationPackage();
+        qPackage.setArtworkId(artworkId);
+        return qPackage;
+    }
+
+    public QuotationPackageDto genQuotationPackageDto() {
+        return MAPPER.toDto(genQuotationPackage());
+    }
+
+    public QuotationPackage savedQuotationPackage() {
+        var principalId = utilUser.savedAdmin().getId();
+        var qPackage = genQuotationPackage();
+        qPackage.setCreatorId(principalId);
+        return quotationPackageRepository.saveAndFlush(qPackage);
+    }
+
+    public QuotationPackageDto savedQuotationPackageDto() {
+        return MAPPER.toDto(savedQuotationPackage());
+    }
+
+    public QuotationPackageCountry genQuotationPackageCountry(long packageId) {
+        var countryId = utilLocation.savedCountry().getId();
+        var qpCountry = new QuotationPackageCountry();
+        qpCountry.setNumberOfEvaluations(genPosInt(50));
+        qpCountry.setId(new QuotationPackageCountry.Id(packageId, countryId));
+        return qpCountry;
+    }
+
+    public QuotationPackageCountryDto genQuotationPackageCountryDto(long packageId) {
+        return MAPPER.toDto(genQuotationPackageCountry(packageId));
+    }
+
+    public SaveQuotationPackageRequest genSaveQuotationPackageRequest() {
+        var artworkId = utilArtwork.savedArtworkDto().getId();
+        var c1 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));
+        var c2 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));
+        var c3 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));
+        return new SaveQuotationPackageRequest(artworkId, Set.of(c1, c2, c3));
     }
 
     public UpdateCountryEvaluationDetailsRequest genUpdateCountryEvaluationDetailsRequest(int id) {

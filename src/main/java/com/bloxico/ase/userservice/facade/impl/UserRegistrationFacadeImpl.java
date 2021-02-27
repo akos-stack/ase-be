@@ -5,6 +5,7 @@ import com.bloxico.ase.userservice.dto.entity.user.UserDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
+import com.bloxico.ase.userservice.service.document.IDocumentService;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
 import com.bloxico.ase.userservice.service.token.ITokenService;
 import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImpl;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.util.FileCategory.CV;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.EVALUATOR_INVITATION;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.VERIFICATION;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
@@ -37,6 +39,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     private final IPendingEvaluatorService pendingEvaluatorService;
     private final IRolePermissionService rolePermissionService;
     private final MailUtil mailUtil;
+    private final IDocumentService documentService;
 
     @Autowired
     public UserRegistrationFacadeImpl(IUserService userService,
@@ -45,7 +48,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
                                       RegistrationTokenServiceImpl registrationTokenService,
                                       IPendingEvaluatorService pendingEvaluatorService,
                                       IRolePermissionService rolePermissionService,
-                                      MailUtil mailUtil)
+                                      MailUtil mailUtil, IDocumentService documentService)
     {
         this.userService = userService;
         this.userProfileService = userProfileService;
@@ -54,6 +57,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         this.pendingEvaluatorService = pendingEvaluatorService;
         this.rolePermissionService = rolePermissionService;
         this.mailUtil = mailUtil;
+        this.documentService = documentService;
     }
 
     @Override
@@ -100,7 +104,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public void sendEvaluatorInvitation(EvaluatorInvitationRequest request, long principalId) {
         log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - start | request: {}, principalId: {}", request, principalId);
-        var token = pendingEvaluatorService.createPendingEvaluator(request, principalId).getToken();
+        var token = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principalId).getToken();
         mailUtil.sendTokenEmail(EVALUATOR_INVITATION, request.getEmail(), token);
         log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - end | request: {}, principalId: {}", request, principalId);
     }
@@ -150,7 +154,9 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public void requestEvaluatorRegistration(EvaluatorRegistrationRequest request, long principalId) {
         log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - start | request: {}, principalId: {}", request, principalId);
-        pendingEvaluatorService.createPendingEvaluator(request, principalId);
+        var pendingEvaluatorDto = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principalId);
+        var documentDto = documentService.saveDocument(request.getCv(), CV, principalId);
+        pendingEvaluatorService.savePendingEvaluatorDocument(pendingEvaluatorDto.getEmail(), documentDto.getId());
         log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - end | request: {}, principalId: {}", request, principalId);
     }
 
@@ -166,7 +172,8 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public ByteArrayResource downloadEvaluatorResume(String email, long principalId) {
         log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - start | email: {}, principalId: {}", email, principalId);
-        var response = pendingEvaluatorService.getEvaluatorResume(email, principalId);
+        var pendingEvaluatorDocumentDto = pendingEvaluatorService.getEvaluatorResume(email, principalId);
+        var response = documentService.getDocumentById(pendingEvaluatorDocumentDto.getDocumentId());
         log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - end | email: {}, principalId: {}", email, principalId);
         return response;
     }

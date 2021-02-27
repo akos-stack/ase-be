@@ -5,6 +5,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import com.bloxico.ase.userservice.web.model.evaluation.*;
+import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ public interface EvaluationApi {
     String EVALUATION_COUNTRY_DETAILS_UPDATE                =   "/evaluation/country-details/update";
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH     =   "/evaluation/management/country-details";
     String EVALUATION_MANAGEMENT_REGIONS_SEARCH             =   "/evaluation/management/regions";
+    String EVALUATION_QUOTATION_PACKAGE_SAVE                =   "/evaluation/quotation-package/save";
 
     @GetMapping(
             value = EVALUATION_COUNTRY_DETAILS_SEARCH,
@@ -80,5 +83,19 @@ public interface EvaluationApi {
             @ApiResponse(code = 200, message = "Paginated list of regions successfully retrieved.")
     })
     ResponseEntity<PagedRegionsResponse> searchRegionsManagement(@Valid SearchRegionsRequest request);
+
+    @PostMapping(
+            value = EVALUATION_QUOTATION_PACKAGE_SAVE,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'save_quotation_package')")
+    @ApiOperation(value = "Saves quotation package for specified artwork in the database.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Quotation package for specified artwork successfully saved."),
+            @ApiResponse(code = 404, message = "Specified artwork doesn't exist."), // TODO
+            @ApiResponse(code = 409, message = "Quotation package already exists for specified artwork.")
+    })
+    ResponseEntity<SaveQuotationPackageResponse> saveQuotationPackage(
+            @Valid @RequestBody SaveQuotationPackageRequest request, Principal principal);
 
 }

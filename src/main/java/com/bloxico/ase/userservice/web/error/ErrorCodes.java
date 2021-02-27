@@ -193,13 +193,28 @@ public interface ErrorCodes {
 
         ARTWORK_METADATA_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "21",
+                "40",
                 "Artwork metadata not found."),
 
         ARTWORK_METADATA_TYPE_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "22",
-                "Artwork metadata type not found.");
+                "41",
+                "Artwork metadata type not found."),
+
+        ARTWORK_MISSING_RESUME(
+                HttpStatus.BAD_REQUEST,
+                "42",
+                "Art Owner resume missing."),
+
+        ARTWORK_MISSING_CERTIFICATE(
+                HttpStatus.BAD_REQUEST,
+                "43",
+                "Artwork certificate not uploaded."),
+
+        ARTWORK_GROUP_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "44",
+                "Artwork group not found.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
@@ -228,7 +243,17 @@ public interface ErrorCodes {
         COUNTRY_EVALUATION_DETAILS_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "41",
-                "Specified evaluation details not found.");;
+                "Specified evaluation details not found."),
+
+        QUOTATION_PACKAGE_EXISTS(
+                HttpStatus.CONFLICT,
+                "42",
+                "Quotation package already exists for specified artwork."),
+
+        QUOTATION_PACKAGE_COUNTRY_EXISTS(
+                HttpStatus.CONFLICT,
+                "43",
+                "Quotation package country already exists for specified country.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
@@ -242,6 +267,30 @@ public interface ErrorCodes {
         @Override
         public AseRuntimeException newException(Throwable cause) {
             return new EvaluationException(httpStatus, code, cause);
+        }
+
+    }
+
+    @Getter
+    enum Documents implements ErrorCodes {
+
+        DOCUMENT_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "60",
+                "Document not found.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        Documents(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        }
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new DocumentException(httpStatus, code, cause);
         }
 
     }

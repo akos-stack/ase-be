@@ -94,4 +94,12 @@ public class UserProfileServiceImpl implements IUserProfileService {
         return dto;
     }
 
+    @Override
+    public ArtOwnerDto findArtOwnerByUserId(long id) {
+        log.debug("UserProfileServiceImpl.getArtOwnerById - start | id: {}",id);
+        var response = artOwnerRepository.findByUserProfile_UserId(id).map(MAPPER::toDto).orElseThrow(USER_NOT_FOUND::newException);
+        log.debug("UserProfileServiceImpl.getArtOwnerById - end | id: {}",id);
+        return response;
+    }
+
 }

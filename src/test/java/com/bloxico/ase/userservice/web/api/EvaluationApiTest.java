@@ -1,21 +1,17 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.AbstractSpringTest;
+import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
 import com.bloxico.ase.testutil.UtilAuth;
 import com.bloxico.ase.testutil.UtilEvaluation;
 import com.bloxico.ase.testutil.UtilLocation;
-import com.bloxico.ase.userservice.web.model.evaluation.PagedCountryEvaluationDetailsResponse;
-import com.bloxico.ase.userservice.web.model.evaluation.PagedRegionsResponse;
-import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsResponse;
-import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsResponse;
+import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.web.api.EvaluationApi.*;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.COUNTRY_EVALUATION_DETAILS_EXISTS;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.COUNTRY_EVALUATION_DETAILS_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.COUNTRY_NOT_FOUND;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -27,11 +23,14 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 
 // Because RestAssured executes in another transaction
 @Transactional(propagation = NOT_SUPPORTED)
-public class EvaluationApiTest extends AbstractSpringTest {
+public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
-    @Autowired private UtilAuth utilAuth;
-    @Autowired private UtilEvaluation utilEvaluation;
-    @Autowired private UtilLocation utilLocation;
+    @Autowired
+    private UtilAuth utilAuth;
+    @Autowired
+    private UtilEvaluation utilEvaluation;
+    @Autowired
+    private UtilLocation utilLocation;
 
     @Test
     public void searchCountryEvaluationDetails_200_ok() {
@@ -191,15 +190,57 @@ public class EvaluationApiTest extends AbstractSpringTest {
                 .queryParam("search", search)
                 .when()
                 .get(API_URL + EVALUATION_MANAGEMENT_REGIONS_SEARCH)
+                .as(PagedRegionsResponse.class)
+                .getRegions();
+
+        assertThat(countedProjs, allOf(hasItems(r1, r2, r3), not(hasItems(r4))));
+    }
+
+    // TODO test saveQuotationPackage_404_artworkNotFound()
+
+    @Test
+    public void saveQuotationPackage_409_packageAlreadyExists() {
+        var request = utilEvaluation.genSaveQuotationPackageRequest();
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + EVALUATION_QUOTATION_PACKAGE_SAVE)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + EVALUATION_QUOTATION_PACKAGE_SAVE)
+                .then()
+                .assertThat()
+                .statusCode(409)
+                .body(ERROR_CODE, is(QUOTATION_PACKAGE_EXISTS.getCode()));
+    }
+
+    @Test
+    public void saveQuotationPackage_200_ok() {
+        var request = utilEvaluation.genSaveQuotationPackageRequest();
+        var qPackage = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + EVALUATION_QUOTATION_PACKAGE_SAVE)
                 .then()
                 .assertThat()
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(PagedRegionsResponse.class)
-                .getRegions();
-
-        assertThat(countedProjs, allOf(hasItems(r1, r2, r3), not(hasItems(r4))));
+                .as(SaveQuotationPackageResponse.class)
+                .getQuotationPackage();
+        assertNotNull(qPackage.getId());
+        assertEquals(request.getArtworkId(), qPackage.getArtworkId());
+        assertEquals(request.getCountries().size(), qPackage.getCountries().size());
     }
 
 }

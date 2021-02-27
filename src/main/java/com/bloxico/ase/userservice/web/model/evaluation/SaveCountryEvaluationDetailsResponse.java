@@ -2,7 +2,9 @@ package com.bloxico.ase.userservice.web.model.evaluation;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Value;
 
 import static lombok.AccessLevel.PRIVATE;
 
