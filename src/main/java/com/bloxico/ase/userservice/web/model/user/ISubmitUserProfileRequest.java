@@ -1,5 +1,7 @@
 package com.bloxico.ase.userservice.web.model.user;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -32,5 +34,7 @@ public interface ISubmitUserProfileRequest {
     BigDecimal getLatitude();
 
     BigDecimal getLongitude();
+
+    MultipartFile getProfileImage();
 
 }

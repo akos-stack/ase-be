@@ -2,11 +2,14 @@ package com.bloxico.ase.userservice.entity.user.profile;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.address.Location;
+import com.bloxico.ase.userservice.entity.document.Document;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -42,5 +45,12 @@ public class UserProfile extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "location_id")
     private Location location;
+
+    @OneToOne(fetch = EAGER, cascade = MERGE)
+    @JoinTable(
+            name = "user_profiles_documents",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "document_id"))
+    private Document document;
 
 }

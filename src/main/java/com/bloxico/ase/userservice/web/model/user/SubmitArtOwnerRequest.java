@@ -10,6 +10,8 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.springframework.lang.Nullable;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -35,6 +37,11 @@ public class SubmitArtOwnerRequest implements ISubmitUserProfileRequest {
     @Override
     public boolean getEnabled() {
         return false;
+    }
+
+    @Override
+    public MultipartFile getProfileImage() {
+        return this.profileImage;
     }
 
     @NotNull
@@ -101,5 +108,10 @@ public class SubmitArtOwnerRequest implements ISubmitUserProfileRequest {
 
     @JsonProperty("longitude")
     BigDecimal longitude;
+
+    @Nullable
+    @JsonProperty("profile_image")
+    @ApiModelProperty(required = false)
+    MultipartFile profileImage;
 
 }

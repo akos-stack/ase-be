@@ -1,4 +1,4 @@
-package com.bloxico.ase.userservice.entity.token;
+package com.bloxico.ase.userservice.entity.user.profile;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(of = {"user_id", "document_id"})
 @Embeddable
-public class UserRegistrationDocumentId implements Serializable {
+public class UserProfileDocumentId implements Serializable {
 
     @Column(name = "user_id")
     private Long userId;

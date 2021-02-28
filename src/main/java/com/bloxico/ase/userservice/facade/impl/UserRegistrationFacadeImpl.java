@@ -69,11 +69,6 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var userDto = MAPPER.toUserDto(request);
         userDto.addRole(rolePermissionService.findRoleByName(request.getRole()));
         userDto = userService.saveUser(userDto);
-//        if(request.getImage() != null){
-//            var documentDto = documentService.saveDocument(request.getImage(), IMAGE, userDto.getId());
-//            userService.saveUserDocument(userDto.getId(), documentDto.getId());
-//        }
-
         var tokenDto = registrationTokenService.createTokenForUser(userDto.getId());
         mailUtil.sendTokenEmail(VERIFICATION, userDto.getEmail(), tokenDto.getValue());
         var response = new RegistrationResponse(tokenDto.getValue());
@@ -142,6 +137,10 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         log.info("UserRegistrationFacadeImpl.submitEvaluator - start | request: {}", request);
         pendingEvaluatorService.consumePendingEvaluator(request.getEmail(), request.getToken());
         var evaluatorDto = doSaveEvaluator(request);
+        if(request.getProfileImage() != null){
+            var documentDto = documentService.saveDocument(request.getProfileImage(), IMAGE, evaluatorDto.getId());
+            userProfileService.saveUserProfileDocument(evaluatorDto.getId(), documentDto.getId());
+        }
         log.info("UserRegistrationFacadeImpl.submitEvaluator - end | request: {}", request);
         return evaluatorDto;
     }
@@ -152,6 +151,10 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var artOwnerDto = doSaveArtOwner(request);
         var userId = artOwnerDto.getUserProfile().getUserId();
         var tokenDto = registrationTokenService.createTokenForUser(userId);
+        if(request.getProfileImage() != null){
+            var documentDto = documentService.saveDocument(request.getProfileImage(), IMAGE, artOwnerDto.getId());
+            userProfileService.saveUserProfileDocument(artOwnerDto.getId(), documentDto.getId());
+        }
         mailUtil.sendTokenEmail(VERIFICATION, request.getEmail(), tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.submitArtOwner - end | request: {}", request);
         return artOwnerDto;

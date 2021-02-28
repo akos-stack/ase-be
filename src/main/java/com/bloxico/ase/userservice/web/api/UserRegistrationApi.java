@@ -39,7 +39,7 @@ public interface UserRegistrationApi {
     @PostMapping(
             value = REGISTRATION_ENDPOINT,
             produces = {"application/json"},
-            consumes = {"multipart/form-data"})
+            consumes = {"application/json"})
     @ApiOperation(value = "Creates disabled user in the database and sends verification token to the provided email.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Registration successfully done."),
@@ -140,7 +140,7 @@ public interface UserRegistrationApi {
     @PostMapping(
             value = REGISTRATION_EVALUATOR_SUBMIT,
             produces = {"application/json"},
-            consumes = {"application/json"})
+            consumes = {"multipart/form-data"})
     @ApiOperation(value = "Creates new evaluator with given data. Evaluator must be invited first.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Evaluator is created successfully."),
@@ -153,7 +153,7 @@ public interface UserRegistrationApi {
     @PostMapping(
             value = REGISTRATION_ART_OWNER_SUBMIT,
             produces = {"application/json"},
-            consumes = {"application/json"})
+            consumes = {"multipart/form-data"})
     @ApiOperation(value = "Creates new art owner with given data.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Art owner is created successfully."),
