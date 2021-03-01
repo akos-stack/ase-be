@@ -1,0 +1,10 @@
+id,name
+101,access_profile
+102,update_profile
+103,disable_user
+104,blacklist_token
+105,invite_evaluator
+106,search_users
+107,register_as_evaluator
+108,download_user_resume
+109,set_password

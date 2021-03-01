@@ -9,11 +9,39 @@ databaseChangeLog:
         tableName: roles
     - loadData:
         encoding: UTF-8
-        file: db/changelog/v0.1.0/initial_data/permissions.csv
+        file: db/changelog/v0.1.0/initial_data/permissions/01_user.csv
         tableName: permissions
     - loadData:
         encoding: UTF-8
-        file: db/changelog/v0.1.0/initial_data/roles_permissions.csv
+        file: db/changelog/v0.1.0/initial_data/permissions/02_location.csv
+        tableName: permissions
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/permissions/03_s3.csv
+        tableName: permissions
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/permissions/04_artwork.csv
+        tableName: permissions
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/permissions/05_evaluation.csv
+        tableName: permissions
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/roles_permissions/01_user.csv
+        tableName: roles_permissions
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/roles_permissions/02_admin.csv
+        tableName: roles_permissions
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/roles_permissions/03_evaluator.csv
+        tableName: roles_permissions
+    - loadData:
+        encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/roles_permissions/04_owner.csv
         tableName: roles_permissions
     - loadData:
         encoding: UTF-8
@@ -28,8 +56,3 @@ databaseChangeLog:
         file: db/changelog/v0.1.0/initial_data/service_client_details.csv
         tableName: oauth_client_details
         quotchar: '"'
-#    - loadData:
-#        encoding: UTF-8
-#        file: db/changelog/v0.1.0/initial_data/oauth_client_registrations.csv
-#        tableName: oauth_client_registrations
-#        quotchar: '"'
