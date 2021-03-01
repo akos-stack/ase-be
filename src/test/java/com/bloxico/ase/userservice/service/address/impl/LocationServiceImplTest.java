@@ -4,7 +4,6 @@ import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.exception.LocationException;
 import com.bloxico.ase.userservice.repository.address.*;
-import com.bloxico.ase.userservice.web.model.address.UpdateCountryRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,8 +13,8 @@ import java.util.Set;
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -79,12 +78,12 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void findAllRegionsWithNames_emptyNames() {
-        assertThat(service.findAllRegionsWithNames(List.of()), hasSize(0));
+        assertEquals(List.of(), service.findAllRegionsWithNames(List.of()));
     }
 
     @Test
     public void findAllRegionsWithNames_nothingFound() {
-        assertThat(service.findAllRegionsWithNames(List.of(genUUID())), hasSize(0));
+        assertEquals(List.of(), service.findAllRegionsWithNames(List.of(genUUID())));
     }
 
     @Test
@@ -92,7 +91,8 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         var r1 = utilLocation.savedRegionDto();
         var r2 = utilLocation.savedRegionDto();
         var r3 = utilLocation.savedRegionDto();
-        var foundRegions = service.findAllRegionsWithNames(List.of(r1.getName(), r2.getName(), r3.getName()));
+        var foundRegions = service.findAllRegionsWithNames(
+                List.of(r1.getName(), r2.getName(), r3.getName()));
         assertThat(foundRegions, hasItems(r1, r2, r3));
     }
 
