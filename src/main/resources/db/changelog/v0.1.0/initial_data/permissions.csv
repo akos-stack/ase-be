@@ -15,7 +15,7 @@ submit_artwork
 save_region
 save_country
 save_country_evaluation_details
-manage_region
-manage_country
+delete_region
+update_country
 manage_country_evaluation_details
 save_quotation_package
