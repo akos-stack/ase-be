@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.EvaluationException;
 import com.bloxico.ase.userservice.exception.LocationException;
+import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -10,6 +11,7 @@ import static com.bloxico.ase.testutil.Util.allPages;
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -17,7 +19,9 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Autowired private UtilUser utilUser;
     @Autowired private UtilEvaluation utilEvaluation;
+    @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private EvaluationFacadeImpl evaluationFacade;
+    @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test
     public void searchCountryEvaluationDetails_nullRequest() {
@@ -132,6 +136,30 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertEquals(details.getCountryId(), updatedDetails.getCountryId());
         assertEquals(request.getPricePerEvaluation(), updatedDetails.getPricePerEvaluation());
         assertEquals(request.getAvailabilityPercentage(), updatedDetails.getAvailabilityPercentage());
+    }
+
+    @Test
+    public void deleteCountryEvaluationDetails_detailsNotFound() {
+        assertThrows(
+                EvaluationException.class,
+                () -> evaluationFacade.deleteCountryEvaluationDetails(-1));
+    }
+
+    @Test
+    public void deleteCountryEvaluationDetails_countryHasEvaluators() {
+        var evaluator = utilUserProfile.savedEvaluator();
+        var countryId = evaluator.getUserProfile().getLocation().getCountry().getId();
+        var evaluationDetailsId = utilEvaluation.savedCountryEvaluationDetails(countryId).getId();
+        assertThrows(
+                EvaluationException.class,
+                () -> evaluationFacade.deleteCountryEvaluationDetails(evaluationDetailsId));
+    }
+
+    @Test
+    public void deleteCountryEvaluationDetails() {
+        var evaluationDetailsId = utilEvaluation.savedCountryEvaluationDetails().getId();
+        evaluationFacade.deleteCountryEvaluationDetails(evaluationDetailsId);
+        assertTrue(countryEvaluationDetailsRepository.findById(evaluationDetailsId).isEmpty());
     }
 
     @Test

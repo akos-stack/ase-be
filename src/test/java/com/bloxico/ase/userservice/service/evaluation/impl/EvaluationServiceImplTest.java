@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.EvaluationException;
+import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -9,15 +10,45 @@ import java.util.List;
 
 import static com.bloxico.ase.testutil.Util.allPages;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Autowired private UtilUser utilUser;
+    @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private EvaluationServiceImpl evaluationService;
+    @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
+
+    @Test
+    public void findCountryEvaluationDetailsById_detailsNotFound() {
+        assertThrows(
+                EvaluationException.class,
+                () -> evaluationService.findCountryEvaluationDetailsById(-1));
+    }
+
+    @Test
+    public void findCountryEvaluationDetailsById() {
+        var details = utilEvaluation.savedCountryEvaluationDetailsDto();
+        var foundDetails = evaluationService.findCountryEvaluationDetailsById(details.getId());
+        assertEquals(foundDetails, details);
+    }
+
+    @Test
+    public void countEvaluatorsByCountryId_countryNotFound() {
+        assertEquals(0, evaluationService.countEvaluatorsByCountryId(-1));
+    }
+
+    @Test
+    public void countEvaluatorsByCountryId() {
+        var c1 = utilLocation.savedCountry();
+        assertEquals(0, evaluationService.countEvaluatorsByCountryId(c1.getId()));
+        var c2 = utilUserProfile.savedEvaluator().getUserProfile().getLocation().getCountry();
+        assertEquals(1, evaluationService.countEvaluatorsByCountryId(c2.getId()));
+    }
 
     @Test
     public void searchCountryEvaluationDetails_nullRequest() {
@@ -118,6 +149,20 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
         assertEquals(details.getCountryId(), updatedDetails.getCountryId());
         assertEquals(dto.getPricePerEvaluation(), updatedDetails.getPricePerEvaluation());
         assertEquals(dto.getAvailabilityPercentage(), updatedDetails.getAvailabilityPercentage());
+    }
+
+    @Test
+    public void deleteCountryEvaluationDetails_nullDetails() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.deleteCountryEvaluationDetails(null));
+    }
+
+    @Test
+    public void deleteCountryEvaluationDetails() {
+        var dto = utilEvaluation.savedCountryEvaluationDetailsDto();
+        evaluationService.deleteCountryEvaluationDetails(dto);
+        assertTrue(countryEvaluationDetailsRepository.findById(dto.getId()).isEmpty());
     }
 
     @Test

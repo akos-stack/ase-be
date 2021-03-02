@@ -2,7 +2,9 @@ package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
+import com.bloxico.ase.userservice.entity.user.profile.Evaluator;
 import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
+import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
 import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
@@ -22,9 +24,11 @@ import static java.math.BigDecimal.TEN;
 public class UtilUserProfile {
 
     @Autowired private UtilUser utilUser;
+    @Autowired private UtilAuth utilAuth;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UserProfileRepository userProfileRepository;
     @Autowired private UserProfileServiceImpl userProfileService;
+    @Autowired private EvaluatorRepository evaluatorRepository;
 
     public UserProfile savedUserProfile(long userId) {
         var userProfile = new UserProfile();
@@ -37,6 +41,15 @@ public class UtilUserProfile {
         userProfile.setLocation(utilLocation.savedLocation());
         userProfile.setCreatorId(userId);
         return userProfileRepository.saveAndFlush(userProfile);
+    }
+
+    public Evaluator savedEvaluator() {
+        var userId = utilUser.savedUser().getId();
+        var userProfile = savedUserProfile(userId);
+        var evaluator = new Evaluator();
+        evaluator.setUserProfile(userProfile);
+        evaluator.setCreatorId(userId);
+        return evaluatorRepository.saveAndFlush(evaluator);
     }
 
     public UserProfile savedUserProfile() {

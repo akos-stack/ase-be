@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
@@ -22,9 +24,16 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 @Transactional(propagation = NOT_SUPPORTED)
 public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
-    @Autowired private UtilAuth utilAuth;
-    @Autowired private UtilEvaluation utilEvaluation;
-    @Autowired private UtilLocation utilLocation;
+    @Autowired
+    private UtilAuth utilAuth;
+    @Autowired
+    private UtilEvaluation utilEvaluation;
+    @Autowired
+    private UtilLocation utilLocation;
+    @Autowired
+    private UtilUserProfile utilUserProfile;
+    @Autowired
+    private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test
     public void searchCountryEvaluationDetails_200_ok() {
@@ -175,6 +184,55 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         assertEquals(details.getCountryId(), updatedDetails.getCountryId());
         assertEquals(request.getPricePerEvaluation(), updatedDetails.getPricePerEvaluation());
         assertEquals(request.getAvailabilityPercentage(), updatedDetails.getAvailabilityPercentage());
+    }
+
+    @Test
+    public void deleteCountryEvaluationDetails_404_detailsNotFound() {
+        var request = new DeleteCountryEvaluationDetailsRequest(-1);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(COUNTRY_EVALUATION_DETAILS_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void deleteCountryEvaluationDetails_400_countryHasEvaluators() {
+        var evaluator = utilUserProfile.savedEvaluator();
+        var countryId = evaluator.getUserProfile().getLocation().getCountry().getId();
+        var evaluationDetailsId = utilEvaluation.savedCountryEvaluationDetails(countryId).getId();
+        var request = new DeleteCountryEvaluationDetailsRequest(evaluationDetailsId);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE)
+                .then()
+                .assertThat()
+                .statusCode(400)
+                .body(ERROR_CODE, is(COUNTRY_EVALUATION_DETAILS_DELETE_OPERATION_NOT_SUPPORTED.getCode()));
+    }
+
+    @Test
+    public void deleteCountryEvaluationDetails_200_ok() {
+        var evaluationDetailsId = utilEvaluation.savedCountryEvaluationDetails().getId();
+        var request = new DeleteCountryEvaluationDetailsRequest(evaluationDetailsId);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        assertTrue(countryEvaluationDetailsRepository.findById(evaluationDetailsId).isEmpty());
     }
 
     @Test
