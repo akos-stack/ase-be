@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.COUNTRY_EVALUATION_DETAILS_DELETE_OPERATION_NOT_SUPPORTED;
 
 @Slf4j
 @Service
@@ -67,6 +69,16 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
     }
 
     @Override
+    public void deleteCountryEvaluationDetails(int evaluationDetailsId) {
+        log.debug("EvaluationFacadeImpl.deleteCountryEvaluationDetails - start | evaluationDetailsId: {}", evaluationDetailsId);
+        var detailsDto = evaluationService.findCountryEvaluationDetailsById(evaluationDetailsId);
+        var countryDto = locationService.findCountryById(detailsDto.getCountryId());
+        requireCountryHasNoEvaluators(countryDto);
+        evaluationService.deleteCountryEvaluationDetails(detailsDto);
+        log.debug("EvaluationFacadeImpl.deleteCountryEvaluationDetails - end | evaluationDetailsId: {}", evaluationDetailsId);
+    }
+
+    @Override
     public SearchRegionEvaluationDetailsResponse searchRegionEvaluationDetails(
             SearchRegionEvaluationDetailsRequest request,
             PageRequest pageDetails)
@@ -91,6 +103,12 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
         var response = new SaveQuotationPackageResponse(quotationPackage);
         log.debug("EvaluationFacadeImpl.saveQuotationPackage - start | request: {}, principalId: {}", request, principalId);
         return response;
+    }
+
+    private void requireCountryHasNoEvaluators(CountryDto countryDto) {
+        var evaluatorsInCountry = evaluationService.countEvaluatorsByCountryId(countryDto.getId());
+        if (evaluatorsInCountry > 0)
+            throw COUNTRY_EVALUATION_DETAILS_DELETE_OPERATION_NOT_SUPPORTED.newException();
     }
 
 }

@@ -16,6 +16,8 @@ public interface IEvaluationFacade {
     UpdateCountryEvaluationDetailsResponse updateCountryEvaluationDetails(
             UpdateCountryEvaluationDetailsRequest request, long principalId);
 
+    void deleteCountryEvaluationDetails(int evaluationDetailsId);
+
     SearchRegionEvaluationDetailsResponse searchRegionEvaluationDetails(
             SearchRegionEvaluationDetailsRequest request,
             PageRequest page);

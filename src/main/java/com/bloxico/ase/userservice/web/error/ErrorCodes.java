@@ -245,14 +245,19 @@ public interface ErrorCodes {
                 "41",
                 "Specified evaluation details not found."),
 
+        COUNTRY_EVALUATION_DETAILS_DELETE_OPERATION_NOT_SUPPORTED(
+                HttpStatus.BAD_REQUEST,
+                "42",
+                "There are evaluators from country to which evaluation details belong."),
+
         QUOTATION_PACKAGE_EXISTS(
                 HttpStatus.CONFLICT,
-                "42",
+                "43",
                 "Quotation package already exists for specified artwork."),
 
         QUOTATION_PACKAGE_COUNTRY_EXISTS(
                 HttpStatus.CONFLICT,
-                "43",
+                "44",
                 "Quotation package country already exists for specified country.");
 
         private final HttpStatus httpStatus;

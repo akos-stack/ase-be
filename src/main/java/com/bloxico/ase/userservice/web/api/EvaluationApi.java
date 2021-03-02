@@ -17,6 +17,7 @@ public interface EvaluationApi {
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH = "/evaluation/management/country-details";
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE   = "/evaluation/management/country-details/save";
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE = "/evaluation/management/country-details/update";
+    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE = "/evaluation/management/country-details/delete";
     String EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH  = "/evaluation/management/region-details";
     String EVALUATION_QUOTATION_PACKAGE_SAVE            = "/evaluation/quotation-package/save";
 
@@ -70,6 +71,18 @@ public interface EvaluationApi {
     })
     ResponseEntity<UpdateCountryEvaluationDetailsResponse> updateCountryEvaluationDetails(
             @Valid @RequestBody UpdateCountryEvaluationDetailsRequest request, Principal principal);
+
+    @PostMapping(
+            value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE,
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'delete_country_evaluation_details')")
+    @ApiOperation(value = "Deletes evaluation details in the database.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Evaluation details successfully deleted."),
+            @ApiResponse(code = 404, message = "Specified evaluation details don't exist."),
+            @ApiResponse(code = 400, message = "There are evaluators from country to which evaluation details belong.")
+    })
+    ResponseEntity<Void> deleteCountryEvaluationDetails(@Valid @RequestBody DeleteCountryEvaluationDetailsRequest request);
 
     @GetMapping(
             value = EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH,

@@ -9,7 +9,7 @@ import java.util.Set;
 
 import static lombok.AccessLevel.PRIVATE;
 
-@Value
+@Data
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
 public class SearchCountryEvaluationDetailsForManagementRequest implements ISearchCountryEvaluationDetailsRequest {

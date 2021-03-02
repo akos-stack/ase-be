@@ -3,5 +3,6 @@ id,name
 502,search_management_country_evaluation_details
 503,save_country_evaluation_details
 504,update_country_evaluation_details
-505,search_management_region_evaluation_details
-506,save_quotation_package
+505,delete_country_evaluation_details
+506,search_management_region_evaluation_details
+507,save_quotation_package
