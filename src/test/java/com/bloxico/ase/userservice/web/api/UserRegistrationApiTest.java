@@ -16,7 +16,11 @@ import java.util.Set;
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.entity.user.Role.USER;
+import static com.bloxico.ase.userservice.util.FileCategory.CV;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.*;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.COUNTRY_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_EXISTS;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static java.lang.Integer.MAX_VALUE;
@@ -29,7 +33,8 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Autowired private UtilAuth utilAuth;
-    @Autowired private UtilToken mockUtil;
+    @Autowired private UtilToken utilToken;
+    @Autowired private UtilUser utilUser;
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private TokenRepository tokenRepository;
 
@@ -66,7 +71,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .then()
                 .assertThat()
                 .statusCode(409)
-                .body(ERROR_CODE, is(ErrorCodes.User.USER_EXISTS.getCode()));
+                .body(ERROR_CODE, is(USER_EXISTS.getCode()));
     }
 
     @Test
@@ -122,7 +127,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .then()
                 .assertThat()
                 .statusCode(404)
-                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
     }
 
     @Test
@@ -148,7 +153,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .then()
                 .assertThat()
                 .statusCode(404)
-                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
     }
 
     @Test
@@ -192,7 +197,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .then()
                 .assertThat()
                 .statusCode(404)
-                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
     }
 
     @Test
@@ -257,13 +262,14 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .get(API_URL + REGISTRATION_EVALUATOR_INVITATION_CHECK)
                 .then()
                 .assertThat()
-                .statusCode(404);
+                .statusCode(404)
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
     }
 
     @Test
     public void checkEvaluatorInvitation_200_ok() {
         given()
-                .pathParam("token", mockUtil.savedInvitedPendingEvaluatorDto().getToken())
+                .pathParam("token", utilToken.savedInvitedPendingEvaluatorDto().getToken())
                 .when()
                 .get(API_URL + REGISTRATION_EVALUATOR_INVITATION_CHECK)
                 .then()
@@ -283,7 +289,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .then()
                 .assertThat()
                 .statusCode(404)
-                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
     }
 
     @Test
@@ -323,7 +329,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .then()
                 .assertThat()
                 .statusCode(404)
-                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
     }
 
     @Test
@@ -354,7 +360,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void requestEvaluatorRegistration_409_evaluatorAlreadyPending() {
         var registration = utilAuth.doConfirmedRegistration();
         var bearerToken = utilAuth.doAuthentication(registration);
-        var cvBytes = getTestCVBytes();
+        var cvBytes = genFileBytes(CV);
         given()
                 .header("Authorization", bearerToken)
                 .formParam("email", registration.getEmail())
@@ -379,7 +385,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     public void requestEvaluatorRegistration_200_ok() {
         var registration = utilAuth.doConfirmedRegistration();
-        var cvBytes = getTestCVBytes();
+        var cvBytes = genFileBytes(CV);
         var name = genUUID() + ".txt";
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
@@ -402,16 +408,40 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .then()
                 .assertThat()
                 .statusCode(404)
-                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_NOT_FOUND.getCode()));
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
     }
 
-    // TODO-test submitEvaluator_404_countryNotFound
+    @Test
+    public void submitEvaluator_404_countryNotFound() {
+        given()
+                .contentType(JSON)
+                .body(utilToken.submitInvitedEvaluatorRequest(genUUID()))
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(COUNTRY_NOT_FOUND.getCode()));
+    }
 
-    // TODO-test submitEvaluator_409_userAlreadyExists
+    @Test
+    public void submitEvaluator_409_userAlreadyExists() {
+        var request = utilToken.submitInvitedEvaluatorRequest();
+        utilUser.savedUserDtoWithEmail(request.getEmail());
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(409)
+                .body(ERROR_CODE, is(USER_EXISTS.getCode()));
+    }
 
     @Test
     public void submitEvaluator_200_ok() {
-        var request = mockUtil.submitInvitedEvaluatorRequest();
+        var request = utilToken.submitInvitedEvaluatorRequest();
         var evaluator = given()
                 .contentType(JSON)
                 .body(request)
@@ -434,7 +464,19 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
         assertEquals(evaluator.getUserProfile().getLocation().getAddress(), request.getAddress());
     }
 
-    // TODO-test submitArtOwner_404_countryNotFound
+    @Test
+    public void submitArtOwner_404_countryNotFound() {
+        var request = utilUserProfile.newSubmitArtOwnerRequest(genUUID());
+        given()
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Location.COUNTRY_NOT_FOUND.getCode()));
+    }
 
     @Test
     public void submitArtOwner_409_userAlreadyExists() {
@@ -497,9 +539,9 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void searchPendingEvaluators_200_ok() {
-        var pe1 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
-        var pe2 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
-        var pe3 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
+        var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
         var pendingEvaluators = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
@@ -543,7 +585,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParam("email", registration.getEmail())
-                .multiPart("cv", name, getTestCVBytes())
+                .multiPart("cv", name, genFileBytes(CV))
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_REQUEST)
                 .then()

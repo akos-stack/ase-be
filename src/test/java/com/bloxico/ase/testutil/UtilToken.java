@@ -165,12 +165,15 @@ public class UtilToken {
     }
 
     public SubmitEvaluatorRequest submitInvitedEvaluatorRequest() {
+        return submitInvitedEvaluatorRequest(utilLocation.savedCountry().getName());
+    }
+
+    public SubmitEvaluatorRequest submitInvitedEvaluatorRequest(String country) {
         var email = genEmail();
         var password = genPassword();
         var principalId = utilUser.savedAdmin().getId();
         userRegistrationFacade.sendEvaluatorInvitation(new EvaluatorInvitationRequest(email), principalId);
         var token = pendingEvaluatorRepository.findByEmailIgnoreCase(email).orElseThrow().getToken();
-        var country = utilLocation.savedCountry().getName();
         return new SubmitEvaluatorRequest(
                 token, genUUID(), password,
                 email, genUUID(), genUUID(),

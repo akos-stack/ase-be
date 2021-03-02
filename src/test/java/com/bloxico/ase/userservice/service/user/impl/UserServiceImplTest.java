@@ -11,8 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Set;
 
-import static com.bloxico.ase.testutil.Util.genPassword;
-import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.testutil.UtilUser.genUserDto;
 import static com.bloxico.ase.userservice.entity.user.Role.*;
 import static java.lang.Integer.MAX_VALUE;
@@ -64,11 +63,35 @@ public class UserServiceImplTest extends AbstractSpringTest {
                 userService.findUserByEmail(userDto.getEmail()));
     }
 
-    // TODO-TEST findUsersByEmailOrRole_nullArgs
+    @Test
+    public void findUsersByEmailOrRole_nullEmail() {
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u3 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        assertThat(
+                userService.findUsersByEmailOrRole(u1.getEmail(), null, 0, MAX_VALUE, "name").getContent(),
+                not(hasItems(u1, u2, u3)));
+    }
 
-    // TODO-TEST findUsersByEmailOrRole_emptyArgs
+    @Test
+    public void findUsersByEmailOrRole_emptyEmail() {
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u3 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        assertThat(
+                userService.findUsersByEmailOrRole(u1.getEmail(), "", 0, MAX_VALUE, "name").getContent(),
+                not(hasItems(u1, u2, u3)));
+    }
 
-    // TODO-TEST findUsersByEmailOrRole_notFound
+    @Test
+    public void findUsersByEmailOrRole_notFound() {
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedUserDto();
+        var u3 = utilUser.savedUserDto();
+        assertThat(
+                userService.findUsersByEmailOrRole("", "admin", 0, MAX_VALUE, "name").getContent(),
+                not(hasItems(u1, u2, u3)));
+    }
 
     @Test
     public void findUsersByEmailOrRole_byEmail() {
