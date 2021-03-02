@@ -8,6 +8,7 @@ import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 
 import java.util.Optional;
 
@@ -20,9 +21,17 @@ public class JpaAuditTestConfig {
     public AuditorAware<Long> auditorProvider() {
         return () -> {
             if (SecurityContextHolder.getContext().getAuthentication() != null) {
-                UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-                AsePrincipal user = (AsePrincipal) auth.getPrincipal();
+                if(SecurityContextHolder.getContext().getAuthentication() instanceof OAuth2Authentication) {
+                    OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
+                    var details = auth.getDetails();
+                    return details instanceof Long
+                            ? Optional.of((Long) details)
+                            : Optional.of(Long.valueOf((Integer) details));
+                }
+                UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+                AsePrincipal user = (AsePrincipal) authentication.getPrincipal();
                 return Optional.of(user.getUser().getId());
+
             }
             return Optional.empty();
         };
