@@ -1368,3 +1368,22 @@ databaseChangeLog:
                   defaultValueNumeric: 0
                   constraints:
                     nullable: false
+        - createTable:
+            tableName: user_profiles_documents
+            columns:
+              - column:
+                  name: user_profile_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_user_profile_document
+                    references: user_profiles(id)
+              - column:
+                  name: document_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_document_user_profile
+                    references: documents(id)

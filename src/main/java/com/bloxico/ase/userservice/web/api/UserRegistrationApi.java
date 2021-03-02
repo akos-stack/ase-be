@@ -140,7 +140,7 @@ public interface UserRegistrationApi {
     @PostMapping(
             value = REGISTRATION_EVALUATOR_SUBMIT,
             produces = {"application/json"},
-            consumes = {"application/json"})
+            consumes = {"multipart/form-data"})
     @ApiOperation(value = "Creates new evaluator with given data. Evaluator must be invited first.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Evaluator is created successfully."),
@@ -148,19 +148,19 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "Specified country doesn't exist."),
             @ApiResponse(code = 409, message = "User with given email already exists.")
     })
-    ResponseEntity<EvaluatorDto> submitEvaluator(@Valid @RequestBody SubmitEvaluatorRequest request);
+    ResponseEntity<EvaluatorDto> submitEvaluator(SubmitEvaluatorRequest request);
 
     @PostMapping(
             value = REGISTRATION_ART_OWNER_SUBMIT,
             produces = {"application/json"},
-            consumes = {"application/json"})
+            consumes = {"multipart/form-data"})
     @ApiOperation(value = "Creates new art owner with given data.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Art owner is created successfully."),
             @ApiResponse(code = 404, message = "Specified country doesn't exist."),
             @ApiResponse(code = 409, message = "User with given email already exists.")
     })
-    ResponseEntity<ArtOwnerDto> submitArtOwner(@Valid @RequestBody SubmitArtOwnerRequest request);
+    ResponseEntity<ArtOwnerDto> submitArtOwner(SubmitArtOwnerRequest request);
 
     @GetMapping(value = REGISTRATION_EVALUATOR_SEARCH)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_users')")
