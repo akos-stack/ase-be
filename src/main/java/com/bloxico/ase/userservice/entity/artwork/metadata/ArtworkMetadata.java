@@ -4,11 +4,12 @@ import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Enumerated;
+import javax.persistence.MappedSuperclass;
 import java.util.function.Supplier;
 
 import static javax.persistence.EnumType.STRING;
-import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = "name", callSuper = false)
@@ -41,10 +42,6 @@ public abstract class ArtworkMetadata extends BaseEntity {
         APPROVED;
 
     }
-
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Integer id;
 
     @Column(name = "name")
     private String name;

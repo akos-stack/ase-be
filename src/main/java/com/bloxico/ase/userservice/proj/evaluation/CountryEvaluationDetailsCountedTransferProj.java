@@ -7,9 +7,9 @@ import lombok.Value;
 public class CountryEvaluationDetailsCountedTransferProj {
 
     Country country;
-    Integer countryId;
+    Long countryId;
     String countryName;
-    Integer evaluationDetailsId;
+    Long evaluationDetailsId;
     Integer pricePerEvaluation;
     Integer availabilityPercentage;
     Long totalOfEvaluators;

@@ -77,7 +77,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: smallint
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     nullable: false
@@ -93,7 +93,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: smallint
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     nullable: false
@@ -109,7 +109,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: role_id
-                  type: smallint
+                  type: bigint
                   constraints:
                     nullable: false
                     primaryKey: true
@@ -117,7 +117,7 @@ databaseChangeLog:
                     references: roles(id)
               - column:
                   name: permission_id
-                  type: smallint
+                  type: bigint
                   constraints:
                     nullable: false
                     primaryKey: true
@@ -136,7 +136,7 @@ databaseChangeLog:
                     references: users(id)
               - column:
                   name: role_id
-                  type: smallint
+                  type: bigint
                   constraints:
                     nullable: false
                     primaryKey: true
@@ -155,7 +155,7 @@ databaseChangeLog:
                     references: users(id)
               - column:
                   name: role_id
-                  type: smallint
+                  type: bigint
                   constraints:
                     nullable: false
                     primaryKey: true
@@ -166,7 +166,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: integer
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     nullable: false
@@ -182,6 +182,8 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
+                    foreignKeyName: fk_region_creator
+                    references: users(id)
               - column:
                   name: created_at
                   type: timestamp
@@ -191,6 +193,9 @@ databaseChangeLog:
               - column:
                   name: updater_id
                   type: bigint
+                  constraints:
+                    foreignKeyName: fk_region_updater
+                    references: users(id)
               - column:
                   name: updated_at
                   type: timestamp
@@ -205,7 +210,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: integer
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     nullable: false
@@ -215,6 +220,13 @@ databaseChangeLog:
                   type: varchar(256)
                   constraints:
                     nullable: false
+              - column:
+                  name: region_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_region_country
+                    references: regions(id)
               # METADATA
               - column:
                   name: creator_id
@@ -249,7 +261,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: country_id
-                  type: integer
+                  type: bigint
                   constraints:
                     nullable: false
                     primaryKey: true
@@ -257,7 +269,7 @@ databaseChangeLog:
                     references: countries(id)
               - column:
                   name: region_id
-                  type: integer
+                  type: bigint
                   constraints:
                     nullable: false
                     primaryKey: true
@@ -268,7 +280,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: integer
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     nullable: false
@@ -285,7 +297,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: country_id
-                  type: integer
+                  type: bigint
                   constraints:
                     nullable: false
                     foreignKeyName: fk_country_evaluation_details_country
@@ -331,7 +343,7 @@ databaseChangeLog:
                     primaryKey: true
               - column:
                   name: country_id
-                  type: integer
+                  type: bigint
                   constraints:
                     nullable: false
                     foreignKeyName: fk_location_country
@@ -707,7 +719,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: integer
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     nullable: false
@@ -757,7 +769,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: integer
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     nullable: false
@@ -807,7 +819,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: integer
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     nullable: false
@@ -857,7 +869,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: integer
+                  type: bigint
                   autoIncrement: true
                   constraints:
                     nullable: false
@@ -1199,7 +1211,7 @@ databaseChangeLog:
                     references: artworks(id)
               - column:
                   name: category_id
-                  type: integer
+                  type: bigint
                   constraints:
                     nullable: false
                     primaryKey: true
@@ -1218,7 +1230,7 @@ databaseChangeLog:
                     references: artworks(id)
               - column:
                   name: material_id
-                  type: integer
+                  type: bigint
                   constraints:
                     nullable: false
                     primaryKey: true
@@ -1237,7 +1249,7 @@ databaseChangeLog:
                     references: artworks(id)
               - column:
                   name: medium_id
-                  type: integer
+                  type: bigint
                   constraints:
                     nullable: false
                     primaryKey: true
@@ -1256,7 +1268,7 @@ databaseChangeLog:
                     references: artworks(id)
               - column:
                   name: style_id
-                  type: integer
+                  type: bigint
                   constraints:
                     nullable: false
                     primaryKey: true
@@ -1340,7 +1352,7 @@ databaseChangeLog:
                     references: quotation_packages(id)
               - column:
                   name: country_id
-                  type: integer
+                  type: bigint
                   constraints:
                     nullable: false
                     primaryKey: true

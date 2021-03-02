@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ILocationService {
 
-    RegionDto findRegionById(int id);
+    RegionDto findRegionById(Long id);
 
     RegionDto findRegionByName(String region);
 
@@ -31,6 +31,6 @@ public interface ILocationService {
 
     LocationDto saveLocation(LocationDto locationDto, long principalId);
 
-    int countCountriesByRegionId(int regionId);
+    int countCountriesByRegionId(Long regionId);
 
 }

@@ -9,10 +9,10 @@ import lombok.EqualsAndHashCode;
 public class CountryEvaluationDetailsDto {
 
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
 
     @JsonProperty("country_id")
-    private Integer countryId;
+    private Long countryId;
 
     @JsonProperty("price_per_evaluation")
     private Integer pricePerEvaluation;

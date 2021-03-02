@@ -31,7 +31,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     public void findRegionById_regionNotFound() {
         assertThrows(
                 LocationException.class,
-                () -> service.findRegionById(-1));
+                () -> service.findRegionById(-1L));
     }
 
     @Test
@@ -207,7 +207,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     @Test
     public void updateCountry_countryNotFound() {
         var countryDto = utilLocation.savedCountryDto();
-        countryDto.setId(-1);
+        countryDto.setId(-1L);
         assertThrows(
                 LocationException.class,
                 () -> service.updateCountry(countryDto, utilUser.savedAdmin().getId()));
@@ -308,7 +308,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void countCountriesByRegionId_regionNotFound() {
-        assertEquals(0, service.countCountriesByRegionId(-1));
+        assertEquals(0, service.countCountriesByRegionId(-1L));
     }
 
     @Test

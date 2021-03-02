@@ -48,7 +48,7 @@ public class LocationFacadeImpl implements ILocationFacade {
     }
 
     @Override
-    public void deleteRegion(int regionId) {
+    public void deleteRegion(Long regionId) {
         log.debug("LocationFacadeImpl.deleteRegion - start | regionId: {}", regionId);
         var regionDto = locationService.findRegionById(regionId);
         requireRegionHasNoCountries(regionDto);

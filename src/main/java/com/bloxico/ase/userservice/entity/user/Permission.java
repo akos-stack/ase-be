@@ -18,7 +18,7 @@ public class Permission implements Serializable {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    private Short id;
+    private Long id;
 
     @Column(name = "name")
     private String name;

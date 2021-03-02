@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.util.Set;
 
 import static javax.persistence.EnumType.STRING;
-import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = "id", callSuper = false)
@@ -22,10 +21,6 @@ public class ArtworkGroup extends BaseEntity {
         WAITING_FOR_EVALUATION
 
     }
-
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
 
     @Column(name = "status", nullable = false)
     @Enumerated(STRING)

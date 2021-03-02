@@ -2,13 +2,14 @@ package com.bloxico.ase.userservice.entity.user.profile;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
 import com.bloxico.ase.userservice.entity.address.Location;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
 import static javax.persistence.FetchType.LAZY;
-import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = "userId", callSuper = false)
@@ -16,10 +17,6 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Entity
 @Table(name = "user_profiles")
 public class UserProfile extends BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
 
     @Column(name = "user_id")
     private Long userId;

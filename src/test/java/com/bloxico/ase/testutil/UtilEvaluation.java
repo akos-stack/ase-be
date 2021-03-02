@@ -26,7 +26,7 @@ public class UtilEvaluation {
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
     @Autowired private QuotationPackageRepository quotationPackageRepository;
 
-    public CountryEvaluationDetails genCountryEvaluationDetails(int countryId) {
+    public CountryEvaluationDetails genCountryEvaluationDetails(Long countryId) {
         var details = new CountryEvaluationDetails();
         details.setCountryId(countryId);
         details.setPricePerEvaluation(genPosInt(50));
@@ -34,7 +34,7 @@ public class UtilEvaluation {
         return details;
     }
 
-    public CountryEvaluationDetailsDto genCountryEvaluationDetailsDto(int countryId) {
+    public CountryEvaluationDetailsDto genCountryEvaluationDetailsDto(Long countryId) {
         return MAPPER.toDto(genCountryEvaluationDetails(countryId));
     }
 
@@ -46,7 +46,7 @@ public class UtilEvaluation {
         return countryEvaluationDetailsRepository.saveAndFlush(details);
     }
 
-    public CountryEvaluationDetails savedCountryEvaluationDetails(int countryId) {
+    public CountryEvaluationDetails savedCountryEvaluationDetails(Long countryId) {
         var principalId = utilUser.savedAdmin().getId();
         var details = genCountryEvaluationDetails(countryId);
         details.setCreatorId(principalId);
@@ -131,7 +131,7 @@ public class UtilEvaluation {
         return new SaveQuotationPackageRequest(artworkId, Set.of(c1, c2, c3));
     }
 
-    public UpdateCountryEvaluationDetailsRequest genUpdateCountryEvaluationDetailsRequest(int id) {
+    public UpdateCountryEvaluationDetailsRequest genUpdateCountryEvaluationDetailsRequest(Long id) {
         return new UpdateCountryEvaluationDetailsRequest(id, 40, 15);
     }
 

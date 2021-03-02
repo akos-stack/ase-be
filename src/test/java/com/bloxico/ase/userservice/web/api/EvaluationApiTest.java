@@ -145,7 +145,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .body(utilEvaluation.genUpdateCountryEvaluationDetailsRequest(-1))
+                .body(utilEvaluation.genUpdateCountryEvaluationDetailsRequest(-1L))
                 .when()
                 .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE)
                 .then()

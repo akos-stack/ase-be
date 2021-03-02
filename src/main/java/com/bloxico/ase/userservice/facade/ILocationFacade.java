@@ -8,7 +8,7 @@ public interface ILocationFacade {
 
     SaveRegionResponse saveRegion(SaveRegionRequest request, long principalId);
 
-    void deleteRegion(int regionId);
+    void deleteRegion(Long regionId);
 
     SearchCountriesResponse findAllCountries();
 

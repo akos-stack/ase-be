@@ -63,7 +63,7 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     public void deleteRegion_regionNotFound() {
         assertThrows(
                 LocationException.class,
-                () -> facade.deleteRegion(-1));
+                () -> facade.deleteRegion(-1L));
     }
 
     @Test

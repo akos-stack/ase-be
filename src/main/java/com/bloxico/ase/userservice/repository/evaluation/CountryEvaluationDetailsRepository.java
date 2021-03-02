@@ -13,9 +13,9 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Repository
-public interface CountryEvaluationDetailsRepository extends JpaRepository<CountryEvaluationDetails, Integer> {
+public interface CountryEvaluationDetailsRepository extends JpaRepository<CountryEvaluationDetails, Long> {
 
-    Optional<CountryEvaluationDetails> findByCountryId(Integer id);
+    Optional<CountryEvaluationDetails> findByCountryId(Long id);
 
     // @formatter:off
     @Query(value =

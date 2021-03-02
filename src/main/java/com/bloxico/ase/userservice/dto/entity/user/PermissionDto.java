@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 public class PermissionDto {
 
     @JsonProperty("id")
-    private Short id;
+    private Long id;
 
     @JsonProperty("name")
     private String name;

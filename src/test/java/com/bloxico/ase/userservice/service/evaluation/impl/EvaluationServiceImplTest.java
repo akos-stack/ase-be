@@ -101,7 +101,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     public void updateCountryEvaluationDetails_evaluationDetailsNotFound() {
         var principalId = utilUser.savedAdmin().getId();
         var details = utilEvaluation.savedCountryEvaluationDetailsDto();
-        details.setId(-1);
+        details.setId(-1L);
         assertThrows(
                 EvaluationException.class,
                 () -> evaluationService.saveCountryEvaluationDetails(details, principalId));

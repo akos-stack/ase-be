@@ -114,7 +114,7 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Test
     public void updateCountryEvaluationDetails_evaluationDetailsNotFound() {
         var principalId = utilUser.savedAdmin().getId();
-        var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest(-1);
+        var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest(-1L);
         assertThrows(
                 EvaluationException.class,
                 () -> evaluationFacade.updateCountryEvaluationDetails(request, principalId));

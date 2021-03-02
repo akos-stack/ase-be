@@ -7,7 +7,7 @@ import lombok.Value;
 public class RegionWithCountriesAndEvaluatorsCountProj {
 
     @JsonProperty("id")
-    int id;
+    Long id;
 
     @JsonProperty("name")
     String name;

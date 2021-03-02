@@ -40,7 +40,7 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public RegionDto findRegionById(int id) {
+    public RegionDto findRegionById(Long id) {
         log.debug("LocationServiceImpl.findRegionById - start | id: {}", id);
         var regionDto = regionRepository
                 .findById(id)
@@ -104,7 +104,6 @@ public class LocationServiceImpl implements ILocationService {
         requireNonNull(dto);
         requireNotExists(dto);
         var region = MAPPER.toEntity(dto);
-        region.setCreatorId(principalId);
         region = regionRepository.saveAndFlush(region);
         var regionDto = MAPPER.toDto(region);
         log.debug("LocationServiceImpl.saveRegion - end | dto: {}, principalId: {}", dto, principalId);
@@ -184,7 +183,7 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public int countCountriesByRegionId(int regionId) {
+    public int countCountriesByRegionId(Long regionId) {
         log.debug("LocationServiceImpl.countCountriesByRegionId - start | regionId: {}", regionId);
         var count = countryRepository.countByRegionsIdEquals(regionId);
         log.debug("LocationServiceImpl.countCountriesByRegionId - end | regionId: {}", regionId);

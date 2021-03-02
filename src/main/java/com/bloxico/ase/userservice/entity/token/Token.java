@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 import static java.time.LocalDateTime.now;
-import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = "value", callSuper = false)
@@ -20,10 +19,6 @@ public class Token extends BaseEntity {
         REGISTRATION,
         PASSWORD_RESET
     }
-
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
 
     @Column(name = "value")
     private String value;
