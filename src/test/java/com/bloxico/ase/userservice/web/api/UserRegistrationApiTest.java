@@ -25,8 +25,6 @@ import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static java.lang.Integer.MAX_VALUE;
-import static java.math.BigDecimal.ONE;
-import static java.math.BigDecimal.TEN;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
@@ -438,19 +436,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
         var token = pendingEvaluatorRepository.findByEmailIgnoreCase(email).orElseThrow().getToken();
         var formParams = utilUserProfile.genSaveEvaluatorFormParams(token, email, password, country);
         given().config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
-                .formParam("token", token)
-                .formParam("email", email)
-                .formParam("password", password)
-                .formParam("username", genUUID())
-                .formParam("country", country)
-                .formParam("first_name",genUUID())
-                .formParam("last_name", genUUID())
-                .formParam("phone", genUUID())
-                .formParam("birthday", "2019-03-29")
-                .formParam("gender", genUUID())
-                .formParam("address", genUUID())
-                .formParam("latitude", ONE)
-                .formParam("longitude", TEN)
+                .formParams(formParams)
                 .multiPart("profile_image", "image.jpg", imageBytes)
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
