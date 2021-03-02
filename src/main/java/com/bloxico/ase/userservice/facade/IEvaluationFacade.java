@@ -1,27 +1,27 @@
 package com.bloxico.ase.userservice.facade;
 
-import com.bloxico.ase.userservice.web.model.evaluation.PagedRegionsResponse;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 
 public interface IEvaluationFacade {
 
-    PagedCountryEvaluationDetailsResponse searchCountriesWithEvaluationDetails(
-            SearchCountryEvaluationDetailsRequest request);
+    SearchCountryEvaluationDetailsResponse searchCountryEvaluationDetails(
+            ISearchCountryEvaluationDetailsRequest request,
+            PageRequest page);
 
     SaveCountryEvaluationDetailsResponse saveCountryEvaluationDetails(
             SaveCountryEvaluationDetailsRequest request,
             long principalId);
 
-    SaveQuotationPackageResponse saveQuotationPackage(
-            SaveQuotationPackageRequest request,
-            long principalId);
-
     UpdateCountryEvaluationDetailsResponse updateCountryEvaluationDetails(
             UpdateCountryEvaluationDetailsRequest request, long principalId);
 
-    PagedCountryEvaluationDetailsResponse searchCountries(SearchCountryEvaluationDetailsRequest request);
+    SearchRegionEvaluationDetailsResponse searchRegionEvaluationDetails(
+            SearchRegionEvaluationDetailsRequest request,
+            PageRequest page);
 
-    PagedRegionsResponse searchRegions(SearchRegionsRequest request);
+    SaveQuotationPackageResponse saveQuotationPackage(
+            SaveQuotationPackageRequest request,
+            long principalId);
 
 }

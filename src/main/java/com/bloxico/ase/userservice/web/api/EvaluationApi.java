@@ -1,17 +1,11 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.web.model.evaluation.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -19,25 +13,39 @@ import java.security.Principal;
 @Api(value = "evaluation")
 public interface EvaluationApi {
 
-    String EVALUATION_COUNTRY_DETAILS_SEARCH                =   "/evaluation/country-details";
-    String EVALUATION_COUNTRY_DETAILS_SAVE                  =   "/evaluation/country-details/save";
-    String EVALUATION_COUNTRY_DETAILS_UPDATE                =   "/evaluation/country-details/update";
-    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH     =   "/evaluation/management/country-details";
-    String EVALUATION_MANAGEMENT_REGIONS_SEARCH             =   "/evaluation/management/regions";
-    String EVALUATION_QUOTATION_PACKAGE_SAVE                =   "/evaluation/quotation-package/save";
+    String EVALUATION_COUNTRY_DETAILS_SEARCH            = "/evaluation/country-details";
+    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH = "/evaluation/management/country-details";
+    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE   = "/evaluation/management/country-details/save";
+    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE = "/evaluation/management/country-details/update";
+    String EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH  = "/evaluation/management/region-details";
+    String EVALUATION_QUOTATION_PACKAGE_SAVE            = "/evaluation/quotation-package/save";
 
     @GetMapping(
             value = EVALUATION_COUNTRY_DETAILS_SEARCH,
             produces = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_country_evaluation_details')")
     @ApiOperation(value = "Search countries with evaluation details.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Paginated list of countries with evaluation details successfully retrieved.")
     })
-    ResponseEntity<PagedCountryEvaluationDetailsResponse> searchCountryEvaluationDetails(
-            @Valid SearchCountryEvaluationDetailsRequest request);
+    ResponseEntity<SearchCountryEvaluationDetailsResponse> searchCountryEvaluationDetails(
+            @Valid SearchCountryEvaluationDetailsRequest request,
+            @Valid PageRequest page);
+
+    @GetMapping(
+            value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH,
+            produces = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_management_country_evaluation_details')")
+    @ApiOperation(value = "Search countries with evaluation details and those without also.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Paginated list of countries with / without evaluation details successfully retrieved.")
+    })
+    ResponseEntity<SearchCountryEvaluationDetailsResponse> searchCountryEvaluationDetailsForManagement(
+            @Valid SearchCountryEvaluationDetailsForManagementRequest request,
+            @Valid PageRequest page);
 
     @PostMapping(
-            value = EVALUATION_COUNTRY_DETAILS_SAVE,
+            value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE,
             produces = {"application/json"},
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'save_country_evaluation_details')")
@@ -51,10 +59,10 @@ public interface EvaluationApi {
             @Valid @RequestBody SaveCountryEvaluationDetailsRequest request, Principal principal);
 
     @PostMapping(
-            value = EVALUATION_COUNTRY_DETAILS_UPDATE,
+            value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE,
             produces = {"application/json"},
             consumes = {"application/json"})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'manage_country_evaluation_details')")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'update_country_evaluation_details')")
     @ApiOperation(value = "Updates evaluation details in the database.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Evaluation details successfully updated."),
@@ -64,25 +72,16 @@ public interface EvaluationApi {
             @Valid @RequestBody UpdateCountryEvaluationDetailsRequest request, Principal principal);
 
     @GetMapping(
-            value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH,
+            value = EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH,
             produces = {"application/json"})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'manage_country_evaluation_details')")
-    @ApiOperation(value = "Search all countries.")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_management_region_evaluation_details')")
+    @ApiOperation(value = "Search regions with evaluation details.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Paginated list of countries successfully retrieved.")
+            @ApiResponse(code = 200, message = "Paginated list of regions with evaluation details successfully retrieved.")
     })
-    ResponseEntity<PagedCountryEvaluationDetailsResponse> searchCountryEvaluationDetailsManagement(
-            @Valid SearchCountryEvaluationDetailsRequest request);
-
-    @GetMapping(
-            value = EVALUATION_MANAGEMENT_REGIONS_SEARCH,
-            produces = "application/json")
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'manage_region')")
-    @ApiOperation(value = "Search regions with countries and evaluators counted.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Paginated list of regions successfully retrieved.")
-    })
-    ResponseEntity<PagedRegionsResponse> searchRegionsManagement(@Valid SearchRegionsRequest request);
+    ResponseEntity<SearchRegionEvaluationDetailsResponse> searchRegionEvaluationDetailsForManagement(
+            @Valid SearchRegionEvaluationDetailsRequest request,
+            @Valid PageRequest page);
 
     @PostMapping(
             value = EVALUATION_QUOTATION_PACKAGE_SAVE,

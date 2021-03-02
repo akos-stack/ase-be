@@ -1,22 +1,16 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
-import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.*;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
-import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
-import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageCountryRepository;
-import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageRepository;
+import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchCountryEvaluationDetailsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
+import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.ISearchCountryEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionEvaluationDetailsRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -27,8 +21,6 @@ import static com.bloxico.ase.userservice.util.Functions.doto;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.*;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toSet;
-import static org.springframework.data.domain.Sort.Direction.ASC;
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Slf4j
 @Service
@@ -41,22 +33,30 @@ public class EvaluationServiceImpl implements IEvaluationService {
     @Autowired
     public EvaluationServiceImpl(CountryEvaluationDetailsRepository countryEvaluationDetailsRepository,
                                  QuotationPackageRepository quotationPackageRepository,
-                                 QuotationPackageCountryRepository quotationPackageCountryRepository) {
+                                 QuotationPackageCountryRepository quotationPackageCountryRepository)
+    {
         this.countryEvaluationDetailsRepository = countryEvaluationDetailsRepository;
         this.quotationPackageRepository = quotationPackageRepository;
         this.quotationPackageCountryRepository = quotationPackageCountryRepository;
     }
 
     @Override
-    public Page<CountryEvaluationDetailsWithEvaluatorsCountProj> findAllCountriesWithEvaluationDetails(
-            SearchCountryEvaluationDetailsRequest request) {
-        log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - start | request: {}", request);
+    public Page<CountryEvaluationDetailsWithEvaluatorsCountProj> searchCountryEvaluationDetails(
+            ISearchCountryEvaluationDetailsRequest request,
+            PageRequest pageDetails)
+    {
+        log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - start | request: {}, pageDetails: {}", request, pageDetails);
         requireNonNull(request);
+        requireNonNull(pageDetails);
         var page = countryEvaluationDetailsRepository
-                .findAllCountryEvaluationDetailsWithEvaluatorsCount(request.getSearch(),
-                        request.getRegions(), false, getPagination(request));
-        log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - end | request: {}", request);
-        return page.map(MAPPER::toCountedProj);
+                .findAllCountryEvaluationDetailsWithEvaluatorsCount(
+                        request.getSearch(),
+                        request.getRegions(),
+                        request.includeCountriesWithoutEvaluationDetails(),
+                        pageDetails.toPageable())
+                .map(MAPPER::toCountedProj);
+        log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - end | request: {}, pageDetails: {}", request, pageDetails);
+        return page;
     }
 
     @Override
@@ -87,24 +87,18 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public Page<CountryEvaluationDetailsWithEvaluatorsCountProj> findAllCountries(
-            SearchCountryEvaluationDetailsRequest request) {
-        log.debug("EvaluationServiceImpl.findAllCountries - start | request: {}", request);
+    public Page<RegionWithCountriesAndEvaluatorsCountProj> searchRegionEvaluationDetails(
+            SearchRegionEvaluationDetailsRequest request,
+            PageRequest pageDetails)
+    {
+        log.debug("EvaluationServiceImpl.findAllRegions - start | request: {}, pageDetails: {}", request, pageDetails);
         requireNonNull(request);
+        requireNonNull(pageDetails);
         var page = countryEvaluationDetailsRepository
-                .findAllCountryEvaluationDetailsWithEvaluatorsCount(request.getSearch(),
-                        request.getRegions(), true, getPagination(request));
-        log.debug("EvaluationServiceImpl.findAllCountries - end | request: {}", request);
-        return page.map(MAPPER::toCountedProj);
-    }
-
-    @Override
-    public Page<RegionWithCountriesAndEvaluatorsCountProj> findAllRegions(SearchRegionsRequest request) {
-        log.debug("EvaluationServiceImpl.findAllRegions - start | request: {}", request);
-        requireNonNull(request);
-        var page = countryEvaluationDetailsRepository
-                .findAllRegionsWithCountriesAndEvaluatorsCount(request.getSearch(), getPagination(request));
-        log.debug("EvaluationServiceImpl.findAllRegions - end | request: {}", request);
+                .findAllRegionsWithCountriesAndEvaluatorsCount(
+                        request.getSearch(),
+                        pageDetails.toPageable());
+        log.debug("EvaluationServiceImpl.findAllRegions - end | request: {}, pageDetails: {}", request, pageDetails);
         return page;
     }
 
@@ -124,7 +118,8 @@ public class EvaluationServiceImpl implements IEvaluationService {
     @Override
     public Set<QuotationPackageCountryDto> saveQuotationPackageCountries(long packageId,
                                                                          Collection<QuotationPackageCountryDto> dtos,
-                                                                         long principalId) {
+                                                                         long principalId)
+    {
         log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - start | packageId: {}, dtos: {}, principalId: {}",
                 packageId, dtos, principalId);
         requireNonNull(dtos);
@@ -147,22 +142,6 @@ public class EvaluationServiceImpl implements IEvaluationService {
             throw COUNTRY_EVALUATION_DETAILS_EXISTS.newException();
     }
 
-    private Pageable getPagination(SearchCountryEvaluationDetailsRequest request) {
-        var unsafeSortProperty = String.format("(%s)", request.getSort());
-        var sort = request.getOrder().equals("asc") ?
-                JpaSort.unsafe(ASC, unsafeSortProperty) :
-                JpaSort.unsafe(DESC, unsafeSortProperty);
-        return PageRequest.of(request.getPage(), request.getSize(), sort);
-    }
-
-    private Pageable getPagination(SearchRegionsRequest request) {
-        var unsafeSortProperty = String.format("(%s)", request.getSort());
-        var sort = request.getOrder().equals("asc") ?
-                JpaSort.unsafe(ASC, unsafeSortProperty) :
-                JpaSort.unsafe(DESC, unsafeSortProperty);
-        return PageRequest.of(request.getPage(), request.getSize(), sort);
-    }
-
     private void requireNotExists(QuotationPackageDto dto) {
         if (quotationPackageRepository.findByArtworkId(dto.getArtworkId()).isPresent())
             throw QUOTATION_PACKAGE_EXISTS.newException();
@@ -172,4 +151,5 @@ public class EvaluationServiceImpl implements IEvaluationService {
         if (quotationPackageCountryRepository.findByIdCountryId(dto.getCountryId()).isPresent())
             throw QUOTATION_PACKAGE_COUNTRY_EXISTS.newException();
     }
+
 }

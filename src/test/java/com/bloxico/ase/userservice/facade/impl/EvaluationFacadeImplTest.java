@@ -6,6 +6,7 @@ import com.bloxico.ase.userservice.exception.LocationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.bloxico.ase.testutil.Util.allPages;
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -19,21 +20,52 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private EvaluationFacadeImpl evaluationFacade;
 
     @Test
-    public void searchCountriesWithEvaluationDetails_nullRequest() {
+    public void searchCountryEvaluationDetails_nullRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationFacade.searchCountriesWithEvaluationDetails(null)
-        );
+                () -> evaluationFacade.searchCountryEvaluationDetails(null, allPages()));
     }
 
     @Test
-    public void searchCountriesWithEvaluationDetails() {
-        var request = utilEvaluation.genDefaultSearchCountryEvaluationDetailsRequest();
+    public void searchCountryEvaluationDetails_nullPageRequest() {
+        var request = utilEvaluation.genSearchCountryEvaluationDetailsRequest();
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.searchCountryEvaluationDetails(request, null));
+    }
+
+    @Test
+    public void searchCountryEvaluationDetails() {
+        var request = utilEvaluation.genSearchCountryEvaluationDetailsRequest();
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
-        assertThat(evaluationFacade.searchCountriesWithEvaluationDetails(request).getCountryEvaluationDetails(), hasItems(c1));
+        assertThat(evaluationFacade
+                        .searchCountryEvaluationDetails(request, allPages())
+                        .getPage()
+                        .getContent(),
+                hasItems(c1));
         var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails();
-        assertThat(evaluationFacade.searchCountriesWithEvaluationDetails(request).getCountryEvaluationDetails(),
+        assertThat(evaluationFacade
+                        .searchCountryEvaluationDetails(request, allPages())
+                        .getPage()
+                        .getContent(),
                 allOf(hasItems(c1), not(hasItems(c2))));
+    }
+
+    @Test
+    public void searchCountryEvaluationDetails_forManagement() {
+        var request = utilEvaluation.genSearchCountryEvaluationDetailsForManagementRequest();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        assertThat(evaluationFacade
+                        .searchCountryEvaluationDetails(request, allPages())
+                        .getPage()
+                        .getContent(),
+                hasItems(c1));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails();
+        assertThat(evaluationFacade
+                        .searchCountryEvaluationDetails(request, allPages())
+                        .getPage()
+                        .getContent(),
+                hasItems(c1, c2));
     }
 
     @Test
@@ -103,37 +135,35 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void searchCountries_nullRequest() {
+    public void searchRegionEvaluationDetails_nullRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationFacade.searchCountries(null)
-        );
+                () -> evaluationFacade.searchRegionEvaluationDetails(null, allPages()));
     }
 
     @Test
-    public void searchCountries() {
-        var request = utilEvaluation.genDefaultSearchCountryEvaluationDetailsRequest();
-        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
-        assertThat(evaluationFacade.searchCountries(request).getCountryEvaluationDetails(), hasItems(c1));
-        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails();
-        assertThat(evaluationFacade.searchCountries(request).getCountryEvaluationDetails(), hasItems(c1, c2));
-    }
-
-    @Test
-    public void searchRegions_nullRequest() {
+    public void searchRegionEvaluationDetails_nullPageRequest() {
+        var request = utilEvaluation.genDefaultSearchRegionsRequest();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationFacade.searchRegions(null)
-        );
+                () -> evaluationFacade.searchRegionEvaluationDetails(request, null));
     }
 
     @Test
-    public void searchRegions() {
+    public void searchRegionEvaluationDetails() {
         var request = utilEvaluation.genDefaultSearchRegionsRequest();
         var c1 = utilEvaluation.savedRegionCountedProj();
-        assertThat(evaluationFacade.searchRegions(request).getRegions(), hasItems(c1));
+        assertThat(evaluationFacade
+                        .searchRegionEvaluationDetails(request, allPages())
+                        .getPage()
+                        .getContent(),
+                hasItems(c1));
         var c2 = utilEvaluation.savedRegionCountedProj();
-        assertThat(evaluationFacade.searchRegions(request).getRegions(), hasItems(c1, c2));
+        assertThat(evaluationFacade
+                        .searchRegionEvaluationDetails(request, allPages())
+                        .getPage()
+                        .getContent(),
+                hasItems(c1, c2));
     }
 
     @Test

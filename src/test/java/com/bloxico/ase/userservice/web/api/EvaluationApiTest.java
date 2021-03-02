@@ -1,9 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
-import com.bloxico.ase.testutil.UtilAuth;
-import com.bloxico.ase.testutil.UtilEvaluation;
-import com.bloxico.ase.testutil.UtilLocation;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,24 +22,21 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 @Transactional(propagation = NOT_SUPPORTED)
 public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
-    @Autowired
-    private UtilAuth utilAuth;
-    @Autowired
-    private UtilEvaluation utilEvaluation;
-    @Autowired
-    private UtilLocation utilLocation;
+    @Autowired private UtilAuth utilAuth;
+    @Autowired private UtilEvaluation utilEvaluation;
+    @Autowired private UtilLocation utilLocation;
 
     @Test
     public void searchCountryEvaluationDetails_200_ok() {
-        var search = genUUID();
-        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search));
-        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search));
-        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails(genEmail(search));
-        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail("fooBar"));
+        var country = genUUID();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(country);
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(country);
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails(country);
+        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genUUID());
 
-        var countedProjs = given()
+        var content = given()
                 .header("Authorization", utilAuth.doAuthentication())
-                .queryParam("search", search)
+                .params(allPages("search", country))
                 .when()
                 .get(API_URL + EVALUATION_COUNTRY_DETAILS_SEARCH)
                 .then()
@@ -50,11 +44,41 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(PagedCountryEvaluationDetailsResponse.class)
-                .getCountryEvaluationDetails();
+                .as(SearchCountryEvaluationDetailsResponse.class)
+                .getPage()
+                .getContent();
 
-        assertThat(countedProjs, allOf(hasItems(c1, c2), not(hasItems(c3, c4))));
+        assertThat(content, allOf(hasItems(c1, c2), not(hasItems(c3, c4))));
     }
+
+    // TODO searchCountryEvaluationDetails_withRegions_200_ok
+
+    @Test
+    public void searchCountryEvaluationDetailsForManagement_200_ok() {
+        var country = genUUID();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(country);
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(country);
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails(country);
+        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genUUID());
+
+        var content = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .queryParams(allPages("search", country))
+                .when()
+                .get(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SearchCountryEvaluationDetailsResponse.class)
+                .getPage()
+                .getContent();
+
+        assertThat(content, allOf(hasItems(c1, c2, c3), not(hasItems(c4))));
+    }
+
+    // TODO searchCountryEvaluationDetailsForManagement_withRegions_200_ok
 
     @Test
     public void saveCountryEvaluationDetails_404_countryNotFound() {
@@ -63,7 +87,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .contentType(JSON)
                 .body(utilEvaluation.genSaveCountryEvaluationDetailsRequest(genUUID()))
                 .when()
-                .post(API_URL + EVALUATION_COUNTRY_DETAILS_SAVE)
+                .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE)
                 .then()
                 .assertThat()
                 .statusCode(404)
@@ -78,7 +102,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .contentType(JSON)
                 .body(request)
                 .when()
-                .post(API_URL + EVALUATION_COUNTRY_DETAILS_SAVE)
+                .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE)
                 .then()
                 .assertThat()
                 .statusCode(200);
@@ -87,7 +111,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .contentType(JSON)
                 .body(request)
                 .when()
-                .post(API_URL + EVALUATION_COUNTRY_DETAILS_SAVE)
+                .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE)
                 .then()
                 .assertThat()
                 .statusCode(409)
@@ -102,7 +126,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .contentType(JSON)
                 .body(request)
                 .when()
-                .post(API_URL + EVALUATION_COUNTRY_DETAILS_SAVE)
+                .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -117,13 +141,13 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void updateCountryEvaluationDetails_404_evaluationDetailsNotFound() {
+    public void updateCountryEvaluationDetails_404_detailsNotFound() {
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(utilEvaluation.genUpdateCountryEvaluationDetailsRequest(-1))
                 .when()
-                .post(API_URL + EVALUATION_COUNTRY_DETAILS_UPDATE)
+                .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE)
                 .then()
                 .assertThat()
                 .statusCode(404)
@@ -139,7 +163,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .contentType(JSON)
                 .body(request)
                 .when()
-                .post(API_URL + EVALUATION_COUNTRY_DETAILS_UPDATE)
+                .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -154,46 +178,23 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void searchCountryEvaluationDetailsManagement_200_ok() {
-        var search = genUUID();
-        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search));
-        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail(search));
-        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails(genEmail(search));
-        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genEmail("fooBar"));
+    public void searchRegionEvaluationDetailsForManagement_200_ok() {
+        var region = genUUID();
+        var r1 = utilEvaluation.savedRegionCountedProj(region);
+        var r2 = utilEvaluation.savedRegionCountedProj(region.toUpperCase());
+        var r3 = utilEvaluation.savedRegionCountedProj(region.toLowerCase());
+        var r4 = utilEvaluation.savedRegionCountedProj(genUUID());
 
-        var countedProjs = given()
+        var content = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
-                .queryParam("search", search)
+                .queryParams(allPages("search", region))
                 .when()
-                .get(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH)
-                .then()
-                .assertThat()
-                .statusCode(200)
-                .extract()
-                .body()
-                .as(PagedCountryEvaluationDetailsResponse.class)
-                .getCountryEvaluationDetails();
+                .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                .as(SearchRegionEvaluationDetailsResponse.class)
+                .getPage()
+                .getContent();
 
-        assertThat(countedProjs, allOf(hasItems(c1, c2, c3), not(hasItems(c4))));
-    }
-
-    @Test
-    public void searchRegionsManagement_200_ok() {
-        var search = genUUID();
-        var r1 = utilEvaluation.savedRegionCountedProj(genEmail(search));
-        var r2 = utilEvaluation.savedRegionCountedProj(genEmail(search.toUpperCase()));
-        var r3 = utilEvaluation.savedRegionCountedProj(genEmail(search.toLowerCase()));
-        var r4 = utilEvaluation.savedRegionCountedProj(genEmail("fooBar"));
-
-        var countedProjs = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
-                .queryParam("search", search)
-                .when()
-                .get(API_URL + EVALUATION_MANAGEMENT_REGIONS_SEARCH)
-                .as(PagedRegionsResponse.class)
-                .getRegions();
-
-        assertThat(countedProjs, allOf(hasItems(r1, r2, r3), not(hasItems(r4))));
+        assertThat(content, allOf(hasItems(r1, r2, r3), not(hasItems(r4))));
     }
 
     // TODO test saveQuotationPackage_404_artworkNotFound()

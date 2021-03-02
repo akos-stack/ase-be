@@ -1,11 +1,7 @@
 package com.bloxico.ase.testutil;
 
-import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
-import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
-import com.bloxico.ase.userservice.entity.evaluation.QuotationPackage;
-import com.bloxico.ase.userservice.entity.evaluation.QuotationPackageCountry;
+import com.bloxico.ase.userservice.dto.entity.evaluation.*;
+import com.bloxico.ase.userservice.entity.evaluation.*;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
@@ -33,26 +29,13 @@ public class UtilEvaluation {
     public CountryEvaluationDetails genCountryEvaluationDetails(int countryId) {
         var details = new CountryEvaluationDetails();
         details.setCountryId(countryId);
-        details.setPricePerEvaluation(50);
-        details.setAvailabilityPercentage(25);
-        return details;
-    }
-
-    public CountryEvaluationDetails genCountryEvaluationDetails(int countryId, int pricePerEvaluation, int availabilityPercentage) {
-        var details = new CountryEvaluationDetails();
-        details.setCountryId(countryId);
-        details.setPricePerEvaluation(pricePerEvaluation);
-        details.setAvailabilityPercentage(availabilityPercentage);
+        details.setPricePerEvaluation(genPosInt(50));
+        details.setAvailabilityPercentage(genPosInt(25));
         return details;
     }
 
     public CountryEvaluationDetailsDto genCountryEvaluationDetailsDto(int countryId) {
         return MAPPER.toDto(genCountryEvaluationDetails(countryId));
-    }
-
-    public CountryEvaluationDetailsDto genCountryEvaluationDetailsDto(
-            int countryId, int pricePerEvaluation, int availabilityPercentage) {
-        return MAPPER.toDto(genCountryEvaluationDetails(countryId, pricePerEvaluation, availabilityPercentage));
     }
 
     public CountryEvaluationDetails savedCountryEvaluationDetails() {
@@ -74,10 +57,6 @@ public class UtilEvaluation {
         return MAPPER.toDto(savedCountryEvaluationDetails());
     }
 
-    public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProj() {
-        return savedCountryEvaluationDetailsCountedProj(genUUID());
-    }
-
     public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProj(String countryName) {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithNameAndRegion(countryName, region);
@@ -87,24 +66,27 @@ public class UtilEvaluation {
                 details.getAvailabilityPercentage(), 0L);
     }
 
-    public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProjNoDetails() {
-        return savedCountryEvaluationDetailsCountedProjNoDetails(genUUID());
+    public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProj() {
+        return savedCountryEvaluationDetailsCountedProj(genUUID());
     }
 
     public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProjNoDetails(String countryName) {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithNameAndRegion(countryName, region);
         return new CountryEvaluationDetailsWithEvaluatorsCountProj(country.getId(), country.getName(),
-                List.of(region.getName()), null,
-                null, null, 0L);
+                List.of(region.getName()), null, null, null, 0L);
     }
 
-    public SaveCountryEvaluationDetailsRequest genSaveCountryEvaluationDetailsRequest() {
-        return genSaveCountryEvaluationDetailsRequest(utilLocation.savedCountry().getName());
+    public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProjNoDetails() {
+        return savedCountryEvaluationDetailsCountedProjNoDetails(genUUID());
     }
 
     public SaveCountryEvaluationDetailsRequest genSaveCountryEvaluationDetailsRequest(String country) {
         return new SaveCountryEvaluationDetailsRequest(country, genPosInt(251), genPosInt(101));
+    }
+
+    public SaveCountryEvaluationDetailsRequest genSaveCountryEvaluationDetailsRequest() {
+        return genSaveCountryEvaluationDetailsRequest(utilLocation.savedCountry().getName());
     }
 
     public QuotationPackage genQuotationPackage() {
@@ -153,8 +135,12 @@ public class UtilEvaluation {
         return new UpdateCountryEvaluationDetailsRequest(id, 40, 15);
     }
 
-    public SearchCountryEvaluationDetailsRequest genDefaultSearchCountryEvaluationDetailsRequest() {
-        return new SearchCountryEvaluationDetailsRequest(null, "", 0, 10, "country", "asc");
+    public SearchCountryEvaluationDetailsRequest genSearchCountryEvaluationDetailsRequest() {
+        return new SearchCountryEvaluationDetailsRequest("", null);
+    }
+
+    public SearchCountryEvaluationDetailsForManagementRequest genSearchCountryEvaluationDetailsForManagementRequest() {
+        return new SearchCountryEvaluationDetailsForManagementRequest("", null);
     }
 
     public RegionWithCountriesAndEvaluatorsCountProj savedRegionCountedProj() {
@@ -167,8 +153,8 @@ public class UtilEvaluation {
         return new RegionWithCountriesAndEvaluatorsCountProj(region.getId(), region.getName(), 0, 0);
     }
 
-    public SearchRegionsRequest genDefaultSearchRegionsRequest() {
-        return new SearchRegionsRequest("", 0, 10, "name", "asc");
+    public SearchRegionEvaluationDetailsRequest genDefaultSearchRegionsRequest() {
+        return new SearchRegionEvaluationDetailsRequest("");
     }
 
 }

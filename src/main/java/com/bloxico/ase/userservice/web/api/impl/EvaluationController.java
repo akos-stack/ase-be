@@ -2,14 +2,12 @@ package com.bloxico.ase.userservice.web.api.impl;
 
 import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.web.api.EvaluationApi;
-import com.bloxico.ase.userservice.web.model.evaluation.PagedRegionsResponse;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionsRequest;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.security.Principal;
 
 import static com.bloxico.ase.userservice.util.Principals.extractId;
@@ -21,9 +19,20 @@ public class EvaluationController implements EvaluationApi {
     private IEvaluationFacade evaluationFacade;
 
     @Override
-    public ResponseEntity<PagedCountryEvaluationDetailsResponse> searchCountryEvaluationDetails(
-            SearchCountryEvaluationDetailsRequest request) {
-        var response = evaluationFacade.searchCountriesWithEvaluationDetails(request);
+    public ResponseEntity<SearchCountryEvaluationDetailsResponse> searchCountryEvaluationDetails(
+            SearchCountryEvaluationDetailsRequest request,
+            PageRequest page)
+    {
+        var response = evaluationFacade.searchCountryEvaluationDetails(request, page);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<SearchCountryEvaluationDetailsResponse> searchCountryEvaluationDetailsForManagement(
+            SearchCountryEvaluationDetailsForManagementRequest request,
+            PageRequest page)
+    {
+        var response = evaluationFacade.searchCountryEvaluationDetails(request, page);
         return ResponseEntity.ok(response);
     }
 
@@ -38,27 +47,26 @@ public class EvaluationController implements EvaluationApi {
 
     @Override
     public ResponseEntity<UpdateCountryEvaluationDetailsResponse> updateCountryEvaluationDetails(
-            UpdateCountryEvaluationDetailsRequest request, Principal principal) {
+            UpdateCountryEvaluationDetailsRequest request, Principal principal)
+    {
         var id = extractId(principal);
-        var response= evaluationFacade.updateCountryEvaluationDetails(request, id);
+        var response = evaluationFacade.updateCountryEvaluationDetails(request, id);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<PagedCountryEvaluationDetailsResponse> searchCountryEvaluationDetailsManagement(
-            @Valid SearchCountryEvaluationDetailsRequest request) {
-        var response = evaluationFacade.searchCountries(request);
+    public ResponseEntity<SearchRegionEvaluationDetailsResponse> searchRegionEvaluationDetailsForManagement(
+            SearchRegionEvaluationDetailsRequest request,
+            PageRequest page)
+    {
+        var response = evaluationFacade.searchRegionEvaluationDetails(request, page);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<PagedRegionsResponse> searchRegionsManagement(SearchRegionsRequest request) {
-        var response = evaluationFacade.searchRegions(request);
-        return ResponseEntity.ok(response);
-    }
-
     public ResponseEntity<SaveQuotationPackageResponse> saveQuotationPackage(
-            SaveQuotationPackageRequest request, Principal principal) {
+            SaveQuotationPackageRequest request, Principal principal)
+    {
         var id = extractId(principal);
         var response = evaluationFacade.saveQuotationPackage(request, id);
         return ResponseEntity.ok(response);
