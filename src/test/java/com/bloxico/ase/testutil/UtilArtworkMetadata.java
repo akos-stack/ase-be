@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.testutil.Util.randEnumConst;
@@ -65,15 +66,23 @@ public class UtilArtworkMetadata {
         return MAPPER.toDto(savedArtworkMetadata(type, status));
     }
 
-    public ArtworkMetadataDto findArtworkMetadataDto(Type type, String name) {
+    public ArtworkMetadataDto findArtworkMetadataDto(Type type, Predicate<ArtworkMetadataDto> predicateFn) {
         var metadata = getRepository(type)
                 .findAll()
                 .stream()
                 .map(MAPPER::toDto)
-                .filter(m -> m.getName().equals(name))
+                .filter(predicateFn)
                 .collect(toList());
         assertTrue(metadata.size() < 2);
         return metadata.isEmpty() ? null : metadata.get(0);
+    }
+
+    public ArtworkMetadataDto findArtworkMetadataDto(Type type, String name) {
+        return findArtworkMetadataDto(type, m -> m.getName().equals(name));
+    }
+
+    public ArtworkMetadataDto findArtworkMetadataDto(Type type, Status status) {
+        return findArtworkMetadataDto(type, m -> m.getStatus().equals(status));
     }
 
     public List<ArtworkMetadataDto> findAllArtworkMetadataDto(Type type) {

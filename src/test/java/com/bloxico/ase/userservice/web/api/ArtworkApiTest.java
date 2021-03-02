@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.util.FileCategory.CV;
+import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.web.api.ArtworkApi.SUBMIT_ARTWORK;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
@@ -28,8 +30,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     public void submitArtwork_notAuthorized() {
         var registration = utilAuth.doConfirmedRegistration();
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
-        byte[] image = getTestImageBytes();
-        byte[] document = getTestCVBytes();
+        byte[] image = genFileBytes(IMAGE);
+        byte[] document = genFileBytes(CV);
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParams(formParams)
@@ -49,8 +51,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
         utilUserProfile.savedArtOwnerDto(registration.getId());
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, true, null);
         formParams.put("iAmArtOwner", String.valueOf(false));
-        byte[] image = getTestImageBytes();
-        byte[] document = getTestCVBytes();
+        byte[] image = genFileBytes(IMAGE);
+        byte[] document = genFileBytes(CV);
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParams(formParams)
@@ -71,8 +73,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
         utilUserProfile.savedArtOwnerDto(registration.getId());
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
         formParams.put("iAmArtOwner", String.valueOf(true));
-        byte[] image = getTestImageBytes();
-        byte[] document = getTestCVBytes();
+        byte[] image = genFileBytes(IMAGE);
+        byte[] document = genFileBytes(CV);
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParams(formParams)
@@ -92,8 +94,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
         var registration = utilAuth.doConfirmedRegistration();
         utilUserProfile.savedArtOwnerDto(registration.getId());
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, -1L);
-        byte[] image = getTestImageBytes();
-        byte[] document = getTestCVBytes();
+        byte[] image = genFileBytes(IMAGE);
+        byte[] document = genFileBytes(CV);
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParams(formParams)
@@ -113,8 +115,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
         var registration = utilAuth.doConfirmedRegistration();
         utilUserProfile.savedArtOwnerDto(registration.getId());
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
-        byte[] image = getTestImageBytes();
-        byte[] document = getTestCVBytes();
+        byte[] image = genFileBytes(IMAGE);
+        byte[] document = genFileBytes(CV);
         var response = given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParams(formParams)
@@ -140,8 +142,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
         utilUserProfile.savedArtOwnerDto(registration.getId());
         var groupDto = utilArtwork.savedArtworkGroupDto(ArtworkGroup.Status.DRAFT);
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, groupDto.getId());
-        byte[] image = getTestImageBytes();
-        byte[] document = getTestCVBytes();
+        byte[] image = genFileBytes(IMAGE);
+        byte[] document = genFileBytes(CV);
         var response = given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .formParams(formParams)

@@ -52,9 +52,12 @@ public class UtilUserProfile {
     }
 
     public SubmitEvaluatorRequest newSubmitUninvitedEvaluatorRequest() {
+        return newSubmitUninvitedEvaluatorRequest(utilLocation.savedCountry().getName());
+    }
+
+    public SubmitEvaluatorRequest newSubmitUninvitedEvaluatorRequest(String country) {
         var email = genEmail();
         var password = genPassword();
-        var country = utilLocation.savedCountry().getName();
         return new SubmitEvaluatorRequest(
                 genUUID(), genUUID(), password,
                 email, genUUID(), genUUID(),
@@ -63,7 +66,10 @@ public class UtilUserProfile {
     }
 
     public SubmitArtOwnerRequest newSubmitArtOwnerRequest() {
-        var country = utilLocation.savedCountry().getName();
+        return newSubmitArtOwnerRequest(utilLocation.savedCountry().getName());
+    }
+
+    public SubmitArtOwnerRequest newSubmitArtOwnerRequest(String country) {
         return new SubmitArtOwnerRequest(
                 genUUID(), genPassword(),
                 genEmail(), genUUID(), genUUID(),
