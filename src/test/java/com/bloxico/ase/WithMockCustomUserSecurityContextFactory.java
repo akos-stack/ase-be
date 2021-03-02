@@ -21,10 +21,10 @@ public class WithMockCustomUserSecurityContextFactory
     public SecurityContext createSecurityContext(WithMockCustomUser customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
-        User principal = null;
+        User principal;
         if(customUser.role() == Role.ADMIN) {
             principal = utilUser.savedAdmin();
-        } else utilUser.savedUser();
+        } else principal = utilUser.savedUser();
         AsePrincipal asePrincipal = AsePrincipal.newUserDetails(principal);
         Authentication auth =
                 new UsernamePasswordAuthenticationToken(asePrincipal, "password", null);

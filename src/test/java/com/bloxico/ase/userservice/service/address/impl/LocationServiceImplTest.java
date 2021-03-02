@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.exception.LocationException;
@@ -20,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LocationServiceImplTest extends AbstractSpringTest {
 
-    @Autowired private UtilUser utilUser;
     @Autowired private UtilLocation utilLocation;
     @Autowired private LocationRepository locationRepository;
     @Autowired private CountryRepository countryRepository;
@@ -120,29 +120,27 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void saveRegion_nullRegion() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> service.saveRegion(null, principalId));
+                () -> service.saveRegion(null));
     }
 
     @Test
     public void saveRegion_alreadyExists() {
-        var principalId = utilUser.savedAdmin().getId();
         var region = utilLocation.savedRegionDto();
         assertTrue(regionRepository.findById(region.getId()).isPresent());
         assertThrows(
                 LocationException.class,
-                () -> service.saveRegion(region, principalId));
+                () -> service.saveRegion(region));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveRegion() {
-        var principalId = utilUser.savedAdmin().getId();
         var region = new RegionDto();
         region.setName(genUUID());
         assertTrue(regionRepository.findByNameIgnoreCase(region.getName()).isEmpty());
-        service.saveRegion(region, principalId);
+        service.saveRegion(region);
         assertTrue(regionRepository.findByNameIgnoreCase(region.getName()).isPresent());
     }
 
@@ -170,30 +168,28 @@ public class LocationServiceImplTest extends AbstractSpringTest {
 
     @Test
     public void saveCountry_nullCountry() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> service.saveCountry(null, principalId));
+                () -> service.saveCountry(null));
     }
 
     @Test
     public void saveCountry_alreadyExists() {
-        var principalId = utilUser.savedAdmin().getId();
         var country = utilLocation.savedCountryDto();
         assertTrue(countryRepository.findById(country.getId()).isPresent());
         assertThrows(
                 LocationException.class,
-                () -> service.saveCountry(country, principalId));
+                () -> service.saveCountry(country));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveCountry() {
-        var principalId = utilUser.savedAdmin().getId();
         var country = new CountryDto();
         country.setName(genUUID());
         country.setRegions(Set.of(utilLocation.savedRegionDto()));
         assertTrue(countryRepository.findByNameIgnoreCase(country.getName()).isEmpty());
-        service.saveCountry(country, principalId);
+        service.saveCountry(country);
         assertTrue(countryRepository.findByNameIgnoreCase(country.getName()).isPresent());
     }
 
@@ -201,7 +197,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     public void updateCountry_nullCountry() {
         assertThrows(
                 NullPointerException.class,
-                () -> service.updateCountry(null, utilUser.savedAdmin().getId()));
+                () -> service.updateCountry(null));
     }
 
     @Test
@@ -210,7 +206,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         countryDto.setId(-1L);
         assertThrows(
                 LocationException.class,
-                () -> service.updateCountry(countryDto, utilUser.savedAdmin().getId()));
+                () -> service.updateCountry(countryDto));
     }
 
     @Test
@@ -219,27 +215,27 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         countryDto.setName(utilLocation.savedCountry().getName());
         assertThrows(
                 LocationException.class,
-                () -> service.updateCountry(countryDto, utilUser.savedAdmin().getId()));
+                () -> service.updateCountry(countryDto));
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountry_updateName() {
-        var adminId = utilUser.savedAdmin().getId();
         var country = utilLocation.savedCountryDto();
         var newCountryName = genUUID();
         var dto = utilLocation.genCountryDto(country.getId(), newCountryName, country.getRegions());
-        var updatedCountry = service.updateCountry(dto, adminId);
+        var updatedCountry = service.updateCountry(dto);
         assertNotEquals(country.getName(), updatedCountry.getName());
         assertEquals(country.getRegions(), updatedCountry.getRegions());
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountry_updateRegions() {
-        var adminId = utilUser.savedAdmin().getId();
         var country = utilLocation.savedCountryDto();
         var newRegion = utilLocation.savedRegionDto();
         var dto = utilLocation.genCountryDto(country.getId(), country.getName(), Set.of(newRegion));
-        var updatedCountry = service.updateCountry(dto, adminId);
+        var updatedCountry = service.updateCountry(dto);
         assertEquals(country.getName(), updatedCountry.getName());
         assertThat(updatedCountry.getRegions(), hasItems(newRegion));
         for (var oldRegion : country.getRegions())
@@ -247,13 +243,13 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountry_updateNameAndRegions() {
-        var adminId = utilUser.savedAdmin().getId();
         var country = utilLocation.savedCountryDto();
         var newRegion = utilLocation.savedRegionDto();
         var newCountryName = genUUID();
         var dto = utilLocation.genCountryDto(country.getId(), newCountryName, Set.of(newRegion));
-        var updatedCountry = service.updateCountry(dto, adminId);
+        var updatedCountry = service.updateCountry(dto);
         assertEquals(newCountryName, updatedCountry.getName());
         assertNotEquals(country.getName(), updatedCountry.getName());
         assertThat(updatedCountry.getRegions(), hasItems(newRegion));
@@ -262,6 +258,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountry() {
         var country = utilLocation.savedCountryDto();
         var region = utilLocation.savedRegionDto();
@@ -270,22 +267,21 @@ public class LocationServiceImplTest extends AbstractSpringTest {
         dto.setId(country.getId());
         dto.setName(newCountryName);
         dto.setRegions(Set.of(region));
-        var updatedCountry = service.updateCountry(dto, utilUser.savedAdmin().getId());
+        var updatedCountry = service.updateCountry(dto);
         assertEquals(newCountryName, updatedCountry.getName());
         assertThat(updatedCountry.getRegions(), hasItems(region));
     }
 
     @Test
     public void saveLocation_nullLocation() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> service.saveLocation(null, principalId));
+                () -> service.saveLocation(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveLocation() {
-        var principalId = utilUser.savedAdmin().getId();
         var location = new LocationDto();
         location.setCountry(utilLocation.savedCountryDto());
         location.setAddress(genUUID());
@@ -296,7 +292,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
                         .map(MAPPER::toDto)
                         .collect(toList()),
                 not(hasItems(location)));
-        service.saveLocation(location, principalId);
+        service.saveLocation(location);
         assertThat(
                 locationRepository
                         .findAll()

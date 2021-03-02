@@ -19,17 +19,17 @@ public interface ILocationService {
 
     List<RegionDto> findAllRegions();
 
-    RegionDto saveRegion(RegionDto regionDto, long principalId);
+    RegionDto saveRegion(RegionDto regionDto);
 
     RegionDto deleteRegion(RegionDto regionDto);
 
     List<CountryDto> findAllCountries();
 
-    CountryDto saveCountry(CountryDto countryDto, long principalId);
+    CountryDto saveCountry(CountryDto countryDto);
 
-    CountryDto updateCountry(CountryDto countryDto, long principalId);
+    CountryDto updateCountry(CountryDto countryDto);
 
-    LocationDto saveLocation(LocationDto locationDto, long principalId);
+    LocationDto saveLocation(LocationDto locationDto);
 
     int countCountriesByRegionId(Long regionId);
 

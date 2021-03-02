@@ -6,14 +6,14 @@ public interface ILocationFacade {
 
     SearchRegionsResponse findAllRegions();
 
-    SaveRegionResponse saveRegion(SaveRegionRequest request, long principalId);
+    SaveRegionResponse saveRegion(SaveRegionRequest request);
 
     void deleteRegion(Long regionId);
 
     SearchCountriesResponse findAllCountries();
 
-    SaveCountryResponse saveCountry(SaveCountryRequest request, long principalId);
+    SaveCountryResponse saveCountry(SaveCountryRequest request);
 
-    UpdateCountryResponse updateCountry(UpdateCountryRequest request, long principalId);
+    UpdateCountryResponse updateCountry(UpdateCountryRequest request);
 
 }

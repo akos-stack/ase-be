@@ -25,9 +25,8 @@ public class LocationController implements LocationApi {
     }
 
     @Override
-    public ResponseEntity<SaveRegionResponse> saveRegion(SaveRegionRequest request, Principal principal) {
-        var id = extractId(principal);
-        var response = locationFacade.saveRegion(request, id);
+    public ResponseEntity<SaveRegionResponse> saveRegion(SaveRegionRequest request) {
+        var response = locationFacade.saveRegion(request);
         return ResponseEntity.ok(response);
     }
 
@@ -44,16 +43,14 @@ public class LocationController implements LocationApi {
     }
 
     @Override
-    public ResponseEntity<SaveCountryResponse> saveCountry(SaveCountryRequest request, Principal principal) {
-        var id = extractId(principal);
-        var response = locationFacade.saveCountry(request, id);
+    public ResponseEntity<SaveCountryResponse> saveCountry(SaveCountryRequest request) {
+        var response = locationFacade.saveCountry(request);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<UpdateCountryResponse> updateCountry(UpdateCountryRequest request, Principal principal) {
-        var id = extractId(principal);
-        var response = locationFacade.updateCountry(request, id);
+    public ResponseEntity<UpdateCountryResponse> updateCountry(UpdateCountryRequest request) {
+        var response = locationFacade.updateCountry(request);
         return ResponseEntity.ok(response);
     }
 

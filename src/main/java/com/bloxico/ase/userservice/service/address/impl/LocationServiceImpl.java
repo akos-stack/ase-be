@@ -99,14 +99,14 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public RegionDto saveRegion(RegionDto dto, long principalId) {
-        log.debug("LocationServiceImpl.saveRegion - start | dto: {}, principalId: {}", dto, principalId);
+    public RegionDto saveRegion(RegionDto dto) {
+        log.debug("LocationServiceImpl.saveRegion - start | dto: {}", dto);
         requireNonNull(dto);
         requireNotExists(dto);
         var region = MAPPER.toEntity(dto);
         region = regionRepository.saveAndFlush(region);
         var regionDto = MAPPER.toDto(region);
-        log.debug("LocationServiceImpl.saveRegion - end | dto: {}, principalId: {}", dto, principalId);
+        log.debug("LocationServiceImpl.saveRegion - end | dto: {}", dto);
         return regionDto;
     }
 
@@ -135,26 +135,24 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public CountryDto saveCountry(CountryDto dto, long principalId) {
-        log.debug("LocationServiceImpl.saveCountry - start | dto: {}, principalId: {}", dto, principalId);
+    public CountryDto saveCountry(CountryDto dto) {
+        log.debug("LocationServiceImpl.saveCountry - start | dto: {}", dto);
         requireNonNull(dto);
         requireNotExists(dto);
         var country = MAPPER.toEntity(dto);
-        country.setCreatorId(principalId);
         country = countryRepository.saveAndFlush(country);
         var countryDto = MAPPER.toDto(country);
-        log.debug("LocationServiceImpl.saveCountry - end | dto: {}, principalId: {}", dto, principalId);
+        log.debug("LocationServiceImpl.saveCountry - end | dto: {}", dto);
         return countryDto;
     }
 
     @Override
-    public CountryDto updateCountry(CountryDto dto, long principalId) {
-        log.debug("LocationServiceImpl.updateCountry - start | dto: {}, principalId: {}", dto, principalId);
+    public CountryDto updateCountry(CountryDto dto) {
+        log.debug("LocationServiceImpl.updateCountry - start | dto: {}", dto);
         requireNonNull(dto);
         var country = countryRepository
                 .findById(dto.getId())
                 .orElseThrow(COUNTRY_NOT_FOUND::newException);
-        country.setUpdaterId(principalId);
         if (countryNameUpdateRequested(country.getName(), dto.getName())) {
             requireNotExists(dto);
             country.setName(dto.getName());
@@ -166,19 +164,18 @@ public class LocationServiceImpl implements ILocationService {
         country.setRegions(regions);
         country = countryRepository.saveAndFlush(country);
         var countryDto = MAPPER.toDto(country);
-        log.debug("LocationServiceImpl.updateCountry - end | dto: {}, principalId: {}", dto, principalId);
+        log.debug("LocationServiceImpl.updateCountry - end | dto: {}", dto);
         return countryDto;
     }
 
     @Override
-    public LocationDto saveLocation(LocationDto dto, long principalId) {
-        log.debug("LocationServiceImpl.saveLocation - start | dto: {}, principalId: {}", dto, principalId);
+    public LocationDto saveLocation(LocationDto dto) {
+        log.debug("LocationServiceImpl.saveLocation - start | dto: {}", dto);
         requireNonNull(dto);
         var location = MAPPER.toEntity(dto);
-        location.setCreatorId(principalId);
         location = locationRepository.saveAndFlush(location);
         var locationDto = MAPPER.toDto(location);
-        log.debug("LocationServiceImpl.saveLocation - end | dto: {}, principalId: {}", dto, principalId);
+        log.debug("LocationServiceImpl.saveLocation - end | dto: {}", dto);
         return locationDto;
     }
 

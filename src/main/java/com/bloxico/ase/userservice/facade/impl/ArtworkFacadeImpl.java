@@ -78,7 +78,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         var artworkDto = MAPPER.toArtworkDto(request);
         artworkDto.setGroup(doSaveGroup(request, principalId));
         artworkDto.setOwner(userProfileService.findArtOwnerByUserId(principalId));
-        artworkDto.setLocation(doSaveLocation(request, principalId));
+        artworkDto.setLocation(doSaveLocation(request));
         artworkDto.setArtist(doSaveArtist(request, principalId));
         artworkDto.addCategories(doSaveCategories(request, principalId));
         artworkDto.addMaterials(doSaveMaterials(request, principalId));
@@ -154,9 +154,9 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         return artistService.saveArtist(artistDto, principalId);
     }
 
-    private LocationDto doSaveLocation(SaveArtworkRequest request, long principalId) {
+    private LocationDto doSaveLocation(SaveArtworkRequest request) {
         var locationDto = MAPPER.toLocationDto(request);
         locationDto.setCountry(locationService.findCountryByName(request.getCountry()));
-        return locationService.saveLocation(locationDto, principalId);
+        return locationService.saveLocation(locationDto);
     }
 }
