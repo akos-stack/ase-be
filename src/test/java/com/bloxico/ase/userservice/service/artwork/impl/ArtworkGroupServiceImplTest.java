@@ -1,8 +1,8 @@
 package com.bloxico.ase.userservice.service.artwork.impl;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilArtwork;
-import com.bloxico.ase.testutil.UtilUser;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkGroupDto;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
 import com.bloxico.ase.userservice.exception.ArtworkException;
@@ -17,7 +17,6 @@ public class ArtworkGroupServiceImplTest extends AbstractSpringTest {
 
     @Autowired private ArtworkGroupServiceImpl artworkGroupService;
     @Autowired private ArtworkGroupRepository artworkGroupRepository;
-    @Autowired private UtilUser utilUser;
     @Autowired private UtilArtwork utilArtwork;
 
     @Test
@@ -39,69 +38,69 @@ public class ArtworkGroupServiceImplTest extends AbstractSpringTest {
         var artworkGroup= utilArtwork.savedArtworkGroup(ArtworkGroup.Status.WAITING_FOR_EVALUATION);
         var newlyCreated = artworkGroupService.findGroupById(artworkGroup.getId());
         assertNotNull(newlyCreated);
-        assertTrue(artworkGroup.getStatus() == newlyCreated.getStatus());
+        assertSame(artworkGroup.getStatus(), newlyCreated.getStatus());
     }
 
     @Test
+    @WithMockCustomUser
     public void findOrUpdateGroup_nullGroup() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> artworkGroupService.findOrUpdateGroup(null, principalId));
+                () -> artworkGroupService.findOrUpdateGroup(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void findOrUpdateGroup_nullGroupId() {
-        var principalId = utilUser.savedAdmin().getId();
         var dto = new ArtworkGroupDto();
         assertThrows(
                 NullPointerException.class,
-                () -> artworkGroupService.findOrUpdateGroup(dto, principalId));
+                () -> artworkGroupService.findOrUpdateGroup(dto));
     }
 
     @Test
+    @WithMockCustomUser
     public void findOrUpdateGroup_groupNotFound() {
-        var principalId = utilUser.savedAdmin().getId();
         var dto = new ArtworkGroupDto();
         dto.setId(1024L);
         assertThrows(
                 ArtworkException.class,
-                () -> artworkGroupService.findOrUpdateGroup(dto, principalId));
+                () -> artworkGroupService.findOrUpdateGroup(dto));
     }
 
     @Test
+    @WithMockCustomUser
     public void findOrUpdateGroup_found() {
-        var principalId = utilUser.savedAdmin().getId();
         var dto = utilArtwork.savedArtworkGroupDto(ArtworkGroup.Status.DRAFT);
-        var response = artworkGroupService.findOrUpdateGroup(dto, principalId);
+        var response = artworkGroupService.findOrUpdateGroup(dto);
         assertNotNull(response);
-        assertTrue(response.getStatus() == dto.getStatus());
+        assertSame(response.getStatus(), dto.getStatus());
     }
 
     @Test
+    @WithMockCustomUser
     public void findOrUpdateGroup_updated() {
-        var principalId = utilUser.savedAdmin().getId();
         var dto = utilArtwork.savedArtworkGroupDto(ArtworkGroup.Status.DRAFT);
         dto.setStatus(ArtworkGroup.Status.WAITING_FOR_EVALUATION);
-        var response = artworkGroupService.findOrUpdateGroup(dto, principalId);
+        var response = artworkGroupService.findOrUpdateGroup(dto);
         assertNotNull(response);
         assertSame(ArtworkGroup.Status.WAITING_FOR_EVALUATION, response.getStatus());
     }
 
     @Test
+    @WithMockCustomUser
     public void saveGroup_nullGroup() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> artworkGroupService.saveGroup(null, principalId));
+                () -> artworkGroupService.saveGroup(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveGroup() {
-        var principalId = utilUser.savedAdmin().getId();
         var dto = new ArtworkGroupDto();
         dto.setStatus(ArtworkGroup.Status.DRAFT);
-        var response = artworkGroupService.saveGroup(dto, principalId);
+        var response = artworkGroupService.saveGroup(dto);
         assertNotNull(response);
         assertTrue(artworkGroupRepository.findById(response.getId()).isPresent());
     }

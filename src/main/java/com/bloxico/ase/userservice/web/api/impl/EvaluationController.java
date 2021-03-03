@@ -8,10 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
-
-import static com.bloxico.ase.userservice.util.Principals.extractId;
-
 @RestController
 public class EvaluationController implements EvaluationApi {
 
@@ -38,19 +34,17 @@ public class EvaluationController implements EvaluationApi {
 
     @Override
     public ResponseEntity<SaveCountryEvaluationDetailsResponse> saveCountryEvaluationDetails(
-            SaveCountryEvaluationDetailsRequest request, Principal principal)
+            SaveCountryEvaluationDetailsRequest request)
     {
-        var id = extractId(principal);
-        var response = evaluationFacade.saveCountryEvaluationDetails(request, id);
+        var response = evaluationFacade.saveCountryEvaluationDetails(request);
         return ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<UpdateCountryEvaluationDetailsResponse> updateCountryEvaluationDetails(
-            UpdateCountryEvaluationDetailsRequest request, Principal principal)
+            UpdateCountryEvaluationDetailsRequest request)
     {
-        var id = extractId(principal);
-        var response = evaluationFacade.updateCountryEvaluationDetails(request, id);
+        var response = evaluationFacade.updateCountryEvaluationDetails(request);
         return ResponseEntity.ok(response);
     }
 
@@ -65,10 +59,9 @@ public class EvaluationController implements EvaluationApi {
 
     @Override
     public ResponseEntity<SaveQuotationPackageResponse> saveQuotationPackage(
-            SaveQuotationPackageRequest request, Principal principal)
+            SaveQuotationPackageRequest request)
     {
-        var id = extractId(principal);
-        var response = evaluationFacade.saveQuotationPackage(request, id);
+        var response = evaluationFacade.saveQuotationPackage(request);
         return ResponseEntity.ok(response);
     }
 

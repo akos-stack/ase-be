@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.service.artwork.impl;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
 import com.bloxico.ase.testutil.UtilArtwork;
 import com.bloxico.ase.testutil.UtilUser;
@@ -21,18 +22,18 @@ public class ArtworkServiceImplTest extends AbstractSpringTestWithAWS {
     @Autowired private ArtworkHistoryRepository artworkHistoryRepository;
 
     @Test
+    @WithMockCustomUser
     public void saveArtwork_nullArtwork() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> artworkService.saveArtwork(null, principalId));
+                () -> artworkService.saveArtwork(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveArtwork() {
-        var principalId = utilUser.savedAdmin().getId();
         var dto = utilArtwork.genArtworkDto();
-        var newlyCreatedDto = artworkService.saveArtwork(dto, principalId);
+        var newlyCreatedDto = artworkService.saveArtwork(dto);
         assertNotNull(newlyCreatedDto);
         assertTrue(artworkRepository.findById(newlyCreatedDto.getId()).isPresent());
         assertTrue(artworkHistoryRepository.findById(newlyCreatedDto.getId()).isPresent());

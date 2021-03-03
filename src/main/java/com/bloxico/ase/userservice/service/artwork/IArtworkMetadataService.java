@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface IArtworkMetadataService {
 
-    ArtworkMetadataDto findOrSaveArtworkMetadata(ArtworkMetadataDto dto, long principalId);
+    ArtworkMetadataDto findOrSaveArtworkMetadata(ArtworkMetadataDto dto);
 
-    ArtworkMetadataDto updateArtworkMetadata(ArtworkMetadataDto dto, long principalId);
+    ArtworkMetadataDto updateArtworkMetadata(ArtworkMetadataDto dto);
 
     void deleteArtworkMetadata(String name);
 

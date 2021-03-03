@@ -28,14 +28,13 @@ public class DocumentServiceImpl implements IDocumentService {
     }
 
     @Override
-    public DocumentDto saveDocument(MultipartFile file, FileCategory type, long principalId) {
-        log.info("DocumentServiceImpl.saveDocument - start | file: {}, fileCategory: {}, principalId: {} ", file, type, principalId);
+    public DocumentDto saveDocument(MultipartFile file, FileCategory type) {
+        log.info("DocumentServiceImpl.saveDocument - start | file: {}, fileCategory: {}", file, type);
         var path = s3Service.uploadFile(type, file);
         var document = new Document();
         document.setPath(path);
         document.setType(type);
-        document.setCreatorId(principalId);
-        log.info("DocumentServiceImpl.saveDocument - end | file: {}, fileCategory: {}, principalId: {} ", file, type, principalId);
+        log.info("DocumentServiceImpl.saveDocument - end | file: {}, fileCategory: {}, principalId: {} ", file, type);
         return MAPPER.toDto(documentRepository.save(document));
     }
 

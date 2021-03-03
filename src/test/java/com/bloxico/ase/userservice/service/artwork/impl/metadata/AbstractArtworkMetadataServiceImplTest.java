@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.service.artwork.impl.metadata;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
@@ -30,14 +31,14 @@ public abstract class AbstractArtworkMetadataServiceImplTest extends AbstractSpr
     // TODO-test findOrSaveArtworkMetadata_nullMetadata
 
     @Test
+    @WithMockCustomUser
     public void findOrSaveArtworkMetadata_saved() {
-        var principalId = utilUser.savedAdmin().getId();
         for (var status : Status.values()) {
             var metadata = utilArtworkMetadata.genArtworkMetadataDto(getType(), status);
             assertThat(
                     utilArtworkMetadata.findAllArtworkMetadataDto(getType()),
                     not(hasItems(metadata)));
-            getService().findOrSaveArtworkMetadata(metadata, principalId);
+            getService().findOrSaveArtworkMetadata(metadata);
             assertThat(
                     utilArtworkMetadata.findAllArtworkMetadataDto(getType()),
                     hasItems(metadata));
@@ -45,14 +46,14 @@ public abstract class AbstractArtworkMetadataServiceImplTest extends AbstractSpr
     }
 
     @Test
+    @WithMockCustomUser
     public void findOrSaveArtworkMetadata_found() {
-        var principalId = utilUser.savedAdmin().getId();
         for (var status : Status.values()) {
             var metadata = utilArtworkMetadata.savedArtworkMetadataDto(getType(), status);
             assertThat(
                     utilArtworkMetadata.findAllArtworkMetadataDto(getType()),
                     hasItems(metadata));
-            getService().findOrSaveArtworkMetadata(metadata, principalId);
+            getService().findOrSaveArtworkMetadata(metadata);
             assertEquals(
                     List.of(metadata.getName()),
                     utilArtworkMetadata
@@ -69,15 +70,15 @@ public abstract class AbstractArtworkMetadataServiceImplTest extends AbstractSpr
     // TODO-test updateArtworkMetadata_notFound
 
     @Test
+    @WithMockCustomUser
     public void updateArtworkMetadata() {
-        var principalId = utilUser.savedAdmin().getId();
         for (var status : Status.values()) {
             var metadata = utilArtworkMetadata.savedArtworkMetadataDto(getType(), status);
             assertSame(
                     status,
                     utilArtworkMetadata.findArtworkMetadataDto(getType(), metadata.getName()).getStatus());
             metadata.setStatus(randOtherEnumConst(status));
-            getService().updateArtworkMetadata(metadata, principalId);
+            getService().updateArtworkMetadata(metadata);
             assertNotSame(
                     status,
                     utilArtworkMetadata.findArtworkMetadataDto(getType(), metadata.getName()).getStatus());

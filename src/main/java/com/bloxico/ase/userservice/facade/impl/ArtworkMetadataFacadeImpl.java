@@ -38,20 +38,20 @@ public class ArtworkMetadataFacadeImpl implements IArtworkMetadataFacade {
     }
 
     @Override
-    public ArtworkMetadataDto saveArtworkMetadata(SaveArtworkMetadataRequest request, long principalId) {
-        log.info("AbstractArtworkMetadataFacadeImpl.saveArtworkMetadata - start | request: {}, principalId: {}", request, principalId);
+    public ArtworkMetadataDto saveArtworkMetadata(SaveArtworkMetadataRequest request) {
+        log.info("AbstractArtworkMetadataFacadeImpl.saveArtworkMetadata - start | request: {}", request);
         var dto = MAPPER.toArtworkMetadataDto(request);
-        var response = getService(request.getType()).findOrSaveArtworkMetadata(dto, principalId);
-        log.info("AbstractArtworkMetadataFacadeImpl.saveArtworkMetadata - end | request: {}, principalId: {}", request, principalId);
+        var response = getService(request.getType()).findOrSaveArtworkMetadata(dto);
+        log.info("AbstractArtworkMetadataFacadeImpl.saveArtworkMetadata - end | request: {}", request);
         return response;
     }
 
     @Override
-    public ArtworkMetadataDto updateArtworkMetadata(UpdateArtworkMetadataRequest request, long principalId) {
-        log.info("AbstractArtworkMetadataFacadeImpl.updateArtworkMetadata - start | request: {}, principalId: {}", request, principalId);
+    public ArtworkMetadataDto updateArtworkMetadata(UpdateArtworkMetadataRequest request) {
+        log.info("AbstractArtworkMetadataFacadeImpl.updateArtworkMetadata - start | request: {}", request);
         var dto = MAPPER.toArtworkMetadataDto(request);
-        var updated = getService(request.getType()).updateArtworkMetadata(dto, principalId);
-        log.info("AbstractArtworkMetadataFacadeImpl.updateArtworkMetadata - end | request: {}, principalId: {}", request, principalId);
+        var updated = getService(request.getType()).updateArtworkMetadata(dto);
+        log.info("AbstractArtworkMetadataFacadeImpl.updateArtworkMetadata - end | request: {}", request);
         return updated;
     }
 

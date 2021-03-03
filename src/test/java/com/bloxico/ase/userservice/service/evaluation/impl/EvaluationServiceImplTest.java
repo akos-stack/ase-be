@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.EvaluationException;
 import org.junit.Test;
@@ -14,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
-    @Autowired private UtilUser utilUser;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private EvaluationServiceImpl evaluationService;
@@ -61,28 +61,28 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void saveCountryEvaluationDetails_nullDetails() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationService.saveCountryEvaluationDetails(null, principalId));
+                () -> evaluationService.saveCountryEvaluationDetails(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveCountryEvaluationDetails_alreadyExists() {
-        var principalId = utilUser.savedAdmin().getId();
         var details = utilEvaluation.savedCountryEvaluationDetailsDto();
         assertThrows(
                 EvaluationException.class,
-                () -> evaluationService.saveCountryEvaluationDetails(details, principalId));
+                () -> evaluationService.saveCountryEvaluationDetails(details));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveCountryEvaluationDetails() {
-        var principalId = utilUser.savedAdmin().getId();
         var countryId = utilLocation.savedCountry().getId();
         var details = utilEvaluation.genCountryEvaluationDetailsDto(countryId);
-        var savedDetails = evaluationService.saveCountryEvaluationDetails(details, principalId);
+        var savedDetails = evaluationService.saveCountryEvaluationDetails(details);
         assertNotNull(savedDetails.getId());
         assertEquals(details.getCountryId(), savedDetails.getCountryId());
         assertEquals(details.getPricePerEvaluation(), savedDetails.getPricePerEvaluation());
@@ -90,30 +90,30 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountryEvaluationDetails_nullDetails() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationService.updateCountryEvaluationDetails(null, principalId));
+                () -> evaluationService.updateCountryEvaluationDetails(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountryEvaluationDetails_evaluationDetailsNotFound() {
-        var principalId = utilUser.savedAdmin().getId();
         var details = utilEvaluation.savedCountryEvaluationDetailsDto();
         details.setId(-1L);
         assertThrows(
                 EvaluationException.class,
-                () -> evaluationService.saveCountryEvaluationDetails(details, principalId));
+                () -> evaluationService.saveCountryEvaluationDetails(details));
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountryEvaluationDetails() {
-        var principalId = utilUser.savedAdmin().getId();
         var details = utilEvaluation.savedCountryEvaluationDetailsDto();
         var dto = utilEvaluation.genCountryEvaluationDetailsDto(details.getCountryId());
         dto.setId(details.getId());
-        var updatedDetails = evaluationService.updateCountryEvaluationDetails(dto, principalId);
+        var updatedDetails = evaluationService.updateCountryEvaluationDetails(dto);
         assertEquals(details.getId(), updatedDetails.getId());
         assertEquals(details.getCountryId(), updatedDetails.getCountryId());
         assertEquals(dto.getPricePerEvaluation(), updatedDetails.getPricePerEvaluation());
@@ -149,44 +149,44 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void saveQuotationPackage_nullPackage() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationService.saveQuotationPackage(null, principalId));
+                () -> evaluationService.saveQuotationPackage(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveQuotationPackage_packageAlreadyExists() {
-        var principalId = utilUser.savedAdmin().getId();
         var qPackage = utilEvaluation.savedQuotationPackageDto();
         assertThrows(
                 EvaluationException.class,
-                () -> evaluationService.saveQuotationPackage(qPackage, principalId));
+                () -> evaluationService.saveQuotationPackage(qPackage));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveQuotationPackage() {
-        var principalId = utilUser.savedAdmin().getId();
         var qPackageDto = utilEvaluation.genQuotationPackageDto();
-        var savedQPackageDto = evaluationService.saveQuotationPackage(qPackageDto, principalId);
+        var savedQPackageDto = evaluationService.saveQuotationPackage(qPackageDto);
         assertNotNull(savedQPackageDto.getId());
         assertEquals(savedQPackageDto.getArtworkId(), qPackageDto.getArtworkId());
         assertSame(savedQPackageDto.getCountries(), qPackageDto.getCountries());
     }
 
     @Test
+    @WithMockCustomUser
     public void saveQuotationPackageCountries_nullPackageCountries() {
-        var principalId = utilUser.savedAdmin().getId();
         var packageId = utilEvaluation.savedQuotationPackage().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationService.saveQuotationPackageCountries(packageId, null, principalId));
+                () -> evaluationService.saveQuotationPackageCountries(packageId, null));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveQuotationPackageCountries_packageCountryAlreadyExists() {
-        var principalId = utilUser.savedAdmin().getId();
         var packageId = utilEvaluation.savedQuotationPackage().getId();
         var qpc1 = utilEvaluation.genQuotationPackageCountryDto(packageId);
         var qpc2 = utilEvaluation.genQuotationPackageCountryDto(packageId);
@@ -195,19 +195,19 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
         assertThrows(
                 EvaluationException.class,
                 () -> evaluationService.saveQuotationPackageCountries(
-                        packageId, List.of(qpc1, qpc2, qpc3), principalId));
+                        packageId, List.of(qpc1, qpc2, qpc3)));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveQuotationPackageCountries() {
-        var principalId = utilUser.savedAdmin().getId();
         var packageId = utilEvaluation.savedQuotationPackage().getId();
         var qpc1 = utilEvaluation.genQuotationPackageCountryDto(packageId);
         var qpc2 = utilEvaluation.genQuotationPackageCountryDto(packageId);
         var qpc3 = utilEvaluation.genQuotationPackageCountryDto(packageId);
         var qPackageCountries = evaluationService
                 .saveQuotationPackageCountries(
-                        packageId, List.of(qpc1, qpc2, qpc3), principalId);
+                        packageId, List.of(qpc1, qpc2, qpc3));
         for (var qpc : qPackageCountries) {
             assertNotNull(qpc.getCountryId());
             assertEquals(packageId, qpc.getQuotationPackageId());

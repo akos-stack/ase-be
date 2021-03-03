@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
 import com.bloxico.ase.userservice.exception.ArtworkException;
@@ -17,6 +18,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private ArtworkGroupServiceImpl artworkGroupService;
 
     @Test
+    @WithMockCustomUser
     public void submitArtwork_groupNotFound() {
         var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.WAITING_FOR_EVALUATION, true, null);
@@ -27,6 +29,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitArtwork_missingResume() {
         var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
@@ -37,6 +40,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitArtwork_missingCertificate() {
         var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.WAITING_FOR_EVALUATION, true, null);
@@ -47,6 +51,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitArtwork_createNewGroup() {
         var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.DRAFT, true, null);
@@ -56,6 +61,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitArtwork_saveToGroup_sameStatus() {
         var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var artworkGroupDto = utilArtwork.savedArtworkGroupDto(ArtworkGroup.Status.DRAFT);
@@ -66,6 +72,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitArtwork_saveToGroup_updateStatus() {
         var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var artworkGroupDto = utilArtwork.savedArtworkGroupDto(ArtworkGroup.Status.DRAFT);

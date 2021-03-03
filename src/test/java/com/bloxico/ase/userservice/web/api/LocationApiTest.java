@@ -3,7 +3,7 @@ package com.bloxico.ase.userservice.web.api;
 import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilLocation;
-import com.bloxico.ase.testutil.UtilOAuthToken;
+import com.bloxico.ase.testutil.UtilSecurityContext;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import com.bloxico.ase.userservice.web.model.address.*;
 import org.junit.Test;
@@ -32,17 +32,17 @@ public class LocationApiTest extends AbstractSpringTest {
 
     @Autowired private UtilLocation utilLocation;
     @Autowired private RegionRepository regionRepository;
-    @Autowired private UtilOAuthToken utilOAuthToken;
+    @Autowired private UtilSecurityContext utilSecurityContext;
 
     @Test
-    @WithMockCustomUser(role = "user")
+    @WithMockCustomUser(role = "user", auth = true)
     public void findAllRegions_200_ok() {
         var r1 = utilLocation.savedRegionDto();
         var r2 = utilLocation.savedRegionDto();
         var r3 = utilLocation.savedRegionDto();
 
         var regions = given()
-                .header("Authorization", utilOAuthToken.getToken())
+                .header("Authorization", utilSecurityContext.getToken())
                 .when()
                 .get(API_URL + REGIONS)
                 .then()
@@ -57,9 +57,9 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(auth = true)
     public void saveRegion_409_regionAlreadyExists() {
-        var auth = utilOAuthToken.getToken();
+        var auth = utilSecurityContext.getToken();
         var request = new SaveRegionRequest(genUUID());
         given()
                 .header("Authorization", auth)
@@ -83,11 +83,11 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(auth = true)
     public void saveRegion_200_ok() {
         var regionName = genUUID();
         var region = given()
-                .header("Authorization", utilOAuthToken.getToken())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new SaveRegionRequest(regionName))
                 .when()
@@ -104,13 +104,13 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(auth = true)
     public void deleteRegion_400_regionHasCountries() {
         var region = utilLocation.savedRegion();
         utilLocation.savedCountryWithRegion(region);
 
         given()
-                .header("Authorization", utilOAuthToken.getToken())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new DeleteRegionRequest(region.getId()))
                 .when()
@@ -122,10 +122,10 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(auth = true)
     public void deleteRegion_404_regionNotFound() {
         given()
-                .header("Authorization", utilOAuthToken.getToken())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new DeleteRegionRequest(-1L))
                 .when()
@@ -137,11 +137,11 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(auth = true)
     public void deleteRegion_200_ok() {
         var region = utilLocation.savedRegion();
         given()
-                .header("Authorization", utilOAuthToken.getToken())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new DeleteRegionRequest(region.getId()))
                 .when()
@@ -153,14 +153,14 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser(role = "user")
+    @WithMockCustomUser(role = "user", auth = true)
     public void findAllCountries_200_ok() {
         var c1 = utilLocation.savedCountryDto();
         var c2 = utilLocation.savedCountryDto();
         var c3 = utilLocation.savedCountryDto();
 
         var countries = given()
-                .header("Authorization", utilOAuthToken.getToken())
+                .header("Authorization", utilSecurityContext.getToken())
                 .when()
                 .get(API_URL + COUNTRIES)
                 .then()
@@ -175,9 +175,9 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(auth = true)
     public void saveCountry_409_countryAlreadyExists() {
-        var auth = utilOAuthToken.getToken();
+        var auth = utilSecurityContext.getToken();
         var region = utilLocation.savedRegion();
         var request = new SaveCountryRequest(genUUID(), Set.of(region.getName()));
         given()
@@ -202,10 +202,10 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(auth = true)
     public void saveCountry_404_regionNotFound() {
         given()
-                .header("Authorization", utilOAuthToken.getToken())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new SaveCountryRequest(genUUID(), Set.of(genUUID())))
                 .when()
@@ -217,13 +217,13 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(auth = true)
     public void saveCountry_200_ok() {
         var region = utilLocation.savedRegionDto();
         var regionName = region.getName();
         var countryName = genUUID();
         var country = given()
-                .header("Authorization", utilOAuthToken.getToken())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new SaveCountryRequest(countryName, Set.of(regionName)))
                 .when()
@@ -242,11 +242,11 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(auth = true)
     public void updateCountry_404_countryNotFound() {
         var region = utilLocation.savedRegion();
         given()
-                .header("Authorization", utilOAuthToken.getToken())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new UpdateCountryRequest(-1L, genUUID(), Set.of(region.getName())))
                 .when()
@@ -258,11 +258,11 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(auth = true)
     public void updateCountry_404_regionNotFound() {
         var country = utilLocation.savedCountry();
         given()
-                .header("Authorization", utilOAuthToken.getToken())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new UpdateCountryRequest(country.getId(), genUUID(), Set.of(genUUID())))
                 .when()
@@ -274,13 +274,13 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(auth = true)
     public void updateCountry_409_countryAlreadyExists() {
         var region = utilLocation.savedRegion();
         var country1 = utilLocation.savedCountryWithRegion(region);
         var country2 = utilLocation.savedCountryWithRegion(region);
         given()
-                .header("Authorization", utilOAuthToken.getToken())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new UpdateCountryRequest(country1.getId(), country2.getName(), Set.of(region.getName())))
                 .when()
@@ -292,14 +292,14 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(auth = true)
     public void updateCountry_200_ok() {
         var country = utilLocation.savedCountry();
         var region = utilLocation.savedRegionDto();
         var newCountryName = genUUID();
         var newRegionName = region.getName();
         var updatedCountry = given()
-                .header("Authorization", utilOAuthToken.getToken())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new UpdateCountryRequest(country.getId(), newCountryName, Set.of(newRegionName)))
                 .when()

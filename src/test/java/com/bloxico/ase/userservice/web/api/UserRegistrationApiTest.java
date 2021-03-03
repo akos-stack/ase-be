@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
@@ -32,6 +33,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilToken mockUtil;
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private TokenRepository tokenRepository;
+    @Autowired private UtilSecurityContext utilSecurityContext;
 
     @Test
     public void registration_400_passwordMismatch() {
@@ -261,6 +263,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void checkEvaluatorInvitation_200_ok() {
         given()
                 .pathParam("token", mockUtil.savedInvitedPendingEvaluatorDto().getToken())
@@ -410,6 +413,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     // TODO-test submitEvaluator_409_userAlreadyExists
 
     @Test
+    @WithMockCustomUser
     public void submitEvaluator_200_ok() {
         var request = mockUtil.submitInvitedEvaluatorRequest();
         var evaluator = given()
@@ -437,6 +441,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     // TODO-test submitArtOwner_404_countryNotFound
 
     @Test
+    @WithMockCustomUser
     public void submitArtOwner_409_userAlreadyExists() {
         var request = utilUserProfile.newSubmitArtOwnerRequest();
         given()
@@ -458,6 +463,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitArtOwner_200_ok() {
         var request = utilUserProfile.newSubmitArtOwnerRequest();
         var artOwner = given()
@@ -496,12 +502,13 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void searchPendingEvaluators_200_ok() {
         var pe1 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
         var pe2 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
         var pe3 = mockUtil.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
         var pendingEvaluators = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .param("email", "fooBar")
                 .param("page", 0)

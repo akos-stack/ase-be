@@ -17,18 +17,17 @@ public interface IEvaluationService {
             ISearchCountryEvaluationDetailsRequest request,
             PageRequest page);
 
-    CountryEvaluationDetailsDto saveCountryEvaluationDetails(CountryEvaluationDetailsDto dto, long principalId);
+    CountryEvaluationDetailsDto saveCountryEvaluationDetails(CountryEvaluationDetailsDto dto);
 
-    CountryEvaluationDetailsDto updateCountryEvaluationDetails(CountryEvaluationDetailsDto dto, long principalId);
+    CountryEvaluationDetailsDto updateCountryEvaluationDetails(CountryEvaluationDetailsDto dto);
 
     Page<RegionWithCountriesAndEvaluatorsCountProj> searchRegionEvaluationDetails(
             SearchRegionEvaluationDetailsRequest request,
             PageRequest page);
 
-    QuotationPackageDto saveQuotationPackage(QuotationPackageDto quotationPackage, long principalId);
+    QuotationPackageDto saveQuotationPackage(QuotationPackageDto quotationPackage);
 
     Set<QuotationPackageCountryDto> saveQuotationPackageCountries(long packageId,
-                                                                  Collection<QuotationPackageCountryDto> countries,
-                                                                  long principalId);
+                                                                  Collection<QuotationPackageCountryDto> countries);
 
 }

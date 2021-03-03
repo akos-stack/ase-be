@@ -15,10 +15,9 @@ public class UtilDocument {
     @Autowired private IDocumentService documentsService;
 
     public DocumentDto savedDocumentDto(FileCategory fileCategory) {
-        var creatorId = utilUser.savedAdmin().getId();
         return documentsService.saveDocument(
                 genMultipartFile(fileCategory),
-                fileCategory, creatorId);
+                fileCategory);
     }
 
 }

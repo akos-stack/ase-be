@@ -2,7 +2,7 @@ package com.bloxico.ase;
 
 import com.bloxico.ase.testutil.UtilAuth;
 import com.bloxico.ase.testutil.UtilUser;
-import com.bloxico.ase.userservice.config.security.AsePrincipal;
+import com.bloxico.ase.userservice.config.security.AseSecurityService;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 
 public class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
@@ -20,6 +21,9 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
     @Autowired
     private UtilAuth utilAuth;
 
+    @Autowired
+    private AseSecurityService aseSecurityService;
+
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUser customUser) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -27,12 +31,16 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
         // create user
         User principal = createPrincipal(customUser);
 
-        // authenticate
-        String authenticationToken = utilAuth.doAuthentication(principal.getEmail(), customUser.password());
+        UserDetails userDetails = aseSecurityService.loadUserByUsername(principal.getEmail());
 
-        AsePrincipal asePrincipal = AsePrincipal.newUserDetails(principal);
+        // authenticate
+        String authenticationToken = "";
+        if(customUser.auth()) {
+            authenticationToken = utilAuth.doAuthentication(principal.getEmail(), customUser.password());
+        }
+
         Authentication auth =
-                new UsernamePasswordAuthenticationToken(asePrincipal, authenticationToken, null);
+                new UsernamePasswordAuthenticationToken(userDetails, authenticationToken, null);
         context.setAuthentication(auth);
         return context;
     }

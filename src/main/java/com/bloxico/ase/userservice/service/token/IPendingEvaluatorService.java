@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 
 public interface IPendingEvaluatorService {
 
-    PendingEvaluatorDto createPendingEvaluator(PendingEvaluatorDto request, long principalId);
+    PendingEvaluatorDto createPendingEvaluator(PendingEvaluatorDto request);
 
     String getPendingEvaluatorToken(String email);
 
@@ -18,7 +18,7 @@ public interface IPendingEvaluatorService {
 
     Page<PendingEvaluatorDto> searchPendingEvaluators(String email, int page, int size, String sort);
 
-    PendingEvaluatorDocumentDto getEvaluatorResume(String email, long principalId);
+    PendingEvaluatorDocumentDto getEvaluatorResume(String email);
 
     void savePendingEvaluatorDocument(String email, long documentId);
 }

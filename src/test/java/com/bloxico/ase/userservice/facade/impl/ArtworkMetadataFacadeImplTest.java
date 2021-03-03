@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
@@ -20,12 +21,12 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
     @Autowired private ArtworkMetadataFacadeImpl facade;
 
     @Test
+    @WithMockCustomUser
     public void saveArtworkMetadata() {
-        var principalId = utilUser.savedAdmin().getId();
         for (var type : Type.values()) {
             var name = genUUID();
             var request = new SaveArtworkMetadataRequest(name, type);
-            facade.saveArtworkMetadata(request, principalId);
+            facade.saveArtworkMetadata(request);
             var metadata = utilArtworkMetadata.findArtworkMetadataDto(type, name);
             assertEquals(name, metadata.getName());
             assertSame(APPROVED, metadata.getStatus());
@@ -33,8 +34,8 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void updateArtworkMetadata() {
-        var principalId = utilUser.savedAdmin().getId();
         for (var type : Type.values()) {
             for (var status : Status.values()) {
                 var metadata = utilArtworkMetadata.savedArtworkMetadataDto(type, status);
@@ -42,7 +43,7 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
                         metadata.getName(),
                         randOtherEnumConst(status),
                         type);
-                facade.updateArtworkMetadata(request, principalId);
+                facade.updateArtworkMetadata(request);
                 var updated = utilArtworkMetadata.findArtworkMetadataDto(type, metadata.getName());
                 assertEquals(metadata.getId(), updated.getId());
                 assertEquals(metadata.getName(), updated.getName());

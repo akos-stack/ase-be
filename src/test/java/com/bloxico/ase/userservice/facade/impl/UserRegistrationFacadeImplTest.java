@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserException;
@@ -39,6 +40,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private ArtOwnerRepository artOwnerRepository;
     @Autowired private PendingEvaluatorRepository pendingEvaluatorRepository;
     @Autowired private UserRegistrationFacadeImpl userRegistrationFacade;
+    @Autowired private UtilSecurityContext utilSecurityContext;
 
     @Test
     public void registerUserWithVerificationToken_nullRequest() {
@@ -174,33 +176,34 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void sendEvaluatorInvitation_requestIsNull() {
-        var admin = utilUser.savedAdmin();
         assertThrows(
                 NullPointerException.class,
-                () -> userRegistrationFacade.sendEvaluatorInvitation(null, admin.getId()));
+                () -> userRegistrationFacade.sendEvaluatorInvitation(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void sendEvaluatorInvitation_evaluatorAlreadyInvited() {
         var user = utilUser.savedUser();
-        var admin = utilUser.savedAdmin();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
-        userRegistrationFacade.sendEvaluatorInvitation(request, admin.getId());
+        userRegistrationFacade.sendEvaluatorInvitation(request);
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         assertThrows(
                 TokenException.class,
-                () -> userRegistrationFacade.sendEvaluatorInvitation(request, admin.getId()));
+                () -> userRegistrationFacade.sendEvaluatorInvitation(request));
     }
 
     @Test
+    @WithMockCustomUser
     public void sendEvaluatorInvitation_evaluatorAlreadyRequested() {
         var user = utilUser.savedUser();
-        var admin = utilUser.savedAdmin();
+        var admin = utilSecurityContext.getLoggedInPrincipal();
         var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
-        userRegistrationFacade.requestEvaluatorRegistration(registrationRequest, user.getId());
+        userRegistrationFacade.requestEvaluatorRegistration(registrationRequest);
 
         var pendingEvaluator = pendingEvaluatorRepository
                 .findByEmailIgnoreCase(user.getEmail())
@@ -210,7 +213,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertSame(REQUESTED, pendingEvaluator.getStatus());
 
         var invitationRequest = new EvaluatorInvitationRequest(user.getEmail());
-        userRegistrationFacade.sendEvaluatorInvitation(invitationRequest, admin.getId());
+        userRegistrationFacade.sendEvaluatorInvitation(invitationRequest);
 
         assertNotNull(pendingEvaluator);
         assertEquals(admin.getId(), pendingEvaluator.getUpdaterId());
@@ -218,12 +221,13 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void sendEvaluatorInvitation() {
         var user = utilUser.savedUser();
-        var admin = utilUser.savedAdmin();
+        var admin = utilSecurityContext.getLoggedInPrincipal();
 
         var request = new EvaluatorInvitationRequest(user.getEmail());
-        userRegistrationFacade.sendEvaluatorInvitation(request, admin.getId());
+        userRegistrationFacade.sendEvaluatorInvitation(request);
 
         var newlyCreatedPendingEvaluator = pendingEvaluatorRepository
                 .findByEmailIgnoreCase(user.getEmail())
@@ -250,20 +254,20 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void checkEvaluatorInvitation_invitationTokenNotFound() {
-        var principalId = utilUser.savedAdmin().getId();
         var request = new EvaluatorRegistrationRequest(genEmail(), genMultipartFile(pdf));
-        var pending = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principalId);
+        var pending = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request));
         assertThrows(
                 TokenException.class,
                 () -> userRegistrationFacade.checkEvaluatorInvitation(pending.getToken()));
     }
 
     @Test
+    @WithMockCustomUser
     public void checkEvaluatorInvitation() {
-        var principalId = utilUser.savedAdmin().getId();
         var request = new EvaluatorInvitationRequest(genEmail());
-        var pending = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principalId);
+        var pending = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request));
         userRegistrationFacade.checkEvaluatorInvitation(pending.getToken());
     }
 
@@ -291,13 +295,13 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void resendEvaluatorInvitation() {
         var user = utilUser.savedUser();
-        var admin = utilUser.savedAdmin();
 
         // send invitation
         var sendInvitationRequest = new EvaluatorInvitationRequest(user.getEmail());
-        userRegistrationFacade.sendEvaluatorInvitation(sendInvitationRequest, admin.getId());
+        userRegistrationFacade.sendEvaluatorInvitation(sendInvitationRequest);
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         // resend invitation
@@ -329,13 +333,13 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void withdrawEvaluatorInvitation() {
         var user = utilUser.savedUser();
-        var admin = utilUser.savedAdmin();
 
         // send invitation to user
         var sendInvitationRequest = new EvaluatorInvitationRequest(user.getEmail());
-        userRegistrationFacade.sendEvaluatorInvitation(sendInvitationRequest, admin.getId());
+        userRegistrationFacade.sendEvaluatorInvitation(sendInvitationRequest);
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         // withdraw invitation
@@ -363,6 +367,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     // TODO-test submitEvaluator_countryNotFound
 
     @Test
+    @WithMockCustomUser
     public void submitEvaluator_evaluatorPending() {
         var request = utilToken.submitInvitedEvaluatorRequest();
         var evaluatorId = userRegistrationFacade.submitEvaluator(request).getId();
@@ -379,6 +384,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     // TODO-test submitArtOwner_countryNotFound
 
     @Test
+    @WithMockCustomUser
     public void submitArtOwner_userAlreadyExists() {
         var request = utilUserProfile.newSubmitArtOwnerRequest();
         userRegistrationFacade.submitArtOwner(request);
@@ -388,6 +394,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitArtOwner() {
         var request = utilUserProfile.newSubmitArtOwnerRequest();
         assertTrue(artOwnerRepository.findAll().isEmpty());
@@ -396,47 +403,49 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void requestEvaluatorRegistration_requestIsNull() {
-        var admin = utilUser.savedAdmin();
         assertThrows(
                 NullPointerException.class,
-                () -> userRegistrationFacade.requestEvaluatorRegistration(null, admin.getId()));
+                () -> userRegistrationFacade.requestEvaluatorRegistration(null));
     }
 
     @Test
+    @WithMockCustomUser(role = "user")
     public void requestEvaluatorRegistration_evaluatorAlreadyRegistered() {
-        var user = utilUser.savedUser();
+        var user = utilSecurityContext.getLoggedInPrincipal();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
-        userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
+        userRegistrationFacade.requestEvaluatorRegistration(request);
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         assertThrows(
                 TokenException.class,
-                () -> userRegistrationFacade.requestEvaluatorRegistration(request, user.getId()));
+                () -> userRegistrationFacade.requestEvaluatorRegistration(request));
     }
 
     @Test
+    @WithMockCustomUser
     public void requestEvaluatorRegistration_evaluatorAlreadyInvited() {
         var user = utilUser.savedUser();
-        var admin = utilUser.savedAdmin();
 
         var invitationRequest = new EvaluatorInvitationRequest(user.getEmail());
-        userRegistrationFacade.sendEvaluatorInvitation(invitationRequest, admin.getId());
+        userRegistrationFacade.sendEvaluatorInvitation(invitationRequest);
         assertTrue(utilToken.isEvaluatorPending(user.getEmail()));
 
         var registrationRequest = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         assertThrows(
                 TokenException.class,
-                () -> userRegistrationFacade.requestEvaluatorRegistration(registrationRequest, user.getId()));
+                () -> userRegistrationFacade.requestEvaluatorRegistration(registrationRequest));
     }
 
     @Test
+    @WithMockCustomUser(role = "user")
     public void requestEvaluatorRegistration() {
-        var user = utilUser.savedUser();
+        var user = utilSecurityContext.getLoggedInPrincipal();
 
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
-        userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
+        userRegistrationFacade.requestEvaluatorRegistration(request);
 
         var newlyCreatedPendingEvaluator = pendingEvaluatorRepository
                 .findByEmailIgnoreCase(user.getEmail())
@@ -453,6 +462,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     // TODO-TEST searchPendingEvaluators_emptyResultSet
 
     @Test
+    @WithMockCustomUser
     public void searchPendingEvaluators() {
         var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
         var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
@@ -467,28 +477,28 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void downloadEvaluatorResume_nullEmail() {
-        var admin = utilUser.savedAdmin();
         assertThrows(
                 NullPointerException.class,
-                () -> userRegistrationFacade.downloadEvaluatorResume(null, admin.getId()));
+                () -> userRegistrationFacade.downloadEvaluatorResume(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void downloadEvaluatorResume_resumeNotFound() {
-        var admin = utilUser.savedAdmin();
         assertThrows(
                 UserException.class,
-                () -> userRegistrationFacade.downloadEvaluatorResume(genEmail(), admin.getId()));
+                () -> userRegistrationFacade.downloadEvaluatorResume(genEmail()));
     }
 
     @Test
+    @WithMockCustomUser(role = "user")
     public void downloadEvaluatorResume() {
-        var user = utilUser.savedUser();
-        var admin = utilUser.savedAdmin();
+        var user = utilSecurityContext.getLoggedInPrincipal();
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
-        userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
-        var response = userRegistrationFacade.downloadEvaluatorResume(user.getEmail(), admin.getId());
+        userRegistrationFacade.requestEvaluatorRegistration(request);
+        var response = userRegistrationFacade.downloadEvaluatorResume(user.getEmail());
         assertNotNull(response);
     }
 

@@ -39,17 +39,17 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     }
 
     @Override
-    public PendingEvaluatorDto createPendingEvaluator(PendingEvaluatorDto request, long principalId) {
-        log.debug("PendingEvaluatorServiceImpl.createPendingEvaluator - start | request: {}, principalId: {}", request, principalId);
+    public PendingEvaluatorDto createPendingEvaluator(PendingEvaluatorDto request) {
+        log.debug("PendingEvaluatorServiceImpl.createPendingEvaluator - start | request: {}", request);
         requireNonNull(request);
         var status = request.getStatus();
         var pendingEvaluator = pendingEvaluatorRepository
                 .findByEmailIgnoreCase(request.getEmail())
                 .map(status::requireDifferentStatus)
-                .map(evaluator -> updateStatus(evaluator, status, principalId))
-                .orElseGet(() -> newPendingEvaluator(request, principalId));
+                .map(evaluator -> updateStatus(evaluator, status))
+                .orElseGet(() -> newPendingEvaluator(request));
         var pendingEvaluatorDto = MAPPER.toDto(pendingEvaluator);
-        log.debug("PendingEvaluatorServiceImpl.createPendingEvaluator - end | request: {}, principalId: {}", request, principalId);
+        log.debug("PendingEvaluatorServiceImpl.createPendingEvaluator - end | request: {}", request);
         return pendingEvaluatorDto;
     }
 
@@ -112,12 +112,12 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     }
 
     @Override
-    public PendingEvaluatorDocumentDto getEvaluatorResume(String email, long principalId) {
-        log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - start | email: {}, principalId {}", email, principalId);
+    public PendingEvaluatorDocumentDto getEvaluatorResume(String email) {
+        log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - start | email: {}", email);
         requireNonNull(email);
         var pendingEvaluatorDocument = pendingEvaluatorDocumentRepository
                 .findByPendingEvaluatorDocumentId_Email(email).orElseThrow(RESUME_NOT_FOUND::newException);
-        log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - end | email: {}, principalId: {}", email, principalId);
+        log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - end | email: {}", email);
         return MAPPER.toDto(pendingEvaluatorDocument);
     }
 
@@ -134,16 +134,14 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     }
 
 
-    private PendingEvaluator updateStatus(PendingEvaluator pendingEvaluator, Status status, long principalId) {
+    private PendingEvaluator updateStatus(PendingEvaluator pendingEvaluator, Status status) {
         pendingEvaluator.setStatus(status);
-        pendingEvaluator.setUpdaterId(principalId);
         return pendingEvaluatorRepository.saveAndFlush(pendingEvaluator);
     }
 
-    private PendingEvaluator newPendingEvaluator(PendingEvaluatorDto request, long principalId) {
+    private PendingEvaluator newPendingEvaluator(PendingEvaluatorDto request) {
         var pendingEvaluator = MAPPER.toEntity(request);
         pendingEvaluator.setToken(UUID.randomUUID().toString());
-        pendingEvaluator.setCreatorId(principalId);
         return pendingEvaluatorRepository.saveAndFlush(pendingEvaluator);
     }
 

@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.junit.Test;
@@ -22,11 +23,11 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 @Transactional(propagation = NOT_SUPPORTED)
 public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
-    @Autowired private UtilAuth utilAuth;
+    @Autowired private UtilSecurityContext utilSecurityContext;
     @Autowired private UtilEvaluation utilEvaluation;
-    @Autowired private UtilLocation utilLocation;
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void searchCountryEvaluationDetails_200_ok() {
         var country = genUUID();
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(country);
@@ -35,7 +36,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genUUID());
 
         var content = given()
-                .header("Authorization", utilAuth.doAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .params(allPages("search", country))
                 .when()
                 .get(API_URL + EVALUATION_COUNTRY_DETAILS_SEARCH)
@@ -54,6 +55,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     // TODO searchCountryEvaluationDetails_withRegions_200_ok
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void searchCountryEvaluationDetailsForManagement_200_ok() {
         var country = genUUID();
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(country);
@@ -62,7 +64,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genUUID());
 
         var content = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .queryParams(allPages("search", country))
                 .when()
                 .get(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH)
@@ -81,9 +83,10 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     // TODO searchCountryEvaluationDetailsForManagement_withRegions_200_ok
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void saveCountryEvaluationDetails_404_countryNotFound() {
         given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(utilEvaluation.genSaveCountryEvaluationDetailsRequest(genUUID()))
                 .when()
@@ -95,10 +98,11 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void saveCountryEvaluationDetails_409_alreadyExists() {
         var request = utilEvaluation.genSaveCountryEvaluationDetailsRequest();
         given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(request)
                 .when()
@@ -107,7 +111,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .assertThat()
                 .statusCode(200);
         given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(request)
                 .when()
@@ -119,10 +123,11 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void saveCountryEvaluationDetails_200_ok() {
         var request = utilEvaluation.genSaveCountryEvaluationDetailsRequest();
         var details = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(request)
                 .when()
@@ -141,9 +146,10 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void updateCountryEvaluationDetails_404_detailsNotFound() {
         given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(utilEvaluation.genUpdateCountryEvaluationDetailsRequest(-1L))
                 .when()
@@ -155,11 +161,12 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void updateCountryEvaluationDetails_200_ok() {
         var details = utilEvaluation.savedCountryEvaluationDetails();
         var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest(details.getId());
         var updatedDetails = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(request)
                 .when()
@@ -178,6 +185,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void searchRegionEvaluationDetailsForManagement_200_ok() {
         var region = genUUID();
         var r1 = utilEvaluation.savedRegionCountedProj(region);
@@ -186,7 +194,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         var r4 = utilEvaluation.savedRegionCountedProj(genUUID());
 
         var content = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .queryParams(allPages("search", region))
                 .when()
                 .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
@@ -200,10 +208,11 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     // TODO test saveQuotationPackage_404_artworkNotFound()
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void saveQuotationPackage_409_packageAlreadyExists() {
         var request = utilEvaluation.genSaveQuotationPackageRequest();
         given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(request)
                 .when()
@@ -212,7 +221,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .assertThat()
                 .statusCode(200);
         given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(request)
                 .when()
@@ -224,10 +233,11 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void saveQuotationPackage_200_ok() {
         var request = utilEvaluation.genSaveQuotationPackageRequest();
         var qPackage = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(request)
                 .when()

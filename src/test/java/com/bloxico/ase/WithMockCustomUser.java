@@ -14,4 +14,6 @@ public @interface WithMockCustomUser {
     String role() default "admin";
 
     String password() default "pass";
+
+    boolean auth() default false;
 }

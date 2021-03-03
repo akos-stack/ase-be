@@ -19,7 +19,7 @@ import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.FetchType.LAZY;
 
 @Data
-@EqualsAndHashCode(exclude = "id", callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "artworks")
 public class Artwork extends BaseEntity {

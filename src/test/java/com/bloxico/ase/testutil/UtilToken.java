@@ -148,9 +148,8 @@ public class UtilToken {
     }
 
     public PendingEvaluatorDto savedInvitedPendingEvaluatorDto(String email) {
-        var principal = utilUser.savedAdmin().getId();
         var request = new EvaluatorInvitationRequest(email);
-        return pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principal);
+        return pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request));
     }
 
     public String savedRequestedPendingEvaluatorDto() {
@@ -158,17 +157,15 @@ public class UtilToken {
     }
 
     public String savedRequestedPendingEvaluatorDto(String email) {
-        var principal = utilUser.savedAdmin().getId();
         var request = new EvaluatorRegistrationRequest(email, genMultipartFile(pdf));
-        userRegistrationFacade.requestEvaluatorRegistration(request, principal);
+        userRegistrationFacade.requestEvaluatorRegistration(request);
         return email;
     }
 
     public SubmitEvaluatorRequest submitInvitedEvaluatorRequest() {
         var email = genEmail();
         var password = genPassword();
-        var principalId = utilUser.savedAdmin().getId();
-        userRegistrationFacade.sendEvaluatorInvitation(new EvaluatorInvitationRequest(email), principalId);
+        userRegistrationFacade.sendEvaluatorInvitation(new EvaluatorInvitationRequest(email));
         var token = pendingEvaluatorRepository.findByEmailIgnoreCase(email).orElseThrow().getToken();
         var country = utilLocation.savedCountry().getName();
         return new SubmitEvaluatorRequest(
