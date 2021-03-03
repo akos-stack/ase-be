@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.FileCategory.CV;
+import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.EVALUATOR_INVITATION;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.VERIFICATION;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
@@ -136,6 +137,10 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         log.info("UserRegistrationFacadeImpl.submitEvaluator - start | request: {}", request);
         pendingEvaluatorService.consumePendingEvaluator(request.getEmail(), request.getToken());
         var evaluatorDto = doSaveEvaluator(request);
+        if(request.getProfileImage() != null){
+            var documentDto = documentService.saveDocument(request.getProfileImage(), IMAGE, evaluatorDto.getUserProfile().getUserId());
+            userProfileService.saveUserProfileDocument(evaluatorDto.getUserProfile().getId(), documentDto.getId());
+        }
         log.info("UserRegistrationFacadeImpl.submitEvaluator - end | request: {}", request);
         return evaluatorDto;
     }
@@ -146,6 +151,10 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var artOwnerDto = doSaveArtOwner(request);
         var userId = artOwnerDto.getUserProfile().getUserId();
         var tokenDto = registrationTokenService.createTokenForUser(userId);
+        if(request.getProfileImage() != null){
+            var documentDto = documentService.saveDocument(request.getProfileImage(), IMAGE, artOwnerDto.getUserProfile().getUserId());
+            userProfileService.saveUserProfileDocument(artOwnerDto.getUserProfile().getId(), documentDto.getId());
+        }
         mailUtil.sendTokenEmail(VERIFICATION, request.getEmail(), tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.submitArtOwner - end | request: {}", request);
         return artOwnerDto;

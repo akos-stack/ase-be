@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.dto.entity.user.profile;
 
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
+import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -45,5 +46,8 @@ public class UserProfileDto {
 
     @JsonProperty("location")
     private LocationDto location;
+
+    @JsonProperty("document")
+    DocumentDto document;
 
 }

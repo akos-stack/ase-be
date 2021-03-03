@@ -3,15 +3,20 @@ package com.bloxico.ase.testutil;
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
 import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
+import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
+import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-
+import java.util.HashMap;
+import java.util.Map;
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.user.Role.ART_OWNER;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -25,6 +30,8 @@ public class UtilUserProfile {
     @Autowired private UtilLocation utilLocation;
     @Autowired private UserProfileRepository userProfileRepository;
     @Autowired private UserProfileServiceImpl userProfileService;
+    @Autowired private PendingEvaluatorRepository pendingEvaluatorRepository;
+    @Autowired private UserRegistrationFacadeImpl userRegistrationFacade;
 
     public UserProfile savedUserProfile(long userId) {
         var userProfile = new UserProfile();
@@ -59,16 +66,19 @@ public class UtilUserProfile {
                 genUUID(), genUUID(), password,
                 email, genUUID(), genUUID(),
                 genUUID(), LocalDate.now(),
-                genUUID(), country, genUUID(), ONE, TEN);
+                genUUID(), country, genUUID(), ONE, TEN, null);
     }
 
     public SubmitArtOwnerRequest newSubmitArtOwnerRequest() {
+        var imageBytes = getTestImageBytes();
+        MultipartFile multipartFile = new MockMultipartFile("fileItem",
+                "testImg.jpg", "image/jpg", imageBytes);
         var country = utilLocation.savedCountry().getName();
         return new SubmitArtOwnerRequest(
                 genUUID(), genPassword(),
                 genEmail(), genUUID(), genUUID(),
                 genUUID(), LocalDate.now(),
-                genUUID(), country, genUUID(), ONE, TEN);
+                genUUID(), country, genUUID(), ONE, TEN, multipartFile);
     }
 
     public ArtOwnerDto savedArtOwnerDto() {
@@ -85,4 +95,38 @@ public class UtilUserProfile {
         return response;
     }
 
+    public Map<String, String> genSaveEvaluatorFormParams(String token, String email, String password, String country) {
+        var map = new HashMap<String, String>();
+        map.put("token", token);
+        map.put("email", email);
+        map.put("password", password);
+        map.put("username", genUUID());
+        map.put("country", country);
+        map.put("first_name", genUUID());
+        map.put("last_name", genUUID());
+        map.put("phone", genUUID());
+        map.put("birthday", "2019-03-29");
+        map.put("gender", genUUID());
+        map.put("address", genUUID());
+        map.put("latitude", genPosBigDecimal(100).toString());
+        map.put("longitude", genPosBigDecimal(100).toString());
+        return map;
+    }
+
+    public Map<String, String> genSaveArtOwnerFormParams(String email, String password, String country) {
+        var map = new HashMap<String, String>();
+        map.put("email", email);
+        map.put("password", password);
+        map.put("username", genUUID());
+        map.put("country", country);
+        map.put("first_name", genUUID());
+        map.put("last_name", genUUID());
+        map.put("phone", genUUID());
+        map.put("birthday", "2019-03-29");
+        map.put("gender", genUUID());
+        map.put("address", genUUID());
+        map.put("latitude", genPosBigDecimal(100).toString());
+        map.put("longitude", genPosBigDecimal(100).toString());
+        return map;
+    }
 }

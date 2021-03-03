@@ -1,8 +1,10 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.userservice.entity.document.Document;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserException;
+import com.bloxico.ase.userservice.repository.document.DocumentRepository;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
@@ -12,6 +14,8 @@ import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import com.bloxico.ase.userservice.web.model.token.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
@@ -39,6 +43,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private ArtOwnerRepository artOwnerRepository;
     @Autowired private PendingEvaluatorRepository pendingEvaluatorRepository;
     @Autowired private UserRegistrationFacadeImpl userRegistrationFacade;
+    @Autowired private DocumentRepository documentRepository;
 
     @Test
     public void registerUserWithVerificationToken_nullRequest() {

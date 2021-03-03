@@ -6,9 +6,12 @@ import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
 import com.bloxico.ase.userservice.entity.address.Country;
 import com.bloxico.ase.userservice.entity.address.Location;
 import com.bloxico.ase.userservice.entity.address.Region;
+import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
+import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.address.CountryRepository;
 import com.bloxico.ase.userservice.repository.address.LocationRepository;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
+import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +27,7 @@ public class UtilLocation {
     @Autowired private CountryRepository countryRepository;
     @Autowired private LocationRepository locationRepository;
     @Autowired private RegionRepository regionRepository;
+    @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     public Region savedRegion() {
         return savedRegion(genUUID());

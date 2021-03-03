@@ -9,12 +9,14 @@ import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageReposit
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import scala.Int;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import static com.bloxico.ase.testutil.Util.genPosInt;
-import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 
 @Component
@@ -155,6 +157,16 @@ public class UtilEvaluation {
 
     public SearchRegionEvaluationDetailsRequest genDefaultSearchRegionsRequest() {
         return new SearchRegionEvaluationDetailsRequest("");
+    }
+
+    public Map<String, String> genRegionEvaluationDetailsFormParams(Integer page, Integer size, String sort, String order, String search) {
+        var map = new HashMap<String, String>();
+        map.put("page", Integer.toString(page));
+        map.put("size", Integer.toString(size));
+        map.put("sort", sort);
+        map.put("order", order);
+        map.put("search", search);
+        return map;
     }
 
 }
