@@ -86,4 +86,4 @@
 
 ---
 
-[<: Application Setup](application_setup.md) | [Development Flow :>](development_flow.md)
+[<: IntelliJ IDEA Setup](intellij_idea_setup.md) | [Development Flow :>](development_flow.md)

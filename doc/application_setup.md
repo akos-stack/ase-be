@@ -47,4 +47,4 @@
 
 ---
 
-[<: Home](../README.md) | [Codebase Overview :>](codebase_overview.md)
+[<: Home](../README.md) | [IntelliJ IDEA Setup :>](intellij_idea_setup.md)
