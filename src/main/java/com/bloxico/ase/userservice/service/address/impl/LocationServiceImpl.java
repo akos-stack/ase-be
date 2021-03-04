@@ -169,10 +169,13 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public LocationDto saveLocation(LocationDto dto) {
+    public LocationDto saveLocation(LocationDto dto, Long principalId) {
         log.debug("LocationServiceImpl.saveLocation - start | dto: {}", dto);
         requireNonNull(dto);
         var location = MAPPER.toEntity(dto);
+        if(principalId != null) {
+            location.setCreatorId(principalId);
+        }
         location = locationRepository.saveAndFlush(location);
         var locationDto = MAPPER.toDto(location);
         log.debug("LocationServiceImpl.saveLocation - end | dto: {}", dto);

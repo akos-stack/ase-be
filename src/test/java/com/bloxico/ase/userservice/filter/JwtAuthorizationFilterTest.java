@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.filter;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
@@ -20,7 +21,6 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 public class JwtAuthorizationFilterTest extends AbstractSpringTest {
 
     @Autowired private UtilAuth utilAuth;
-    @Autowired private UtilUser utilUser;
     @Autowired private UtilToken utilToken;
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private ITokenBlacklistService blacklistService;
@@ -57,14 +57,14 @@ public class JwtAuthorizationFilterTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void doFilterInternal_403_blacklistedAccessToken() {
         var registration = utilAuth.doConfirmedRegistration();
         utilUserProfile.savedUserProfile(registration.getId());
         var accessToken = utilAuth.doAuthentication(registration);
         var email = registration.getEmail();
         var oauthToken = utilToken.toOAuthAccessTokenDto(email, accessToken);
-        var admin = utilUser.savedAdmin();
-        blacklistService.blacklistTokens(List.of(oauthToken), admin.getId());
+        blacklistService.blacklistTokens(List.of(oauthToken));
         given()
                 .header("Authorization", accessToken)
                 .contentType(JSON)

@@ -107,18 +107,16 @@ public class UtilToken {
     }
 
     public BlacklistedToken savedBlacklistedToken() {
-        var adminId = utilUser.savedAdmin().getId();
         var user = utilUser.savedUser();
         var token = savedOauthTokenDto(user.getEmail());
-        userManagementFacade.blacklistTokens(user.getId(), adminId);
+        userManagementFacade.blacklistTokens(user.getId());
         return getBlacklistedToken(token.getTokenId());
     }
 
     public BlacklistedToken savedExpiredBlacklistedToken() {
-        var adminId = utilUser.savedAdmin().getId();
         var user = utilUser.savedUser();
         var token = savedExpiredOauthTokenDto(user.getEmail());
-        userManagementFacade.blacklistTokens(user.getId(), adminId);
+        userManagementFacade.blacklistTokens(user.getId());
         return getBlacklistedToken(token.getTokenId());
     }
 

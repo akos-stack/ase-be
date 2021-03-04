@@ -6,8 +6,8 @@ public interface IUserManagementFacade {
 
     PagedUserDataResponse searchUsers(String email, String role, int page, int size, String sort);
 
-    void disableUser(long userId, long principalId);
+    void disableUser(long userId);
 
-    void blacklistTokens(long userId, long principalId);
+    void blacklistTokens(long userId);
 
 }

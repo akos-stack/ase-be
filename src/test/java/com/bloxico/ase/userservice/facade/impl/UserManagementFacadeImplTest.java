@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.service.token.impl.TokenBlacklistServiceImpl;
@@ -56,16 +57,16 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void disableUser_notFound() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 UserException.class,
-                () -> userManagementFacade.disableUser(-1, principalId));
+                () -> userManagementFacade.disableUser(-1));
     }
 
     @Test
+    @WithMockCustomUser
     public void disableUser() {
-        var principalId = utilUser.savedAdmin().getId();
         var user = utilUser.savedUser();
         var userId = user.getId();
         var t1 = utilToken.savedOauthToken(user.getEmail()).getTokenId();
@@ -75,7 +76,7 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
                 tokenBlacklistService.blacklistedTokens(),
                 not(hasItems(t1, t2, t3)));
         assertTrue(userService.findUserById(userId).getEnabled());
-        userManagementFacade.disableUser(userId, principalId);
+        userManagementFacade.disableUser(userId);
         assertThat(
                 tokenBlacklistService.blacklistedTokens(),
                 hasItems(t1, t2, t3));
@@ -83,16 +84,16 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void blacklistTokens_notFound() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 UserException.class,
-                () -> userManagementFacade.blacklistTokens(-1, principalId));
+                () -> userManagementFacade.blacklistTokens(-1));
     }
 
     @Test
+    @WithMockCustomUser
     public void blacklistTokens() {
-        var principalId = utilUser.savedAdmin().getId();
         var user = utilUser.savedUser();
         var userId = user.getId();
         var t1 = utilToken.savedOauthToken(user.getEmail()).getTokenId();
@@ -102,7 +103,7 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
                 tokenBlacklistService.blacklistedTokens(),
                 not(hasItems(t1, t2, t3)));
         assertTrue(userService.findUserById(userId).getEnabled());
-        userManagementFacade.blacklistTokens(userId, principalId);
+        userManagementFacade.blacklistTokens(userId);
         assertThat(
                 tokenBlacklistService.blacklistedTokens(),
                 hasItems(t1, t2, t3));

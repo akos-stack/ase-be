@@ -157,6 +157,6 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     private LocationDto doSaveLocation(SaveArtworkRequest request) {
         var locationDto = MAPPER.toLocationDto(request);
         locationDto.setCountry(locationService.findCountryByName(request.getCountry()));
-        return locationService.saveLocation(locationDto);
+        return locationService.saveLocation(locationDto, null);
     }
 }

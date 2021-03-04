@@ -18,7 +18,7 @@ public interface IUserService {
 
     void enableUser(long userId, long principalId);
 
-    void disableUser(long userId, long principalId);
+    void disableUser(long userId);
 
     List<Long> deleteDisabledUsersWithIds(Collection<Long> ids);
 

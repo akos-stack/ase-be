@@ -29,7 +29,7 @@ public interface ILocationService {
 
     CountryDto updateCountry(CountryDto countryDto);
 
-    LocationDto saveLocation(LocationDto locationDto);
+    LocationDto saveLocation(LocationDto locationDto, Long principalId);
 
     int countCountriesByRegionId(Long regionId);
 

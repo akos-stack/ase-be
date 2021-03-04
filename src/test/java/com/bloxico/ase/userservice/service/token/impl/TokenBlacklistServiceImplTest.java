@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.service.token.impl;
 
+import com.bloxico.ase.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.exception.TokenException;
@@ -22,41 +23,42 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
     @Autowired private UtilToken utilToken;
     @Autowired private TokenBlacklistServiceImpl service;
     @Autowired private BlacklistedTokenRepository repository;
+    @Autowired private UtilSecurityContext utilSecurityContext;
 
     @Test
+    @WithMockCustomUser
     public void blacklistedTokens_caching() {
-        var principalId = utilUser.savedAdmin().getId();
         var user = utilUser.savedUser();
         var token = genUUID();
         var oToken = utilToken.toOAuthAccessTokenDto(user, token);
-        service.blacklistTokens(List.of(oToken), principalId);
+        service.blacklistTokens(List.of(oToken));
         assertThat(service.blacklistedTokens(), hasItems(token));
     }
 
     @Test
+    @WithMockCustomUser
     public void blacklistTokens_nullTokens() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> service.blacklistTokens(null, principalId));
+                () -> service.blacklistTokens(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void blacklistTokens_emptyTokens() {
-        var principalId = utilUser.savedAdmin().getId();
-        service.blacklistTokens(List.of(), principalId); // refresh cache
+        service.blacklistTokens(List.of()); // refresh cache
         var size = service.blacklistedTokens().size();
-        service.blacklistTokens(List.of(), principalId);
+        service.blacklistTokens(List.of());
         assertEquals(size, service.blacklistedTokens().size());
     }
 
     @Test
+    @WithMockCustomUser
     public void blacklistTokens_generatedTokens() {
-        var principalId = utilUser.savedAdmin().getId();
         var user = utilUser.savedUser();
         var token = genUUID();
         var oToken = utilToken.toOAuthAccessTokenDto(user, token);
-        service.blacklistTokens(List.of(oToken), principalId);
+        service.blacklistTokens(List.of(oToken));
         assertThat(
                 service.blacklistedTokens(),
                 hasItems(token));
@@ -66,19 +68,19 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void blacklistTokens_sameTokenMultipleTimes() {
-        var principalId = utilUser.savedAdmin().getId();
         var user = utilUser.savedUser();
         var token = genUUID();
         var oToken = utilToken.toOAuthAccessTokenDto(user, token);
-        service.blacklistTokens(List.of(oToken), principalId);
+        service.blacklistTokens(List.of(oToken));
         assertThat(
                 service.blacklistedTokens(),
                 hasItems(token));
         assertThat(
                 repository.findDistinctTokenValues(),
                 hasItems(token));
-        service.blacklistTokens(List.of(oToken), principalId);
+        service.blacklistTokens(List.of(oToken));
         assertEquals(
                 2,
                 repository
@@ -97,6 +99,7 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void checkIfBlacklisted_blacklistedToken() {
         var token = utilToken.savedBlacklistedToken();
         assertThrows(
@@ -110,8 +113,9 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void deleteExpiredTokens() {
-        var principal = utilUser.savedAdmin();
+        var principal = utilSecurityContext.getLoggedInPrincipal();
         var valid = utilToken.savedOauthTokenDto(principal.getEmail());
         var expired = utilToken.savedExpiredOauthTokenDto(principal.getEmail());
         assertThat(
@@ -119,7 +123,7 @@ public class TokenBlacklistServiceImplTest extends AbstractSpringTest {
                 not(hasItems(
                         valid.getTokenId(),
                         expired.getTokenId())));
-        service.blacklistTokens(List.of(valid, expired), principal.getId());
+        service.blacklistTokens(List.of(valid, expired));
         assertThat(
                 service.blacklistedTokens(),
                 hasItems(

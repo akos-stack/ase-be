@@ -180,10 +180,10 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
 
     // HELPER METHODS
 
-    private LocationDto doSaveLocation(ISubmitUserProfileRequest request) {
+    private LocationDto doSaveLocation(ISubmitUserProfileRequest request, Long principalId) {
         var locationDto = MAPPER.toLocationDto(request);
         locationDto.setCountry(locationService.findCountryByName(request.getCountry()));
-        return locationService.saveLocation(locationDto);
+        return locationService.saveLocation(locationDto, principalId);
     }
 
     private UserDto doSaveUser(ISubmitUserProfileRequest request) {
@@ -194,7 +194,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
 
     private UserProfileDto doSaveUserProfile(ISubmitUserProfileRequest request) {
         var principalId = doSaveUser(request).getId();
-        var locationDto = doSaveLocation(request);
+        var locationDto = doSaveLocation(request, principalId);
         var userProfileDto = MAPPER.toUserProfileDto(request);
         userProfileDto.setUserId(principalId);
         userProfileDto.setLocation(locationDto);

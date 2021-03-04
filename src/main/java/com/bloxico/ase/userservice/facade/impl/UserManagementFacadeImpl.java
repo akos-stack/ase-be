@@ -39,20 +39,20 @@ public class UserManagementFacadeImpl implements IUserManagementFacade {
     }
 
     @Override
-    public void disableUser(long userId, long principalId) {
-        log.info("UserManagementFacadeImpl.disableUser - start | userId: {}, principalId: {}", userId, principalId);
-        userService.disableUser(userId, principalId);
-        blacklistTokens(userId, principalId);
-        log.info("UserManagementFacadeImpl.disableUser - end | userId: {}, principalId: {}", userId, principalId);
+    public void disableUser(long userId) {
+        log.info("UserManagementFacadeImpl.disableUser - start | userId: {}", userId);
+        userService.disableUser(userId);
+        blacklistTokens(userId);
+        log.info("UserManagementFacadeImpl.disableUser - end | userId: {}", userId);
     }
 
     @Override
-    public void blacklistTokens(long userId, long principalId) {
-        log.info("UserManagementFacadeImpl.blacklistTokens - start | userId: {}, principalId: {}", userId, principalId);
+    public void blacklistTokens(long userId) {
+        log.info("UserManagementFacadeImpl.blacklistTokens - start | userId: {}", userId);
         var email = userService.findUserById(userId).getEmail();
         var tokens = oAuthAccessTokenService.deleteTokensByEmail(email);
-        tokenBlacklistService.blacklistTokens(tokens, principalId);
-        log.info("UserManagementFacadeImpl.blacklistTokens - end | userId: {}, principalId: {}", userId, principalId);
+        tokenBlacklistService.blacklistTokens(tokens);
+        log.info("UserManagementFacadeImpl.blacklistTokens - end | userId: {}", userId);
     }
 
 }

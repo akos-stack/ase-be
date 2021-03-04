@@ -281,7 +281,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     public void saveLocation_nullLocation() {
         assertThrows(
                 NullPointerException.class,
-                () -> service.saveLocation(null));
+                () -> service.saveLocation(null, null));
     }
 
     @Test
@@ -297,7 +297,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
                         .map(MAPPER::toDto)
                         .collect(toList()),
                 not(hasItems(location)));
-        service.saveLocation(location);
+        service.saveLocation(location, null);
         assertThat(
                 locationRepository
                         .findAll()
