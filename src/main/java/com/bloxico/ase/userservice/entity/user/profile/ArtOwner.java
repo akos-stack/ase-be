@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import static javax.persistence.FetchType.LAZY;
 
 @Data
-@EqualsAndHashCode(of = "id", callSuper = false)
+@EqualsAndHashCode(of = "userProfile", callSuper = false)
 @ToString(exclude = "userProfile")
 @Table(name = "art_owners")
 @Entity

@@ -6,14 +6,20 @@ import com.bloxico.ase.testutil.UtilUserProfile;
 import com.bloxico.ase.userservice.config.security.AseSecurityService;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
+import org.assertj.core.util.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 final class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
@@ -49,6 +55,17 @@ final class WithMockCustomUserSecurityContextFactory implements WithSecurityCont
         Authentication auth =
                 new UsernamePasswordAuthenticationToken(userDetails, authenticationToken, null);
         context.setAuthentication(auth);
+
+        List<String> scope = new ArrayList<>();
+        scope.add("access_profile");
+
+        OAuth2Request authRequest = new OAuth2Request(null, "appId", null, true, Sets.newHashSet(scope), null, null, null,
+                null);
+        OAuth2Authentication oAuth = new OAuth2Authentication(authRequest, auth);
+        oAuth.setDetails(principal.getId());
+
+        // Add the OAuth2Authentication object to the security context
+        context.setAuthentication(oAuth);
         return context;
     }
 
