@@ -158,7 +158,7 @@ public interface ErrorCodes {
                 "Region with specified name was not found."),
 
         REGION_DELETE_OPERATION_NOT_SUPPORTED(
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.CONFLICT,
                 "32",
                 "One or more countries are tied down to the region. Region cannot be deleted."),
 
@@ -246,7 +246,7 @@ public interface ErrorCodes {
                 "Specified evaluation details not found."),
 
         COUNTRY_EVALUATION_DETAILS_DELETE_OPERATION_NOT_SUPPORTED(
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.CONFLICT,
                 "42",
                 "There are evaluators from country to which evaluation details belong."),
 

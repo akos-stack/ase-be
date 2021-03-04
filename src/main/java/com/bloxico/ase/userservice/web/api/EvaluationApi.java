@@ -80,7 +80,7 @@ public interface EvaluationApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Evaluation details successfully deleted."),
             @ApiResponse(code = 404, message = "Specified evaluation details don't exist."),
-            @ApiResponse(code = 400, message = "There are evaluators from country to which evaluation details belong.")
+            @ApiResponse(code = 409, message = "There are evaluators from country to which evaluation details belong.")
     })
     ResponseEntity<Void> deleteCountryEvaluationDetails(@Valid @RequestBody DeleteCountryEvaluationDetailsRequest request);
 

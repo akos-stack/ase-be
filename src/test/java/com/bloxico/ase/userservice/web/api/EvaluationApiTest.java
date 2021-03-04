@@ -202,7 +202,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void deleteCountryEvaluationDetails_400_countryHasEvaluators() {
+    public void deleteCountryEvaluationDetails_409_countryHasEvaluators() {
         var evaluator = utilUserProfile.savedEvaluator();
         var countryId = evaluator.getUserProfile().getLocation().getCountry().getId();
         var evaluationDetailsId = utilEvaluation.savedCountryEvaluationDetails(countryId).getId();
@@ -215,7 +215,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE)
                 .then()
                 .assertThat()
-                .statusCode(400)
+                .statusCode(409)
                 .body(ERROR_CODE, is(COUNTRY_EVALUATION_DETAILS_DELETE_OPERATION_NOT_SUPPORTED.getCode()));
     }
 
