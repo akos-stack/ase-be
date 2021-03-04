@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4475bc05-af2b-448c-bbf9-438d242b9e68",
+		"_postman_id": "0ec80a33-e437-4aca-b0e9-398d104ea5eb",
 		"name": "Art Stock Exchange",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -778,7 +778,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"region\": \"North America\"\r\n}",
+									"raw": "{\r\n    \"region\": \"Europe\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -786,13 +786,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{endpoint_ase}}/api/region/save",
+									"raw": "{{endpoint_ase}}/api/region/management/save",
 									"host": [
 										"{{endpoint_ase}}"
 									],
 									"path": [
 										"api",
 										"region",
+										"management",
 										"save"
 									]
 								}
@@ -816,7 +817,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"id\": 6\r\n}",
+									"raw": "{\r\n    \"id\": 1\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -824,13 +825,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{endpoint_ase}}/api/region/delete",
+									"raw": "{{endpoint_ase}}/api/region/management/delete",
 									"host": [
 										"{{endpoint_ase}}"
 									],
 									"path": [
 										"api",
 										"region",
+										"management",
 										"delete"
 									]
 								}
@@ -887,7 +889,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"country\": \"USA\",\r\n    \"regions\": [\"North America\"]\r\n}",
+									"raw": "{\r\n    \"country\": \"Serbia\",\r\n    \"regions\": [\"Europe\"]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -895,13 +897,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{endpoint_ase}}/api/country/save",
+									"raw": "{{endpoint_ase}}/api/country/management/save",
 									"host": [
 										"{{endpoint_ase}}"
 									],
 									"path": [
 										"api",
 										"country",
+										"management",
 										"save"
 									]
 								}
@@ -925,7 +928,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"id\": 5,\r\n    \"country\": \"Montenegro\",\r\n    \"regions\": [\"Europe\", \"Balkan\"]\r\n}",
+									"raw": "{\r\n    \"id\": 1,\r\n    \"country\": \"Serbia\",\r\n    \"regions\": [\"Europe\", \"Balkan\"]\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -933,13 +936,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{ase-endpoint}}/api/country/update",
+									"raw": "{{ase-endpoint}}/api/country/management/update",
 									"host": [
 										"{{ase-endpoint}}"
 									],
 									"path": [
 										"api",
 										"country",
+										"management",
 										"update"
 									]
 								}
@@ -1001,7 +1005,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"country\": \"Montenegro\",\r\n    \"price_per_evaluation\": 13,\r\n    \"availability_percentage\": 50\r\n}",
+									"raw": "{\r\n    \"country\": \"Serbia\",\r\n    \"price_per_evaluation\": 10,\r\n    \"availability_percentage\": 40\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1009,13 +1013,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{endpoint_ase}}/api/evaluation/country-details/save",
+									"raw": "{{endpoint_ase}}/api/evaluation/management/country-details/save",
 									"host": [
 										"{{endpoint_ase}}"
 									],
 									"path": [
 										"api",
 										"evaluation",
+										"management",
 										"country-details",
 										"save"
 									]
@@ -1040,7 +1045,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"id\": 3,\r\n    \"price_per_evaluation\": 15,\r\n    \"availability_percentage\": 50\r\n}",
+									"raw": "{\r\n    \"id\": 1,\r\n    \"price_per_evaluation\": 15,\r\n    \"availability_percentage\": 50\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1048,13 +1053,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{endpoint_ase}}/api/evaluation/country-details/update",
+									"raw": "{{endpoint_ase}}/api/evaluation/management/country-details/update",
 									"host": [
 										"{{endpoint_ase}}"
 									],
 									"path": [
 										"api",
 										"evaluation",
+										"management",
 										"country-details",
 										"update"
 									]
@@ -1194,7 +1200,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{endpoint_ase}}/api/evaluation/management/regions?page=0&size=10&sort=name&order=desc&search=a",
+									"raw": "{{endpoint_ase}}/api/evaluation/management/region-details?page=0&size=10&sort=name&order=desc&search=a",
 									"host": [
 										"{{endpoint_ase}}"
 									],
@@ -1202,7 +1208,7 @@
 										"api",
 										"evaluation",
 										"management",
-										"regions"
+										"region-details"
 									],
 									"query": [
 										{

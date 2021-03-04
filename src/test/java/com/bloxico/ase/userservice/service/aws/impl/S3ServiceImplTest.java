@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.bloxico.ase.testutil.Util.genMultipartFile;
+import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.testutil.UtilS3.findOtherCategory;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,7 +17,27 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Autowired private S3ServiceImpl s3Service;
 
-    // TODO-TEST validateFile_nullArguments
+    @Test
+    public void validateFile_nullCategory() {
+        for (var category : FileCategory.values())
+            for (var extension : category.getSupportedFileExtensions())
+                assertThrows(
+                        NullPointerException.class,
+                        () -> s3Service.validateFile(
+                                null,
+                                genMultipartFile(extension)));
+    }
+
+    @Test
+    public void validateFile_nullFile() {
+        for (var category : FileCategory.values())
+            //noinspection ConstantConditions
+            assertThrows(
+                    NullPointerException.class,
+                    () -> s3Service.validateFile(
+                            findOtherCategory(category),
+                            null));
+    }
 
     @Test
     public void validateFile_typeNotSupportedForCategory() {
@@ -36,15 +57,26 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
                 s3Service.validateFile(category, genMultipartFile(extension));
     }
 
-    // TODO-TEST uploadFile_nullArguments
+    @Test
+    public void uploadFile_nullCategory() {
+        for (var category : FileCategory.values())
+            for (var extension : category.getSupportedFileExtensions())
+                assertThrows(
+                        NullPointerException.class,
+                        () -> s3Service.uploadFile(
+                                null,
+                                genMultipartFile(extension)));
+    }
 
     @Test
-    public void uploadFile() {
+    public void uploadFile_nullFile() {
         for (var category : FileCategory.values())
-            for (var extension : category.getSupportedFileExtensions()) {
-                var fileName = s3Service.uploadFile(category, genMultipartFile(extension));
-                assertNotNull(amazonS3.getObject(bucketName, fileName));
-            }
+            //noinspection ConstantConditions
+            assertThrows(
+                    NullPointerException.class,
+                    () -> s3Service.uploadFile(
+                            findOtherCategory(category),
+                            null));
     }
 
     @Test
@@ -58,9 +90,28 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
                                 genMultipartFile(extension)));
     }
 
-    // TODO-TEST downloadFile_nullPath
+    @Test
+    public void uploadFile() {
+        for (var category : FileCategory.values())
+            for (var extension : category.getSupportedFileExtensions()) {
+                var fileName = s3Service.uploadFile(category, genMultipartFile(extension));
+                assertNotNull(amazonS3.getObject(bucketName, fileName));
+            }
+    }
 
-    // TODO-TEST downloadFile_notFound
+    @Test
+    public void downloadFile_nullPath() {
+        assertThrows(
+                NullPointerException.class,
+                () -> s3Service.downloadFile(null));
+    }
+
+    @Test
+    public void downloadFile_notFound() {
+        assertThrows(
+                S3Exception.class,
+                () -> s3Service.downloadFile(genUUID()));
+    }
 
     @Test
     public void downloadFile() {
@@ -71,9 +122,19 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
             }
     }
 
-    // TODO-TEST deleteFile_nullPath
+    @Test
+    public void deleteFile_nullPath() {
+        assertThrows(
+                NullPointerException.class,
+                () -> s3Service.deleteFile(null));
+    }
 
-    // TODO-TEST downloadFile_notFound
+    @Test
+    public void deleteFile_notFound() {
+        assertThrows(
+                S3Exception.class,
+                () -> s3Service.deleteFile(genUUID()));
+    }
 
     @Test
     public void deleteFile() {

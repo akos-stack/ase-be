@@ -12,6 +12,7 @@ import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import com.bloxico.ase.userservice.repository.token.*;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
+import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorRegistrationRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
@@ -168,15 +169,18 @@ public class UtilToken {
     }
 
     public SubmitEvaluatorRequest submitInvitedEvaluatorRequest() {
-        var imageBytes = getTestImageBytes();
-        MultipartFile multipartFile = new MockMultipartFile("fileItem",
-                "testImg.jpg", "image/jpg", imageBytes);
+        return submitInvitedEvaluatorRequest(utilLocation.savedCountry().getName());
+    }
+
+    public SubmitEvaluatorRequest submitInvitedEvaluatorRequest(String country) {
         var email = genEmail();
         var password = genPassword();
         var principalId = utilUser.savedAdmin().getId();
+        var imageBytes = genFileBytes(FileCategory.IMAGE);
+        MultipartFile multipartFile = new MockMultipartFile("fileItem",
+                "testImg.jpg", "image/jpg", imageBytes);
         userRegistrationFacade.sendEvaluatorInvitation(new EvaluatorInvitationRequest(email), principalId);
         var token = pendingEvaluatorRepository.findByEmailIgnoreCase(email).orElseThrow().getToken();
-        var country = utilLocation.savedCountry().getName();
         return new SubmitEvaluatorRequest(
                 token, genUUID(), password,
                 email, genUUID(), genUUID(),

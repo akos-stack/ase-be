@@ -43,7 +43,12 @@ public class AseSecurityServiceTest extends AbstractSpringTest {
                 service.loadUserByUsername(user.getEmail()));
     }
 
-    // TODO-TEST loadUser_null
+    @Test
+    public void loadUser_null() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.loadUser(null));
+    }
 
     // TODO-TEST loadUser_notExists (for each provider)
 

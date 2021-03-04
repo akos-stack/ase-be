@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
+import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,9 +60,12 @@ public class UtilUserProfile {
     }
 
     public SubmitEvaluatorRequest newSubmitUninvitedEvaluatorRequest() {
+        return newSubmitUninvitedEvaluatorRequest(utilLocation.savedCountry().getName());
+    }
+
+    public SubmitEvaluatorRequest newSubmitUninvitedEvaluatorRequest(String country) {
         var email = genEmail();
         var password = genPassword();
-        var country = utilLocation.savedCountry().getName();
         return new SubmitEvaluatorRequest(
                 genUUID(), genUUID(), password,
                 email, genUUID(), genUUID(),
@@ -70,10 +74,13 @@ public class UtilUserProfile {
     }
 
     public SubmitArtOwnerRequest newSubmitArtOwnerRequest() {
-        var imageBytes = getTestImageBytes();
+        return newSubmitArtOwnerRequest(utilLocation.savedCountry().getName());
+    }
+
+    public SubmitArtOwnerRequest newSubmitArtOwnerRequest(String country) {
+        var imageBytes = genFileBytes(FileCategory.IMAGE);
         MultipartFile multipartFile = new MockMultipartFile("fileItem",
                 "testImg.jpg", "image/jpg", imageBytes);
-        var country = utilLocation.savedCountry().getName();
         return new SubmitArtOwnerRequest(
                 genUUID(), genPassword(),
                 genEmail(), genUUID(), genUUID(),

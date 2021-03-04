@@ -79,17 +79,20 @@ public class Util {
                 genUUID().getBytes());
     }
 
-    public static byte[] getTestCVBytes() {
-        try {
-            return toByteArray(Util.class.getResourceAsStream("/testFiles/testCv.txt"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public static String getTestFilePath(FileCategory category) {
+        switch (category) {
+            case CV:
+                return "/testFiles/testCv.txt";
+            case IMAGE:
+                return "/testFiles/testImg.jpg";
+            default:
+                throw new IllegalArgumentException(category.toString());
         }
     }
 
-    public static byte[] getTestImageBytes() {
+    public static byte[] genFileBytes(FileCategory category) {
         try {
-            return toByteArray(Util.class.getResourceAsStream("/testFiles/testImg.jpg"));
+            return toByteArray(Util.class.getResourceAsStream(getTestFilePath(category)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
