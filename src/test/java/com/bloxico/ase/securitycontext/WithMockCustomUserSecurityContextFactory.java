@@ -13,20 +13,23 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
+import org.springframework.stereotype.Component;
 
-public class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
+@Component
+final class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
 
-    @Autowired
-    private UtilUser utilUser;
-
-    @Autowired
-    private UtilAuth utilAuth;
-
-    @Autowired
-    private UtilUserProfile utilUserProfile;
+    private final UtilUser utilUser;
+    private final UtilAuth utilAuth;
+    private final UtilUserProfile utilUserProfile;
+    private final AseSecurityService aseSecurityService;
 
     @Autowired
-    private AseSecurityService aseSecurityService;
+    public WithMockCustomUserSecurityContextFactory(UtilUser utilUser, UtilAuth utilAuth, UtilUserProfile utilUserProfile, AseSecurityService aseSecurityService) {
+        this.utilUser = utilUser;
+        this.utilAuth = utilAuth;
+        this.utilUserProfile = utilUserProfile;
+        this.aseSecurityService = aseSecurityService;
+    }
 
     @Override
     public SecurityContext createSecurityContext(WithMockCustomUser customUser) {
