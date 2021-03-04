@@ -5,9 +5,9 @@ import com.bloxico.ase.testutil.UtilAuth;
 import com.bloxico.ase.testutil.UtilEvaluation;
 import com.bloxico.ase.testutil.UtilLocation;
 import com.bloxico.ase.userservice.facade.impl.EvaluationFacadeImpl;
+import com.bloxico.ase.userservice.repository.address.RegionRepository;
+import com.bloxico.ase.userservice.service.evaluation.impl.EvaluationServiceImpl;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionEvaluationDetailsRequest;
-import io.restassured.RestAssured;
-import io.restassured.parsing.Parser;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +23,13 @@ public class PageRequestTest extends AbstractSpringTest {
 
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilAuth utilAuth;
-    @Autowired private EvaluationFacadeImpl evaluationFacadeImpl;
+    @Autowired private EvaluationFacadeImpl evaluationFacade;
     @Autowired private UtilEvaluation utilEvaluation;
+    @Autowired private EvaluationServiceImpl evaluationService;
+    @Autowired private RegionRepository regionRepository;
 
     @Test
-    public void searchRegionEvaluationDetailsForManagement_200_ok() {
+    public void searchRegionEvaluationDetails_200_ok() {
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType("application/json")
@@ -40,7 +42,7 @@ public class PageRequestTest extends AbstractSpringTest {
     }
 
     @Test
-    public void searchRegionEvaluationDetailsForManagement_400_page_min_value() {
+    public void searchRegionEvaluationDetails_400_page_min_value() {
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType("application/json")
@@ -53,8 +55,7 @@ public class PageRequestTest extends AbstractSpringTest {
     }
 
     @Test
-    public void searchRegionEvaluationDetailsForManagement_400_size_min_value() {
-        RestAssured.registerParser("text/plain", Parser.JSON);
+    public void searchRegionEvaluationDetails_400_size_min_value() {
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType("application/json")
@@ -67,49 +68,100 @@ public class PageRequestTest extends AbstractSpringTest {
     }
 
     @Test
-    public void searchRegionEvaluationDetailsForManagement() {
+    public void searchRegionEvaluationDetails() {
         var r1 = utilLocation.savedRegion("a");
         var r2 = utilLocation.savedRegion("b");
         var r3 = utilLocation.savedRegion("c");
         var request = new SearchRegionEvaluationDetailsRequest("b");
         var pageDetails = new PageRequest(0, 10, "name", "DESC");
-        var response = evaluationFacadeImpl.searchRegionEvaluationDetails(request, pageDetails);
+        var response = evaluationFacade.searchRegionEvaluationDetails(request, pageDetails);
+        var foundRegion =  response.getPage().getContent().get(0);
+        assertEquals(foundRegion.getName(), r2.getName());
         assertNotNull(response.getPage().getContent());
     }
 
     @Test
-    public void searchRegionEvaluationDetailsForManagement_test_min_page_value() {
+    public void searchRegionEvaluationDetails_test_min_page_value() {
         var request = new SearchRegionEvaluationDetailsRequest("b");
         var pageDetails = new PageRequest(-1, 10, "name", "DESC");
         assertThrows(
                 IllegalArgumentException.class,
-                () -> evaluationFacadeImpl.searchRegionEvaluationDetails(request, pageDetails));
+                () -> evaluationFacade.searchRegionEvaluationDetails(request, pageDetails));
     }
 
     @Test
-    public void searchRegionEvaluationDetailsForManagement_test_min_size_value() {
+    public void searchRegionEvaluationDetails_test_min_size_value() {
         var request = new SearchRegionEvaluationDetailsRequest("b");
         var pageDetails = new PageRequest(0, 0, "name", "DESC");
         assertThrows(
                 IllegalArgumentException.class,
-                () -> evaluationFacadeImpl.searchRegionEvaluationDetails(request, pageDetails));
+                () -> evaluationFacade.searchRegionEvaluationDetails(request, pageDetails));
     }
 
     @Test
-    public void searchRegionEvaluationDetailsForManagement_null_page_value() {
+    public void searchRegionEvaluationDetails_null_page_value() {
         var request = new SearchRegionEvaluationDetailsRequest("b");
         var pageDetails = new PageRequest(null, 10, "name", "DESC");
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationFacadeImpl.searchRegionEvaluationDetails(request, pageDetails));
+                () -> evaluationFacade.searchRegionEvaluationDetails(request, pageDetails));
     }
 
     @Test
-    public void searchRegionEvaluationDetailsForManagement_null_size_value() {
+    public void searchRegionEvaluationDetails_null_size_value() {
         var request = new SearchRegionEvaluationDetailsRequest("b");
         var pageDetails = new PageRequest(0, null, "name", "DESC");
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationFacadeImpl.searchRegionEvaluationDetails(request, pageDetails));
+                () -> evaluationFacade.searchRegionEvaluationDetails(request, pageDetails));
+    }
+
+    @Test
+    public void searchRegionEvaluationDetails_testService() {
+        var r1 = utilLocation.savedRegion("a");
+        var r2 = utilLocation.savedRegion("b");
+        var r3 = utilLocation.savedRegion("c");
+        var request = new SearchRegionEvaluationDetailsRequest("b");
+        var pageDetails = new PageRequest(0, 10, "name", "DESC");
+        var foundRegions = evaluationService.searchRegionEvaluationDetails(request, pageDetails);
+        var foundRegion =  foundRegions.getContent().get(0);
+        assertEquals(foundRegion.getName(), r2.getName());
+        assertNotNull(foundRegions.getContent());
+    }
+
+    @Test
+    public void searchRegionEvaluationDetails_testService_null_page_param() {
+        var request = new SearchRegionEvaluationDetailsRequest("b");
+        var pageDetails = new PageRequest(null, 10, "name", "DESC");
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.searchRegionEvaluationDetails(request, pageDetails));
+    }
+
+    @Test
+    public void searchRegionEvaluationDetails_testService_null_size_param() {
+        var request = new SearchRegionEvaluationDetailsRequest("b");
+        var pageDetails = new PageRequest(0, null, "name", "DESC");
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.searchRegionEvaluationDetails(request, pageDetails));
+    }
+
+    @Test
+    public void searchRegionEvaluationDetails_testService_min_size_param() {
+        var request = new SearchRegionEvaluationDetailsRequest("b");
+        var pageDetails = new PageRequest(0, 0, "name", "DESC");
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> evaluationService.searchRegionEvaluationDetails(request, pageDetails));
+    }
+
+    @Test
+    public void searchRegionEvaluationDetails_testService_min_page_param() {
+        var request = new SearchRegionEvaluationDetailsRequest("b");
+        var pageDetails = new PageRequest(-1, 10, "name", "DESC");
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> evaluationService.searchRegionEvaluationDetails(request, pageDetails));
     }
 }
