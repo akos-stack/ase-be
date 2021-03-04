@@ -38,10 +38,10 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     @Test
     public void searchCountryEvaluationDetails_200_ok() {
         var country = genUUID();
-        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(country);
-        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(country);
-        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails(country);
-        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genUUID());
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(country);
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(country);
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithCountryName(country);
+        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(genUUID());
 
         var content = given()
                 .header("Authorization", utilAuth.doAuthentication())
@@ -60,15 +60,40 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         assertThat(content, allOf(hasItems(c1, c2), not(hasItems(c3, c4))));
     }
 
-    // TODO searchCountryEvaluationDetails_withRegions_200_ok
+    @Test
+    public void searchCountryEvaluationDetails_withRegions_200_ok() {
+        var region1 = utilLocation.savedRegion().getName();
+        var region2 = utilLocation.savedRegion().getName();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegionName(region1);
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegionName(region2);
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithRegionName(region2);
+
+        var content = given()
+                .header("Authorization", utilAuth.doAuthentication())
+                .params(allPages("search", ""))
+                .param("regions", String.format("%s,%s", region1, region2))
+                .when()
+                .get(API_URL + EVALUATION_COUNTRY_DETAILS_SEARCH)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SearchCountryEvaluationDetailsResponse.class)
+                .getPage()
+                .getContent();
+
+        assertThat(content, allOf(hasItems(c1, c2), not(hasItems(c3, c4))));
+    }
 
     @Test
     public void searchCountryEvaluationDetailsForManagement_200_ok() {
         var country = genUUID();
-        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(country);
-        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(country);
-        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails(country);
-        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProj(genUUID());
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(country);
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(country);
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithCountryName(country);
+        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(genUUID());
 
         var content = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
@@ -87,7 +112,32 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         assertThat(content, allOf(hasItems(c1, c2, c3), not(hasItems(c4))));
     }
 
-    // TODO searchCountryEvaluationDetailsForManagement_withRegions_200_ok
+    @Test
+    public void searchCountryEvaluationDetailsForManagement_withRegions_200_ok() {
+        var region1 = utilLocation.savedRegion().getName();
+        var region2 = utilLocation.savedRegion().getName();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegionName(region1);
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegionName(region2);
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithRegionName(region2);
+
+        var content = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .params(allPages("search", ""))
+                .param("regions", String.format("%s,%s", region1, region2))
+                .when()
+                .get(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SearchCountryEvaluationDetailsResponse.class)
+                .getPage()
+                .getContent();
+
+        assertThat(content, allOf(hasItems(c1, c2, c4), not(hasItems(c3))));
+    }
 
     @Test
     public void saveCountryEvaluationDetails_404_countryNotFound() {

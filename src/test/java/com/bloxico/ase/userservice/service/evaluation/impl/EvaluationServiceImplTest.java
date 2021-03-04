@@ -6,6 +6,8 @@ import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetail
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.bloxico.ase.testutil.Util.allPages;
@@ -66,6 +68,14 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    public void searchCountryEvaluationDetails_emptyRegions() {
+        var request= utilEvaluation.genSearchCountryEvaluationDetailsRequest(Collections.emptyList());
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.searchCountryEvaluationDetails(request, allPages()));
+    }
+
+    @Test
     public void searchCountryEvaluationDetails() {
         var request = utilEvaluation.genSearchCountryEvaluationDetailsRequest();
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
@@ -79,6 +89,24 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    public void searchCountryEvaluationDetails_withRegions() {
+        var region1 = utilLocation.savedRegion().getName();
+        var region2 = utilLocation.savedRegion().getName();
+        var regionsFilter = Arrays.asList(region1, region2);
+        var request = utilEvaluation
+                .genSearchCountryEvaluationDetailsRequest(regionsFilter);
+        var c1 = utilEvaluation
+                .savedCountryEvaluationDetailsCountedProjWithRegionName(region1);
+        var c2 = utilEvaluation
+                .savedCountryEvaluationDetailsCountedProjWithRegionName(region2);
+        var c3 = utilEvaluation
+                .savedCountryEvaluationDetailsCountedProj();
+        assertThat(
+                evaluationService.searchCountryEvaluationDetails(request, allPages()),
+                allOf(hasItems(c1, c2), not(hasItems(c3))));
+    }
+
+    @Test
     public void searchCountryEvaluationDetails_forManagement() {
         var request = utilEvaluation.genSearchCountryEvaluationDetailsForManagementRequest();
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
@@ -89,6 +117,24 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
         assertThat(
                 evaluationService.searchCountryEvaluationDetails(request, allPages()),
                 hasItems(c1, c2));
+    }
+
+    @Test
+    public void searchCountryEvaluationDetails_forManagement_withRegions() {
+        var region1 = utilLocation.savedRegion().getName();
+        var region2 = utilLocation.savedRegion().getName();
+        var regionsFilter = Arrays.asList(region1, region2);
+        var request = utilEvaluation
+                .genSearchCountryEvaluationDetailsForManagementRequest(regionsFilter);
+        var c1 = utilEvaluation
+                .savedCountryEvaluationDetailsCountedProjWithRegionName(region1);
+        var c2 = utilEvaluation
+                .savedCountryEvaluationDetailsCountedProjNoDetailsWithRegionName(region2);
+        var c3 = utilEvaluation
+                .savedCountryEvaluationDetailsCountedProj();
+        assertThat(
+                evaluationService.searchCountryEvaluationDetails(request, allPages()),
+                allOf(hasItems(c1, c2), not(hasItems(c3))));
     }
 
     @Test
