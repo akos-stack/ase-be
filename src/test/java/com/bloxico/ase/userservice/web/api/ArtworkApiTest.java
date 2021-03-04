@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.web.api;
 import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilSecurityContext securityContext;
 
     @Test
-    @WithMockCustomUser(role = "user", auth = true)
+    @WithMockCustomUser(role = Role.USER, auth = true)
     public void submitArtwork_notAuthorized() {
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
         byte[] image = getTestImageBytes();
@@ -44,7 +45,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser(role = "art_owner", auth = true)
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void submitArtwork_missingCertificate() {
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, true, null);
         formParams.put("iAmArtOwner", String.valueOf(false));
@@ -65,7 +66,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser(role = "art_owner", auth = true)
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void submitArtwork_missingResume() {
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
         formParams.put("iAmArtOwner", String.valueOf(true));
@@ -86,7 +87,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser(role = "art_owner", auth = true)
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void submitArtwork_groupNotFound() {
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, -1L);
         byte[] image = getTestImageBytes();
@@ -106,7 +107,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser(role = "art_owner", auth = true)
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void submitArtwork_saveToNewGroup() {
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
         byte[] image = getTestImageBytes();
@@ -131,7 +132,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser(role = "art_owner", auth = true)
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void submitArtwork_saveToExistingGroup() {
         var groupDto = utilArtwork.savedArtworkGroupDto(ArtworkGroup.Status.DRAFT);
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, groupDto.getId());

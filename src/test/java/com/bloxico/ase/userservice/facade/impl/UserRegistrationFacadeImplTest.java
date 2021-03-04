@@ -411,7 +411,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser(role = "user")
+    @WithMockCustomUser(role = USER)
     public void requestEvaluatorRegistration_evaluatorAlreadyRegistered() {
         var user = utilSecurityContext.getLoggedInPrincipal();
 
@@ -440,7 +440,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser(role = "user")
+    @WithMockCustomUser(role = USER)
     public void requestEvaluatorRegistration() {
         var user = utilSecurityContext.getLoggedInPrincipal();
 
@@ -493,7 +493,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser(role = "user")
+    @WithMockCustomUser(role = USER)
     public void downloadEvaluatorResume() {
         var user = utilSecurityContext.getLoggedInPrincipal();
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));

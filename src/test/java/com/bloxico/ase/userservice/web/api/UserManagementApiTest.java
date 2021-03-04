@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.user.*;
 import org.junit.Test;
@@ -27,7 +28,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
     @Autowired private UtilSecurityContext utilSecurityContext;
 
     @Test
-    @WithMockCustomUser(role = "user", auth = true)
+    @WithMockCustomUser(role = Role.USER, auth = true)
     public void searchUsers_403_forbidden() {
         given()
                 .header("Authorization", utilSecurityContext.getToken())

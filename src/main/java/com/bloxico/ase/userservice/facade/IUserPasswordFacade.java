@@ -11,8 +11,8 @@ public interface IUserPasswordFacade {
 
     void updateForgottenPassword(ForgottenPasswordUpdateRequest request);
 
-    void updateKnownPassword(long principalId, KnownPasswordUpdateRequest request);
+    void updateKnownPassword(KnownPasswordUpdateRequest request);
 
-    void setNewPassword(long principalId, SetPasswordRequest request);
+    void setNewPassword(SetPasswordRequest request);
 
 }

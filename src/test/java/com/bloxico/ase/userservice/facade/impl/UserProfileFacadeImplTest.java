@@ -1,8 +1,10 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTest;
+import com.bloxico.ase.testutil.UtilSecurityContext;
 import com.bloxico.ase.testutil.UtilUserProfile;
-import com.bloxico.ase.userservice.exception.UserException;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,41 +17,45 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
 
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private UserProfileFacadeImpl userProfileFacade;
+    @Autowired private UtilSecurityContext securityContext;
 
     @Test
     public void returnMyProfileData_userNotFound() {
         assertThrows(
-                UserException.class,
-                () -> userProfileFacade.returnMyProfileData(-1));
+                NullPointerException.class,
+                () -> userProfileFacade.returnMyProfileData());
     }
 
     @Test
+    @WithMockCustomUser(role = Role.USER)
     public void returnMyProfileData() {
-        var userProfileDto = utilUserProfile.savedUserProfileDto();
-        var response = userProfileFacade.returnMyProfileData(userProfileDto.getUserId());
+        var userProfileDto = utilUserProfile.savedUserProfileDto(securityContext.getLoggedInUserId());
+        var response = userProfileFacade.returnMyProfileData();
         assertEquals(userProfileDto, response.getUserProfile());
     }
 
     @Test
+    @WithMockCustomUser
     public void updateMyProfile_nullRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> userProfileFacade.updateMyProfile(1, null));
+                () -> userProfileFacade.updateMyProfile(null));
     }
 
     @Test
     public void updateMyProfile_notFound() {
         var request = new UpdateUserProfileRequest(genUUID(), genUUID(), genUUID());
         assertThrows(
-                UserException.class,
-                () -> userProfileFacade.updateMyProfile(-1, request));
+                NullPointerException.class,
+                () -> userProfileFacade.updateMyProfile(request));
     }
 
     @Test
+    @WithMockCustomUser(role = Role.USER)
     public void updateMyProfile() {
-        var id = utilUserProfile.savedUserProfile().getUserId();
+        var userProfileDto = utilUserProfile.savedUserProfileDto(securityContext.getLoggedInUserId());
         var request = new UpdateUserProfileRequest(genUUID(), genUUID(), genUUID());
-        var response = userProfileFacade.updateMyProfile(id, request);
+        var response = userProfileFacade.updateMyProfile(request);
         assertEquals(request.getFirstName(), response.getUserProfile().getFirstName());
         assertEquals(request.getLastName(), response.getUserProfile().getLastName());
         assertEquals(request.getPhone(), response.getUserProfile().getPhone());

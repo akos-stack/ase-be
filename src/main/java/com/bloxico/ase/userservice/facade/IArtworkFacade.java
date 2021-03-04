@@ -5,5 +5,5 @@ import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
 
 public interface IArtworkFacade {
 
-    SaveArtworkResponse submitArtwork(SaveArtworkRequest request, long principalId);
+    SaveArtworkResponse submitArtwork(SaveArtworkRequest request);
 }

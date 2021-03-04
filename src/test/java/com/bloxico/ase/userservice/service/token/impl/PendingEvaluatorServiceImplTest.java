@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.service.token.impl;
 
 import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
@@ -53,7 +54,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser(role = "user")
+    @WithMockCustomUser(role = Role.USER)
     public void createPendingEvaluator_evaluatorAlreadyRegistered() {
         var user = utilSecurityContext.getLoggedInPrincipal();
 
@@ -90,7 +91,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser(role = "user")
+    @WithMockCustomUser(role = Role.USER)
     public void createPendingEvaluator_evaluatorRequested() {
         var user = utilSecurityContext.getLoggedInPrincipal();
 

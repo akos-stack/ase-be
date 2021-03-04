@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.exception.TokenException;
@@ -25,6 +26,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
     @Autowired private UserServiceImpl userService;
     @Autowired private TokenRepository tokenRepository;
     @Autowired private UserPasswordFacadeImpl userPasswordFacade;
+    @Autowired private UtilSecurityContext utilSecurityContext;
 
     @Test
     public void handleForgotPasswordRequest_nullRequest() {
@@ -127,65 +129,67 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void updateKnownPassword_nullRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> userPasswordFacade.updateKnownPassword(1, null));
+                () -> userPasswordFacade.updateKnownPassword(null));
     }
 
     @Test
     public void updateKnownPassword_userNotFound() {
         var request = new KnownPasswordUpdateRequest(genPassword(), genPassword());
         assertThrows(
-                UserException.class,
-                () -> userPasswordFacade.updateKnownPassword(-1, request));
+                NullPointerException.class,
+                () -> userPasswordFacade.updateKnownPassword(request));
     }
 
     @Test
+    @WithMockCustomUser
     public void updateKnownPassword_oldPasswordMismatch() {
         var request = new KnownPasswordUpdateRequest(genPassword(), genPassword());
-        var userId = utilUser.savedAdmin().getId();
         assertThrows(
                 UserException.class,
-                () -> userPasswordFacade.updateKnownPassword(userId, request));
+                () -> userPasswordFacade.updateKnownPassword(request));
     }
 
     @Test
+    @WithMockCustomUser
     public void updateKnownPassword() {
-        var oldPassword = genPassword();
+        var oldPassword = "pass";
         var newPassword = genPassword();
         var request = new KnownPasswordUpdateRequest(oldPassword, newPassword);
-        var userId = utilUser.savedAdmin(oldPassword).getId();
-        userPasswordFacade.updateKnownPassword(userId, request);
+        userPasswordFacade.updateKnownPassword(request);
         assertTrue(passwordEncoder.matches(
                 newPassword,
-                userService.findUserById(userId).getPassword()));
+                userService.findUserById(utilSecurityContext.getLoggedInUserId()).getPassword()));
     }
 
     @Test
+    @WithMockCustomUser
     public void setNewPassword_nullRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> userPasswordFacade.setNewPassword(1, null));
+                () -> userPasswordFacade.setNewPassword(null));
     }
 
     @Test
     public void setNewPassword_userNotFound() {
         var request = new SetPasswordRequest(genPassword());
         assertThrows(
-                UserException.class,
-                () -> userPasswordFacade.setNewPassword(-1, request));
+                NullPointerException.class,
+                () -> userPasswordFacade.setNewPassword(request));
     }
 
     @Test
+    @WithMockCustomUser
     public void setNewPassword() {
         var password = genPassword();
         var request = new SetPasswordRequest(password);
-        var userId = utilUser.savedAdmin().getId();
-        userPasswordFacade.setNewPassword(userId, request);
+        userPasswordFacade.setNewPassword(request);
         assertTrue(passwordEncoder.matches(
                 password,
-                userService.findUserById(userId).getPassword()));
+                userService.findUserById(utilSecurityContext.getLoggedInUserId()).getPassword()));
     }
 
 }

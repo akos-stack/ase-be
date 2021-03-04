@@ -4,6 +4,7 @@ import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilLocation;
 import com.bloxico.ase.testutil.UtilSecurityContext;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import com.bloxico.ase.userservice.web.model.address.*;
 import org.junit.Test;
@@ -35,7 +36,7 @@ public class LocationApiTest extends AbstractSpringTest {
     @Autowired private UtilSecurityContext utilSecurityContext;
 
     @Test
-    @WithMockCustomUser(role = "user", auth = true)
+    @WithMockCustomUser(role = Role.USER, auth = true)
     public void findAllRegions_200_ok() {
         var r1 = utilLocation.savedRegionDto();
         var r2 = utilLocation.savedRegionDto();
@@ -153,7 +154,7 @@ public class LocationApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser(role = "user", auth = true)
+    @WithMockCustomUser(role = Role.USER, auth = true)
     public void findAllCountries_200_ok() {
         var c1 = utilLocation.savedCountryDto();
         var c2 = utilLocation.savedCountryDto();

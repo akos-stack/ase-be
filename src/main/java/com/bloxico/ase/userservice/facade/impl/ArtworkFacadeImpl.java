@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.userservice.config.security.AseSecurityContextService;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
@@ -48,8 +49,9 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     private final MaterialServiceImpl materialService;
     private final MediumServiceImpl mediumService;
     private final StyleServiceImpl styleService;
+    private final AseSecurityContextService securityContextService;
 
-    public ArtworkFacadeImpl(ILocationService locationService, IDocumentService documentService, IArtworkService artworkService, IArtistService artistService, IUserProfileService userProfileService, CategoryServiceImpl categoryService, MaterialServiceImpl materialService, MediumServiceImpl mediumService, StyleServiceImpl styleService, IArtworkGroupService artworkGroupService) {
+    public ArtworkFacadeImpl(ILocationService locationService, IDocumentService documentService, IArtworkService artworkService, IArtistService artistService, IUserProfileService userProfileService, CategoryServiceImpl categoryService, MaterialServiceImpl materialService, MediumServiceImpl mediumService, StyleServiceImpl styleService, IArtworkGroupService artworkGroupService, AseSecurityContextService securityContextService) {
         this.locationService = locationService;
         this.documentService = documentService;
         this.artworkService = artworkService;
@@ -60,24 +62,25 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         this.mediumService = mediumService;
         this.styleService = styleService;
         this.artworkGroupService = artworkGroupService;
+        this.securityContextService = securityContextService;
     }
 
     @Override
-    public SaveArtworkResponse submitArtwork(SaveArtworkRequest request, long principalId) {
-        log.info("ArtworkFacadeImpl.submitArtwork - start | request: {}, principalId: {} ", request, principalId);
-        var artworkDto = doPrepareArtworkDto(request, principalId);
+    public SaveArtworkResponse submitArtwork(SaveArtworkRequest request) {
+        log.info("ArtworkFacadeImpl.submitArtwork - start | request: {}", request);
+        var artworkDto = doPrepareArtworkDto(request);
         artworkDto = artworkService.saveArtwork(artworkDto);
-        log.info("ArtworkFacadeImpl.submitArtwork - end | request: {}, principalId: {} ", request, principalId);
+        log.info("ArtworkFacadeImpl.submitArtwork - end | request: {}", request);
         return new SaveArtworkResponse(artworkDto.getGroup());
     }
 
     // HELPER METHODS
 
-    private ArtworkDto doPrepareArtworkDto(SaveArtworkRequest request, long principalId) {
+    private ArtworkDto doPrepareArtworkDto(SaveArtworkRequest request) {
         request.validateRequest();
         var artworkDto = MAPPER.toArtworkDto(request);
         artworkDto.setGroup(doSaveGroup(request));
-        artworkDto.setOwner(userProfileService.findArtOwnerByUserId(principalId));
+        artworkDto.setOwner(userProfileService.findArtOwnerByUserId(securityContextService.getPrincipalId()));
         artworkDto.setLocation(doSaveLocation(request));
         artworkDto.setArtist(doSaveArtist(request));
         artworkDto.addCategories(doSaveCategories(request));

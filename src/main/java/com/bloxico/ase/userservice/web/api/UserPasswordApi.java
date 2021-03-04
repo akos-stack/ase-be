@@ -1,15 +1,20 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.web.model.password.*;
+import com.bloxico.ase.userservice.web.model.password.ForgotPasswordRequest;
+import com.bloxico.ase.userservice.web.model.password.ForgottenPasswordUpdateRequest;
+import com.bloxico.ase.userservice.web.model.password.KnownPasswordUpdateRequest;
+import com.bloxico.ase.userservice.web.model.password.SetPasswordRequest;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
-import java.security.Principal;
 
 @Api(value = "password")
 public interface UserPasswordApi {
@@ -66,7 +71,7 @@ public interface UserPasswordApi {
             @ApiResponse(code = 200, message = "Password is updated successfully."),
             @ApiResponse(code = 400, message = "Current password does not match the `old_password`.")
     })
-    ResponseEntity<Void> updateKnownPassword(@Valid @RequestBody KnownPasswordUpdateRequest request, Principal principal);
+    ResponseEntity<Void> updateKnownPassword(@Valid @RequestBody KnownPasswordUpdateRequest request);
 
     @PostMapping(
             value = PASSWORD_SET_ENDPOINT,
@@ -77,6 +82,6 @@ public interface UserPasswordApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Password is set successfully.")
     })
-    ResponseEntity<Void> setNewPassword(@Valid @RequestBody SetPasswordRequest request, Principal principal);
+    ResponseEntity<Void> setNewPassword(@Valid @RequestBody SetPasswordRequest request);
 
 }

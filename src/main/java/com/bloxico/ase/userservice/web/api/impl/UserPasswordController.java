@@ -38,16 +38,14 @@ public class UserPasswordController implements UserPasswordApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateKnownPassword(KnownPasswordUpdateRequest request, Principal principal) {
-        var id = extractId(principal);
-        userPasswordFacade.updateKnownPassword(id, request);
+    public ResponseEntity<Void> updateKnownPassword(KnownPasswordUpdateRequest request) {
+        userPasswordFacade.updateKnownPassword(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Void> setNewPassword(SetPasswordRequest request, Principal principal) {
-        var id = extractId(principal);
-        userPasswordFacade.setNewPassword(id, request);
+    public ResponseEntity<Void> setNewPassword(SetPasswordRequest request) {
+        userPasswordFacade.setNewPassword(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

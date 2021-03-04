@@ -4,6 +4,7 @@ import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,7 +130,7 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser(role = "user", auth = true)
+    @WithMockCustomUser(role = Role.USER, auth = true)
     public void searchApprovedArtworkMetadata_200_ok() {
         for (var type : Type.values()) {
             var m1 = utilArtworkMetadata.savedArtworkMetadataDto(type, APPROVED);
