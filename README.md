@@ -6,3 +6,4 @@ This repo contains backend services for *Art Stock Exchange* project.
 
 - [Application Setup](doc/application_setup.md)
 - [Codebase Overview](doc/codebase_overview.md)
+- [Development Flow](doc/development_flow.md)
