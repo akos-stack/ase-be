@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.WithMockCustomUser;
+import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilLocation;
 import com.bloxico.ase.testutil.UtilSecurityContext;

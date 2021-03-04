@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.service.document.impl;
 
-import com.bloxico.ase.WithMockCustomUser;
+import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
 import com.bloxico.ase.testutil.UtilDocument;
 import com.bloxico.ase.userservice.exception.AseRuntimeException;

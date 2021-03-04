@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.service.token.impl;
 
-import com.bloxico.ase.WithMockCustomUser;
+import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
 import com.bloxico.ase.userservice.exception.TokenException;

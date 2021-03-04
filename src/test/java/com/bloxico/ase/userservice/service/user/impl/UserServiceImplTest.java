@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
-import com.bloxico.ase.WithMockCustomUser;
+import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilUser;
 import com.bloxico.ase.userservice.exception.UserException;

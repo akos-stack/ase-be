@@ -1,7 +1,8 @@
-package com.bloxico.ase;
+package com.bloxico.ase.securitycontext;
 
 import com.bloxico.ase.testutil.UtilAuth;
 import com.bloxico.ase.testutil.UtilUser;
+import com.bloxico.ase.testutil.UtilUserProfile;
 import com.bloxico.ase.userservice.config.security.AseSecurityService;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
@@ -20,6 +21,9 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
 
     @Autowired
     private UtilAuth utilAuth;
+
+    @Autowired
+    private UtilUserProfile utilUserProfile;
 
     @Autowired
     private AseSecurityService aseSecurityService;
@@ -58,6 +62,14 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 principal = utilUser.savedUserWithPassword(customUser.password());
             } else {
                 principal = utilUser.savedUser(customUser.email(), customUser.password());
+            }
+
+            if(Role.ART_OWNER.equals(customUser.role())) {
+                utilUserProfile.savedArtOwnerDto(principal.getId());
+            }
+
+            if(Role.EVALUATOR.equals(customUser.role())) {
+                // TODO
             }
         }
         return principal;

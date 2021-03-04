@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.service.artwork.impl;
 
-import com.bloxico.ase.WithMockCustomUser;
+import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
 import com.bloxico.ase.testutil.UtilArtwork;
 import com.bloxico.ase.testutil.UtilUser;

@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
@@ -20,18 +21,17 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 @Transactional(propagation = NOT_SUPPORTED)
 public class ArtworkApiTest extends AbstractSpringTestWithAWS {
 
-    @Autowired private UtilAuth utilAuth;
     @Autowired private UtilArtwork utilArtwork;
-    @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private UtilSecurityContext securityContext;
 
     @Test
+    @WithMockCustomUser(role = "user", auth = true)
     public void submitArtwork_notAuthorized() {
-        var registration = utilAuth.doConfirmedRegistration();
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
         byte[] image = getTestImageBytes();
         byte[] document = getTestCVBytes();
         given()
-                .header("Authorization", utilAuth.doAuthentication(registration))
+                .header("Authorization", securityContext.getToken())
                 .formParams(formParams)
                 .multiPart("images", genUUID() + ".jpg", image)
                 .multiPart("principalImage", genUUID() + ".jpg", image)
@@ -44,15 +44,14 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(role = "art_owner", auth = true)
     public void submitArtwork_missingCertificate() {
-        var registration = utilAuth.doConfirmedRegistration();
-        utilUserProfile.savedArtOwnerDto(registration.getId());
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, true, null);
         formParams.put("iAmArtOwner", String.valueOf(false));
         byte[] image = getTestImageBytes();
         byte[] document = getTestCVBytes();
         given()
-                .header("Authorization", utilAuth.doAuthentication(registration))
+                .header("Authorization", securityContext.getToken())
                 .formParams(formParams)
                 .multiPart("images", genUUID() + ".jpg", image)
                 .multiPart("principalImage", genUUID() + ".jpg", image)
@@ -66,15 +65,14 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(role = "art_owner", auth = true)
     public void submitArtwork_missingResume() {
-        var registration = utilAuth.doConfirmedRegistration();
-        utilUserProfile.savedArtOwnerDto(registration.getId());
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
         formParams.put("iAmArtOwner", String.valueOf(true));
         byte[] image = getTestImageBytes();
         byte[] document = getTestCVBytes();
         given()
-                .header("Authorization", utilAuth.doAuthentication(registration))
+                .header("Authorization", securityContext.getToken())
                 .formParams(formParams)
                 .multiPart("images", genUUID() + ".jpg", image)
                 .multiPart("principalImage", genUUID() + ".jpg", image)
@@ -88,14 +86,13 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(role = "art_owner", auth = true)
     public void submitArtwork_groupNotFound() {
-        var registration = utilAuth.doConfirmedRegistration();
-        utilUserProfile.savedArtOwnerDto(registration.getId());
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, -1L);
         byte[] image = getTestImageBytes();
         byte[] document = getTestCVBytes();
         given()
-                .header("Authorization", utilAuth.doAuthentication(registration))
+                .header("Authorization", securityContext.getToken())
                 .formParams(formParams)
                 .multiPart("images", genUUID() + ".jpg", image)
                 .multiPart("principalImage", genUUID() + ".jpg", image)
@@ -109,14 +106,13 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(role = "art_owner", auth = true)
     public void submitArtwork_saveToNewGroup() {
-        var registration = utilAuth.doConfirmedRegistration();
-        utilUserProfile.savedArtOwnerDto(registration.getId());
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
         byte[] image = getTestImageBytes();
         byte[] document = getTestCVBytes();
         var response = given()
-                .header("Authorization", utilAuth.doAuthentication(registration))
+                .header("Authorization", securityContext.getToken())
                 .formParams(formParams)
                 .multiPart("images", genUUID() + ".jpg", image)
                 .multiPart("principalImage", genUUID() + ".jpg", image)
@@ -135,15 +131,14 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(role = "art_owner", auth = true)
     public void submitArtwork_saveToExistingGroup() {
-        var registration = utilAuth.doConfirmedRegistration();
-        utilUserProfile.savedArtOwnerDto(registration.getId());
         var groupDto = utilArtwork.savedArtworkGroupDto(ArtworkGroup.Status.DRAFT);
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, groupDto.getId());
         byte[] image = getTestImageBytes();
         byte[] document = getTestCVBytes();
         var response = given()
-                .header("Authorization", utilAuth.doAuthentication(registration))
+                .header("Authorization", securityContext.getToken())
                 .formParams(formParams)
                 .multiPart("images", genUUID() + ".jpg", image)
                 .multiPart("principalImage", genUUID() + ".jpg", image)

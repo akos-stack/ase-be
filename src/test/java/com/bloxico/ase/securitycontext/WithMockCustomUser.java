@@ -1,4 +1,4 @@
-package com.bloxico.ase;
+package com.bloxico.ase.securitycontext;
 
 import org.springframework.security.test.context.support.WithSecurityContext;
 

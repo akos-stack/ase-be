@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
-import com.bloxico.ase.WithMockCustomUser;
+import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilLocation;
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
