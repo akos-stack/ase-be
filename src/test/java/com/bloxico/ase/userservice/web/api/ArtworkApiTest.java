@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.util.FileCategory.CV;
+import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.web.api.ArtworkApi.SUBMIT_ARTWORK;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
@@ -29,8 +31,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @WithMockCustomUser(role = Role.USER, auth = true)
     public void submitArtwork_notAuthorized() {
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
-        byte[] image = getTestImageBytes();
-        byte[] document = getTestCVBytes();
+        byte[] image = genFileBytes(IMAGE);
+        byte[] document = genFileBytes(CV);
         given()
                 .header("Authorization", securityContext.getToken())
                 .formParams(formParams)
@@ -49,8 +51,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     public void submitArtwork_missingCertificate() {
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, true, null);
         formParams.put("iAmArtOwner", String.valueOf(false));
-        byte[] image = getTestImageBytes();
-        byte[] document = getTestCVBytes();
+        byte[] image = genFileBytes(IMAGE);
+        byte[] document = genFileBytes(CV);
         given()
                 .header("Authorization", securityContext.getToken())
                 .formParams(formParams)
@@ -70,8 +72,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     public void submitArtwork_missingResume() {
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
         formParams.put("iAmArtOwner", String.valueOf(true));
-        byte[] image = getTestImageBytes();
-        byte[] document = getTestCVBytes();
+        byte[] image = genFileBytes(IMAGE);
+        byte[] document = genFileBytes(CV);
         given()
                 .header("Authorization", securityContext.getToken())
                 .formParams(formParams)
@@ -90,8 +92,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void submitArtwork_groupNotFound() {
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, -1L);
-        byte[] image = getTestImageBytes();
-        byte[] document = getTestCVBytes();
+        byte[] image = genFileBytes(IMAGE);
+        byte[] document = genFileBytes(CV);
         given()
                 .header("Authorization", securityContext.getToken())
                 .formParams(formParams)
@@ -110,8 +112,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void submitArtwork_saveToNewGroup() {
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, null);
-        byte[] image = getTestImageBytes();
-        byte[] document = getTestCVBytes();
+        byte[] image = genFileBytes(IMAGE);
+        byte[] document = genFileBytes(CV);
         var response = given()
                 .header("Authorization", securityContext.getToken())
                 .formParams(formParams)
@@ -136,8 +138,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     public void submitArtwork_saveToExistingGroup() {
         var groupDto = utilArtwork.savedArtworkGroupDto(ArtworkGroup.Status.DRAFT);
         var formParams = utilArtwork.genSaveArtworkFormParams(ArtworkGroup.Status.WAITING_FOR_EVALUATION, false, groupDto.getId());
-        byte[] image = getTestImageBytes();
-        byte[] document = getTestCVBytes();
+        byte[] image = genFileBytes(IMAGE);
+        byte[] document = genFileBytes(CV);
         var response = given()
                 .header("Authorization", securityContext.getToken())
                 .formParams(formParams)

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
 import static com.bloxico.ase.userservice.web.api.ArtworkMetadataApi.*;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_METADATA_NOT_FOUND;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.*;
@@ -51,7 +52,24 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         }
     }
 
-    // TODO-test updateArtworkMetadata_404_notFound
+    @Test
+    @WithMockCustomUser(auth = true)
+    public void updateArtworkMetadata_404_notFound() {
+        for (var type : Type.values()) {
+            var status = randEnumConst(Status.class);
+            var newStatus = randOtherEnumConst(status);
+            given()
+                    .header("Authorization", utilSecurityContext.getToken())
+                    .contentType(JSON)
+                    .body(new UpdateArtworkMetadataRequest(genUUID(), newStatus, type))
+                    .when()
+                    .post(API_URL + ARTWORK_METADATA_UPDATE)
+                    .then()
+                    .assertThat()
+                    .statusCode(404)
+                    .body(ERROR_CODE, is(ARTWORK_METADATA_NOT_FOUND.getCode()));
+        }
+    }
 
     @Test
     @WithMockCustomUser(auth = true)
@@ -77,7 +95,23 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
         }
     }
 
-    // TODO-test deleteArtworkMetadata_404_notFound
+    @Test
+    @WithMockCustomUser(auth = true)
+    public void deleteArtworkMetadata_404_notFound() {
+        for (var type : Type.values()) {
+            given()
+                    .header("Authorization", utilSecurityContext.getToken())
+                    .contentType(JSON)
+                    .param("name", genUUID())
+                    .param("type", type.name())
+                    .when()
+                    .delete(API_URL + ARTWORK_METADATA_DELETE)
+                    .then()
+                    .assertThat()
+                    .statusCode(404)
+                    .body(ERROR_CODE, is(ARTWORK_METADATA_NOT_FOUND.getCode()));
+        }
+    }
 
     @Test
     @WithMockCustomUser(auth = true)

@@ -4,7 +4,9 @@ import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
-import com.bloxico.ase.userservice.web.model.user.*;
+import com.bloxico.ase.userservice.web.model.user.BlacklistTokensRequest;
+import com.bloxico.ase.userservice.web.model.user.DisableUserRequest;
+import com.bloxico.ase.userservice.web.model.user.PagedUserDataResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 // Because RestAssured executes in another transaction
@@ -58,7 +61,27 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .body(ERROR_CODE, is(ErrorCodes.User.ROLE_NOT_FOUND.getCode()));
     }
 
-    // TODO-TEST searchUsers_nothingFound_200_ok
+    @Test
+    public void searchUsers_nothingFound_200_ok() {
+        utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var users = given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .param("email", genEmail())
+                .param("role", "admin")
+                .when()
+                .get(API_URL + USER_SEARCH_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PagedUserDataResponse.class)
+                .getUsers();
+        assertTrue(users.isEmpty());
+    }
 
     @Test
     @WithMockCustomUser(auth = true)
@@ -83,9 +106,52 @@ public class UserManagementApiTest extends AbstractSpringTest {
         assertThat(users, allOf(hasItems(u1, u2), not(hasItems(u3))));
     }
 
-    // TODO-TEST searchUsers_byRole_200_ok
+    @Test
+    @WithMockCustomUser(auth = true)
+    public void searchUsers_byRole_200_ok() {
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var a1 = utilUser.savedAdminDtoWithEmail(genEmail("adminBarFoo"));
+        var a2 = utilUser.savedAdminDtoWithEmail(genEmail("adminFooBar"));
+        var users = given()
+                .header("Authorization", utilSecurityContext.getToken())
+                .contentType(JSON)
+                .param("email", "")
+                .param("role", "admin")
+                .param("size", Integer.MAX_VALUE)
+                .when()
+                .get(API_URL + USER_SEARCH_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PagedUserDataResponse.class)
+                .getUsers();
+        assertThat(users, allOf(hasItems(a1, a2), not(hasItems(u1))));
+    }
 
-    // TODO-TEST searchUsers_byEmailAndRole_200_ok
+    @Test
+    @WithMockCustomUser(auth = true)
+    public void searchUsers_byEmailAndRole_200_ok() {
+        var admin = utilUser.savedAdminDtoWithEmail(genEmail("adFooBar"));
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var users = given()
+                .header("Authorization", utilSecurityContext.getToken())
+                .contentType(JSON)
+                .param("email", admin.getEmail())
+                .param("role", "admin")
+                .when()
+                .get(API_URL + USER_SEARCH_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PagedUserDataResponse.class)
+                .getUsers();
+        assertThat(users, allOf(hasItems(admin), not(hasItems(u1, u2))));
+    }
 
     @Test
     @WithMockCustomUser(auth = true)

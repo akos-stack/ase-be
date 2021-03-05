@@ -7,7 +7,9 @@ import com.bloxico.ase.userservice.service.token.impl.TokenBlacklistServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 
+import static com.bloxico.ase.testutil.Util.genEmail;
 import static com.bloxico.ase.userservice.entity.user.Role.ADMIN;
 import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
@@ -22,9 +24,27 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
     @Autowired private UserServiceImpl userService;
     @Autowired private UserManagementFacadeImpl userManagementFacade;
 
-    // TODO-TEST searchUsers_nullArgs
+    @Test
+    public void searchUsers_nullArgs() {
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u3 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        assertThat(userManagementFacade.searchUsers(u1.getEmail(), null, 0, MAX_VALUE, "name").getUsers(),
+                not(hasItems(u1, u2, u3)));
+        assertThrows(
+                InvalidDataAccessApiUsageException.class,
+                () -> userManagementFacade.searchUsers(null, "user", 0, MAX_VALUE, "name"));
+    }
 
-    // TODO-TEST searchUsers_notFound
+    @Test
+    public void searchUsers_notFound() {
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedUserDto();
+        var u3 = utilUser.savedUserDto();
+        assertThat(
+                userManagementFacade.searchUsers(u1.getEmail(), "admin", 0, MAX_VALUE, "name").getUsers(),
+                not(hasItems(u1, u2, u3)));
+    }
 
     @Test
     public void searchUsers_byEmail() {

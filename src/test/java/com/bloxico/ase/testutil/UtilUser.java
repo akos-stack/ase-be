@@ -85,6 +85,10 @@ public class UtilUser {
         return MAPPER.toDto(savedUserWithEmail(email));
     }
 
+    public UserDto savedAdminDtoWithEmail(String email) {
+        return MAPPER.toDto(savedAdmin(email, genPassword()));
+    }
+
     public void disableUser(Long userId) {
         var user = userRepository
                 .findById(userId)

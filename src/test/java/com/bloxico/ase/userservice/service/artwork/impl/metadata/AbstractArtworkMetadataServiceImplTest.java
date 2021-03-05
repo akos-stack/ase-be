@@ -5,19 +5,20 @@ import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
+import com.bloxico.ase.userservice.exception.ArtworkException;
 import com.bloxico.ase.userservice.service.artwork.IArtworkMetadataService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.bloxico.ase.testutil.Util.randEnumConst;
-import static com.bloxico.ase.testutil.Util.randOtherEnumConst;
+import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.PENDING;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public abstract class AbstractArtworkMetadataServiceImplTest extends AbstractSpringTest {
 
@@ -28,7 +29,13 @@ public abstract class AbstractArtworkMetadataServiceImplTest extends AbstractSpr
 
     abstract IArtworkMetadataService getService();
 
-    // TODO-test findOrSaveArtworkMetadata_nullMetadata
+    @Test
+    @WithMockCustomUser
+    public void findOrSaveArtworkMetadata_nullMetadata() {
+        assertThrows(
+                NullPointerException.class,
+                () -> getService().findOrSaveArtworkMetadata(null));
+    }
 
     @Test
     @WithMockCustomUser
@@ -65,9 +72,20 @@ public abstract class AbstractArtworkMetadataServiceImplTest extends AbstractSpr
         }
     }
 
-    // TODO-test updateArtworkMetadata_nullMetadata
+    @Test
+    @WithMockCustomUser
+    public void updateArtworkMetadata_nullMetadata() {
+        assertThrows(
+                NullPointerException.class,
+                () -> getService().updateArtworkMetadata(null));
+    }
 
-    // TODO-test updateArtworkMetadata_notFound
+    @Test
+    public void updateArtworkMetadata_notFound() {
+        utilArtworkMetadata.savedArtworkMetadataDto(getType(), APPROVED);
+        utilArtworkMetadata.savedArtworkMetadataDto(getType(), APPROVED);
+        assertNull(utilArtworkMetadata.findArtworkMetadataDto(getType(), PENDING));
+    }
 
     @Test
     @WithMockCustomUser
@@ -85,9 +103,19 @@ public abstract class AbstractArtworkMetadataServiceImplTest extends AbstractSpr
         }
     }
 
-    // TODO-test deleteCategory_nullName
+    @Test
+    public void deleteCategory_nullName() {
+        assertThrows(
+                NullPointerException.class,
+                () -> getService().deleteArtworkMetadata(null));
+    }
 
-    // TODO-test deleteCategory_notFound
+    @Test
+    public void deleteCategory_notFound() {
+        assertThrows(
+                ArtworkException.class,
+                () -> getService().deleteArtworkMetadata(genUUID()));
+    }
 
     @Test
     public void deleteCategory() {
@@ -111,7 +139,14 @@ public abstract class AbstractArtworkMetadataServiceImplTest extends AbstractSpr
                 hasItems(metadata1, metadata2));
     }
 
-    // TODO-test searchApprovedArtworkMetadata_nullName
+    @Test
+    public void searchApprovedArtworkMetadata_nullName() {
+        var metadata1 = utilArtworkMetadata.savedArtworkMetadataDto(getType(), APPROVED);
+        var metadata2 = utilArtworkMetadata.savedArtworkMetadataDto(getType(), PENDING);
+        assertThat(
+                getService().searchApprovedArtworkMetadata(null),
+                not(hasItems(metadata1, metadata2)));
+    }
 
     @Test
     public void searchApprovedArtworkMetadata() {

@@ -2,19 +2,14 @@ package com.bloxico.ase.userservice.service.token.impl;
 
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDocumentDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
-import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
+import com.bloxico.ase.userservice.entity.token.*;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status;
-import com.bloxico.ase.userservice.entity.token.PendingEvaluatorDocument;
-import com.bloxico.ase.userservice.entity.token.PendingEvaluatorDocumentId;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorDocumentRepository;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -103,6 +98,7 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     @Override
     public Page<PendingEvaluatorDto> searchPendingEvaluators(String email, int page, int size, String sort) {
         log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - start | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
+        requireNonNull(email);
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
         var pendingEvaluatorsDto = pendingEvaluatorRepository
                 .findAllByEmailContaining(email, pageable)
@@ -124,6 +120,7 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     @Override
     public void savePendingEvaluatorDocument(String email, long documentId) {
         log.debug("PendingEvaluatorServiceImpl.savePendingEvaluatorDocument - start | email: {}, documentId {}", email, documentId);
+        requireNonNull(email);
         var pendingEvaluatorDocument = new PendingEvaluatorDocument();
         var pendingEvaluatorDocumentId = new PendingEvaluatorDocumentId();
         pendingEvaluatorDocumentId.setDocumentId(documentId);

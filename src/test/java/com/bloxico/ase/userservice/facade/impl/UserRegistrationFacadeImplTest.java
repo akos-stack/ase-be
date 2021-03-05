@@ -364,7 +364,13 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
                 () -> userRegistrationFacade.submitEvaluator(request));
     }
 
-    // TODO-test submitEvaluator_countryNotFound
+    @Test
+    public void submitEvaluator_countryNotFound() {
+        var request = utilUserProfile.newSubmitUninvitedEvaluatorRequest(genUUID());
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.submitEvaluator(request));
+    }
 
     @Test
     @WithMockCustomUser
@@ -457,9 +463,26 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertSame(REQUESTED, newlyCreatedPendingEvaluator.getStatus());
     }
 
-    // TODO-TEST searchPendingEvaluators_nullEmail
+    @Test
+    public void searchPendingEvaluators_nullEmail() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userRegistrationFacade
+                        .searchPendingEvaluators(null, 0, 2, "email"));
+    }
 
-    // TODO-TEST searchPendingEvaluators_emptyResultSet
+    @Test
+    @WithMockCustomUser
+    public void searchPendingEvaluators_emptyResultSet() {
+        var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        assertThat(
+                userRegistrationFacade
+                        .searchPendingEvaluators("barFoo", 0, 2, "email")
+                        .getPendingEvaluators(),
+                not(hasItems(pe1, pe2, pe3)));
+    }
 
     @Test
     @WithMockCustomUser

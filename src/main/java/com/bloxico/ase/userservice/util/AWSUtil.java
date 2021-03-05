@@ -28,6 +28,8 @@ public class AWSUtil {
     private Environment environment;
 
     public String uploadFile(FileCategory category, MultipartFile file) {
+        requireNonNull(category);
+        requireNonNull(file);
         File convFile = null;
         try {
             convFile = convertMultiPartToFile(file);
@@ -44,9 +46,9 @@ public class AWSUtil {
     }
 
     public byte[] downloadFile(String path) {
+        requireNonNull(path);
         try (var ob = s3client.getObject(bucketName, path);
-             var in = ob.getObjectContent())
-        {
+             var in = ob.getObjectContent()) {
             return IOUtils.toByteArray(in);
         } catch (Throwable ex) {
             throw FILE_DOWNLOAD_FAILED.newException(ex);
@@ -54,6 +56,7 @@ public class AWSUtil {
     }
 
     public void deleteFile(String path) {
+        requireNonNull(path);
         try {
             s3client.deleteObject(bucketName, path);
         } catch (Throwable ex) {
@@ -62,6 +65,7 @@ public class AWSUtil {
     }
 
     private static File convertMultiPartToFile(MultipartFile file) {
+        requireNonNull(file);
         var convFile = new File(requireNonNull(file.getOriginalFilename()));
         try (var fos = new FileOutputStream(convFile)) {
             fos.write(file.getBytes());
@@ -72,6 +76,7 @@ public class AWSUtil {
     }
 
     private static String genFileName(MultipartFile file) {
+        requireNonNull(file);
         return UUID.randomUUID()
                 + "."
                 + FilenameUtils.getExtension(file.getOriginalFilename());
