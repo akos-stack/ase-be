@@ -159,7 +159,7 @@ public class UtilEvaluation {
         return new SearchRegionEvaluationDetailsRequest("");
     }
 
-    public Map<String, String> genRegionEvaluationDetailsFormParams(Integer page, Integer size, String sort, String order, String search) {
+    public Map<String, String> allPages(Integer page, Integer size, String sort, String order, String search) {
         var map = new HashMap<String, String>();
         map.put("page", Integer.toString(page));
         map.put("size", Integer.toString(size));
@@ -168,5 +168,4 @@ public class UtilEvaluation {
         map.put("search", search);
         return map;
     }
-
 }
