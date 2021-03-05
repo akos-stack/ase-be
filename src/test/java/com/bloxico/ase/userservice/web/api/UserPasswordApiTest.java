@@ -1,6 +1,8 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.password.*;
 import com.bloxico.ase.userservice.web.model.token.ResendTokenRequest;
@@ -21,6 +23,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
 
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilUser utilUser;
+    @Autowired private UtilSecurityContext utilSecurityContext;
 
     @Test
     public void initForgotPasswordProcedure_404_userNotFound() {
@@ -132,11 +135,12 @@ public class UserPasswordApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(role = Role.USER, auth = true)
     public void updateKnownPassword_400_oldPasswordMismatch() {
         var oldPassword = genPassword();
         var newPassword = genPassword();
         given()
-                .header("Authorization", utilAuth.doAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new KnownPasswordUpdateRequest(oldPassword, newPassword))
                 .when()
@@ -148,11 +152,12 @@ public class UserPasswordApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true, password = "SomePass1#")
     public void updateKnownPassword_200_ok() {
-        var oldPassword = genPassword();
+        var oldPassword = "SomePass1#";
         var newPassword = genPassword();
         given()
-                .header("Authorization", utilAuth.doAuthentication(oldPassword))
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new KnownPasswordUpdateRequest(oldPassword, newPassword))
                 .when()
@@ -163,9 +168,10 @@ public class UserPasswordApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void setNewPassword_200_ok() {
         given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new SetPasswordRequest(genPassword()))
                 .when()
