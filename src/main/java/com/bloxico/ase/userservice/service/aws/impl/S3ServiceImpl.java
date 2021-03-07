@@ -42,16 +42,17 @@ public class S3ServiceImpl implements IS3Service {
     public List<String> validateFiles(FileCategory category, List<MultipartFile> files) {
         var log_files = files.stream().map(MultipartFile::getOriginalFilename).collect(Collectors.toList());
         log.debug("S3ServiceImpl.validateFile - start | category: {}, files: {}", category, log_files);
-        var invalidFiles = new ArrayList<MultipartFile>();
+        var checkedFiles = new ArrayList<MultipartFile>();
         requireNonNull(category);
+        requireNonNull(files);
         files.forEach(file -> {
             requireNonNull(file);
             if(!category.validateFiles(file, environment))
-                invalidFiles.add(file);
+                checkedFiles.add(file);
         });
-        var invalidFilesNames = invalidFiles.stream().map(MultipartFile::getOriginalFilename).collect(Collectors.toList());
-        log.debug("S3ServiceImpl.validateFile - end | category: {}, files: {}", category, invalidFilesNames);
-        return invalidFilesNames;
+        var checkedFilesNames = checkedFiles.stream().map(MultipartFile::getOriginalFilename).collect(Collectors.toList());
+        log.debug("S3ServiceImpl.validateFile - end | category: {}, files: {}", category, checkedFilesNames);
+        return checkedFilesNames;
     }
 
     @Override
