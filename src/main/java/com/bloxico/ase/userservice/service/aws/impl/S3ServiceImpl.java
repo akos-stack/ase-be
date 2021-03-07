@@ -10,6 +10,10 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -32,6 +36,22 @@ public class S3ServiceImpl implements IS3Service {
         requireNonNull(file);
         category.validate(file, environment);
         log.debug("S3ServiceImpl.validateFile - end | category: {}, file: {}", category, file.getName());
+    }
+
+    @Override
+    public List<String> validateFiles(FileCategory category, List<MultipartFile> files) {
+        var log_files = files.stream().map(MultipartFile::getOriginalFilename).collect(Collectors.toList());
+        log.debug("S3ServiceImpl.validateFile - start | category: {}, files: {}", category, log_files);
+        var invalidFiles = new ArrayList<MultipartFile>();
+        requireNonNull(category);
+        files.forEach(file -> {
+            requireNonNull(file);
+            if(!category.validateFiles(file, environment))
+                invalidFiles.add(file);
+        });
+        var invalidFilesNames = invalidFiles.stream().map(MultipartFile::getOriginalFilename).collect(Collectors.toList());
+        log.debug("S3ServiceImpl.validateFile - end | category: {}, files: {}", category, invalidFilesNames);
+        return invalidFilesNames;
     }
 
     @Override

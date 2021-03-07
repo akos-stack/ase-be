@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
@@ -68,4 +69,12 @@ public enum FileCategory {
             throw FILE_SIZE_EXCEEDED.newException();
     }
 
+    public boolean validateFiles(MultipartFile file, Environment environment) {
+        if (!supportedFileExtensions.contains(getByExtension(getExtension(file.getOriginalFilename()))))
+            return false;
+        long maxFileSizeKb = Long.parseLong(requireNonNull(environment.getProperty(maxSizeProperty)));
+        if ((file.getSize() / 1024) > maxFileSizeKb)
+            return false;
+        return true;
+    }
 }
