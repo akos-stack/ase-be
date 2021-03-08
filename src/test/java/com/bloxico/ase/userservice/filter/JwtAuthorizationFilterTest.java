@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.filter;
 
-import com.bloxico.ase.securitycontext.WithMockCustomUser;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;

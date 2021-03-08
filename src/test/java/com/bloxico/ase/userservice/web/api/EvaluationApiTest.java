@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.securitycontext.WithMockCustomUser;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.entity.user.Role;

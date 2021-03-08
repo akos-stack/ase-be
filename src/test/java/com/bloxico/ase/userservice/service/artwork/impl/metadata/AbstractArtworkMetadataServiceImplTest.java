@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.service.artwork.impl.metadata;
 
-import com.bloxico.ase.securitycontext.WithMockCustomUser;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;

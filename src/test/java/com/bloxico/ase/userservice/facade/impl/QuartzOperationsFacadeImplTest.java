@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.securitycontext.WithMockCustomUser;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import com.bloxico.ase.userservice.repository.token.BlacklistedTokenRepository;
