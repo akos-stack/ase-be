@@ -20,18 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
 
-    @Autowired
-    private UtilUser utilUser;
-    @Autowired
-    private UtilLocation utilLocation;
-    @Autowired
-    private UtilEvaluation utilEvaluation;
-    @Autowired
-    private UtilUserProfile utilUserProfile;
-    @Autowired
-    private EvaluationFacadeImpl evaluationFacade;
-    @Autowired
-    private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilLocation utilLocation;
+    @Autowired private UtilEvaluation utilEvaluation;
+    @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private EvaluationFacadeImpl evaluationFacade;
+    @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test
     public void searchCountryEvaluationDetails_nullRequest() {

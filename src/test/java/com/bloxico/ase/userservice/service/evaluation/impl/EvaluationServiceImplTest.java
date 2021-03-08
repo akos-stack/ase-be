@@ -17,18 +17,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
-    @Autowired
-    private UtilUser utilUser;
-    @Autowired
-    private UtilUserProfile utilUserProfile;
-    @Autowired
-    private UtilLocation utilLocation;
-    @Autowired
-    private UtilEvaluation utilEvaluation;
-    @Autowired
-    private EvaluationServiceImpl evaluationService;
-    @Autowired
-    private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private UtilLocation utilLocation;
+    @Autowired private UtilEvaluation utilEvaluation;
+    @Autowired private EvaluationServiceImpl evaluationService;
+    @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test
     public void findCountryEvaluationDetailsById_detailsNotFound() {
