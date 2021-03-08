@@ -48,6 +48,6 @@ public class UserProfileDto {
     private LocationDto location;
 
     @JsonProperty("document")
-    DocumentDto document;
+    private DocumentDto document;
 
 }

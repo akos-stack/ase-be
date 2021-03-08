@@ -7,9 +7,9 @@ import lombok.Value;
 public class UserProfileDocumentDto {
 
     @JsonProperty("user_id")
-    private Long userId;
+    Long userId;
 
     @JsonProperty("document_id")
-    private Long documentId;
+    Long documentId;
 
 }
