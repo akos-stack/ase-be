@@ -27,7 +27,8 @@ public class ValidateFilesRequest {
     @ApiModelProperty(required = true)
     List<MultipartFile> files;
 
-
+    @NotNull
+    @NotEmpty
     @JsonProperty("file_category")
     @ApiModelProperty(required = true)
     FileCategory fileCategory;

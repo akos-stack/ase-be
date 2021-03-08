@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -43,7 +44,7 @@ public interface S3Api {
             @ApiResponse(code = 200, message = "Files successfully uploaded."),
             @ApiResponse(code = 400, message = "Invalid files.")
     })
-    ResponseEntity<List<String>> validateFiles(ValidateFilesRequest validateFilesRequest);
+    ResponseEntity<List<String>> validateFiles(@Valid ValidateFilesRequest validateFilesRequest);
 
     @GetMapping(
             value = S3_DOWNLOAD,

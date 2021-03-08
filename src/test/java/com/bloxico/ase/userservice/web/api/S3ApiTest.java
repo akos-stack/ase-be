@@ -30,7 +30,7 @@ public class S3ApiTest extends AbstractSpringTestWithAWS{
         var registration = utilAuth.doConfirmedRegistration();
         var textBytes_CV = genFileBytes(CV);
         var textBytes2_CV = genFileBytes(CV);
-        given().config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+        given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .contentType("multipart/form-data")
                 .formParam("fileCategory", "CV")
@@ -48,7 +48,7 @@ public class S3ApiTest extends AbstractSpringTestWithAWS{
         var registration = utilAuth.doConfirmedRegistration();
         var imageBytes_JPG = genFileBytes(IMAGE);
         var imageBytes2_JPG = genFileBytes(IMAGE);
-        given().config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+        given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .contentType("multipart/form-data")
                 .formParam("fileCategory", "IMAGE")
@@ -66,7 +66,7 @@ public class S3ApiTest extends AbstractSpringTestWithAWS{
         var registration = utilAuth.doConfirmedRegistration();
         var imageBytes_JPG = genFileBytes(IMAGE);
         var textBytes2_CV = genFileBytes(CV);
-        var response = given().config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+        var response = given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .contentType("multipart/form-data")
                 .formParam("fileCategory", "IMAGE")
@@ -91,7 +91,7 @@ public class S3ApiTest extends AbstractSpringTestWithAWS{
         var registration = utilAuth.doConfirmedRegistration();
         var imageBytes_JPG = genFileBytes(IMAGE);
         var imageBytes2_JPG = genFileBytes(IMAGE);
-        var response = given().config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+        var response = given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .contentType("multipart/form-data")
                 .formParam("fileCategory", "CV")
@@ -116,7 +116,7 @@ public class S3ApiTest extends AbstractSpringTestWithAWS{
     public void validateFiles_400_one_file() {
         var registration = utilAuth.doConfirmedRegistration();
         var imageBytes_JPG = genFileBytes(IMAGE);
-        given().config(RestAssured.config().encoderConfig(EncoderConfig.encoderConfig().encodeContentTypeAs("multipart/form-data", ContentType.JSON)))
+        given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
                 .contentType("multipart/form-data")
                 .formParam("fileCategory", "IMAGE")
