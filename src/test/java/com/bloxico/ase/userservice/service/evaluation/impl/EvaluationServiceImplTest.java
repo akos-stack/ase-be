@@ -18,12 +18,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
-    @Autowired private UtilUser utilUser;
-    @Autowired private UtilUserProfile utilUserProfile;
-    @Autowired private UtilLocation utilLocation;
-    @Autowired private UtilEvaluation utilEvaluation;
-    @Autowired private EvaluationServiceImpl evaluationService;
-    @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
+    @Autowired
+    private UtilUser utilUser;
+    @Autowired
+    private UtilUserProfile utilUserProfile;
+    @Autowired
+    private UtilLocation utilLocation;
+    @Autowired
+    private UtilEvaluation utilEvaluation;
+    @Autowired
+    private EvaluationServiceImpl evaluationService;
+    @Autowired
+    private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test
     public void findCountryEvaluationDetailsById_detailsNotFound() {
@@ -69,7 +75,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void searchCountryEvaluationDetails_emptyRegions() {
-        var request= utilEvaluation.genSearchCountryEvaluationDetailsRequest(Collections.emptyList());
+        var request = utilEvaluation.genSearchCountryEvaluationDetailsRequest(Collections.emptyList());
         assertThrows(
                 NullPointerException.class,
                 () -> evaluationService.searchCountryEvaluationDetails(request, allPages()));
@@ -90,17 +96,13 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void searchCountryEvaluationDetails_withRegions() {
-        var region1 = utilLocation.savedRegion().getName();
-        var region2 = utilLocation.savedRegion().getName();
-        var regionsFilter = Arrays.asList(region1, region2);
-        var request = utilEvaluation
-                .genSearchCountryEvaluationDetailsRequest(regionsFilter);
-        var c1 = utilEvaluation
-                .savedCountryEvaluationDetailsCountedProjWithRegionName(region1);
-        var c2 = utilEvaluation
-                .savedCountryEvaluationDetailsCountedProjWithRegionName(region2);
-        var c3 = utilEvaluation
-                .savedCountryEvaluationDetailsCountedProj();
+        var region1 = utilLocation.savedRegion();
+        var region2 = utilLocation.savedRegion();
+        var regionsFilter = Arrays.asList(region1.getName(), region2.getName());
+        var request = utilEvaluation.genSearchCountryEvaluationDetailsRequest(regionsFilter);
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region1);
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region2);
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
         assertThat(
                 evaluationService.searchCountryEvaluationDetails(request, allPages()),
                 allOf(hasItems(c1, c2), not(hasItems(c3))));
@@ -121,17 +123,13 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void searchCountryEvaluationDetails_forManagement_withRegions() {
-        var region1 = utilLocation.savedRegion().getName();
-        var region2 = utilLocation.savedRegion().getName();
-        var regionsFilter = Arrays.asList(region1, region2);
-        var request = utilEvaluation
-                .genSearchCountryEvaluationDetailsForManagementRequest(regionsFilter);
-        var c1 = utilEvaluation
-                .savedCountryEvaluationDetailsCountedProjWithRegionName(region1);
-        var c2 = utilEvaluation
-                .savedCountryEvaluationDetailsCountedProjNoDetailsWithRegionName(region2);
-        var c3 = utilEvaluation
-                .savedCountryEvaluationDetailsCountedProj();
+        var region1 = utilLocation.savedRegion();
+        var region2 = utilLocation.savedRegion();
+        var regionsFilter = Arrays.asList(region1.getName(), region2.getName());
+        var request = utilEvaluation.genSearchCountryEvaluationDetailsForManagementRequest(regionsFilter);
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region1);
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithRegion(region2);
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
         assertThat(
                 evaluationService.searchCountryEvaluationDetails(request, allPages()),
                 allOf(hasItems(c1, c2), not(hasItems(c3))));

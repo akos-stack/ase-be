@@ -1,6 +1,7 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.*;
+import com.bloxico.ase.userservice.entity.address.Region;
 import com.bloxico.ase.userservice.entity.evaluation.*;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
@@ -71,9 +72,7 @@ public class UtilEvaluation {
                 details.getAvailabilityPercentage(), 0L);
     }
 
-    public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProjWithRegionName(
-            String regionName) {
-        var region = utilLocation.savedRegion(regionName);
+    public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProjWithRegion(Region region) {
         var country = utilLocation.savedCountryWithRegion(region);
         var details = savedCountryEvaluationDetails(country.getId());
         return new CountryEvaluationDetailsWithEvaluatorsCountProj(country.getId(), country.getName(),
@@ -96,9 +95,7 @@ public class UtilEvaluation {
                 null, null, null, 0L);
     }
 
-    public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProjNoDetailsWithRegionName(
-            String regionName) {
-        var region = utilLocation.savedRegion(regionName);
+    public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProjNoDetailsWithRegion(Region region) {
         var country = utilLocation.savedCountryWithRegion(region);
         return new CountryEvaluationDetailsWithEvaluatorsCountProj(country.getId(), country.getName(),
                 List.of(region.getName()), null, null, null, 0L);

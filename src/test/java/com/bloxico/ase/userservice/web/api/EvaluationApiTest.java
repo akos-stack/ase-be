@@ -62,17 +62,17 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void searchCountryEvaluationDetails_withRegions_200_ok() {
-        var region1 = utilLocation.savedRegion().getName();
-        var region2 = utilLocation.savedRegion().getName();
-        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegionName(region1);
-        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegionName(region2);
+        var region1 = utilLocation.savedRegion();
+        var region2 = utilLocation.savedRegion();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region1);
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region2);
         var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
-        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithRegionName(region2);
+        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithRegion(region2);
 
         var content = given()
                 .header("Authorization", utilAuth.doAuthentication())
                 .params(allPages("search", ""))
-                .param("regions", String.format("%s,%s", region1, region2))
+                .param("regions", String.format("%s,%s", region1.getName(), region2.getName()))
                 .when()
                 .get(API_URL + EVALUATION_COUNTRY_DETAILS_SEARCH)
                 .then()
@@ -114,17 +114,17 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void searchCountryEvaluationDetailsForManagement_withRegions_200_ok() {
-        var region1 = utilLocation.savedRegion().getName();
-        var region2 = utilLocation.savedRegion().getName();
-        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegionName(region1);
-        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegionName(region2);
+        var region1 = utilLocation.savedRegion();
+        var region2 = utilLocation.savedRegion();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region1);
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region2);
         var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
-        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithRegionName(region2);
+        var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithRegion(region2);
 
         var content = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .params(allPages("search", ""))
-                .param("regions", String.format("%s,%s", region1, region2))
+                .param("regions", String.format("%s,%s", region1.getName(), region2.getName()))
                 .when()
                 .get(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH)
                 .then()
