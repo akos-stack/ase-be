@@ -298,6 +298,11 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .queryParams(allPages("search", region))
                 .when()
                 .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
                 .as(SearchRegionEvaluationDetailsResponse.class)
                 .getPage()
                 .getContent();
