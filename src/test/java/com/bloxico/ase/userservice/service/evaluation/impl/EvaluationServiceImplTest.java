@@ -6,7 +6,6 @@ import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetail
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -98,7 +97,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     public void searchCountryEvaluationDetails_withRegions() {
         var region1 = utilLocation.savedRegion();
         var region2 = utilLocation.savedRegion();
-        var regionsFilter = Arrays.asList(region1.getName(), region2.getName());
+        var regionsFilter = List.of(region1.getName(), region2.getName());
         var request = utilEvaluation.genSearchCountryEvaluationDetailsRequest(regionsFilter);
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region1);
         var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region2);
@@ -125,7 +124,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     public void searchCountryEvaluationDetails_forManagement_withRegions() {
         var region1 = utilLocation.savedRegion();
         var region2 = utilLocation.savedRegion();
-        var regionsFilter = Arrays.asList(region1.getName(), region2.getName());
+        var regionsFilter = List.of(region1.getName(), region2.getName());
         var request = utilEvaluation.genSearchCountryEvaluationDetailsForManagementRequest(regionsFilter);
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region1);
         var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithRegion(region2);
