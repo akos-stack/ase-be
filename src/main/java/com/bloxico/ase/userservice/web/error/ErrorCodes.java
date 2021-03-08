@@ -158,7 +158,7 @@ public interface ErrorCodes {
                 "Region with specified name was not found."),
 
         REGION_DELETE_OPERATION_NOT_SUPPORTED(
-                HttpStatus.BAD_REQUEST,
+                HttpStatus.CONFLICT,
                 "32",
                 "One or more countries are tied down to the region. Region cannot be deleted."),
 
@@ -245,14 +245,19 @@ public interface ErrorCodes {
                 "41",
                 "Specified evaluation details not found."),
 
-        QUOTATION_PACKAGE_EXISTS(
+        COUNTRY_EVALUATION_DETAILS_DELETE_OPERATION_NOT_SUPPORTED(
                 HttpStatus.CONFLICT,
                 "42",
+                "There are evaluators from country to which evaluation details belong."),
+
+        QUOTATION_PACKAGE_EXISTS(
+                HttpStatus.CONFLICT,
+                "43",
                 "Quotation package already exists for specified artwork."),
 
         QUOTATION_PACKAGE_COUNTRY_EXISTS(
                 HttpStatus.CONFLICT,
-                "43",
+                "44",
                 "Quotation package country already exists for specified country.");
 
         private final HttpStatus httpStatus;

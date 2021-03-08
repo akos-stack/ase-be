@@ -1,12 +1,12 @@
 package com.bloxico.ase.userservice.web.model.evaluation;
 
-import java.util.Set;
+import java.util.List;
 
 public interface ISearchCountryEvaluationDetailsRequest {
 
     String getSearch();
 
-    Set<String> getRegions();
+    List<String> getRegions();
 
     default boolean includeCountriesWithoutEvaluationDetails() {
         return false;

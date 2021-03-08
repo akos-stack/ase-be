@@ -3,21 +3,35 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.EvaluationException;
 import com.bloxico.ase.userservice.exception.LocationException;
+import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Collections;
+import java.util.List;
 
 import static com.bloxico.ase.testutil.Util.allPages;
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
 
-    @Autowired private UtilUser utilUser;
-    @Autowired private UtilEvaluation utilEvaluation;
-    @Autowired private EvaluationFacadeImpl evaluationFacade;
+    @Autowired
+    private UtilUser utilUser;
+    @Autowired
+    private UtilLocation utilLocation;
+    @Autowired
+    private UtilEvaluation utilEvaluation;
+    @Autowired
+    private UtilUserProfile utilUserProfile;
+    @Autowired
+    private EvaluationFacadeImpl evaluationFacade;
+    @Autowired
+    private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test
     public void searchCountryEvaluationDetails_nullRequest() {
@@ -32,6 +46,15 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertThrows(
                 NullPointerException.class,
                 () -> evaluationFacade.searchCountryEvaluationDetails(request, null));
+    }
+
+    @Test
+    public void searchCountryEvaluationDetails_emptyRegions() {
+        var request = utilEvaluation
+                .genSearchCountryEvaluationDetailsRequest(Collections.emptyList());
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.searchCountryEvaluationDetails(request, allPages()));
     }
 
     @Test
@@ -52,6 +75,22 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    public void searchCountryEvaluationDetails_withRegions() {
+        var region1 = utilLocation.savedRegion();
+        var region2 = utilLocation.savedRegion();
+        var regionsFilter = List.of(region1.getName(), region2.getName());
+        var request = utilEvaluation.genSearchCountryEvaluationDetailsRequest(regionsFilter);
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region1);
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region2);
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        assertThat(
+                evaluationFacade.searchCountryEvaluationDetails(request, allPages())
+                        .getPage()
+                        .getContent(),
+                allOf(hasItems(c1, c2), not(hasItems(c3))));
+    }
+
+    @Test
     public void searchCountryEvaluationDetails_forManagement() {
         var request = utilEvaluation.genSearchCountryEvaluationDetailsForManagementRequest();
         var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
@@ -66,6 +105,22 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
                         .getPage()
                         .getContent(),
                 hasItems(c1, c2));
+    }
+
+    @Test
+    public void searchCountryEvaluationDetails_forManagement_withRegions() {
+        var region1 = utilLocation.savedRegion();
+        var region2 = utilLocation.savedRegion();
+        var regionsFilter = List.of(region1.getName(), region2.getName());
+        var request = utilEvaluation.genSearchCountryEvaluationDetailsForManagementRequest(regionsFilter);
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithRegion(region1);
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithRegion(region2);
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        assertThat(
+                evaluationFacade.searchCountryEvaluationDetails(request, allPages())
+                        .getPage()
+                        .getContent(),
+                allOf(hasItems(c1, c2), not(hasItems(c3))));
     }
 
     @Test
@@ -132,6 +187,30 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertEquals(details.getCountryId(), updatedDetails.getCountryId());
         assertEquals(request.getPricePerEvaluation(), updatedDetails.getPricePerEvaluation());
         assertEquals(request.getAvailabilityPercentage(), updatedDetails.getAvailabilityPercentage());
+    }
+
+    @Test
+    public void deleteCountryEvaluationDetails_detailsNotFound() {
+        assertThrows(
+                EvaluationException.class,
+                () -> evaluationFacade.deleteCountryEvaluationDetails(-1));
+    }
+
+    @Test
+    public void deleteCountryEvaluationDetails_countryHasEvaluators() {
+        var evaluator = utilUserProfile.savedEvaluator();
+        var countryId = evaluator.getUserProfile().getLocation().getCountry().getId();
+        var evaluationDetailsId = utilEvaluation.savedCountryEvaluationDetails(countryId).getId();
+        assertThrows(
+                EvaluationException.class,
+                () -> evaluationFacade.deleteCountryEvaluationDetails(evaluationDetailsId));
+    }
+
+    @Test
+    public void deleteCountryEvaluationDetails() {
+        var evaluationDetailsId = utilEvaluation.savedCountryEvaluationDetails().getId();
+        evaluationFacade.deleteCountryEvaluationDetails(evaluationDetailsId);
+        assertTrue(countryEvaluationDetailsRepository.findById(evaluationDetailsId).isEmpty());
     }
 
     @Test

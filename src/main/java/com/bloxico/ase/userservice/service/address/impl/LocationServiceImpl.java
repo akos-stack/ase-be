@@ -75,6 +75,17 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
+    public CountryDto findCountryById(int id) {
+        log.debug("LocationServiceImpl.findCountryById - start | id: {}", id);
+        var countryDto = countryRepository
+                .findById(id)
+                .map(MAPPER::toDto)
+                .orElseThrow(COUNTRY_NOT_FOUND::newException);
+        log.debug("LocationServiceImpl.findCountryById - end | id: {}", id);
+        return countryDto;
+    }
+
+    @Override
     public CountryDto findCountryByName(String country) {
         log.debug("LocationServiceImpl.findCountryByName - start | country: {}", country);
         var countryDto = countryRepository

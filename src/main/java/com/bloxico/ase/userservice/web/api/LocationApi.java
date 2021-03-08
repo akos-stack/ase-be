@@ -51,7 +51,7 @@ public interface LocationApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Region successfully deleted."),
             @ApiResponse(code = 404, message = "Specified region doesn't exist."),
-            @ApiResponse(code = 400, message = "Region has one or more countries tied down to it.")
+            @ApiResponse(code = 409, message = "Region has one or more countries tied down to it.")
     })
     ResponseEntity<Void> deleteRegion(@Valid @RequestBody DeleteRegionRequest request);
 
