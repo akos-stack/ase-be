@@ -38,9 +38,9 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     @Test
     public void searchCountryEvaluationDetails_200_ok() {
         var country = genUUID();
-        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(country);
-        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(country);
-        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithCountryName(country);
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(genWithSubstring(country));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(genWithSubstring(country));
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithCountryName(genWithSubstring(country));
         var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(genUUID());
 
         var content = given()
@@ -90,9 +90,9 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     @Test
     public void searchCountryEvaluationDetailsForManagement_200_ok() {
         var country = genUUID();
-        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(country);
-        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(country);
-        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithCountryName(country);
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(genWithSubstring(country));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(genWithSubstring(country));
+        var c3 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetailsWithCountryName(genWithSubstring(country));
         var c4 = utilEvaluation.savedCountryEvaluationDetailsCountedProjWithCountryName(genUUID());
 
         var content = given()
@@ -288,9 +288,9 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     @Test
     public void searchRegionEvaluationDetailsForManagement_200_ok() {
         var region = genUUID();
-        var r1 = utilEvaluation.savedRegionCountedProj(region);
-        var r2 = utilEvaluation.savedRegionCountedProj(region.toUpperCase());
-        var r3 = utilEvaluation.savedRegionCountedProj(region.toLowerCase());
+        var r1 = utilEvaluation.savedRegionCountedProj(genWithSubstring(region));
+        var r2 = utilEvaluation.savedRegionCountedProj(genWithSubstring(region.toUpperCase()));
+        var r3 = utilEvaluation.savedRegionCountedProj(genWithSubstring(region.toLowerCase()));
         var r4 = utilEvaluation.savedRegionCountedProj(genUUID());
 
         var content = given()

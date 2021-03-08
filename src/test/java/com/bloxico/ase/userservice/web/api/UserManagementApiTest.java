@@ -108,6 +108,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .contentType(JSON)
                 .param("email", "")
                 .param("role", "admin")
+                .param("size", Integer.MAX_VALUE)
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()

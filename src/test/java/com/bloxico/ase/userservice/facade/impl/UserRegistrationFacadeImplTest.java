@@ -1,8 +1,7 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
-import com.bloxico.ase.userservice.exception.TokenException;
-import com.bloxico.ase.userservice.exception.UserException;
+import com.bloxico.ase.userservice.exception.*;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
@@ -362,9 +361,9 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void submitEvaluator_countryNotFound() {
-        var request = utilUserProfile.newSubmitUninvitedEvaluatorRequest(genUUID());
+        var request = utilToken.submitInvitedEvaluatorRequest(genUUID());
         assertThrows(
-                TokenException.class,
+                LocationException.class,
                 () -> userRegistrationFacade.submitEvaluator(request));
     }
 
@@ -382,7 +381,13 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
                 () -> userRegistrationFacade.submitArtOwner(null));
     }
 
-    // TODO-test submitArtOwner_countryNotFound
+    @Test
+    public void submitArtOwner_countryNotFound() {
+        var request = utilUserProfile.newSubmitArtOwnerRequest(genUUID());
+        assertThrows(
+                LocationException.class,
+                () -> userRegistrationFacade.submitArtOwner(request));
+    }
 
     @Test
     public void submitArtOwner_userAlreadyExists() {

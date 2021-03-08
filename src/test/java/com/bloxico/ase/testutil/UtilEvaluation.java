@@ -62,8 +62,12 @@ public class UtilEvaluation {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithNameAndRegion(countryName, region);
         var details = savedCountryEvaluationDetails(country.getId());
-        return new CountryEvaluationDetailsWithEvaluatorsCountProj(country.getId(), country.getName(),
-                List.of(region.getName()), details.getId(), details.getPricePerEvaluation(),
+        return new CountryEvaluationDetailsWithEvaluatorsCountProj(
+                country.getId(),
+                country.getName(),
+                List.of(region.getName()),
+                details.getId(),
+                details.getPricePerEvaluation(),
                 details.getAvailabilityPercentage(), 0L);
     }
 
@@ -85,8 +89,11 @@ public class UtilEvaluation {
             String countryName) {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithNameAndRegion(countryName, region);
-        return new CountryEvaluationDetailsWithEvaluatorsCountProj(country.getId(), country.getName(),
-                List.of(region.getName()), null, null, null, 0L);
+        return new CountryEvaluationDetailsWithEvaluatorsCountProj(
+                country.getId(),
+                country.getName(),
+                List.of(region.getName()),
+                null, null, null, 0L);
     }
 
     public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProjNoDetailsWithRegionName(
@@ -176,8 +183,8 @@ public class UtilEvaluation {
         return new RegionWithCountriesAndEvaluatorsCountProj(region.getId(), region.getName(), 0, 0);
     }
 
-    public RegionWithCountriesAndEvaluatorsCountProj savedRegionCountedProj(String name) {
-        var region = utilLocation.savedRegion(name);
+    public RegionWithCountriesAndEvaluatorsCountProj savedRegionCountedProj(String regionName) {
+        var region = utilLocation.savedRegion(regionName);
         return new RegionWithCountriesAndEvaluatorsCountProj(region.getId(), region.getName(), 0, 0);
     }
 

@@ -3,8 +3,11 @@ package com.bloxico.ase.userservice.service.user.impl;
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
+import com.bloxico.ase.userservice.entity.user.profile.UserProfileDocument;
+import com.bloxico.ase.userservice.entity.user.profile.UserProfileDocumentId;
 import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
 import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
+import com.bloxico.ase.userservice.repository.user.profile.UserProfileDocumentRepository;
 import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
@@ -23,15 +26,18 @@ public class UserProfileServiceImpl implements IUserProfileService {
     private final UserProfileRepository userProfileRepository;
     private final EvaluatorRepository evaluatorRepository;
     private final ArtOwnerRepository artOwnerRepository;
+    private final UserProfileDocumentRepository userProfileDocumentRepository;
 
     @Autowired
     public UserProfileServiceImpl(UserProfileRepository userProfileRepository,
                                   EvaluatorRepository evaluatorRepository,
-                                  ArtOwnerRepository artOwnerRepository)
+                                  ArtOwnerRepository artOwnerRepository,
+                                  UserProfileDocumentRepository userProfileDocumentRepository)
     {
         this.userProfileRepository = userProfileRepository;
         this.evaluatorRepository = evaluatorRepository;
         this.artOwnerRepository = artOwnerRepository;
+        this.userProfileDocumentRepository = userProfileDocumentRepository;
     }
 
     @Override
@@ -100,6 +106,18 @@ public class UserProfileServiceImpl implements IUserProfileService {
         var response = artOwnerRepository.findByUserProfile_UserId(id).map(MAPPER::toDto).orElseThrow(USER_NOT_FOUND::newException);
         log.debug("UserProfileServiceImpl.getArtOwnerById - end | id: {}",id);
         return response;
+    }
+
+    @Override
+    public void saveUserProfileDocument(Long userId, long documentId) {
+        log.debug("UserServiceImpl.saveUserProfileDocument - start | userId: {}, documentId {}", userId, documentId);
+        var userProfileDocument = new UserProfileDocument();
+        var userProfileDocumentId = new UserProfileDocumentId();
+        userProfileDocumentId.setDocumentId(documentId);
+        userProfileDocumentId.setUserProfileId(userId);
+        userProfileDocument.setUserProfileDocumentId(userProfileDocumentId);
+        userProfileDocumentRepository.saveAndFlush(userProfileDocument);
+        log.debug("UserServiceImpl.saveUserProfileDocument - end | userId: {}, documentId {}", userId, documentId);
     }
 
 }

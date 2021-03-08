@@ -7,8 +7,8 @@ import lombok.Value;
 public class PendingEvaluatorDocumentDto {
 
     @JsonProperty("email")
-    private String email;
+    String email;
 
     @JsonProperty("document_id")
-    private Long documentId;
+    Long documentId;
 }
