@@ -36,5 +36,4 @@ public interface ISubmitUserProfileRequest {
     BigDecimal getLongitude();
 
     MultipartFile getProfileImage();
-
 }
