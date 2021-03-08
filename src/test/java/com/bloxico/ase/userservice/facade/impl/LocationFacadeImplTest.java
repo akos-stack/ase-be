@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
 import com.bloxico.ase.userservice.exception.LocationException;
@@ -19,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LocationFacadeImplTest extends AbstractSpringTest {
 
-    @Autowired private UtilUser utilUser;
     @Autowired private UtilLocation utilLocation;
     @Autowired private LocationFacadeImpl facade;
     @Autowired private RegionRepository regionRepository;
@@ -34,27 +34,26 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void saveRegion_nullRequest() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> facade.saveRegion(null, principalId));
+                () -> facade.saveRegion(null));
     }
 
     @Test
     public void saveRegion_alreadyExists() {
-        var principalId = utilUser.savedAdmin().getId();
         var region = utilLocation.savedRegion();
         var request = new SaveRegionRequest(region.getName());
         assertThrows(
                 LocationException.class,
-                () -> facade.saveRegion(request, principalId));
+                () -> facade.saveRegion(request));
     }
 
+
     @Test
+    @WithMockCustomUser
     public void saveRegion() {
-        var principalId = utilUser.savedAdmin().getId();
         var request = new SaveRegionRequest(genUUID());
-        var region = facade.saveRegion(request, principalId).getRegion();
+        var region = facade.saveRegion(request).getRegion();
         assertNotNull(region.getId());
         assertEquals(request.getRegion(), region.getName());
     }
@@ -63,7 +62,7 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     public void deleteRegion_regionNotFound() {
         assertThrows(
                 LocationException.class,
-                () -> facade.deleteRegion(-1));
+                () -> facade.deleteRegion(-1L));
     }
 
     @Test
@@ -93,38 +92,37 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
 
     @Test
     public void saveCountry_requestIsNull() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> facade.saveCountry(null, principalId));
+                () -> facade.saveCountry(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveCountry_regionNotFound() {
-        var principalId = utilUser.savedAdmin().getId();
         var request = new SaveCountryRequest(genUUID(), Set.of(genUUID()));
         assertThrows(
                 LocationException.class,
-                () -> facade.saveCountry(request, principalId));
+                () -> facade.saveCountry(request));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveCountry_alreadyExists() {
-        var principalId = utilUser.savedAdmin().getId();
         var regionName = utilLocation.savedRegion().getName();
         var request = new SaveCountryRequest(genUUID(), Set.of(regionName));
-        facade.saveCountry(request, principalId);
+        facade.saveCountry(request);
         assertThrows(
                 LocationException.class,
-                () -> facade.saveCountry(request, principalId));
+                () -> facade.saveCountry(request));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveCountry() {
-        var principalId = utilUser.savedAdmin().getId();
         var region = utilLocation.savedRegionDto();
         var request = new SaveCountryRequest(genUUID(), Set.of(region.getName()));
-        var country = facade.saveCountry(request, principalId).getCountry();
+        var country = facade.saveCountry(request).getCountry();
         assertNotNull(country.getId());
         assertNotNull(country.getRegions());
         assertThat(country.getRegions(), hasItems(region));
@@ -132,36 +130,36 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountry_nullRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> facade.updateCountry(null,
-                        utilUser.savedAdmin().getId()));
+                () -> facade.updateCountry(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountry_countryAlreadyExists() {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithRegion(region);
         var request = new UpdateCountryRequest(utilLocation.savedCountry().getId(), country.getName(), Set.of(region.getName()));
         assertThrows(
                 LocationException.class,
-                () -> facade.updateCountry(request,
-                        utilUser.savedAdmin().getId()));
+                () -> facade.updateCountry(request));
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountry_regionNotFound() {
         var request = new UpdateCountryRequest(utilLocation.savedCountry().getId(), genUUID(), Set.of(genUUID()));
         assertThrows(
                 LocationException.class,
-                () -> facade.updateCountry(request,
-                        utilUser.savedAdmin().getId()));
+                () -> facade.updateCountry(request));
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountry_updateName() {
-        var adminId = utilUser.savedAdmin().getId();
         var country = utilLocation.savedCountryDto();
         var newCountryName = genUUID();
         var request = new UpdateCountryRequest(
@@ -172,19 +170,19 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
                         .stream()
                         .map(RegionDto::getName)
                         .collect(toSet()));
-        var updatedCountry = facade.updateCountry(request, adminId).getCountry();
+        var updatedCountry = facade.updateCountry(request).getCountry();
         assertNotEquals(country.getName(), updatedCountry.getName());
         assertEquals(country.getRegions(), updatedCountry.getRegions());
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountry_updateRegions() {
-        var adminId = utilUser.savedAdmin().getId();
         var country = utilLocation.savedCountryDto();
         var region = utilLocation.savedRegionDto();
         var newRegionName = region.getName();
         var request = new UpdateCountryRequest(country.getId(), country.getName(), Set.of(newRegionName));
-        var updatedCountry = facade.updateCountry(request, adminId).getCountry();
+        var updatedCountry = facade.updateCountry(request).getCountry();
         assertEquals(country.getName(), updatedCountry.getName());
         assertThat(updatedCountry.getRegions(), hasItems(region));
         for (var oldRegion : country.getRegions())
@@ -192,14 +190,14 @@ public class LocationFacadeImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountry_updateNameAndRegions() {
-        var adminId = utilUser.savedAdmin().getId();
         var country = utilLocation.savedCountryDto();
         var region = utilLocation.savedRegionDto();
         var newCountryName = genUUID();
         var newRegionName = region.getName();
         var request = new UpdateCountryRequest(country.getId(), newCountryName, Set.of(newRegionName));
-        var updatedCountry = facade.updateCountry(request, adminId).getCountry();
+        var updatedCountry = facade.updateCountry(request).getCountry();
         assertEquals(newCountryName, updatedCountry.getName());
         assertNotEquals(country.getName(), updatedCountry.getName());
         assertThat(updatedCountry.getRegions(), hasItems(region));

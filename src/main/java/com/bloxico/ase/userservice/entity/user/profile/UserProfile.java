@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.FetchType.LAZY;
-import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
 @EqualsAndHashCode(of = "userId", callSuper = false)
@@ -19,10 +18,6 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Entity
 @Table(name = "user_profiles")
 public class UserProfile extends BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
 
     @Column(name = "user_id")
     private Long userId;

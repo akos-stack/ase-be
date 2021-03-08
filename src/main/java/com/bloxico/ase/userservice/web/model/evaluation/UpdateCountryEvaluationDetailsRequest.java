@@ -16,7 +16,7 @@ public class UpdateCountryEvaluationDetailsRequest {
     @NotNull
     @JsonProperty("id")
     @ApiModelProperty(required = true)
-    Integer id;
+    Long id;
 
     @NotNull
     @Min(1)

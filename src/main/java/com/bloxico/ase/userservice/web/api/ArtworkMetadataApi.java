@@ -3,14 +3,16 @@ package com.bloxico.ase.userservice.web.api;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.*;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.security.Principal;
 
 @Api(value = "artworksMetadataManagement")
 public interface ArtworkMetadataApi {
@@ -31,7 +33,7 @@ public interface ArtworkMetadataApi {
             @ApiResponse(code = 200, message = "Artwork metadata successfully saved.")
     })
     ResponseEntity<SaveArtworkMetadataResponse> saveArtworkMetadata(
-            @Valid @RequestBody SaveArtworkMetadataRequest request, Principal principal);
+            @Valid @RequestBody SaveArtworkMetadataRequest request);
 
     @PostMapping(
             value = ARTWORK_METADATA_UPDATE,
@@ -44,7 +46,7 @@ public interface ArtworkMetadataApi {
             @ApiResponse(code = 404, message = "Artwork metadata not found.")
     })
     ResponseEntity<UpdateArtworkMetadataResponse> updateArtworkMetadata(
-            @Valid @RequestBody UpdateArtworkMetadataRequest request, Principal principal);
+            @Valid @RequestBody UpdateArtworkMetadataRequest request);
 
     @DeleteMapping(
             value = ARTWORK_METADATA_DELETE,

@@ -40,16 +40,15 @@ public class TokenBlacklistServiceImpl implements ITokenBlacklistService {
 
     @Override
     @CacheEvict(value = BLACKLISTED_TOKENS_CACHE, allEntries = true)
-    public void blacklistTokens(List<OAuthAccessTokenDto> tokens, long principalId) {
-        log.debug("TokenBlacklistServiceImpl.blacklistTokens - start | tokens: {}, principalId: {}", tokens, principalId);
+    public void blacklistTokens(List<OAuthAccessTokenDto> tokens) {
+        log.debug("TokenBlacklistServiceImpl.blacklistTokens - start | tokens: {}", tokens);
         requireNonNull(tokens);
         var bTokens = tokens
                 .stream()
                 .map(MAPPER::toBlacklistedToken)
-                .peek(bt -> bt.setCreatorId(principalId))
                 .collect(toList());
         blacklistedTokenRepository.saveAll(bTokens);
-        log.debug("TokenBlacklistServiceImpl.blacklistTokens - end | tokens: {}, principalId: {}", tokens, principalId);
+        log.debug("TokenBlacklistServiceImpl.blacklistTokens - end | tokens: {}", tokens);
     }
 
     @Override

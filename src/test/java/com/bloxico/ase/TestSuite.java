@@ -2,7 +2,6 @@ package com.bloxico.ase;
 
 import com.bloxico.ase.userservice.config.security.AseSecurityServiceTest;
 import com.bloxico.ase.userservice.config.security.PersistentJwtTokenStoreTest;
-import com.bloxico.ase.userservice.entity.BaseEntityTest;
 import com.bloxico.ase.userservice.facade.impl.*;
 import com.bloxico.ase.userservice.filter.JwtAuthorizationFilterTest;
 import com.bloxico.ase.userservice.service.address.impl.LocationServiceImplTest;
@@ -22,9 +21,6 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses(value = {
-        // entity
-        BaseEntityTest.class,
-
         // config
         PersistentJwtTokenStoreTest.class,
         AseSecurityServiceTest.class,

@@ -108,18 +108,16 @@ public class UtilToken {
     }
 
     public BlacklistedToken savedBlacklistedToken() {
-        var adminId = utilUser.savedAdmin().getId();
         var user = utilUser.savedUser();
         var token = savedOauthTokenDto(user.getEmail());
-        userManagementFacade.blacklistTokens(user.getId(), adminId);
+        userManagementFacade.blacklistTokens(user.getId());
         return getBlacklistedToken(token.getTokenId());
     }
 
     public BlacklistedToken savedExpiredBlacklistedToken() {
-        var adminId = utilUser.savedAdmin().getId();
         var user = utilUser.savedUser();
         var token = savedExpiredOauthTokenDto(user.getEmail());
-        userManagementFacade.blacklistTokens(user.getId(), adminId);
+        userManagementFacade.blacklistTokens(user.getId());
         return getBlacklistedToken(token.getTokenId());
     }
 
@@ -149,10 +147,8 @@ public class UtilToken {
     }
 
     public PendingEvaluatorDto savedInvitedPendingEvaluatorDto(String email) {
-        var principal = utilUser.savedAdmin().getId();
         var request = new EvaluatorInvitationRequest(email);
-        return pendingEvaluatorService.createPendingEvaluator(
-                MAPPER.toPendingEvaluatorDto(request), principal);
+        return pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request));
     }
 
     public String savedRequestedPendingEvaluatorDto() {
@@ -160,9 +156,8 @@ public class UtilToken {
     }
 
     public String savedRequestedPendingEvaluatorDto(String email) {
-        var principal = utilUser.savedAdmin().getId();
         var request = new EvaluatorRegistrationRequest(email, genMultipartFile(pdf));
-        userRegistrationFacade.requestEvaluatorRegistration(request, principal);
+        userRegistrationFacade.requestEvaluatorRegistration(request);
         return email;
     }
 
@@ -173,8 +168,7 @@ public class UtilToken {
     public SubmitEvaluatorRequest submitInvitedEvaluatorRequest(String country) {
         var email = genEmail();
         var password = genPassword();
-        var principalId = utilUser.savedAdmin().getId();
-        userRegistrationFacade.sendEvaluatorInvitation(new EvaluatorInvitationRequest(email), principalId);
+        userRegistrationFacade.sendEvaluatorInvitation(new EvaluatorInvitationRequest(email));
         var token = pendingEvaluatorRepository.findByEmailIgnoreCase(email).orElseThrow().getToken();
         return new SubmitEvaluatorRequest(
                 token, genUUID(), password,

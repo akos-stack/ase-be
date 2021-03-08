@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 public class RegionDto {
 
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
 
     @JsonProperty("name")
     private String name;

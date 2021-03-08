@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilUser;
 import com.bloxico.ase.userservice.exception.UserException;
@@ -198,19 +199,19 @@ public class UserServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser
     public void disableUser_notFound() {
-        var adminId = utilUser.savedAdmin().getId();
         assertThrows(
                 UserException.class,
-                () -> userService.disableUser(-1, adminId));
+                () -> userService.disableUser(-1));
     }
 
     @Test
+    @WithMockCustomUser
     public void disableUser() {
-        var adminId = utilUser.savedAdmin().getId();
         var userId = utilUser.savedUser().getId();
         assertTrue(userService.findUserById(userId).getEnabled());
-        userService.disableUser(userId, adminId);
+        userService.disableUser(userId);
         assertFalse(userService.findUserById(userId).getEnabled());
     }
 

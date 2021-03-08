@@ -5,8 +5,8 @@ import com.bloxico.ase.userservice.web.model.user.UserProfileDataResponse;
 
 public interface IUserProfileFacade {
 
-    UserProfileDataResponse returnMyProfileData(long principalId);
+    UserProfileDataResponse returnMyProfileData();
 
-    UserProfileDataResponse updateMyProfile(long principalId, UpdateUserProfileRequest request);
+    UserProfileDataResponse updateMyProfile(UpdateUserProfileRequest request);
 
 }

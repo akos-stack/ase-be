@@ -19,9 +19,8 @@ public class ArtworkController implements ArtworkApi {
     private IArtworkFacade artworkFacade;
 
     @Override
-    public ResponseEntity<SaveArtworkResponse> submitArtwork(SaveArtworkRequest request, Principal principal) {
-        var id = extractId(principal);
-        var response = artworkFacade.submitArtwork(request, id);
+    public ResponseEntity<SaveArtworkResponse> submitArtwork(SaveArtworkRequest request) {
+        var response = artworkFacade.submitArtwork(request);
         return ResponseEntity.ok(response);
     }
 }

@@ -44,32 +44,32 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
 
     @Override
     public SaveCountryEvaluationDetailsResponse saveCountryEvaluationDetails(
-            SaveCountryEvaluationDetailsRequest request, long principalId)
+            SaveCountryEvaluationDetailsRequest request)
     {
-        log.debug("EvaluationFacadeImpl.saveCountryEvaluationDetails - start | request: {}, principalId: {}", request, principalId);
+        log.debug("EvaluationFacadeImpl.saveCountryEvaluationDetails - start | request: {}", request);
         var countryDto = locationService.findCountryByName(request.getCountry());
         var evaluationDetailsDto = MAPPER.toCountryEvaluationDetailsDto(request);
         evaluationDetailsDto.setCountryId(countryDto.getId());
-        var detailsDto = evaluationService.saveCountryEvaluationDetails(evaluationDetailsDto, principalId);
+        var detailsDto = evaluationService.saveCountryEvaluationDetails(evaluationDetailsDto);
         var response = new SaveCountryEvaluationDetailsResponse(detailsDto);
-        log.debug("EvaluationFacadeImpl.saveCountryEvaluationDetails - end | request: {}, principalId: {}", request, principalId);
+        log.debug("EvaluationFacadeImpl.saveCountryEvaluationDetails - end | request: {}", request);
         return response;
     }
 
     @Override
     public UpdateCountryEvaluationDetailsResponse updateCountryEvaluationDetails(
-            UpdateCountryEvaluationDetailsRequest request, long principalId)
+            UpdateCountryEvaluationDetailsRequest request)
     {
-        log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - start | request: {}, principalId: {}", request, principalId);
+        log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - start | request: {}", request);
         var evaluationDetailsDto = MAPPER.toCountryEvaluationDetailsDto(request);
-        var detailsDto = evaluationService.updateCountryEvaluationDetails(evaluationDetailsDto, principalId);
+        var detailsDto = evaluationService.updateCountryEvaluationDetails(evaluationDetailsDto);
         var response = new UpdateCountryEvaluationDetailsResponse(detailsDto);
-        log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - end | request: {}, principalId: {}", request, principalId);
+        log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - end | request: {}", request);
         return response;
     }
 
     @Override
-    public void deleteCountryEvaluationDetails(int evaluationDetailsId) {
+    public void deleteCountryEvaluationDetails(Long evaluationDetailsId) {
         log.debug("EvaluationFacadeImpl.deleteCountryEvaluationDetails - start | evaluationDetailsId: {}", evaluationDetailsId);
         var detailsDto = evaluationService.findCountryEvaluationDetailsById(evaluationDetailsId);
         var countryDto = locationService.findCountryById(detailsDto.getCountryId());
@@ -91,17 +91,16 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
     }
 
     @Override
-    public SaveQuotationPackageResponse saveQuotationPackage(SaveQuotationPackageRequest request, long principalId) {
-        log.debug("EvaluationFacadeImpl.saveQuotationPackage - start | request: {}, principalId: {}", request, principalId);
+    public SaveQuotationPackageResponse saveQuotationPackage(SaveQuotationPackageRequest request) {
+        log.debug("EvaluationFacadeImpl.saveQuotationPackage - start | request: {}", request);
         var quotationPackageDto = MAPPER.toQuotationPackageDto(request);
-        var quotationPackage = evaluationService.saveQuotationPackage(quotationPackageDto, principalId);
+        var quotationPackage = evaluationService.saveQuotationPackage(quotationPackageDto);
         var countries = evaluationService.saveQuotationPackageCountries(
                 quotationPackage.getId(),
-                quotationPackageDto.getCountries(),
-                principalId);
+                quotationPackageDto.getCountries());
         quotationPackage.setCountries(countries);
         var response = new SaveQuotationPackageResponse(quotationPackage);
-        log.debug("EvaluationFacadeImpl.saveQuotationPackage - start | request: {}, principalId: {}", request, principalId);
+        log.debug("EvaluationFacadeImpl.saveQuotationPackage - start | request: {}", request);
         return response;
     }
 

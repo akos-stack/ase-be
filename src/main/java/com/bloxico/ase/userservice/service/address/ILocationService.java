@@ -9,29 +9,29 @@ import java.util.List;
 
 public interface ILocationService {
 
-    RegionDto findRegionById(int id);
+    RegionDto findRegionById(Long id);
 
     RegionDto findRegionByName(String region);
 
     List<RegionDto> findAllRegionsWithNames(Collection<String> regionNames);
 
-    CountryDto findCountryById(int id);
+    CountryDto findCountryById(Long id);
 
     CountryDto findCountryByName(String country);
 
     List<RegionDto> findAllRegions();
 
-    RegionDto saveRegion(RegionDto regionDto, long principalId);
+    RegionDto saveRegion(RegionDto regionDto);
 
     RegionDto deleteRegion(RegionDto regionDto);
 
     List<CountryDto> findAllCountries();
 
-    CountryDto saveCountry(CountryDto countryDto, long principalId);
+    CountryDto saveCountry(CountryDto countryDto);
 
-    CountryDto updateCountry(CountryDto countryDto, long principalId);
+    CountryDto updateCountry(CountryDto countryDto);
 
-    LocationDto saveLocation(LocationDto locationDto, long principalId);
+    LocationDto saveLocation(LocationDto locationDto, Long principalId);
 
-    int countCountriesByRegionId(int regionId);
+    int countCountriesByRegionId(Long regionId);
 }

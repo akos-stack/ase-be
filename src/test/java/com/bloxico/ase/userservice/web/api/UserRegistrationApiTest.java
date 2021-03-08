@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
@@ -43,6 +44,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilUser utilUser;
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private TokenRepository tokenRepository;
+    @Autowired private UtilSecurityContext utilSecurityContext;
     @Autowired private PendingEvaluatorRepository pendingEvaluatorRepository;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UserRegistrationFacadeImpl userRegistrationFacade;
@@ -276,6 +278,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void checkEvaluatorInvitation_200_ok() {
         given()
                 .pathParam("token", utilToken.savedInvitedPendingEvaluatorDto().getToken())
@@ -408,6 +411,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitEvaluator_404_tokenNotFound() {
         var request = utilUserProfile.genSaveEvaluatorFormParams();
         request.put("token", genUUID());
@@ -423,6 +427,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitEvaluator_404_countryNotFound() {
         var request = utilUserProfile.genSaveEvaluatorFormParams();
         request.put("country", genUUID());
@@ -438,6 +443,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitEvaluator_409_userAlreadyExists() {
         var request = utilUserProfile.genSaveEvaluatorFormParams();
         utilUser.savedUserDtoWithEmail(request.get("email"));
@@ -454,6 +460,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitEvaluator_200_ok() {
         var request = utilUserProfile.genSaveEvaluatorFormParams();
         var evaluatorDto = given()
@@ -494,6 +501,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitArtOwner_409_userAlreadyExists() {
         var imageBytes = genFileBytes(IMAGE);
         var formParams = utilUserProfile.genSaveArtOwnerFormParams();
@@ -516,6 +524,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitArtOwner_200_ok() {
         var request = utilUserProfile.genSaveArtOwnerFormParams();
         var artOwnerDto = given()
@@ -554,12 +563,13 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void searchPendingEvaluators_200_ok() {
         var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
         var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
         var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
         var pendingEvaluators = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .param("email", "fooBar")
                 .param("page", 0)

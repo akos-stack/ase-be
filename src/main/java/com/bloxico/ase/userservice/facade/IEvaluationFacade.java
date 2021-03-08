@@ -10,20 +10,18 @@ public interface IEvaluationFacade {
             PageRequest page);
 
     SaveCountryEvaluationDetailsResponse saveCountryEvaluationDetails(
-            SaveCountryEvaluationDetailsRequest request,
-            long principalId);
+            SaveCountryEvaluationDetailsRequest request);
 
     UpdateCountryEvaluationDetailsResponse updateCountryEvaluationDetails(
-            UpdateCountryEvaluationDetailsRequest request, long principalId);
+            UpdateCountryEvaluationDetailsRequest request);
 
-    void deleteCountryEvaluationDetails(int evaluationDetailsId);
+    void deleteCountryEvaluationDetails(Long evaluationDetailsId);
 
     SearchRegionEvaluationDetailsResponse searchRegionEvaluationDetails(
             SearchRegionEvaluationDetailsRequest request,
             PageRequest page);
 
     SaveQuotationPackageResponse saveQuotationPackage(
-            SaveQuotationPackageRequest request,
-            long principalId);
+            SaveQuotationPackageRequest request);
 
 }

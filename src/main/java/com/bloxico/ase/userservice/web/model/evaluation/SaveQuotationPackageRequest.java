@@ -23,7 +23,7 @@ public class SaveQuotationPackageRequest {
         @NotNull
         @JsonProperty("country_id")
         @ApiModelProperty(required = true)
-        Integer countryId;
+        Long countryId;
 
         @NotNull
         @Min(1)

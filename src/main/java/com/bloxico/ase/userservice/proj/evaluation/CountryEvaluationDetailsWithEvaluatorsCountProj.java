@@ -9,7 +9,7 @@ import java.util.List;
 public class CountryEvaluationDetailsWithEvaluatorsCountProj {
 
     @JsonProperty("country_id")
-    Integer countryId;
+    Long countryId;
 
     @JsonProperty("country")
     String country;
@@ -18,7 +18,7 @@ public class CountryEvaluationDetailsWithEvaluatorsCountProj {
     List<String> regions;
 
     @JsonProperty("evaluation_details_id")
-    Integer evaluationDetailsId;
+    Long evaluationDetailsId;
 
     @JsonProperty("price_per_evaluation")
     Integer pricePerEvaluation;

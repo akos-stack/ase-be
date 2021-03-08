@@ -2,13 +2,17 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
-import java.security.Principal;
 
 @Api(value = "evaluation")
 public interface EvaluationApi {
@@ -57,7 +61,7 @@ public interface EvaluationApi {
             @ApiResponse(code = 409, message = "Evaluation details already exists for specified country.")
     })
     ResponseEntity<SaveCountryEvaluationDetailsResponse> saveCountryEvaluationDetails(
-            @Valid @RequestBody SaveCountryEvaluationDetailsRequest request, Principal principal);
+            @Valid @RequestBody SaveCountryEvaluationDetailsRequest request);
 
     @PostMapping(
             value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE,
@@ -70,7 +74,7 @@ public interface EvaluationApi {
             @ApiResponse(code = 404, message = "Specified evaluation details don't exist.")
     })
     ResponseEntity<UpdateCountryEvaluationDetailsResponse> updateCountryEvaluationDetails(
-            @Valid @RequestBody UpdateCountryEvaluationDetailsRequest request, Principal principal);
+            @Valid @RequestBody UpdateCountryEvaluationDetailsRequest request);
 
     @PostMapping(
             value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE,
@@ -108,6 +112,6 @@ public interface EvaluationApi {
             @ApiResponse(code = 409, message = "Quotation package already exists for specified artwork.")
     })
     ResponseEntity<SaveQuotationPackageResponse> saveQuotationPackage(
-            @Valid @RequestBody SaveQuotationPackageRequest request, Principal principal);
+            @Valid @RequestBody SaveQuotationPackageRequest request);
 
 }

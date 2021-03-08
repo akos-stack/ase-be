@@ -45,7 +45,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public CountryEvaluationDetailsDto findCountryEvaluationDetailsById(int id) {
+    public CountryEvaluationDetailsDto findCountryEvaluationDetailsById(Long id) {
         log.debug("EvaluationServiceImpl.findCountryEvaluationDetailsById - start | id: {}", id);
         var detailsDto = countryEvaluationDetailsRepository
                 .findById(id)
@@ -56,7 +56,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public int countEvaluatorsByCountryId(int countryId) {
+    public int countEvaluatorsByCountryId(Long countryId) {
         log.debug("EvaluationServiceImpl.countEvaluatorsByCountryId - start | countryId: {}", countryId);
         var count = countryEvaluationDetailsRepository.countEvaluatorsByCountryId(countryId);
         log.debug("EvaluationServiceImpl.countEvaluatorsByCountryId - end | countryId: {}", countryId);
@@ -83,29 +83,27 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public CountryEvaluationDetailsDto saveCountryEvaluationDetails(CountryEvaluationDetailsDto dto, long principalId) {
-        log.debug("EvaluationServiceImpl.saveCountryEvaluationDetails - start | dto: {}, principalId: {}", dto, principalId);
+    public CountryEvaluationDetailsDto saveCountryEvaluationDetails(CountryEvaluationDetailsDto dto) {
+        log.debug("EvaluationServiceImpl.saveCountryEvaluationDetails - start | dto: {}", dto);
         requireNonNull(dto);
         requireNotExists(dto);
         var details = MAPPER.toEntity(dto);
-        details.setCreatorId(principalId);
         var detailsDto = MAPPER.toDto(countryEvaluationDetailsRepository.saveAndFlush(details));
-        log.debug("EvaluationServiceImpl.saveCountryEvaluationDetails - end | dto: {}, principalId: {}", dto, principalId);
+        log.debug("EvaluationServiceImpl.saveCountryEvaluationDetails - end | dto: {}", dto);
         return detailsDto;
     }
 
     @Override
-    public CountryEvaluationDetailsDto updateCountryEvaluationDetails(CountryEvaluationDetailsDto dto, long principalId) {
-        log.debug("EvaluationServiceImpl.updateCountryEvaluationDetails - start | dto: {}, principalId: {}", dto, principalId);
+    public CountryEvaluationDetailsDto updateCountryEvaluationDetails(CountryEvaluationDetailsDto dto) {
+        log.debug("EvaluationServiceImpl.updateCountryEvaluationDetails - start | dto: {}", dto);
         requireNonNull(dto);
         var details = countryEvaluationDetailsRepository
                 .findById(dto.getId())
                 .orElseThrow(COUNTRY_EVALUATION_DETAILS_NOT_FOUND::newException);
-        details.setUpdaterId(principalId);
         details.setPricePerEvaluation(dto.getPricePerEvaluation());
         details.setAvailabilityPercentage(dto.getAvailabilityPercentage());
         var detailsDto = MAPPER.toDto(countryEvaluationDetailsRepository.saveAndFlush(details));
-        log.debug("EvaluationServiceImpl.updateCountryEvaluationDetails - end | dto: {}, principalId: {}", dto, principalId);
+        log.debug("EvaluationServiceImpl.updateCountryEvaluationDetails - end | dto: {}", dto);
         return detailsDto;
     }
 
@@ -136,38 +134,35 @@ public class EvaluationServiceImpl implements IEvaluationService {
         return page;
     }
 
-    public QuotationPackageDto saveQuotationPackage(QuotationPackageDto dto, long principalId) {
-        log.debug("EvaluationServiceImpl.saveQuotationPackageDto - start | dto: {}, principalId: {}", dto, principalId);
+    public QuotationPackageDto saveQuotationPackage(QuotationPackageDto dto) {
+        log.debug("EvaluationServiceImpl.saveQuotationPackageDto - start | dto: {}", dto);
         requireNonNull(dto);
         requireNotExists(dto);
         var quotationPackage = MAPPER.toEntity(dto);
-        quotationPackage.setCreatorId(principalId);
         quotationPackageRepository.saveAndFlush(quotationPackage);
         var quotationPackageDto = MAPPER.toDto(quotationPackage);
         quotationPackageDto.setCountries(dto.getCountries());
-        log.debug("EvaluationServiceImpl.saveQuotationPackageDto - start | dto: {}, principalId: {}", dto, principalId);
+        log.debug("EvaluationServiceImpl.saveQuotationPackageDto - start | dto: {}", dto);
         return quotationPackageDto;
     }
 
     @Override
     public Set<QuotationPackageCountryDto> saveQuotationPackageCountries(long packageId,
-                                                                         Collection<QuotationPackageCountryDto> dtos,
-                                                                         long principalId)
+                                                                         Collection<QuotationPackageCountryDto> dtos)
     {
-        log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - start | packageId: {}, dtos: {}, principalId: {}",
-                packageId, dtos, principalId);
+        log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - start | packageId: {}, dtos: {}",
+                packageId, dtos);
         requireNonNull(dtos);
         var quotationPackageCountryDtos = dtos
                 .stream()
                 .map(doto(this::requireNotExists))
                 .map(doto(qpc -> qpc.setQuotationPackageId(packageId)))
                 .map(MAPPER::toEntity)
-                .map(doto(qpc -> qpc.setCreatorId(principalId)))
                 .map(quotationPackageCountryRepository::saveAndFlush)
                 .map(MAPPER::toDto)
                 .collect(toSet());
-        log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - end | packageId: {}, dtos: {}, principalId: {}",
-                packageId, dtos, principalId);
+        log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - end | packageId: {}, dtos: {}",
+                packageId, dtos);
         return quotationPackageCountryDtos;
     }
 

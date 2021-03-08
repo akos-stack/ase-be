@@ -24,14 +24,13 @@ public class ArtworkServiceImpl implements IArtworkService {
     }
 
     @Override
-    public ArtworkDto saveArtwork(ArtworkDto artworkDto, long principalId) {
-        log.info("ArtworkServiceImpl.submitArtwork - start | artworkDto: {}, principalId: {} ", artworkDto, principalId);
+    public ArtworkDto saveArtwork(ArtworkDto artworkDto) {
+        log.info("ArtworkServiceImpl.submitArtwork - start | artworkDto: {}", artworkDto);
         requireNonNull(artworkDto);
         var artwork = MAPPER.toEntity(artworkDto);
-        artwork.setCreatorId(principalId);
         artwork = artworkRepository.saveAndFlush(artwork);
         if(artworkDto.getHistory() != null) saveArtworkHistory(artwork, artworkDto);
-        log.info("ArtworkServiceImpl.submitArtwork - end | artworkDto: {}, principalId: {} ", artworkDto, principalId);
+        log.info("ArtworkServiceImpl.submitArtwork - end | artworkDto: {}", artworkDto);
         return MAPPER.toDto(artwork);
     }
 

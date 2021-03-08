@@ -6,7 +6,7 @@ public interface IArtworkGroupService {
 
     ArtworkGroupDto findGroupById(Long id);
 
-    ArtworkGroupDto findOrUpdateGroup(ArtworkGroupDto dto, long principalId);
+    ArtworkGroupDto findOrUpdateGroup(ArtworkGroupDto dto);
 
-    ArtworkGroupDto saveGroup(ArtworkGroupDto dto, long principalId);
+    ArtworkGroupDto saveGroup(ArtworkGroupDto dto);
 }

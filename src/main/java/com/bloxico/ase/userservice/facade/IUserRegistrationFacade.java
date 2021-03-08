@@ -19,7 +19,7 @@ public interface IUserRegistrationFacade {
 
     void resendVerificationToken(ResendTokenRequest request);
 
-    void sendEvaluatorInvitation(EvaluatorInvitationRequest request, long principalId);
+    void sendEvaluatorInvitation(EvaluatorInvitationRequest request);
 
     void checkEvaluatorInvitation(String token);
 
@@ -31,9 +31,9 @@ public interface IUserRegistrationFacade {
 
     ArtOwnerDto submitArtOwner(SubmitArtOwnerRequest request);
 
-    void requestEvaluatorRegistration(EvaluatorRegistrationRequest request, long principalId);
+    void requestEvaluatorRegistration(EvaluatorRegistrationRequest request);
 
     PagedPendingEvaluatorDataResponse searchPendingEvaluators(String email, int page, int size, String sort);
 
-    ByteArrayResource downloadEvaluatorResume(String email, long principalId);
+    ByteArrayResource downloadEvaluatorResume(String email);
 }

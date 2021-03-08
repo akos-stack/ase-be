@@ -133,9 +133,8 @@ public class UtilUserProfile {
 
     public Map<String, String> genSaveEvaluatorFormParams() {
         var email = genEmail();
-        var principalId = utilUser.savedAdmin().getId();
         userRegistrationFacade.sendEvaluatorInvitation(
-                new EvaluatorInvitationRequest(email), principalId);
+                new EvaluatorInvitationRequest(email));
         var token = pendingEvaluatorRepository
                 .findByEmailIgnoreCase(email)
                 .orElseThrow()

@@ -7,7 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IDocumentService {
 
-    DocumentDto saveDocument(MultipartFile file, FileCategory type, long principalId);
+    DocumentDto saveDocument(MultipartFile file, FileCategory type);
+
+    DocumentDto saveDocument(MultipartFile file, FileCategory type, Long principalId);
 
     ByteArrayResource getDocumentById(Long id);
 }

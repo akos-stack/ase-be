@@ -18,6 +18,6 @@ public class DeleteCountryEvaluationDetailsRequest {
     @NotNull
     @JsonProperty("id")
     @ApiModelProperty(required = true)
-    Integer id;
+    Long id;
 
 }

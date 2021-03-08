@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.EvaluationException;
 import com.bloxico.ase.userservice.exception.LocationException;
@@ -20,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
 
-    @Autowired private UtilUser utilUser;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private UtilUserProfile utilUserProfile;
@@ -118,64 +118,64 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void saveCountryEvaluationDetails_nullRequest() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationFacade.saveCountryEvaluationDetails(null, principalId));
+                () -> evaluationFacade.saveCountryEvaluationDetails(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveCountryEvaluationDetails_countryNotFound() {
-        var principalId = utilUser.savedAdmin().getId();
         var request = utilEvaluation.genSaveCountryEvaluationDetailsRequest(genUUID());
         assertThrows(
                 LocationException.class,
-                () -> evaluationFacade.saveCountryEvaluationDetails(request, principalId));
+                () -> evaluationFacade.saveCountryEvaluationDetails(request));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveCountryEvaluationDetails_detailsAlreadyExists() {
-        var principalId = utilUser.savedAdmin().getId();
         var r1 = utilEvaluation.genSaveCountryEvaluationDetailsRequest();
-        evaluationFacade.saveCountryEvaluationDetails(r1, principalId);
+        evaluationFacade.saveCountryEvaluationDetails(r1);
         var r2 = utilEvaluation.genSaveCountryEvaluationDetailsRequest(r1.getCountry());
         assertThrows(
                 EvaluationException.class,
-                () -> evaluationFacade.saveCountryEvaluationDetails(r2, principalId));
+                () -> evaluationFacade.saveCountryEvaluationDetails(r2));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveCountryEvaluationDetails() {
-        var principalId = utilUser.savedAdmin().getId();
         var request = utilEvaluation.genSaveCountryEvaluationDetailsRequest();
-        evaluationFacade.saveCountryEvaluationDetails(request, principalId);
+        evaluationFacade.saveCountryEvaluationDetails(request);
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountryEvaluationDetails_nullRequest() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationFacade.updateCountryEvaluationDetails(null, principalId));
+                () -> evaluationFacade.updateCountryEvaluationDetails(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountryEvaluationDetails_evaluationDetailsNotFound() {
-        var principalId = utilUser.savedAdmin().getId();
-        var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest(-1);
+        var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest(-1L);
         assertThrows(
                 EvaluationException.class,
-                () -> evaluationFacade.updateCountryEvaluationDetails(request, principalId));
+                () -> evaluationFacade.updateCountryEvaluationDetails(request));
     }
 
     @Test
+    @WithMockCustomUser
     public void updateCountryEvaluationDetails() {
-        var principalId = utilUser.savedAdmin().getId();
         var details = utilEvaluation.savedCountryEvaluationDetails();
         var request = utilEvaluation.genUpdateCountryEvaluationDetailsRequest(details.getId());
         var updatedDetails = evaluationFacade
-                .updateCountryEvaluationDetails(request, principalId)
+                .updateCountryEvaluationDetails(request)
                 .getCountryEvaluationDetails();
         assertEquals(details.getId(), updatedDetails.getId());
         assertEquals(details.getCountryId(), updatedDetails.getCountryId());
@@ -187,7 +187,7 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void deleteCountryEvaluationDetails_detailsNotFound() {
         assertThrows(
                 EvaluationException.class,
-                () -> evaluationFacade.deleteCountryEvaluationDetails(-1));
+                () -> evaluationFacade.deleteCountryEvaluationDetails(-1L));
     }
 
     @Test
@@ -240,30 +240,30 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void saveQuotationPackage_nullRequest() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationFacade.saveQuotationPackage(null, principalId));
+                () -> evaluationFacade.saveQuotationPackage(null));
     }
 
     // TODO test saveQuotationPackage_artworkNotFound
 
     @Test
+    @WithMockCustomUser
     public void saveQuotationPackage_packageAlreadyExists() {
-        var principalId = utilUser.savedAdmin().getId();
         var request = utilEvaluation.genSaveQuotationPackageRequest();
-        evaluationFacade.saveQuotationPackage(request, principalId);
+        evaluationFacade.saveQuotationPackage(request);
         assertThrows(
                 EvaluationException.class,
-                () -> evaluationFacade.saveQuotationPackage(request, principalId));
+                () -> evaluationFacade.saveQuotationPackage(request));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveQuotationPackage() {
-        var principalId = utilUser.savedAdmin().getId();
         var request = utilEvaluation.genSaveQuotationPackageRequest();
-        evaluationFacade.saveQuotationPackage(request, principalId);
+        evaluationFacade.saveQuotationPackage(request);
     }
 
 }

@@ -1,7 +1,10 @@
 package com.bloxico.ase.userservice.entity.evaluation;
 
-import com.bloxico.ase.userservice.entity.BaseEntity;
-import lombok.*;
+import com.bloxico.ase.userservice.entity.BaseEntityAudit;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,7 +13,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "quotation_packages_countries")
-public class QuotationPackageCountry extends BaseEntity {
+public class QuotationPackageCountry extends BaseEntityAudit {
 
     @Data
     @NoArgsConstructor
@@ -22,7 +25,7 @@ public class QuotationPackageCountry extends BaseEntity {
         Long quotationPackageId;
 
         @Column(name = "country_id")
-        Integer countryId;
+        Long countryId;
 
     }
 

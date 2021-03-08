@@ -15,10 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
-
-import static com.bloxico.ase.userservice.util.Principals.extractId;
-
 @RestController
 public class UserRegistrationController implements UserRegistrationApi {
 
@@ -50,9 +46,8 @@ public class UserRegistrationController implements UserRegistrationApi {
     }
 
     @Override
-    public ResponseEntity<Void> sendEvaluatorInvitation(EvaluatorInvitationRequest request, Principal principal) {
-        var id = extractId(principal);
-        userRegistrationFacade.sendEvaluatorInvitation(request, id);
+    public ResponseEntity<Void> sendEvaluatorInvitation(EvaluatorInvitationRequest request) {
+        userRegistrationFacade.sendEvaluatorInvitation(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -87,9 +82,8 @@ public class UserRegistrationController implements UserRegistrationApi {
     }
 
     @Override
-    public ResponseEntity<Void> requestEvaluatorRegistration(EvaluatorRegistrationRequest request, Principal principal) {
-        var id = extractId(principal);
-        userRegistrationFacade.requestEvaluatorRegistration(request, id);
+    public ResponseEntity<Void> requestEvaluatorRegistration(EvaluatorRegistrationRequest request) {
+        userRegistrationFacade.requestEvaluatorRegistration(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -100,9 +94,8 @@ public class UserRegistrationController implements UserRegistrationApi {
     }
 
     @Override
-    public ResponseEntity<Resource> downloadEvaluatorResume(String email, Principal principal) {
-        var id = extractId(principal);
-        var response = userRegistrationFacade.downloadEvaluatorResume(email, id);
+    public ResponseEntity<Resource> downloadEvaluatorResume(String email) {
+        var response = userRegistrationFacade.downloadEvaluatorResume(email);
         return ResponseEntity.ok(response);
     }
 

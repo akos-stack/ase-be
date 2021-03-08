@@ -12,7 +12,7 @@ public class QuotationPackageCountryDto {
     private Long quotationPackageId;
 
     @JsonProperty("country_id")
-    private Integer countryId;
+    private Long countryId;
 
     @JsonProperty("number_of_evaluations")
     private Integer numberOfEvaluations;

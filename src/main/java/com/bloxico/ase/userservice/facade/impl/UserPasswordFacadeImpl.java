@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.userservice.config.security.AseSecurityContextService;
 import com.bloxico.ase.userservice.facade.IUserPasswordFacade;
 import com.bloxico.ase.userservice.service.token.ITokenService;
 import com.bloxico.ase.userservice.service.token.impl.PasswordResetTokenServiceImpl;
@@ -22,15 +23,18 @@ public class UserPasswordFacadeImpl implements IUserPasswordFacade {
     private final IUserService userService;
     private final ITokenService passwordResetTokenService;
     private final MailUtil mailUtil;
+    private final AseSecurityContextService securityContextService;
 
     @Autowired
     public UserPasswordFacadeImpl(IUserService userService,
                                   PasswordResetTokenServiceImpl passwordResetTokenService,
-                                  MailUtil mailUtil)
+                                  MailUtil mailUtil,
+                                  AseSecurityContextService securityContextService)
     {
         this.userService = userService;
         this.passwordResetTokenService = passwordResetTokenService;
         this.mailUtil = mailUtil;
+        this.securityContextService = securityContextService;
     }
 
     @Override
@@ -64,17 +68,17 @@ public class UserPasswordFacadeImpl implements IUserPasswordFacade {
     }
 
     @Override
-    public void updateKnownPassword(long principalId, KnownPasswordUpdateRequest request) {
-        log.info("UserPasswordFacadeImpl.updateKnownPassword - start | principalId: {}, request: {}", principalId, request);
-        userService.updatePassword(principalId, request.getOldPassword(), request.getNewPassword());
-        log.info("UserPasswordFacadeImpl.updateKnownPassword - end | principalId: {}, request: {}", principalId, request);
+    public void updateKnownPassword(KnownPasswordUpdateRequest request) {
+        log.info("UserPasswordFacadeImpl.updateKnownPassword - start | request: {}", request);
+        userService.updatePassword(securityContextService.getPrincipalId(), request.getOldPassword(), request.getNewPassword());
+        log.info("UserPasswordFacadeImpl.updateKnownPassword - end | request: {}", request);
     }
 
     @Override
-    public void setNewPassword(long principalId, SetPasswordRequest request) {
-        log.info("UserPasswordFacadeImpl.setNewPassword - start | principalId: {}, request: {}", principalId, request);
-        userService.setNewPassword(principalId, request.getPassword());
-        log.info("UserPasswordFacadeImpl.setNewPassword - end | principalId: {}, request: {}", principalId, request);
+    public void setNewPassword(SetPasswordRequest request) {
+        log.info("UserPasswordFacadeImpl.setNewPassword - start | request: {}", request);
+        userService.setNewPassword(securityContextService.getPrincipalId(), request.getPassword());
+        log.info("UserPasswordFacadeImpl.setNewPassword - end | request: {}", request);
     }
 
 }
