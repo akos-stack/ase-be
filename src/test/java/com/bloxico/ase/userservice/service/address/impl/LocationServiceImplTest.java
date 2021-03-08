@@ -102,6 +102,20 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
+    public void findCountryById_countryNotFound() {
+        assertThrows(
+                LocationException.class,
+                () -> service.findCountryById(-1L));
+    }
+
+    @Test
+    public void findCountryById() {
+        var countryDto = utilLocation.savedCountryDto();
+        var foundCountry = service.findCountryById(countryDto.getId());
+        assertEquals(countryDto, foundCountry);
+    }
+
+    @Test
     public void findCountryByName_countryNotFound() {
         assertThrows(
                 LocationException.class,

@@ -4,6 +4,8 @@ import com.bloxico.ase.securitycontext.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
+import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
+import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
@@ -12,12 +14,14 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.entity.user.Role.USER;
 import static com.bloxico.ase.userservice.util.FileCategory.CV;
+import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.web.api.UserRegistrationApi.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.COUNTRY_NOT_FOUND;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
@@ -26,7 +30,9 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 // Because RestAssured executes in another transaction
@@ -39,6 +45,9 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private TokenRepository tokenRepository;
     @Autowired private UtilSecurityContext utilSecurityContext;
+    @Autowired private PendingEvaluatorRepository pendingEvaluatorRepository;
+    @Autowired private UtilLocation utilLocation;
+    @Autowired private UserRegistrationFacadeImpl userRegistrationFacade;
 
     @Test
     public void registration_400_passwordMismatch() {
@@ -402,10 +411,13 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser
     public void submitEvaluator_404_tokenNotFound() {
+        var request = utilUserProfile.genSaveEvaluatorFormParams();
+        request.put("token", genUUID());
         given()
-                .contentType(JSON)
-                .body(utilUserProfile.newSubmitUninvitedEvaluatorRequest())
+                .formParams(request)
+                .multiPart("profileImage", genUUID() + ".jpg", genFileBytes(IMAGE))
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
                 .then()
@@ -417,9 +429,11 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser
     public void submitEvaluator_404_countryNotFound() {
+        var request = utilUserProfile.genSaveEvaluatorFormParams();
+        request.put("country", genUUID());
         given()
-                .contentType(JSON)
-                .body(utilToken.submitInvitedEvaluatorRequest(genUUID()))
+                .formParams(request)
+                .multiPart("profileImage", genUUID() + ".jpg", genFileBytes(IMAGE))
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
                 .then()
@@ -431,10 +445,11 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser
     public void submitEvaluator_409_userAlreadyExists() {
-        var request = utilToken.submitInvitedEvaluatorRequest();
-        utilUser.savedUserDtoWithEmail(request.getEmail());
+        var request = utilUserProfile.genSaveEvaluatorFormParams();
+        utilUser.savedUserDtoWithEmail(request.get("email"));
         given()
-                .contentType(JSON)
+                .formParams(request)
+                .multiPart("profileImage", genUUID() + ".jpg", genFileBytes(IMAGE))
                 .body(request)
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
@@ -447,10 +462,10 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser
     public void submitEvaluator_200_ok() {
-        var request = utilToken.submitInvitedEvaluatorRequest();
-        var evaluator = given()
-                .contentType(JSON)
-                .body(request)
+        var request = utilUserProfile.genSaveEvaluatorFormParams();
+        var evaluatorDto = given()
+                .formParams(request)
+                .multiPart("profileImage", genUUID() + ".jpg", genFileBytes(IMAGE))
                 .when()
                 .post(API_URL + REGISTRATION_EVALUATOR_SUBMIT)
                 .then()
@@ -459,23 +474,24 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .extract()
                 .body()
                 .as(EvaluatorDto.class);
-        assertNotNull(evaluator.getUserProfile().getId());
-        assertNotNull(evaluator.getUserProfile().getUserId());
-        assertEquals(evaluator.getUserProfile().getFirstName(), request.getFirstName());
-        assertEquals(evaluator.getUserProfile().getLastName(), request.getLastName());
-        assertEquals(evaluator.getUserProfile().getPhone(), request.getPhone());
-        assertEquals(evaluator.getUserProfile().getBirthday(), request.getBirthday());
-        assertEquals(evaluator.getUserProfile().getGender(), request.getGender());
-        assertEquals(evaluator.getUserProfile().getLocation().getCountry().getName(), request.getCountry());
-        assertEquals(evaluator.getUserProfile().getLocation().getAddress(), request.getAddress());
+        assertNotNull(evaluatorDto.getUserProfile().getId());
+        assertNotNull(evaluatorDto.getUserProfile().getUserId());
+        assertEquals(evaluatorDto.getUserProfile().getFirstName(), request.get("firstName"));
+        assertEquals(evaluatorDto.getUserProfile().getLastName(), request.get("lastName"));
+        assertEquals(evaluatorDto.getUserProfile().getPhone(), request.get("phone"));
+        assertEquals(evaluatorDto.getUserProfile().getBirthday(), LocalDate.parse(request.get("birthday")));
+        assertEquals(evaluatorDto.getUserProfile().getGender(), request.get("gender"));
+        assertEquals(evaluatorDto.getUserProfile().getLocation().getCountry().getName(), request.get("country"));
+        assertEquals(evaluatorDto.getUserProfile().getLocation().getAddress(), request.get("address"));
     }
 
     @Test
     public void submitArtOwner_404_countryNotFound() {
-        var request = utilUserProfile.newSubmitArtOwnerRequest(genUUID());
+        var request = utilUserProfile.genSaveArtOwnerFormParams();
+        request.put("country", genUUID());
         given()
-                .contentType(JSON)
-                .body(request)
+                .formParams(request)
+                .multiPart("profileImage", genUUID() + ".jpg", genFileBytes(IMAGE))
                 .when()
                 .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
                 .then()
@@ -487,18 +503,19 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser
     public void submitArtOwner_409_userAlreadyExists() {
-        var request = utilUserProfile.newSubmitArtOwnerRequest();
+        var imageBytes = genFileBytes(IMAGE);
+        var formParams = utilUserProfile.genSaveArtOwnerFormParams();
         given()
-                .contentType(JSON)
-                .body(request)
+                .formParams(formParams)
+                .multiPart("profileImage", genUUID() + ".jpg", imageBytes)
                 .when()
                 .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
                 .then()
                 .assertThat()
                 .statusCode(200);
         given()
-                .contentType(JSON)
-                .body(request)
+                .formParams(formParams)
+                .multiPart("profileImage", genUUID() + ".jpg", imageBytes)
                 .when()
                 .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
                 .then()
@@ -509,10 +526,10 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser
     public void submitArtOwner_200_ok() {
-        var request = utilUserProfile.newSubmitArtOwnerRequest();
-        var artOwner = given()
-                .contentType(JSON)
-                .body(request)
+        var request = utilUserProfile.genSaveArtOwnerFormParams();
+        var artOwnerDto = given()
+                .formParams(request)
+                .multiPart("profileImage", genUUID() + ".jpg", genFileBytes(IMAGE))
                 .when()
                 .post(API_URL + REGISTRATION_ART_OWNER_SUBMIT)
                 .then()
@@ -521,15 +538,15 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .extract()
                 .body()
                 .as(ArtOwnerDto.class);
-        assertNotNull(artOwner.getUserProfile().getId());
-        assertNotNull(artOwner.getUserProfile().getUserId());
-        assertEquals(artOwner.getUserProfile().getFirstName(), request.getFirstName());
-        assertEquals(artOwner.getUserProfile().getLastName(), request.getLastName());
-        assertEquals(artOwner.getUserProfile().getPhone(), request.getPhone());
-        assertEquals(artOwner.getUserProfile().getBirthday(), request.getBirthday());
-        assertEquals(artOwner.getUserProfile().getGender(), request.getGender());
-        assertEquals(artOwner.getUserProfile().getLocation().getCountry().getName(), request.getCountry());
-        assertEquals(artOwner.getUserProfile().getLocation().getAddress(), request.getAddress());
+        assertNotNull(artOwnerDto.getUserProfile().getId());
+        assertNotNull(artOwnerDto.getUserProfile().getUserId());
+        assertEquals(artOwnerDto.getUserProfile().getFirstName(), request.get("firstName"));
+        assertEquals(artOwnerDto.getUserProfile().getLastName(), request.get("lastName"));
+        assertEquals(artOwnerDto.getUserProfile().getPhone(), request.get("phone"));
+        assertEquals(artOwnerDto.getUserProfile().getBirthday(), LocalDate.parse(request.get("birthday")));
+        assertEquals(artOwnerDto.getUserProfile().getGender(), request.get("gender"));
+        assertEquals(artOwnerDto.getUserProfile().getLocation().getCountry().getName(), request.get("country"));
+        assertEquals(artOwnerDto.getUserProfile().getLocation().getAddress(), request.get("address"));
     }
 
     @Test

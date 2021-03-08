@@ -1,9 +1,13 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
-import com.bloxico.ase.userservice.dto.entity.evaluation.*;
+import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
-import com.bloxico.ase.userservice.repository.evaluation.*;
+import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
+import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageCountryRepository;
+import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageRepository;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.ISearchCountryEvaluationDetailsRequest;
@@ -38,6 +42,25 @@ public class EvaluationServiceImpl implements IEvaluationService {
         this.countryEvaluationDetailsRepository = countryEvaluationDetailsRepository;
         this.quotationPackageRepository = quotationPackageRepository;
         this.quotationPackageCountryRepository = quotationPackageCountryRepository;
+    }
+
+    @Override
+    public CountryEvaluationDetailsDto findCountryEvaluationDetailsById(Long id) {
+        log.debug("EvaluationServiceImpl.findCountryEvaluationDetailsById - start | id: {}", id);
+        var detailsDto = countryEvaluationDetailsRepository
+                .findById(id)
+                .map(MAPPER::toDto)
+                .orElseThrow(COUNTRY_EVALUATION_DETAILS_NOT_FOUND::newException);
+        log.debug("EvaluationServiceImpl.findCountryEvaluationDetailsById - end | id: {}", id);
+        return detailsDto;
+    }
+
+    @Override
+    public int countEvaluatorsByCountryId(Long countryId) {
+        log.debug("EvaluationServiceImpl.countEvaluatorsByCountryId - start | countryId: {}", countryId);
+        var count = countryEvaluationDetailsRepository.countEvaluatorsByCountryId(countryId);
+        log.debug("EvaluationServiceImpl.countEvaluatorsByCountryId - end | countryId: {}", countryId);
+        return count;
     }
 
     @Override
@@ -81,6 +104,17 @@ public class EvaluationServiceImpl implements IEvaluationService {
         details.setAvailabilityPercentage(dto.getAvailabilityPercentage());
         var detailsDto = MAPPER.toDto(countryEvaluationDetailsRepository.saveAndFlush(details));
         log.debug("EvaluationServiceImpl.updateCountryEvaluationDetails - end | dto: {}", dto);
+        return detailsDto;
+    }
+
+    @Override
+    public CountryEvaluationDetailsDto deleteCountryEvaluationDetails(CountryEvaluationDetailsDto dto) {
+        log.debug("EvaluationServiceImpl.deleteCountryEvaluationDetails - start | dto: {}", dto);
+        requireNonNull(dto);
+        var details = MAPPER.toEntity(dto);
+        countryEvaluationDetailsRepository.delete(details);
+        var detailsDto = MAPPER.toDto(details);
+        log.debug("EvaluationServiceImpl.deleteCountryEvaluationDetails - end | dto: {}", dto);
         return detailsDto;
     }
 

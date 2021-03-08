@@ -17,32 +17,32 @@ public interface ErrorCodes {
 
         USER_EXISTS(
                 HttpStatus.CONFLICT,
-                "1",
+                "User_01",
                 "Upon registration, when given email already exists."),
 
         USER_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "2",
+                "User_02",
                 "For various situations, when user passed by parameter (email) does not exist."),
 
         OLD_PASSWORD_DOES_NOT_MATCH(
                 HttpStatus.BAD_REQUEST,
-                "3",
+                "User_03",
                 "When updating known password, if provided old password does not match with (current) password."),
 
         MATCH_REGISTRATION_PASSWORD_ERROR(
                 HttpStatus.BAD_REQUEST,
-                "4",
+                "User_04",
                 "When registering user, if password and matchPassword values are not valid."),
 
         ROLE_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "5",
+                "User_05",
                 "When filtering users, if role parameter is non existing role."),
 
         RESUME_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "6",
+                "User_06",
                 "When downloading user resume, if resume path is null or empty."
         );
 
@@ -66,17 +66,17 @@ public interface ErrorCodes {
 
         INVALID_TOKEN(
                 HttpStatus.FORBIDDEN,
-                "10",
+                "Token_01",
                 "Token is not valid (anymore). E.g. it's fake, expired or blacklisted."),
 
         TOKEN_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "11",
+                "Token_02",
                 "Token cannot be found in the database. It may be deleted due to expiry."),
 
         TOKEN_EXISTS(
                 HttpStatus.CONFLICT,
-                "12",
+                "Token_03",
                 "Token already exists for given parameters.");
 
         private final HttpStatus httpStatus;
@@ -100,32 +100,32 @@ public interface ErrorCodes {
 
         FILE_TYPE_NOT_SUPPORTED(
                 HttpStatus.BAD_REQUEST,
-                "20",
+                "AmazonS3_01",
                 "File type is not supported."),
 
         FILE_SIZE_EXCEEDED(
                 HttpStatus.BAD_REQUEST,
-                "21",
+                "AmazonS3_02",
                 "File size exceeded limit."),
 
         FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY(
                 HttpStatus.BAD_REQUEST,
-                "22",
+                "AmazonS3_03",
                 "File type is not supported for the category."),
 
         FILE_UPLOAD_FAILED(
                 HttpStatus.BAD_REQUEST,
-                "23",
+                "AmazonS3_04",
                 "File upload failed."),
 
         FILE_DOWNLOAD_FAILED(
                 HttpStatus.BAD_REQUEST,
-                "24",
+                "AmazonS3_05",
                 "File download failed."),
 
         FILE_DELETE_FAILED(
                 HttpStatus.BAD_REQUEST,
-                "25",
+                "AmazonS3_06",
                 "File deletion failed.");
 
         private final HttpStatus httpStatus;
@@ -149,27 +149,27 @@ public interface ErrorCodes {
 
         REGION_EXISTS(
                 HttpStatus.CONFLICT,
-                "30",
+                "Location_01",
                 "Region already exists in the database."),
 
         REGION_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "31",
+                "Location_02",
                 "Region with specified name was not found."),
 
         REGION_DELETE_OPERATION_NOT_SUPPORTED(
-                HttpStatus.BAD_REQUEST,
-                "32",
+                HttpStatus.CONFLICT,
+                "Location_03",
                 "One or more countries are tied down to the region. Region cannot be deleted."),
 
         COUNTRY_EXISTS(
                 HttpStatus.CONFLICT,
-                "33",
+                "Location_04",
                 "Country already exists in the database."),
 
         COUNTRY_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "34",
+                "Location_05",
                 "Country with specified name was not found.");
 
         private final HttpStatus httpStatus;
@@ -189,37 +189,37 @@ public interface ErrorCodes {
     }
 
     @Getter
-    enum Artworks implements ErrorCodes {
+    enum Artwork implements ErrorCodes {
 
         ARTWORK_METADATA_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "40",
+                "Artworks_01",
                 "Artwork metadata not found."),
 
         ARTWORK_METADATA_TYPE_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "41",
+                "Artworks_02",
                 "Artwork metadata type not found."),
 
         ARTWORK_MISSING_RESUME(
                 HttpStatus.BAD_REQUEST,
-                "42",
+                "Artworks_03",
                 "Art Owner resume missing."),
 
         ARTWORK_MISSING_CERTIFICATE(
                 HttpStatus.BAD_REQUEST,
-                "43",
+                "Artworks_04",
                 "Artwork certificate not uploaded."),
 
         ARTWORK_GROUP_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "44",
+                "Artworks_05",
                 "Artwork group not found.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
 
-        Artworks(HttpStatus httpStatus, String code, String description) {
+        Artwork(HttpStatus httpStatus, String code, String description) {
             this.httpStatus = httpStatus;
             this.code = code;
             this.description = description;
@@ -237,22 +237,27 @@ public interface ErrorCodes {
 
         COUNTRY_EVALUATION_DETAILS_EXISTS(
                 HttpStatus.CONFLICT,
-                "40",
+                "Evaluation_01",
                 "Evaluation details already exists for specified country."),
 
         COUNTRY_EVALUATION_DETAILS_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "41",
+                "Evaluation_02",
                 "Specified evaluation details not found."),
+
+        COUNTRY_EVALUATION_DETAILS_DELETE_OPERATION_NOT_SUPPORTED(
+                HttpStatus.CONFLICT,
+                "Evaluation_03",
+                "There are evaluators from country to which evaluation details belong."),
 
         QUOTATION_PACKAGE_EXISTS(
                 HttpStatus.CONFLICT,
-                "42",
+                "Evaluation_04",
                 "Quotation package already exists for specified artwork."),
 
         QUOTATION_PACKAGE_COUNTRY_EXISTS(
                 HttpStatus.CONFLICT,
-                "43",
+                "Evaluation_05",
                 "Quotation package country already exists for specified country.");
 
         private final HttpStatus httpStatus;
@@ -272,17 +277,17 @@ public interface ErrorCodes {
     }
 
     @Getter
-    enum Documents implements ErrorCodes {
+    enum Document implements ErrorCodes {
 
         DOCUMENT_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
-                "60",
+                "Documents_01",
                 "Document not found.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
 
-        Documents(HttpStatus httpStatus, String code, String description) {
+        Document(HttpStatus httpStatus, String code, String description) {
             this.httpStatus = httpStatus;
             this.code = code;
             this.description = description;

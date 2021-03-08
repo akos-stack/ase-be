@@ -22,6 +22,7 @@ import java.time.LocalDate;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.util.SupportedFileExtension.pdf;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
@@ -174,7 +175,8 @@ public class UtilToken {
                 email, genUUID(), genUUID(),
                 genUUID(), LocalDate.now(),
                 genUUID(), country,
-                genUUID(), ONE, TEN);
+                genUUID(), ONE, TEN,
+                genMultipartFile(IMAGE));
     }
 
 }

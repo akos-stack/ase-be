@@ -176,6 +176,7 @@ databaseChangeLog:
                   type: varchar(256)
                   constraints:
                     nullable: false
+                    unique: true
               # METADATA
               - column:
                   name: creator_id
@@ -220,13 +221,7 @@ databaseChangeLog:
                   type: varchar(256)
                   constraints:
                     nullable: false
-              - column:
-                  name: region_id
-                  type: bigint
-                  constraints:
-                    nullable: true
-                    foreignKeyName: fk_region_country
-                    references: regions(id)
+                    unique: true
               # METADATA
               - column:
                   name: creator_id
@@ -286,6 +281,14 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
               - column:
+                  name: country_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    unique: true
+                    foreignKeyName: fk_country_evaluation_details_country
+                    references: countries(id)
+              - column:
                   name: price_per_evaluation
                   type: integer
                   constraints:
@@ -295,13 +298,6 @@ databaseChangeLog:
                   type: integer
                   constraints:
                     nullable: false
-              - column:
-                  name: country_id
-                  type: bigint
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_country_evaluation_details_country
-                    references: countries(id)
               # METADATA
               - column:
                   name: creator_id
@@ -1392,3 +1388,22 @@ databaseChangeLog:
                   defaultValueNumeric: 0
                   constraints:
                     nullable: false
+        - createTable:
+            tableName: user_profiles_documents
+            columns:
+              - column:
+                  name: user_profile_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_user_profile_document
+                    references: user_profiles(id)
+              - column:
+                  name: document_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_document_user_profile
+                    references: documents(id)

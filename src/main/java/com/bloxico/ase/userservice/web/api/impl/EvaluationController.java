@@ -5,8 +5,11 @@ import com.bloxico.ase.userservice.web.api.EvaluationApi;
 import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @RestController
 public class EvaluationController implements EvaluationApi {
@@ -46,6 +49,12 @@ public class EvaluationController implements EvaluationApi {
     {
         var response = evaluationFacade.updateCountryEvaluationDetails(request);
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteCountryEvaluationDetails(@Valid DeleteCountryEvaluationDetailsRequest request) {
+        evaluationFacade.deleteCountryEvaluationDetails(request.getId());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override

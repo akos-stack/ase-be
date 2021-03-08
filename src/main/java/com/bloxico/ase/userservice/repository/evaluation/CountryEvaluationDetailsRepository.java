@@ -17,6 +17,9 @@ public interface CountryEvaluationDetailsRepository extends JpaRepository<Countr
 
     Optional<CountryEvaluationDetails> findByCountryId(Long id);
 
+    @Query("SELECT COUNT(*) FROM Evaluator e JOIN e.userProfile.location.country c WHERE c.id = :countryId")
+    int countEvaluatorsByCountryId(Long countryId);
+
     // @formatter:off
     @Query(value =
             "SELECT DISTINCT new com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsCountedTransferProj( " +

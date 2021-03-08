@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Documents.DOCUMENT_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Document.DOCUMENT_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -29,12 +29,20 @@ public class DocumentServiceImpl implements IDocumentService {
 
     @Override
     public DocumentDto saveDocument(MultipartFile file, FileCategory type) {
+         return saveDocument(file, type, null);
+    }
+
+    @Override
+    public DocumentDto saveDocument(MultipartFile file, FileCategory type, Long principalId) {
         log.info("DocumentServiceImpl.saveDocument - start | file: {}, fileCategory: {}", file, type);
         var path = s3Service.uploadFile(type, file);
         var document = new Document();
         document.setPath(path);
         document.setType(type);
-        log.info("DocumentServiceImpl.saveDocument - end | file: {}, fileCategory: {}, principalId: {} ", file, type);
+        if(principalId != null) {
+            document.setCreatorId(principalId);
+        }
+        log.info("DocumentServiceImpl.saveDocument - end | file: {}, fileCategory: {}", file, type);
         return MAPPER.toDto(documentRepository.save(document));
     }
 

@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_GROUP_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_GROUP_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j

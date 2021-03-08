@@ -9,5 +9,7 @@ public interface IDocumentService {
 
     DocumentDto saveDocument(MultipartFile file, FileCategory type);
 
+    DocumentDto saveDocument(MultipartFile file, FileCategory type, Long principalId);
+
     ByteArrayResource getDocumentById(Long id);
 }

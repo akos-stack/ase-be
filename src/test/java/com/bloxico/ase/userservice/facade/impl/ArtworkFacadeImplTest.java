@@ -74,7 +74,6 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
         var saveArtworkResponse = artworkFacade.submitArtwork(submitArtworkRequest);
         assertNotNull(saveArtworkResponse);
         assertSame(artworkGroupService.findGroupById(saveArtworkResponse.getGroupDto().getId()).getStatus(), ArtworkGroup.Status.WAITING_FOR_EVALUATION);
-
     }
 
 }

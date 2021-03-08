@@ -15,6 +15,8 @@ public interface ILocationService {
 
     List<RegionDto> findAllRegionsWithNames(Collection<String> regionNames);
 
+    CountryDto findCountryById(Long id);
+
     CountryDto findCountryByName(String country);
 
     List<RegionDto> findAllRegions();
@@ -32,5 +34,4 @@ public interface ILocationService {
     LocationDto saveLocation(LocationDto locationDto, Long principalId);
 
     int countCountriesByRegionId(Long regionId);
-
 }

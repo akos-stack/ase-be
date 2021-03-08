@@ -64,7 +64,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body(ERROR_CODE, is(ErrorCodes.Artworks.ARTWORK_MISSING_CERTIFICATE.getCode()));
+                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_MISSING_CERTIFICATE.getCode()));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
                 .then()
                 .assertThat()
                 .statusCode(400)
-                .body(ERROR_CODE, is(ErrorCodes.Artworks.ARTWORK_MISSING_RESUME.getCode()));
+                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_MISSING_RESUME.getCode()));
     }
 
     @Test
@@ -105,7 +105,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
                 .then()
                 .assertThat()
                 .statusCode(404)
-                .body(ERROR_CODE, is(ErrorCodes.Artworks.ARTWORK_GROUP_NOT_FOUND.getCode()));
+                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_GROUP_NOT_FOUND.getCode()));
     }
 
     @Test

@@ -106,7 +106,7 @@ public class LocationApiTest extends AbstractSpringTest {
 
     @Test
     @WithMockCustomUser(auth = true)
-    public void deleteRegion_400_regionHasCountries() {
+    public void deleteRegion_409_regionHasCountries() {
         var region = utilLocation.savedRegion();
         utilLocation.savedCountryWithRegion(region);
 
@@ -118,7 +118,7 @@ public class LocationApiTest extends AbstractSpringTest {
                 .post(API_URL + REGION_MANAGEMENT_DELETE)
                 .then()
                 .assertThat()
-                .statusCode(400)
+                .statusCode(409)
                 .body(ERROR_CODE, is(REGION_DELETE_OPERATION_NOT_SUPPORTED.getCode()));
     }
 

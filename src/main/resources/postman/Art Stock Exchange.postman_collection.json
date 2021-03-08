@@ -1178,6 +1178,46 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Delete Country Details",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{ase-endpoint}}/api/evaluation/management/country-details/delete",
+									"host": [
+										"{{ase-endpoint}}"
+									],
+									"path": [
+										"api",
+										"evaluation",
+										"management",
+										"country-details",
+										"delete"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
