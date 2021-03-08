@@ -61,7 +61,6 @@ public interface UserPasswordApi {
             value = PASSWORD_UPDATE_ENDPOINT,
             produces = {"application/json"},
             consumes = {"application/json"})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'update_profile')")
     @ApiOperation(value = "Replaces current password with a new password.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Password is updated successfully."),
@@ -73,7 +72,7 @@ public interface UserPasswordApi {
             value = PASSWORD_SET_ENDPOINT,
             produces = {"application/json"},
             consumes = {"application/json"})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'update_profile')")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'set_password')")
     @ApiOperation(value = "Sets a new password for user who does not have a password (i.e. integrated user).")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Password is set successfully.")

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4475bc05-af2b-448c-bbf9-438d242b9e68",
+		"_postman_id": "0ec80a33-e437-4aca-b0e9-398d104ea5eb",
 		"name": "Art Stock Exchange",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -10,6 +10,18 @@
 			"item": [
 				{
 					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"pm.collectionVariables.set(\"access_token\", jsonData[\"access_token\"]);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "basic",
@@ -627,7 +639,7 @@
 			"name": "S3",
 			"item": [
 				{
-					"name": "Validate file",
+					"name": "Upload file",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -744,224 +756,487 @@
 			]
 		},
 		{
-			"name": "Artwork Metadata Management",
+			"name": "Location",
 			"item": [
 				{
-					"name": "Create artwork metadata",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access-token}}",
-									"type": "string"
+					"name": "Region",
+					"item": [
+						{
+							"name": "Save Region",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"region\": \"Europe\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint_ase}}/api/region/management/save",
+									"host": [
+										"{{endpoint_ase}}"
+									],
+									"path": [
+										"api",
+										"region",
+										"management",
+										"save"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"categoryName\",\r\n    \"type\": \"CATEGORY\"\r\n}\r\n\r\n// type: CATEGORY | MATERIAL | MEDIUM | STYLE",
-							"options": {
-								"raw": {
-									"language": "json"
+						{
+							"name": "Delete Region",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint_ase}}/api/region/management/delete",
+									"host": [
+										"{{endpoint_ase}}"
+									],
+									"path": [
+										"api",
+										"region",
+										"management",
+										"delete"
+									]
 								}
-							}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/create",
-							"host": [
-								"{{ase-endpoint}}"
-							],
-							"path": [
-								"api",
-								"artwork",
-								"management",
-								"metadata",
-								"create"
-							]
+						{
+							"name": "Fetch All Regions",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{ase-endpoint}}/api/regions",
+									"host": [
+										"{{ase-endpoint}}"
+									],
+									"path": [
+										"api",
+										"regions"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "Search artwork metadata",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access-token}}",
-									"type": "string"
+					"name": "Country",
+					"item": [
+						{
+							"name": "Save Country",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"country\": \"Serbia\",\r\n    \"regions\": [\"Europe\"]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint_ase}}/api/country/management/save",
+									"host": [
+										"{{endpoint_ase}}"
+									],
+									"path": [
+										"api",
+										"country",
+										"management",
+										"save"
+									]
 								}
-							]
+							},
+							"response": []
 						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/management/metadata?type=CATEGORY",
-							"host": [
-								"{{ase-endpoint}}"
-							],
-							"path": [
-								"api",
-								"artwork",
-								"management",
-								"metadata"
-							],
-							"query": [
-								{
-									"key": "status",
-									"value": "APPROVED",
-									"disabled": true
+						{
+							"name": "Update Country",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
 								},
-								{
-									"key": "name",
-									"value": "5",
-									"disabled": true
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": 1,\r\n    \"country\": \"Serbia\",\r\n    \"regions\": [\"Europe\", \"Balkan\"]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
 								},
-								{
-									"key": "size",
-									"value": "2",
-									"disabled": true
-								},
-								{
-									"key": "type",
-									"value": "CATEGORY"
+								"url": {
+									"raw": "{{ase-endpoint}}/api/country/management/update",
+									"host": [
+										"{{ase-endpoint}}"
+									],
+									"path": [
+										"api",
+										"country",
+										"management",
+										"update"
+									]
 								}
-							]
+							},
+							"response": []
+						},
+						{
+							"name": "Fetch All Countries",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint_ase}}/api/countries",
+									"host": [
+										"{{endpoint_ase}}"
+									],
+									"path": [
+										"api",
+										"countries"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update artwork metadata status",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access-token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"categoryName\",\r\n    \"status\": \"PENDING\",\r\n    \"type\": \"CATEGORY\"\r\n}\r\n\r\n// status: APPROVED | PENDING\r\n// type: CATEGORY | MATERIAL | MEDIUM | STYLE",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/update",
-							"host": [
-								"{{ase-endpoint}}"
-							],
-							"path": [
-								"api",
-								"artwork",
-								"management",
-								"metadata",
-								"update"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete artwork metadata",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access-token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/delete?name=categoryName&type=CATEGORY",
-							"host": [
-								"{{ase-endpoint}}"
-							],
-							"path": [
-								"api",
-								"artwork",
-								"management",
-								"metadata",
-								"delete"
-							],
-							"query": [
-								{
-									"key": "name",
-									"value": "categoryName"
-								},
-								{
-									"key": "type",
-									"value": "CATEGORY"
-								}
-							]
-						}
-					},
-					"response": []
+					]
 				}
 			]
 		},
 		{
-			"name": "Artwork Metadata",
+			"name": "Evaluation",
 			"item": [
 				{
-					"name": "Fetch approved metadata",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access-token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/metadata?type=CATEGORY",
-							"host": [
-								"{{ase-endpoint}}"
-							],
-							"path": [
-								"api",
-								"artwork",
-								"metadata"
-							],
-							"query": [
-								{
-									"key": "type",
-									"value": "CATEGORY"
+					"name": "Country Details",
+					"item": [
+						{
+							"name": "Save Country Details",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
 								},
-								{
-									"key": "name",
-									"value": "<searchText>",
-									"disabled": true
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"country\": \"Serbia\",\r\n    \"price_per_evaluation\": 10,\r\n    \"availability_percentage\": 40\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint_ase}}/api/evaluation/management/country-details/save",
+									"host": [
+										"{{endpoint_ase}}"
+									],
+									"path": [
+										"api",
+										"evaluation",
+										"management",
+										"country-details",
+										"save"
+									]
 								}
-							]
+							},
+							"response": []
+						},
+						{
+							"name": "Update Country Details",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": 1,\r\n    \"price_per_evaluation\": 15,\r\n    \"availability_percentage\": 50\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint_ase}}/api/evaluation/management/country-details/update",
+									"host": [
+										"{{endpoint_ase}}"
+									],
+									"path": [
+										"api",
+										"evaluation",
+										"management",
+										"country-details",
+										"update"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search Country Details",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint_ase}}/api/evaluation/country-details?page=0&size=10&sort=price_per_evaluation&order=desc&search=a&regions=Europe,Asia",
+									"host": [
+										"{{endpoint_ase}}"
+									],
+									"path": [
+										"api",
+										"evaluation",
+										"country-details"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "sort",
+											"value": "price_per_evaluation"
+										},
+										{
+											"key": "order",
+											"value": "desc"
+										},
+										{
+											"key": "search",
+											"value": "a"
+										},
+										{
+											"key": "regions",
+											"value": "Europe,Asia"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Manage Countries",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint_ase}}/api/evaluation/management/country-details?page=0&size=10&sort=price_per_evaluation&order=desc&search=a&regions=Europe,Asia",
+									"host": [
+										"{{endpoint_ase}}"
+									],
+									"path": [
+										"api",
+										"evaluation",
+										"management",
+										"country-details"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "sort",
+											"value": "price_per_evaluation"
+										},
+										{
+											"key": "order",
+											"value": "desc"
+										},
+										{
+											"key": "search",
+											"value": "a"
+										},
+										{
+											"key": "regions",
+											"value": "Europe,Asia"
+										}
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
+				},
+				{
+					"name": "Regions",
+					"item": [
+						{
+							"name": "Managa Regions",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{endpoint_ase}}/api/evaluation/management/region-details?page=0&size=10&sort=name&order=desc&search=a",
+									"host": [
+										"{{endpoint_ase}}"
+									],
+									"path": [
+										"api",
+										"evaluation",
+										"management",
+										"region-details"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "0"
+										},
+										{
+											"key": "size",
+											"value": "10"
+										},
+										{
+											"key": "sort",
+											"value": "name"
+										},
+										{
+											"key": "order",
+											"value": "desc"
+										},
+										{
+											"key": "search",
+											"value": "a"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		},
@@ -1185,6 +1460,10 @@
 		{
 			"key": "endpoint",
 			"value": "localhost:8089"
+		},
+		{
+			"key": "access_token",
+			"value": ""
 		}
 	]
 }

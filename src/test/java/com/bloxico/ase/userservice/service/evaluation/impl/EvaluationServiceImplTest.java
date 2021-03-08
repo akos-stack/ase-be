@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static com.bloxico.ase.testutil.Util.allPages;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
@@ -15,6 +18,47 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private EvaluationServiceImpl evaluationService;
+
+    @Test
+    public void searchCountryEvaluationDetails_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.searchCountryEvaluationDetails(null, allPages()));
+    }
+
+    @Test
+    public void searchCountryEvaluationDetails_nullPageRequest() {
+        var request = utilEvaluation.genSearchCountryEvaluationDetailsRequest();
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.searchCountryEvaluationDetails(request, null));
+    }
+
+    @Test
+    public void searchCountryEvaluationDetails() {
+        var request = utilEvaluation.genSearchCountryEvaluationDetailsRequest();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        assertThat(
+                evaluationService.searchCountryEvaluationDetails(request, allPages()),
+                hasItems(c1));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails();
+        assertThat(
+                evaluationService.searchCountryEvaluationDetails(request, allPages()),
+                allOf(hasItems(c1), not(hasItems(c2))));
+    }
+
+    @Test
+    public void searchCountryEvaluationDetails_forManagement() {
+        var request = utilEvaluation.genSearchCountryEvaluationDetailsForManagementRequest();
+        var c1 = utilEvaluation.savedCountryEvaluationDetailsCountedProj();
+        assertThat(
+                evaluationService.searchCountryEvaluationDetails(request, allPages()),
+                hasItems(c1));
+        var c2 = utilEvaluation.savedCountryEvaluationDetailsCountedProjNoDetails();
+        assertThat(
+                evaluationService.searchCountryEvaluationDetails(request, allPages()),
+                hasItems(c1, c2));
+    }
 
     @Test
     public void saveCountryEvaluationDetails_nullDetails() {
@@ -27,8 +71,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     @Test
     public void saveCountryEvaluationDetails_alreadyExists() {
         var principalId = utilUser.savedAdmin().getId();
-        var countryId = utilEvaluation.savedCountryEvaluationDetailsDto().getCountryId();
-        var details = utilEvaluation.genCountryEvaluationDetailsDto(countryId);
+        var details = utilEvaluation.savedCountryEvaluationDetailsDto();
         assertThrows(
                 EvaluationException.class,
                 () -> evaluationService.saveCountryEvaluationDetails(details, principalId));
@@ -44,6 +87,65 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
         assertEquals(details.getCountryId(), savedDetails.getCountryId());
         assertEquals(details.getPricePerEvaluation(), savedDetails.getPricePerEvaluation());
         assertEquals(details.getAvailabilityPercentage(), savedDetails.getAvailabilityPercentage());
+    }
+
+    @Test
+    public void updateCountryEvaluationDetails_nullDetails() {
+        var principalId = utilUser.savedAdmin().getId();
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.updateCountryEvaluationDetails(null, principalId));
+    }
+
+    @Test
+    public void updateCountryEvaluationDetails_evaluationDetailsNotFound() {
+        var principalId = utilUser.savedAdmin().getId();
+        var details = utilEvaluation.savedCountryEvaluationDetailsDto();
+        details.setId(-1);
+        assertThrows(
+                EvaluationException.class,
+                () -> evaluationService.saveCountryEvaluationDetails(details, principalId));
+    }
+
+    @Test
+    public void updateCountryEvaluationDetails() {
+        var principalId = utilUser.savedAdmin().getId();
+        var details = utilEvaluation.savedCountryEvaluationDetailsDto();
+        var dto = utilEvaluation.genCountryEvaluationDetailsDto(details.getCountryId());
+        dto.setId(details.getId());
+        var updatedDetails = evaluationService.updateCountryEvaluationDetails(dto, principalId);
+        assertEquals(details.getId(), updatedDetails.getId());
+        assertEquals(details.getCountryId(), updatedDetails.getCountryId());
+        assertEquals(dto.getPricePerEvaluation(), updatedDetails.getPricePerEvaluation());
+        assertEquals(dto.getAvailabilityPercentage(), updatedDetails.getAvailabilityPercentage());
+    }
+
+    @Test
+    public void searchRegionEvaluationDetails_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.searchRegionEvaluationDetails(null, allPages()));
+    }
+
+    @Test
+    public void searchRegionEvaluationDetails_nullPageRequest() {
+        var request = utilEvaluation.genDefaultSearchRegionsRequest();
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.searchRegionEvaluationDetails(request, null));
+    }
+
+    @Test
+    public void searchRegionEvaluationDetails() {
+        var request = utilEvaluation.genDefaultSearchRegionsRequest();
+        var c1 = utilEvaluation.savedRegionCountedProj();
+        assertThat(evaluationService
+                        .searchRegionEvaluationDetails(request, allPages()),
+                hasItems(c1));
+        var c2 = utilEvaluation.savedRegionCountedProj();
+        assertThat(evaluationService
+                        .searchRegionEvaluationDetails(request, allPages()),
+                hasItems(c1, c2));
     }
 
     @Test

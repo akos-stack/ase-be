@@ -1,15 +1,25 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.*;
-import com.bloxico.ase.userservice.repository.address.*;
+import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
+import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
+import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
+import com.bloxico.ase.userservice.repository.address.CountryRepository;
+import com.bloxico.ase.userservice.repository.address.LocationRepository;
+import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.List;
+
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.*;
+import static java.util.Comparator.comparing;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Slf4j
 @Service
@@ -30,6 +40,17 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
+    public RegionDto findRegionById(int id) {
+        log.debug("LocationServiceImpl.findRegionById - start | id: {}", id);
+        var regionDto = regionRepository
+                .findById(id)
+                .map(MAPPER::toDto)
+                .orElseThrow(REGION_NOT_FOUND::newException);
+        log.debug("LocationServiceImpl.findRegionById - end | id: {}", id);
+        return regionDto;
+    }
+
+    @Override
     public RegionDto findRegionByName(String region) {
         log.debug("LocationServiceImpl.findRegionByName - start | region: {}", region);
         var regionDto = regionRepository
@@ -41,16 +62,41 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
+    public List<RegionDto> findAllRegionsWithNames(Collection<String> regionNames) {
+        log.debug("LocationServiceImpl.findAllRegionsWithNames - start | regionNames: {}", regionNames);
+        requireNonNull(regionNames);
+        var regions = regionRepository
+                .findAllByNameInIgnoreCase(regionNames)
+                .stream()
+                .map(MAPPER::toDto)
+                .collect(toList());
+        log.debug("LocationServiceImpl.findAllRegionsWithNames - end | regionNames: {}", regionNames);
+        return regions;
+    }
+
+    @Override
     public CountryDto findCountryByName(String country) {
         log.debug("LocationServiceImpl.findCountryByName - start | country: {}", country);
-        var regionDto = countryRepository
+        var countryDto = countryRepository
                 .findByNameIgnoreCase(country)
                 .map(MAPPER::toDto)
                 .orElseThrow(COUNTRY_NOT_FOUND::newException);
         log.debug("LocationServiceImpl.findCountryByName - end | country: {}", country);
-        return regionDto;
+        return countryDto;
     }
 
+    @Override
+    public List<RegionDto> findAllRegions() {
+        log.debug("LocationServiceImpl.findAllRegions - start");
+        var regions = regionRepository
+                .findAll()
+                .stream()
+                .map(MAPPER::toDto)
+                .sorted(comparing(RegionDto::getName))
+                .collect(toList());
+        log.debug("LocationServiceImpl.findAllRegions - end");
+        return regions;
+    }
 
     @Override
     public RegionDto saveRegion(RegionDto dto, long principalId) {
@@ -63,6 +109,30 @@ public class LocationServiceImpl implements ILocationService {
         var regionDto = MAPPER.toDto(region);
         log.debug("LocationServiceImpl.saveRegion - end | dto: {}, principalId: {}", dto, principalId);
         return regionDto;
+    }
+
+    @Override
+    public RegionDto deleteRegion(RegionDto dto) {
+        log.debug("LocationServiceImpl.deleteRegion - start | dto: {}", dto);
+        requireNonNull(dto);
+        var region = MAPPER.toEntity(dto);
+        regionRepository.delete(region);
+        var regionDto = MAPPER.toDto(region);
+        log.debug("LocationServiceImpl.deleteRegion - end | dto: {}", dto);
+        return regionDto;
+    }
+
+    @Override
+    public List<CountryDto> findAllCountries() {
+        log.debug("LocationServiceImpl.findAllCountries - start");
+        var countries = countryRepository
+                .findAll()
+                .stream()
+                .map(MAPPER::toDto)
+                .sorted(comparing(CountryDto::getName))
+                .collect(toList());
+        log.debug("LocationServiceImpl.findAllCountries - end");
+        return countries;
     }
 
     @Override
@@ -79,6 +149,29 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
+    public CountryDto updateCountry(CountryDto dto, long principalId) {
+        log.debug("LocationServiceImpl.updateCountry - start | dto: {}, principalId: {}", dto, principalId);
+        requireNonNull(dto);
+        var country = countryRepository
+                .findById(dto.getId())
+                .orElseThrow(COUNTRY_NOT_FOUND::newException);
+        country.setUpdaterId(principalId);
+        if (countryNameUpdateRequested(country.getName(), dto.getName())) {
+            requireNotExists(dto);
+            country.setName(dto.getName());
+        }
+        var regions = dto.getRegions()
+                .stream()
+                .map(MAPPER::toEntity)
+                .collect(toSet());
+        country.setRegions(regions);
+        country = countryRepository.saveAndFlush(country);
+        var countryDto = MAPPER.toDto(country);
+        log.debug("LocationServiceImpl.updateCountry - end | dto: {}, principalId: {}", dto, principalId);
+        return countryDto;
+    }
+
+    @Override
     public LocationDto saveLocation(LocationDto dto, long principalId) {
         log.debug("LocationServiceImpl.saveLocation - start | dto: {}, principalId: {}", dto, principalId);
         requireNonNull(dto);
@@ -90,6 +183,14 @@ public class LocationServiceImpl implements ILocationService {
         return locationDto;
     }
 
+    @Override
+    public int countCountriesByRegionId(int regionId) {
+        log.debug("LocationServiceImpl.countCountriesByRegionId - start | regionId: {}", regionId);
+        var count = countryRepository.countByRegionsIdEquals(regionId);
+        log.debug("LocationServiceImpl.countCountriesByRegionId - end | regionId: {}", regionId);
+        return count;
+    }
+
     private void requireNotExists(RegionDto dto) {
         if (regionRepository.findByNameIgnoreCase(dto.getName()).isPresent())
             throw REGION_EXISTS.newException();
@@ -98,6 +199,10 @@ public class LocationServiceImpl implements ILocationService {
     private void requireNotExists(CountryDto dto) {
         if (countryRepository.findByNameIgnoreCase(dto.getName()).isPresent())
             throw COUNTRY_EXISTS.newException();
+    }
+
+    private boolean countryNameUpdateRequested(String name, String updatedName) {
+        return !name.equalsIgnoreCase(updatedName);
     }
 
 }

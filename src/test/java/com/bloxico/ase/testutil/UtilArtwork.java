@@ -99,7 +99,8 @@ public class UtilArtwork {
     }
 
     public SaveArtworkRequest genSaveArtworkRequest(ArtworkGroup.Status status, boolean artOwner, Long groupId) {
-        var locationDto = utilLocation.savedLocationDto();
+        var region = utilLocation.savedRegion();
+        var country = utilLocation.savedCountryWithRegion(region);
         var fileCategory = artOwner ? CV : CERTIFICATE;
         return new SaveArtworkRequest(
                 List.of(genMultipartFile(IMAGE)),               // images
@@ -121,8 +122,8 @@ public class UtilArtwork {
                 genUUID(),                                      // address
                 genUUID(),                                      // address2
                 genUUID(),                                      // city
-                locationDto.getCountry().getName(),             // country
-                locationDto.getCountry().getRegion().getName(), // region
+                country.getName(),                              // country
+                region.getName(),                               // region
                 genUUID(),                                      // zipCode
                 genUUID(),                                      // phone
                 genUUID(),                                      // appraisalHistory
@@ -136,7 +137,8 @@ public class UtilArtwork {
     }
 
     public Map<String, String> genSaveArtworkFormParams(ArtworkGroup.Status status, boolean iAmArtOwner, Long groupId) {
-        var locationDto = utilLocation.savedLocationDto();
+        var region = utilLocation.savedRegion();
+        var country = utilLocation.savedCountryWithRegion(region);
         var map = new HashMap<String, String>();
         map.put("title", genUUID());
         map.put("categories", genUUID());
@@ -154,8 +156,8 @@ public class UtilArtwork {
         map.put("address", genUUID());
         map.put("address2", genUUID());
         map.put("city", genUUID());
-        map.put("country", locationDto.getCountry().getName());
-        map.put("region", locationDto.getCountry().getRegion().getName());
+        map.put("country", country.getName());
+        map.put("region", region.getName());
         map.put("zipCode", genUUID());
         map.put("phone", genUUID());
         map.put("appraisalHistory", genUUID());

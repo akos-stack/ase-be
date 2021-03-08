@@ -165,7 +165,7 @@ public class UserPasswordApiTest extends AbstractSpringTest {
     @Test
     public void setNewPassword_200_ok() {
         given()
-                .header("Authorization", utilAuth.doAuthentication())
+                .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
                 .body(new SetPasswordRequest(genPassword()))
                 .when()

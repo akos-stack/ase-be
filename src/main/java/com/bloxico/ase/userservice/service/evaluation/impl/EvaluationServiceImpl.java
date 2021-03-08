@@ -1,10 +1,16 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.*;
+import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
+import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
+import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.ISearchCountryEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionEvaluationDetailsRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -35,6 +41,25 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
+    public Page<CountryEvaluationDetailsWithEvaluatorsCountProj> searchCountryEvaluationDetails(
+            ISearchCountryEvaluationDetailsRequest request,
+            PageRequest pageDetails)
+    {
+        log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - start | request: {}, pageDetails: {}", request, pageDetails);
+        requireNonNull(request);
+        requireNonNull(pageDetails);
+        var page = countryEvaluationDetailsRepository
+                .findAllCountryEvaluationDetailsWithEvaluatorsCount(
+                        request.getSearch(),
+                        request.getRegions(),
+                        request.includeCountriesWithoutEvaluationDetails(),
+                        pageDetails.toPageable())
+                .map(MAPPER::toCountedProj);
+        log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - end | request: {}, pageDetails: {}", request, pageDetails);
+        return page;
+    }
+
+    @Override
     public CountryEvaluationDetailsDto saveCountryEvaluationDetails(CountryEvaluationDetailsDto dto, long principalId) {
         log.debug("EvaluationServiceImpl.saveCountryEvaluationDetails - start | dto: {}, principalId: {}", dto, principalId);
         requireNonNull(dto);
@@ -47,6 +72,36 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
+    public CountryEvaluationDetailsDto updateCountryEvaluationDetails(CountryEvaluationDetailsDto dto, long principalId) {
+        log.debug("EvaluationServiceImpl.updateCountryEvaluationDetails - start | dto: {}, principalId: {}", dto, principalId);
+        requireNonNull(dto);
+        var details = countryEvaluationDetailsRepository
+                .findById(dto.getId())
+                .orElseThrow(COUNTRY_EVALUATION_DETAILS_NOT_FOUND::newException);
+        details.setUpdaterId(principalId);
+        details.setPricePerEvaluation(dto.getPricePerEvaluation());
+        details.setAvailabilityPercentage(dto.getAvailabilityPercentage());
+        var detailsDto = MAPPER.toDto(countryEvaluationDetailsRepository.saveAndFlush(details));
+        log.debug("EvaluationServiceImpl.updateCountryEvaluationDetails - end | dto: {}, principalId: {}", dto, principalId);
+        return detailsDto;
+    }
+
+    @Override
+    public Page<RegionWithCountriesAndEvaluatorsCountProj> searchRegionEvaluationDetails(
+            SearchRegionEvaluationDetailsRequest request,
+            PageRequest pageDetails)
+    {
+        log.debug("EvaluationServiceImpl.findAllRegions - start | request: {}, pageDetails: {}", request, pageDetails);
+        requireNonNull(request);
+        requireNonNull(pageDetails);
+        var page = countryEvaluationDetailsRepository
+                .findAllRegionsWithCountriesAndEvaluatorsCount(
+                        request.getSearch(),
+                        pageDetails.toPageable());
+        log.debug("EvaluationServiceImpl.findAllRegions - end | request: {}, pageDetails: {}", request, pageDetails);
+        return page;
+    }
+
     public QuotationPackageDto saveQuotationPackage(QuotationPackageDto dto, long principalId) {
         log.debug("EvaluationServiceImpl.saveQuotationPackageDto - start | dto: {}, principalId: {}", dto, principalId);
         requireNonNull(dto);

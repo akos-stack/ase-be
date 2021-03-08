@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,18 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
     }
 
     @Override
+    public SearchCountryEvaluationDetailsResponse searchCountryEvaluationDetails(
+            ISearchCountryEvaluationDetailsRequest request,
+            PageRequest pageDetails)
+    {
+        log.debug("EvaluationFacadeImpl.searchCountriesWithEvaluationDetails - start | request: {}, pageDetails: {}", request, pageDetails);
+        var page = evaluationService.searchCountryEvaluationDetails(request, pageDetails);
+        var response = new SearchCountryEvaluationDetailsResponse(page);
+        log.debug("EvaluationFacadeImpl.searchCountriesWithEvaluationDetails - end | request: {}, pageDetails: {}", request, pageDetails);
+        return response;
+    }
+
+    @Override
     public SaveCountryEvaluationDetailsResponse saveCountryEvaluationDetails(
             SaveCountryEvaluationDetailsRequest request, long principalId)
     {
@@ -35,9 +48,33 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
         var countryDto = locationService.findCountryByName(request.getCountry());
         var evaluationDetailsDto = MAPPER.toCountryEvaluationDetailsDto(request);
         evaluationDetailsDto.setCountryId(countryDto.getId());
-        evaluationDetailsDto = evaluationService.saveCountryEvaluationDetails(evaluationDetailsDto, principalId);
-        var response = new SaveCountryEvaluationDetailsResponse(evaluationDetailsDto);
+        var detailsDto = evaluationService.saveCountryEvaluationDetails(evaluationDetailsDto, principalId);
+        var response = new SaveCountryEvaluationDetailsResponse(detailsDto);
         log.debug("EvaluationFacadeImpl.saveCountryEvaluationDetails - end | request: {}, principalId: {}", request, principalId);
+        return response;
+    }
+
+    @Override
+    public UpdateCountryEvaluationDetailsResponse updateCountryEvaluationDetails(
+            UpdateCountryEvaluationDetailsRequest request, long principalId)
+    {
+        log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - start | request: {}, principalId: {}", request, principalId);
+        var evaluationDetailsDto = MAPPER.toCountryEvaluationDetailsDto(request);
+        var detailsDto = evaluationService.updateCountryEvaluationDetails(evaluationDetailsDto, principalId);
+        var response = new UpdateCountryEvaluationDetailsResponse(detailsDto);
+        log.debug("EvaluationFacadeImpl.updateCountryEvaluationDetails - end | request: {}, principalId: {}", request, principalId);
+        return response;
+    }
+
+    @Override
+    public SearchRegionEvaluationDetailsResponse searchRegionEvaluationDetails(
+            SearchRegionEvaluationDetailsRequest request,
+            PageRequest pageDetails)
+    {
+        log.info("EvaluationFacadeImpl.searchRegions - start | request: {}, pageDetails: {}", request, pageDetails);
+        var page = evaluationService.searchRegionEvaluationDetails(request, pageDetails);
+        var response = new SearchRegionEvaluationDetailsResponse(page);
+        log.info("EvaluationFacadeImpl.searchRegions - end | request: {}, pageDetails: {}", request, pageDetails);
         return response;
     }
 

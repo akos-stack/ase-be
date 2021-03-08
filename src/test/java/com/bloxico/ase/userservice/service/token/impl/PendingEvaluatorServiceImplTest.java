@@ -8,7 +8,6 @@ import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorRegistrationRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.mapping.PropertyReferenceException;
 
 import static com.bloxico.ase.testutil.Util.*;
@@ -302,7 +301,7 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
     @Test
     public void searchPendingEvaluators_nullEmail() {
         assertThrows(
-                InvalidDataAccessApiUsageException.class,
+                NullPointerException.class,
                 () -> service.searchPendingEvaluators(null, 0, 10, "email"));
     }
 
