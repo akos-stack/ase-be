@@ -135,7 +135,7 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 200, message = "Invitation is sent successfully."),
             @ApiResponse(code = 409, message = "Evaluator with given email is already pending evaluator.")
     })
-    ResponseEntity<Void> requestEvaluatorRegistration(EvaluatorRegistrationRequest request, Principal principal);
+    ResponseEntity<Void> requestEvaluatorRegistration(@Valid EvaluatorRegistrationRequest request, Principal principal);
 
     @PostMapping(
             value = REGISTRATION_EVALUATOR_SUBMIT,
@@ -148,7 +148,7 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "Specified country doesn't exist."),
             @ApiResponse(code = 409, message = "User with given email already exists.")
     })
-    ResponseEntity<EvaluatorDto> submitEvaluator(SubmitEvaluatorRequest request);
+    ResponseEntity<EvaluatorDto> submitEvaluator(@Valid SubmitEvaluatorRequest request);
 
     @PostMapping(
             value = REGISTRATION_ART_OWNER_SUBMIT,
@@ -160,7 +160,7 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "Specified country doesn't exist."),
             @ApiResponse(code = 409, message = "User with given email already exists.")
     })
-    ResponseEntity<ArtOwnerDto> submitArtOwner(SubmitArtOwnerRequest request);
+    ResponseEntity<ArtOwnerDto> submitArtOwner(@Valid SubmitArtOwnerRequest request);
 
     @GetMapping(value = REGISTRATION_EVALUATOR_SEARCH)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_users')")

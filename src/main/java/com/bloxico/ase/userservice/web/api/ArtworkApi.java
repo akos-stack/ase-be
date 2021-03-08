@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.validation.Valid;
 import java.security.Principal;
 
 @Api(value = "artwork")
@@ -26,5 +27,5 @@ public interface ArtworkApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "User successfully submitted artwork.")
     })
-    ResponseEntity<SaveArtworkResponse> submitArtwork(SaveArtworkRequest request, Principal principal);
+    ResponseEntity<SaveArtworkResponse> submitArtwork(@Valid SaveArtworkRequest request, Principal principal);
 }

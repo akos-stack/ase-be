@@ -17,13 +17,11 @@ import static com.bloxico.ase.userservice.util.FileCategory.CERTIFICATE;
 import static com.bloxico.ase.userservice.util.FileCategory.CV;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_MISSING_CERTIFICATE;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_MISSING_RESUME;
-import static lombok.AccessLevel.PRIVATE;
 import static org.springframework.util.StringUtils.isEmpty;
 
+@Data
 @AllArgsConstructor
-@NoArgsConstructor(force = true, access = PRIVATE)
-@Getter
-@Setter
+@NoArgsConstructor
 public class SaveArtworkRequest {
 
     @NotNull
@@ -33,7 +31,6 @@ public class SaveArtworkRequest {
     List<MultipartFile> images;
 
     @NotNull
-    @NotEmpty
     @JsonProperty("principal_image")
     @ApiModelProperty(required = true)
     MultipartFile principalImage;
@@ -55,13 +52,11 @@ public class SaveArtworkRequest {
     String artist;
 
     @NotNull
-    @NotEmpty
     @JsonProperty("i_am_art_owner")
     @ApiModelProperty(required = true)
     Boolean iAmArtOwner;
 
     @NotNull
-    @NotEmpty
     @JsonProperty("year")
     @ApiModelProperty(required = true)
     Integer year;
@@ -93,25 +88,21 @@ public class SaveArtworkRequest {
     FileCategory fileCategory;
 
     @NotNull
-    @NotEmpty
     @JsonProperty("weight")
     @ApiModelProperty(required = true)
     BigDecimal weight;
 
     @NotNull
-    @NotEmpty
     @JsonProperty("height")
     @ApiModelProperty(required = true)
     BigDecimal height;
 
     @NotNull
-    @NotEmpty
     @JsonProperty("width")
     @ApiModelProperty(required = true)
     BigDecimal width;
 
     @NotNull
-    @NotEmpty
     @JsonProperty("depth")
     @ApiModelProperty(required = true)
     BigDecimal depth;
@@ -171,7 +162,6 @@ public class SaveArtworkRequest {
     String notes;
 
     @NotNull
-    @NotEmpty
     @JsonProperty("status")
     @ApiModelProperty(required = true)
     ArtworkGroup.Status status;
