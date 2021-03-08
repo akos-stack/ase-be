@@ -52,6 +52,10 @@ public class Util {
         return BigDecimal.valueOf(current().nextDouble(1, bound));
     }
 
+    public static String genWithSubstring(String text) {
+        return genUUID() + text + genUUID();
+    }
+
     public static String genUUID() {
         return UUID.randomUUID().toString();
     }
