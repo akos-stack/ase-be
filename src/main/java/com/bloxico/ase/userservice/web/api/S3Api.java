@@ -9,6 +9,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
+
 @Api(value = "s3")
 public interface S3Api {
 
@@ -25,8 +27,8 @@ public interface S3Api {
     @ApiResponses({
             @ApiResponse(code = 200, message = "File successfully uploaded.")
     })
-    ResponseEntity<Void> validateFile(@RequestParam(name = "fileCategory") FileCategory category,
-                                      @RequestPart(value = "file") MultipartFile file);
+    ResponseEntity<Void> validateFile(@Valid @RequestParam(name = "fileCategory") FileCategory category,
+                                      @Valid @RequestPart(value = "file") MultipartFile file);
 
     @GetMapping(
             value = S3_DOWNLOAD,
