@@ -15,8 +15,8 @@ import java.util.List;
 
 import static com.bloxico.ase.userservice.util.FileCategory.CERTIFICATE;
 import static com.bloxico.ase.userservice.util.FileCategory.CV;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_MISSING_CERTIFICATE;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_MISSING_RESUME;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_MISSING_CERTIFICATE;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_MISSING_RESUME;
 import static org.springframework.util.StringUtils.isEmpty;
 
 @Data
