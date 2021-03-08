@@ -16,15 +16,13 @@ import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorRegistrationRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
 import java.time.LocalDate;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.util.SupportedFileExtension.pdf;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
@@ -153,7 +151,8 @@ public class UtilToken {
     public PendingEvaluatorDto savedInvitedPendingEvaluatorDto(String email) {
         var principal = utilUser.savedAdmin().getId();
         var request = new EvaluatorInvitationRequest(email);
-        return pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principal);
+        return pendingEvaluatorService.createPendingEvaluator(
+                MAPPER.toPendingEvaluatorDto(request), principal);
     }
 
     public String savedRequestedPendingEvaluatorDto() {
@@ -168,21 +167,22 @@ public class UtilToken {
     }
 
     public SubmitEvaluatorRequest submitInvitedEvaluatorRequest() {
-        var imageBytes = getTestImageBytes();
-        MultipartFile multipartFile = new MockMultipartFile("fileItem",
-                "testImg.jpg", "image/jpg", imageBytes);
         var email = genEmail();
-        var password = genPassword();
         var principalId = utilUser.savedAdmin().getId();
-        userRegistrationFacade.sendEvaluatorInvitation(new EvaluatorInvitationRequest(email), principalId);
-        var token = pendingEvaluatorRepository.findByEmailIgnoreCase(email).orElseThrow().getToken();
+        userRegistrationFacade.sendEvaluatorInvitation(
+                new EvaluatorInvitationRequest(email), principalId);
+        var token = pendingEvaluatorRepository
+                .findByEmailIgnoreCase(email)
+                .orElseThrow()
+                .getToken();
         var country = utilLocation.savedCountry().getName();
         return new SubmitEvaluatorRequest(
-                token, genUUID(), password,
+                token, genUUID(), genPassword(),
                 email, genUUID(), genUUID(),
                 genUUID(), LocalDate.now(),
                 genUUID(), country,
-                genUUID(), ONE, TEN, multipartFile);
+                genUUID(), ONE, TEN,
+                genMultipartFile(IMAGE));
     }
 
 }

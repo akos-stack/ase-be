@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
+import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,11 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.user.Role.ART_OWNER;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.TEN;
 
@@ -64,7 +67,8 @@ public class UtilUserProfile {
                 genUUID(), genUUID(), password,
                 email, genUUID(), genUUID(),
                 genUUID(), LocalDate.now(),
-                genUUID(), country, genUUID(), ONE, TEN, null);
+                genUUID(), country, genUUID(),
+                ONE, TEN, genMultipartFile(IMAGE));
     }
 
     public SubmitArtOwnerRequest newSubmitArtOwnerRequest() {
@@ -73,7 +77,8 @@ public class UtilUserProfile {
                 genUUID(), genPassword(),
                 genEmail(), genUUID(), genUUID(),
                 genUUID(), LocalDate.now(),
-                genUUID(), country, genUUID(), ONE, TEN, null);
+                genUUID(), country, genUUID(),
+                ONE, TEN, genMultipartFile(IMAGE));
     }
 
     public ArtOwnerDto savedArtOwnerDto() {
@@ -90,38 +95,44 @@ public class UtilUserProfile {
         return response;
     }
 
-    public Map<String, String> genSaveEvaluatorFormParams(String token, String email, String password, String country) {
+    public Map<String, String> genUserProfileFormParams() {
         var map = new HashMap<String, String>();
-        map.put("token", token);
-        map.put("email", email);
-        map.put("password", password);
         map.put("username", genUUID());
-        map.put("country", country);
-        map.put("first_name", genUUID());
-        map.put("last_name", genUUID());
+        map.put("password", genPassword());
+        map.put("email", genEmail());
+        map.put("firstName", genUUID());
+        map.put("lastName", genUUID());
         map.put("phone", genUUID());
-        map.put("birthday", "2019-03-29");
+        map.put("birthday", genPastLD().toString());
         map.put("gender", genUUID());
+        map.put("country", utilLocation.savedCountry().getName());
         map.put("address", genUUID());
         map.put("latitude", genPosBigDecimal(100).toString());
         map.put("longitude", genPosBigDecimal(100).toString());
         return map;
     }
 
-    public Map<String, String> genSaveArtOwnerFormParams(String email, String password, String country) {
-        var map = new HashMap<String, String>();
+    public Map<String, String> genSaveEvaluatorFormParams(String token, String email) {
+        var map = genUserProfileFormParams();
+        map.put("token", token);
         map.put("email", email);
-        map.put("password", password);
-        map.put("username", genUUID());
-        map.put("country", country);
-        map.put("first_name", genUUID());
-        map.put("last_name", genUUID());
-        map.put("phone", genUUID());
-        map.put("birthday", "2019-03-29");
-        map.put("gender", genUUID());
-        map.put("address", genUUID());
-        map.put("latitude", genPosBigDecimal(100).toString());
-        map.put("longitude", genPosBigDecimal(100).toString());
         return map;
     }
+
+    public Map<String, String> genSaveEvaluatorFormParams() {
+        var email = genEmail();
+        var principalId = utilUser.savedAdmin().getId();
+        userRegistrationFacade.sendEvaluatorInvitation(
+                new EvaluatorInvitationRequest(email), principalId);
+        var token = pendingEvaluatorRepository
+                .findByEmailIgnoreCase(email)
+                .orElseThrow()
+                .getToken();
+        return genSaveEvaluatorFormParams(token, email);
+    }
+
+    public Map<String, String> genSaveArtOwnerFormParams() {
+        return genUserProfileFormParams();
+    }
+
 }

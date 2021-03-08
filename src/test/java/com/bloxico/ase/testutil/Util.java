@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -52,6 +53,10 @@ public class Util {
 
     public static String genUUID() {
         return UUID.randomUUID().toString();
+    }
+
+    public static LocalDate genPastLD() {
+        return LocalDate.now().minusYears(current().nextInt(1, 100));
     }
 
     public static LocalDateTime genExpiredLDT() {
