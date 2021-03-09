@@ -14,7 +14,7 @@ import java.util.List;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.Functions.doto;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_METADATA_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_METADATA_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -30,33 +30,32 @@ abstract class AbstractArtworkMetadataServiceImpl<T extends ArtworkMetadata> imp
     protected abstract Type getType();
 
     @Override
-    public ArtworkMetadataDto findOrSaveArtworkMetadata(ArtworkMetadataDto dto, long principalId) {
-        log.debug("AbstractArtworkMetadataServiceImpl[{}].findOrSaveArtworkMetadata - start | dto: {}, principalId: {}",
-                getType(), dto, principalId);
+    public ArtworkMetadataDto findOrSaveArtworkMetadata(ArtworkMetadataDto dto) {
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].findOrSaveArtworkMetadata - start | dto: {}",
+                getType(), dto);
         requireNonNull(dto);
         var artworkMetadataDto = repository
                 .findByNameIgnoreCase(dto.getName())
                 .map(MAPPER::toDto)
-                .orElseGet(() -> saveArtworkMetadata(dto, principalId));
-        log.debug("AbstractArtworkMetadataServiceImpl[{}].findOrSaveArtworkMetadata - end | dto: {}, principalId: {}",
-                getType(), dto, principalId);
+                .orElseGet(() -> saveArtworkMetadata(dto));
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].findOrSaveArtworkMetadata - end | dto: {}",
+                getType(), dto);
         return artworkMetadataDto;
     }
 
     @Override
-    public ArtworkMetadataDto updateArtworkMetadata(ArtworkMetadataDto dto, long principalId) {
-        log.debug("AbstractArtworkMetadataServiceImpl[{}].updateArtworkMetadata - start | dto: {}, principalId: {}",
-                getType(), dto, principalId);
+    public ArtworkMetadataDto updateArtworkMetadata(ArtworkMetadataDto dto) {
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].updateArtworkMetadata - start | dto: {}",
+                getType(), dto);
         requireNonNull(dto);
         var artworkMetadata = repository
                 .findByNameIgnoreCase(dto.getName())
                 .orElseThrow(ARTWORK_METADATA_NOT_FOUND::newException);
         artworkMetadata.setStatus(dto.getStatus());
-        artworkMetadata.setUpdaterId(principalId);
         artworkMetadata = repository.saveAndFlush(artworkMetadata);
         var artworkMetadataDto = MAPPER.toDto(artworkMetadata);
-        log.debug("AbstractArtworkMetadataServiceImpl[{}].updateArtworkMetadata - end | dto: {}, principalId: {}",
-                getType(), dto, principalId);
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].updateArtworkMetadata - end | dto: {}",
+                getType(), dto);
         return artworkMetadataDto;
     }
 
@@ -96,12 +95,11 @@ abstract class AbstractArtworkMetadataServiceImpl<T extends ArtworkMetadata> imp
         return artworkMetadataDtos;
     }
 
-    private ArtworkMetadataDto saveArtworkMetadata(ArtworkMetadataDto dto, long principalId) {
+    private ArtworkMetadataDto saveArtworkMetadata(ArtworkMetadataDto dto) {
         T entity = getType().newInstance();
         entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setStatus(dto.getStatus());
-        entity.setCreatorId(principalId);
         return MAPPER.toDto(repository.saveAndFlush(entity));
     }
 

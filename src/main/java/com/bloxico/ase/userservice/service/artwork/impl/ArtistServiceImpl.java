@@ -20,12 +20,11 @@ public class ArtistServiceImpl implements IArtistService {
     }
 
     @Override
-    public ArtistDto saveArtist(ArtistDto artistDto, long principalId) {
-        log.info("ArtistService.saveArtist - start | artistDto: {}, principalId: {} ", artistDto, principalId);
+    public ArtistDto saveArtist(ArtistDto artistDto) {
+        log.info("ArtistService.saveArtist - start | artistDto: {}, principalId: {} ", artistDto);
         requireNonNull(artistDto);
         var artist = MAPPER.toEntity(artistDto);
-        artist.setCreatorId(principalId);
-        log.info("ArtistService.saveArtist - end | artistDto: {}, principalId: {} ", artistDto, principalId);
+        log.info("ArtistService.saveArtist - end | artistDto: {}, principalId: {} ", artistDto);
         return MAPPER.toDto(artistRepository.save(artist));
     }
 }

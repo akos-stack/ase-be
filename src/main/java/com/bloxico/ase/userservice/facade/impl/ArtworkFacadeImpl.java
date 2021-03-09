@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.userservice.config.security.AseSecurityContextService;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
@@ -48,8 +49,9 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     private final MaterialServiceImpl materialService;
     private final MediumServiceImpl mediumService;
     private final StyleServiceImpl styleService;
+    private final AseSecurityContextService securityContextService;
 
-    public ArtworkFacadeImpl(ILocationService locationService, IDocumentService documentService, IArtworkService artworkService, IArtistService artistService, IUserProfileService userProfileService, CategoryServiceImpl categoryService, MaterialServiceImpl materialService, MediumServiceImpl mediumService, StyleServiceImpl styleService, IArtworkGroupService artworkGroupService) {
+    public ArtworkFacadeImpl(ILocationService locationService, IDocumentService documentService, IArtworkService artworkService, IArtistService artistService, IUserProfileService userProfileService, CategoryServiceImpl categoryService, MaterialServiceImpl materialService, MediumServiceImpl mediumService, StyleServiceImpl styleService, IArtworkGroupService artworkGroupService, AseSecurityContextService securityContextService) {
         this.locationService = locationService;
         this.documentService = documentService;
         this.artworkService = artworkService;
@@ -60,34 +62,35 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         this.mediumService = mediumService;
         this.styleService = styleService;
         this.artworkGroupService = artworkGroupService;
+        this.securityContextService = securityContextService;
     }
 
     @Override
-    public SaveArtworkResponse submitArtwork(SaveArtworkRequest request, long principalId) {
-        log.info("ArtworkFacadeImpl.submitArtwork - start | request: {}, principalId: {} ", request, principalId);
-        var artworkDto = doPrepareArtworkDto(request, principalId);
-        artworkDto = artworkService.saveArtwork(artworkDto, principalId);
-        log.info("ArtworkFacadeImpl.submitArtwork - end | request: {}, principalId: {} ", request, principalId);
+    public SaveArtworkResponse submitArtwork(SaveArtworkRequest request) {
+        log.info("ArtworkFacadeImpl.submitArtwork - start | request: {}", request);
+        var artworkDto = doPrepareArtworkDto(request);
+        artworkDto = artworkService.saveArtwork(artworkDto);
+        log.info("ArtworkFacadeImpl.submitArtwork - end | request: {}", request);
         return new SaveArtworkResponse(artworkDto.getGroup());
     }
 
     // HELPER METHODS
 
-    private ArtworkDto doPrepareArtworkDto(SaveArtworkRequest request, long principalId) {
+    private ArtworkDto doPrepareArtworkDto(SaveArtworkRequest request) {
         request.validateRequest();
         var artworkDto = MAPPER.toArtworkDto(request);
-        artworkDto.setGroup(doSaveGroup(request, principalId));
-        artworkDto.setOwner(userProfileService.findArtOwnerByUserId(principalId));
-        artworkDto.setLocation(doSaveLocation(request, principalId));
-        artworkDto.setArtist(doSaveArtist(request, principalId));
-        artworkDto.addCategories(doSaveCategories(request, principalId));
-        artworkDto.addMaterials(doSaveMaterials(request, principalId));
-        artworkDto.addMediums(doSaveMediums(request, principalId));
-        artworkDto.addStyles(doSaveStyles(request, principalId));
+        artworkDto.setGroup(doSaveGroup(request));
+        artworkDto.setOwner(userProfileService.findArtOwnerByUserId(securityContextService.getPrincipalId()));
+        artworkDto.setLocation(doSaveLocation(request));
+        artworkDto.setArtist(doSaveArtist(request));
+        artworkDto.addCategories(doSaveCategories(request));
+        artworkDto.addMaterials(doSaveMaterials(request));
+        artworkDto.addMediums(doSaveMediums(request));
+        artworkDto.addStyles(doSaveStyles(request));
         artworkDto.setHistory(doPrepareArtworkHistory(request));
-        artworkDto.addDocuments(Collections.singletonList(doSaveDocument(request, principalId)));
-        artworkDto.addDocuments(doSaveImages(request, principalId));
-        artworkDto.addDocuments(Collections.singletonList(doSavePrincipalImage(request, principalId)));
+        artworkDto.addDocuments(Collections.singletonList(doSaveDocument(request)));
+        artworkDto.addDocuments(doSaveImages(request));
+        artworkDto.addDocuments(Collections.singletonList(doSavePrincipalImage(request)));
         return artworkDto;
     }
 
@@ -97,66 +100,66 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         } else return null;
     }
 
-    private ArtworkGroupDto doSaveGroup(SaveArtworkRequest request, long principalId) {
+    private ArtworkGroupDto doSaveGroup(SaveArtworkRequest request) {
         var artworkGroupDto = MAPPER.toArtworkGroupDto(request);
         if(request.getGroupId() != null) {
-            return artworkGroupService.findOrUpdateGroup(artworkGroupDto, principalId);
+            return artworkGroupService.findOrUpdateGroup(artworkGroupDto);
         }
-        return artworkGroupService.saveGroup(artworkGroupDto, principalId);
+        return artworkGroupService.saveGroup(artworkGroupDto);
     }
 
-    private List<ArtworkMetadataDto> doSaveCategories(SaveArtworkRequest request, long principalId) {
-        return doSaveArtworkMetadata(categoryService, request.getCategories(), principalId);
+    private List<ArtworkMetadataDto> doSaveCategories(SaveArtworkRequest request) {
+        return doSaveArtworkMetadata(categoryService, request.getCategories());
     }
 
-    private List<ArtworkMetadataDto> doSaveMaterials(SaveArtworkRequest request, long principalId) {
-        return doSaveArtworkMetadata(materialService, request.getMaterials(), principalId);
+    private List<ArtworkMetadataDto> doSaveMaterials(SaveArtworkRequest request) {
+        return doSaveArtworkMetadata(materialService, request.getMaterials());
     }
 
-    private List<ArtworkMetadataDto> doSaveMediums(SaveArtworkRequest request, long principalId) {
-        return doSaveArtworkMetadata(mediumService, request.getMediums(), principalId);
+    private List<ArtworkMetadataDto> doSaveMediums(SaveArtworkRequest request) {
+        return doSaveArtworkMetadata(mediumService, request.getMediums());
     }
 
-    private List<ArtworkMetadataDto> doSaveStyles(SaveArtworkRequest request, long principalId) {
-        return doSaveArtworkMetadata(styleService, request.getStyles(), principalId);
+    private List<ArtworkMetadataDto> doSaveStyles(SaveArtworkRequest request) {
+        return doSaveArtworkMetadata(styleService, request.getStyles());
     }
-    private List<ArtworkMetadataDto> doSaveArtworkMetadata(IArtworkMetadataService service, String [] artworkMetadataDtos, long principalId) {
+    private List<ArtworkMetadataDto> doSaveArtworkMetadata(IArtworkMetadataService service, String [] artworkMetadataDtos) {
         List<ArtworkMetadataDto> result = new ArrayList<>();
         for(String s: artworkMetadataDtos) {
             var dto = new ArtworkMetadataDto();
             dto.setName(s);
             dto.setStatus(ArtworkMetadata.Status.PENDING);
-            result.add(service.findOrSaveArtworkMetadata(dto, principalId));
+            result.add(service.findOrSaveArtworkMetadata(dto));
         }
         return result;
     }
 
-    private DocumentDto doSavePrincipalImage(SaveArtworkRequest request, long principalId) {
-        return documentService.saveDocument(request.getPrincipalImage(), FileCategory.PRINCIPAL_IMAGE, principalId);
+    private DocumentDto doSavePrincipalImage(SaveArtworkRequest request) {
+        return documentService.saveDocument(request.getPrincipalImage(), FileCategory.PRINCIPAL_IMAGE);
     }
 
-    private DocumentDto doSaveDocument(SaveArtworkRequest request, long principalId) {
-       return documentService.saveDocument(request.getDocument(), request.getFileCategory(), principalId);
+    private DocumentDto doSaveDocument(SaveArtworkRequest request) {
+       return documentService.saveDocument(request.getDocument(), request.getFileCategory());
     }
 
-    private List<DocumentDto> doSaveImages(SaveArtworkRequest request, long principalId) {
+    private List<DocumentDto> doSaveImages(SaveArtworkRequest request) {
         List<DocumentDto> savedImages = new ArrayList<>();
         request.getImages().forEach(image -> {
-            var documentDto = documentService.saveDocument(image, FileCategory.IMAGE, principalId);
+            var documentDto = documentService.saveDocument(image, FileCategory.IMAGE);
             savedImages.add(documentDto);
         });
         return savedImages;
     }
 
-    private ArtistDto doSaveArtist(SaveArtworkRequest request, long principalId) {
+    private ArtistDto doSaveArtist(SaveArtworkRequest request) {
         var artistDto = new ArtistDto();
         artistDto.setName(request.getArtist());
-        return artistService.saveArtist(artistDto, principalId);
+        return artistService.saveArtist(artistDto);
     }
 
-    private LocationDto doSaveLocation(SaveArtworkRequest request, long principalId) {
+    private LocationDto doSaveLocation(SaveArtworkRequest request) {
         var locationDto = MAPPER.toLocationDto(request);
         locationDto.setCountry(locationService.findCountryByName(request.getCountry()));
-        return locationService.saveLocation(locationDto, principalId);
+        return locationService.saveLocation(locationDto, null);
     }
 }

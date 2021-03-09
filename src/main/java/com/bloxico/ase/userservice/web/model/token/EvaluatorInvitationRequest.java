@@ -5,9 +5,7 @@ import com.bloxico.ase.userservice.validator.ValidEmail;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
@@ -30,14 +28,14 @@ public class EvaluatorInvitationRequest implements IPendingEvaluatorRequest {
 
     @JsonIgnore
     @Override
-    public Status getStatus() {
-        return INVITED;
+    public MultipartFile getCv() {
+        return null;
     }
 
     @JsonIgnore
     @Override
-    public MultipartFile getCv() {
-        return null;
+    public Status getStatus() {
+        return INVITED;
     }
 
 }

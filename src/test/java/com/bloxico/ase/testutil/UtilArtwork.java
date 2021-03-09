@@ -93,9 +93,8 @@ public class UtilArtwork {
     }
 
     public ArtworkDto savedArtworkDto() {
-        var principalId = utilUser.savedAdmin().getId();
         var artworkDto = genArtworkDto();
-        return artworkService.saveArtwork(artworkDto, principalId);
+        return artworkService.saveArtwork(artworkDto);
     }
 
     public SaveArtworkRequest genSaveArtworkRequest(ArtworkGroup.Status status, boolean artOwner, Long groupId) {

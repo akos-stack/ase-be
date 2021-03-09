@@ -2,13 +2,17 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
-import java.security.Principal;
 
 @Api(value = "evaluation")
 public interface EvaluationApi {
@@ -17,6 +21,7 @@ public interface EvaluationApi {
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH = "/evaluation/management/country-details";
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE   = "/evaluation/management/country-details/save";
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE = "/evaluation/management/country-details/update";
+    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE = "/evaluation/management/country-details/delete";
     String EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH  = "/evaluation/management/region-details";
     String EVALUATION_QUOTATION_PACKAGE_SAVE            = "/evaluation/quotation-package/save";
 
@@ -56,7 +61,7 @@ public interface EvaluationApi {
             @ApiResponse(code = 409, message = "Evaluation details already exists for specified country.")
     })
     ResponseEntity<SaveCountryEvaluationDetailsResponse> saveCountryEvaluationDetails(
-            @Valid @RequestBody SaveCountryEvaluationDetailsRequest request, Principal principal);
+            @Valid @RequestBody SaveCountryEvaluationDetailsRequest request);
 
     @PostMapping(
             value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE,
@@ -69,7 +74,19 @@ public interface EvaluationApi {
             @ApiResponse(code = 404, message = "Specified evaluation details don't exist.")
     })
     ResponseEntity<UpdateCountryEvaluationDetailsResponse> updateCountryEvaluationDetails(
-            @Valid @RequestBody UpdateCountryEvaluationDetailsRequest request, Principal principal);
+            @Valid @RequestBody UpdateCountryEvaluationDetailsRequest request);
+
+    @PostMapping(
+            value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE,
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'delete_country_evaluation_details')")
+    @ApiOperation(value = "Deletes evaluation details in the database.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Evaluation details successfully deleted."),
+            @ApiResponse(code = 404, message = "Specified evaluation details don't exist."),
+            @ApiResponse(code = 409, message = "There are evaluators from country to which evaluation details belong.")
+    })
+    ResponseEntity<Void> deleteCountryEvaluationDetails(@Valid @RequestBody DeleteCountryEvaluationDetailsRequest request);
 
     @GetMapping(
             value = EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH,
@@ -95,6 +112,6 @@ public interface EvaluationApi {
             @ApiResponse(code = 409, message = "Quotation package already exists for specified artwork.")
     })
     ResponseEntity<SaveQuotationPackageResponse> saveQuotationPackage(
-            @Valid @RequestBody SaveQuotationPackageRequest request, Principal principal);
+            @Valid @RequestBody SaveQuotationPackageRequest request);
 
 }

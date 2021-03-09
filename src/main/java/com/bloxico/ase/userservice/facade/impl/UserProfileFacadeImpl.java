@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.userservice.config.security.AseSecurityContextService;
 import com.bloxico.ase.userservice.facade.IUserProfileFacade;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
@@ -15,27 +16,30 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserProfileFacadeImpl implements IUserProfileFacade {
 
     private final IUserProfileService userProfileService;
+    private final AseSecurityContextService securityContextService;
 
     @Autowired
-    public UserProfileFacadeImpl(IUserProfileService userProfileService) {
+    public UserProfileFacadeImpl(IUserProfileService userProfileService,
+                                 AseSecurityContextService securityContextService) {
         this.userProfileService = userProfileService;
+        this.securityContextService = securityContextService;
     }
 
     @Override
-    public UserProfileDataResponse returnMyProfileData(long principalId) {
-        log.info("UserProfileFacadeImpl.returnMyProfileData - start | principalId: {}", principalId);
-        var userProfileDto = userProfileService.findUserProfileByUserId(principalId);
+    public UserProfileDataResponse returnMyProfileData() {
+        log.info("UserProfileFacadeImpl.returnMyProfileData - start");
+        var userProfileDto = userProfileService.findUserProfileByUserId(securityContextService.getPrincipalId());
         var response = new UserProfileDataResponse(userProfileDto);
-        log.info("UserProfileFacadeImpl.returnMyProfileData - end | principalId: {}", principalId);
+        log.info("UserProfileFacadeImpl.returnMyProfileData - end");
         return response;
     }
 
     @Override
-    public UserProfileDataResponse updateMyProfile(long principalId, UpdateUserProfileRequest request) {
-        log.info("UserProfileFacadeImpl.updateMyProfile - start | principalId: {}, request: {}", principalId, request);
-        var userProfileDto = userProfileService.updateUserProfile(principalId, request);
+    public UserProfileDataResponse updateMyProfile(UpdateUserProfileRequest request) {
+        log.info("UserProfileFacadeImpl.updateMyProfile - start | request: {}", request);
+        var userProfileDto = userProfileService.updateUserProfile(securityContextService.getPrincipalId(), request);
         var response = new UserProfileDataResponse(userProfileDto);
-        log.info("UserProfileFacadeImpl.updateMyProfile - end | principalId: {}, request: {}", principalId, request);
+        log.info("UserProfileFacadeImpl.updateMyProfile - end | request: {}", request);
         return response;
     }
 

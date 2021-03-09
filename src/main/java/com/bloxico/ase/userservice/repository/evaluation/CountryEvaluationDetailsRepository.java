@@ -13,9 +13,12 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Repository
-public interface CountryEvaluationDetailsRepository extends JpaRepository<CountryEvaluationDetails, Integer> {
+public interface CountryEvaluationDetailsRepository extends JpaRepository<CountryEvaluationDetails, Long> {
 
-    Optional<CountryEvaluationDetails> findByCountryId(Integer id);
+    Optional<CountryEvaluationDetails> findByCountryId(Long id);
+
+    @Query("SELECT COUNT(*) FROM Evaluator e JOIN e.userProfile.location.country c WHERE c.id = :countryId")
+    int countEvaluatorsByCountryId(Long countryId);
 
     // @formatter:off
     @Query(value =

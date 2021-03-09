@@ -7,9 +7,9 @@ import com.bloxico.ase.userservice.web.model.artwork.metadata.*;
 
 public interface IArtworkMetadataFacade {
 
-    ArtworkMetadataDto saveArtworkMetadata(SaveArtworkMetadataRequest request, long principalId);
+    ArtworkMetadataDto saveArtworkMetadata(SaveArtworkMetadataRequest request);
 
-    ArtworkMetadataDto updateArtworkMetadata(UpdateArtworkMetadataRequest request, long principalId);
+    ArtworkMetadataDto updateArtworkMetadata(UpdateArtworkMetadataRequest request);
 
     void deleteArtworkMetadata(String name, Type type);
 

@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_GROUP_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_GROUP_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -33,8 +33,8 @@ public class ArtworkGroupServiceImpl implements IArtworkGroupService {
     }
 
     @Override
-    public ArtworkGroupDto findOrUpdateGroup(ArtworkGroupDto dto, long principalId) {
-        log.info("ArtworkGroupServiceImpl.findOrUpdateGroup - start | dto: {}, principalId: {}", dto, principalId);
+    public ArtworkGroupDto findOrUpdateGroup(ArtworkGroupDto dto) {
+        log.info("ArtworkGroupServiceImpl.findOrUpdateGroup - start | dto: {}", dto);
         requireNonNull(dto);
         requireNonNull(dto.getId());
         var group = artworkGroupRepository
@@ -42,20 +42,18 @@ public class ArtworkGroupServiceImpl implements IArtworkGroupService {
                 .orElseThrow(ARTWORK_GROUP_NOT_FOUND::newException);
         if(group.getStatus() != dto.getStatus()) {
             group.setStatus(dto.getStatus());
-            group.setUpdaterId(principalId);
             group = artworkGroupRepository.saveAndFlush(group);
         }
-        log.info("ArtworkGroupServiceImpl.findOrUpdateGroup - end | dto: {}, principalId: {}", dto, principalId);
+        log.info("ArtworkGroupServiceImpl.findOrUpdateGroup - end | dto: {}", dto);
         return MAPPER.toDto(group);
     }
 
     @Override
-    public ArtworkGroupDto saveGroup(ArtworkGroupDto dto, long principalId) {
-        log.info("ArtworkGroupServiceImpl.saveGroup - start | principalId: {} ", principalId);
+    public ArtworkGroupDto saveGroup(ArtworkGroupDto dto) {
+        log.info("ArtworkGroupServiceImpl.saveGroup - start | dto: {} ", dto);
         requireNonNull(dto);
         var artworkGroup = MAPPER.toEntity(dto);
-        artworkGroup.setCreatorId(principalId);
-        log.info("ArtworkGroupServiceImpl.saveGroup - end | principalId: {} ", principalId);
+        log.info("ArtworkGroupServiceImpl.saveGroup - end | dto: {} ", dto);
         return MAPPER.toDto(artworkGroupRepository.save(artworkGroup));
     }
 }

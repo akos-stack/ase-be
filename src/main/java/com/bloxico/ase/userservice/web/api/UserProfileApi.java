@@ -2,13 +2,17 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import com.bloxico.ase.userservice.web.model.user.UserProfileDataResponse;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
-import java.security.Principal;
 
 @Api(value = "userProfile")
 public interface UserProfileApi {
@@ -22,7 +26,7 @@ public interface UserProfileApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Profile data successfully retrieved.")
     })
-    ResponseEntity<UserProfileDataResponse> accessMyProfile(Principal principal);
+    ResponseEntity<UserProfileDataResponse> accessMyProfile();
 
     @PostMapping(
             value = MY_PROFILE_UPDATE_ENDPOINT,
@@ -33,6 +37,6 @@ public interface UserProfileApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Profile data successfully updated.")
     })
-    ResponseEntity<UserProfileDataResponse> updateMyProfile(@Valid @RequestBody UpdateUserProfileRequest request, Principal principal);
+    ResponseEntity<UserProfileDataResponse> updateMyProfile(@Valid @RequestBody UpdateUserProfileRequest request);
 
 }

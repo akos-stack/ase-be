@@ -9,7 +9,7 @@ public interface ITokenBlacklistService {
 
     Set<String> blacklistedTokens();
 
-    void blacklistTokens(List<OAuthAccessTokenDto> tokens, long principalId);
+    void blacklistTokens(List<OAuthAccessTokenDto> tokens);
 
     void checkIfBlacklisted(String token);
 

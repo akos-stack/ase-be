@@ -1,8 +1,10 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
 import static com.bloxico.ase.userservice.web.api.ArtworkMetadataApi.*;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artworks.ARTWORK_METADATA_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_METADATA_NOT_FOUND;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.*;
@@ -22,16 +24,17 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 @Transactional(propagation = NOT_SUPPORTED)
 public class ArtworkMetadataApiTest extends AbstractSpringTest {
 
-    @Autowired private UtilAuth utilAuth;
     @Autowired private UtilArtworkMetadata utilArtworkMetadata;
+    @Autowired private UtilSecurityContext utilSecurityContext;
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void saveArtworkMetadata_200_ok() {
         for (var type : Type.values()) {
             var name = genUUID();
             assertNull(utilArtworkMetadata.findArtworkMetadataDto(type, name));
             var response = given()
-                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .header("Authorization", utilSecurityContext.getToken())
                     .contentType(JSON)
                     .body(new SaveArtworkMetadataRequest(name, type))
                     .when()
@@ -50,12 +53,13 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void updateArtworkMetadata_404_notFound() {
         for (var type : Type.values()) {
             var status = randEnumConst(Status.class);
             var newStatus = randOtherEnumConst(status);
             given()
-                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .header("Authorization", utilSecurityContext.getToken())
                     .contentType(JSON)
                     .body(new UpdateArtworkMetadataRequest(genUUID(), newStatus, type))
                     .when()
@@ -68,13 +72,14 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void updateArtworkMetadata_200_ok() {
         for (var type : Type.values()) {
             var status = randEnumConst(Status.class);
             var metadata = utilArtworkMetadata.savedArtworkMetadataDto(type, status);
             var newStatus = randOtherEnumConst(status);
             var response = given()
-                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .header("Authorization", utilSecurityContext.getToken())
                     .contentType(JSON)
                     .body(new UpdateArtworkMetadataRequest(metadata.getName(), newStatus, type))
                     .when()
@@ -91,10 +96,11 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void deleteArtworkMetadata_404_notFound() {
         for (var type : Type.values()) {
             given()
-                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .header("Authorization", utilSecurityContext.getToken())
                     .contentType(JSON)
                     .param("name", genUUID())
                     .param("type", type.name())
@@ -108,12 +114,13 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void deleteArtworkMetadata_200_ok() {
         for (var type : Type.values()) {
             var name = utilArtworkMetadata.savedArtworkMetadataDto(type).getName();
             assertNotNull(utilArtworkMetadata.findArtworkMetadataDto(type, name));
             given()
-                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .header("Authorization", utilSecurityContext.getToken())
                     .contentType(JSON)
                     .param("name", name)
                     .param("type", type.name())
@@ -127,6 +134,7 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void searchMetadata_200_ok() {
         for (var type : Type.values()) {
             var m1 = utilArtworkMetadata.savedArtworkMetadataDto(type, APPROVED);
@@ -135,7 +143,7 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
             var m4 = utilArtworkMetadata.savedArtworkMetadataDto(type, randOtherEnumConst(APPROVED));
             var m5 = utilArtworkMetadata.savedArtworkMetadataDto(randOtherEnumConst(type), APPROVED);
             var response = given()
-                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .header("Authorization", utilSecurityContext.getToken())
                     .contentType(JSON)
                     .param("type", type.name())
                     .param("size", Integer.MAX_VALUE)
@@ -156,6 +164,7 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(role = Role.USER, auth = true)
     public void searchApprovedArtworkMetadata_200_ok() {
         for (var type : Type.values()) {
             var m1 = utilArtworkMetadata.savedArtworkMetadataDto(type, APPROVED);
@@ -164,7 +173,7 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
             var m4 = utilArtworkMetadata.savedArtworkMetadataDto(type, randOtherEnumConst(APPROVED));
             var m5 = utilArtworkMetadata.savedArtworkMetadataDto(randOtherEnumConst(type), APPROVED);
             var response = given()
-                    .header("Authorization", utilAuth.doAuthentication())
+                    .header("Authorization", utilSecurityContext.getToken())
                     .contentType(JSON)
                     .param("type", type.name())
                     .param("size", Integer.MAX_VALUE)

@@ -19,16 +19,14 @@ public class UserProfileController implements UserProfileApi {
     private IUserProfileFacade userProfileFacade;
 
     @Override
-    public ResponseEntity<UserProfileDataResponse> accessMyProfile(Principal principal) {
-        var id = extractId(principal);
-        var response = userProfileFacade.returnMyProfileData(id);
+    public ResponseEntity<UserProfileDataResponse> accessMyProfile() {
+        var response = userProfileFacade.returnMyProfileData();
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<UserProfileDataResponse> updateMyProfile(UpdateUserProfileRequest request, Principal principal) {
-        var id = extractId(principal);
-        var response = userProfileFacade.updateMyProfile(id, request);
+    public ResponseEntity<UserProfileDataResponse> updateMyProfile(UpdateUserProfileRequest request) {
+        var response = userProfileFacade.updateMyProfile(request);
         return ResponseEntity.ok(response);
     }
 

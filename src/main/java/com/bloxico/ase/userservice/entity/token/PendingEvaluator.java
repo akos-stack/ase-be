@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.entity.token;
 
-import com.bloxico.ase.userservice.entity.BaseEntity;
+import com.bloxico.ase.userservice.entity.BaseEntityAudit;
 import com.bloxico.ase.userservice.entity.document.Document;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +16,7 @@ import static javax.persistence.FetchType.EAGER;
 @EqualsAndHashCode(of = "token", callSuper = false)
 @Entity
 @Table(name = "pending_evaluators")
-public class PendingEvaluator extends BaseEntity {
+public class PendingEvaluator extends BaseEntityAudit {
 
     public enum Status {
 

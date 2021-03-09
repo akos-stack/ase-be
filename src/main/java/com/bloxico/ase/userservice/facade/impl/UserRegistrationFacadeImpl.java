@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.FileCategory.CV;
+import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.EVALUATOR_INVITATION;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.VERIFICATION;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
@@ -102,11 +103,11 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     }
 
     @Override
-    public void sendEvaluatorInvitation(EvaluatorInvitationRequest request, long principalId) {
-        log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - start | request: {}, principalId: {}", request, principalId);
-        var token = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principalId).getToken();
+    public void sendEvaluatorInvitation(EvaluatorInvitationRequest request) {
+        log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - start | request: {}", request);
+        var token = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request)).getToken();
         mailUtil.sendTokenEmail(EVALUATOR_INVITATION, request.getEmail(), token);
-        log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - end | request: {}, principalId: {}", request, principalId);
+        log.info("UserRegistrationFacadeImpl.sendEvaluatorInvitation - end | request: {}", request);
     }
 
     @Override
@@ -136,6 +137,13 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         log.info("UserRegistrationFacadeImpl.submitEvaluator - start | request: {}", request);
         pendingEvaluatorService.consumePendingEvaluator(request.getEmail(), request.getToken());
         var evaluatorDto = doSaveEvaluator(request);
+        var profileImage = request.getProfileImage();
+        if (profileImage != null) {
+            var principalId = evaluatorDto.getUserProfile().getUserId();
+            var documentId = documentService.saveDocument(profileImage, IMAGE, principalId).getId();
+            var userProfileId = evaluatorDto.getUserProfile().getId();
+            userProfileService.saveUserProfileDocument(userProfileId, documentId);
+        }
         log.info("UserRegistrationFacadeImpl.submitEvaluator - end | request: {}", request);
         return evaluatorDto;
     }
@@ -146,18 +154,25 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var artOwnerDto = doSaveArtOwner(request);
         var userId = artOwnerDto.getUserProfile().getUserId();
         var tokenDto = registrationTokenService.createTokenForUser(userId);
+        var profileImage = request.getProfileImage();
+        if (profileImage != null) {
+            var principalId = artOwnerDto.getUserProfile().getUserId();
+            var documentId = documentService.saveDocument(profileImage, IMAGE, principalId).getId();
+            var userProfileId = artOwnerDto.getUserProfile().getId();
+            userProfileService.saveUserProfileDocument(userProfileId, documentId);
+        }
         mailUtil.sendTokenEmail(VERIFICATION, request.getEmail(), tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.submitArtOwner - end | request: {}", request);
         return artOwnerDto;
     }
 
     @Override
-    public void requestEvaluatorRegistration(EvaluatorRegistrationRequest request, long principalId) {
-        log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - start | request: {}, principalId: {}", request, principalId);
-        var pendingEvaluatorDto = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request), principalId);
-        var documentDto = documentService.saveDocument(request.getCv(), CV, principalId);
+    public void requestEvaluatorRegistration(EvaluatorRegistrationRequest request) {
+        log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - start | request: {}", request);
+        var pendingEvaluatorDto = pendingEvaluatorService.createPendingEvaluator(MAPPER.toPendingEvaluatorDto(request));
+        var documentDto = documentService.saveDocument(request.getCv(), CV);
         pendingEvaluatorService.savePendingEvaluatorDocument(pendingEvaluatorDto.getEmail(), documentDto.getId());
-        log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - end | request: {}, principalId: {}", request, principalId);
+        log.info("UserRegistrationFacadeImpl.requestEvaluatorRegistration - end | request: {}", request);
     }
 
     @Override
@@ -170,17 +185,17 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     }
 
     @Override
-    public ByteArrayResource downloadEvaluatorResume(String email, long principalId) {
-        log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - start | email: {}, principalId: {}", email, principalId);
-        var pendingEvaluatorDocumentDto = pendingEvaluatorService.getEvaluatorResume(email, principalId);
+    public ByteArrayResource downloadEvaluatorResume(String email) {
+        log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - start | email: {}", email);
+        var pendingEvaluatorDocumentDto = pendingEvaluatorService.getEvaluatorResume(email);
         var response = documentService.getDocumentById(pendingEvaluatorDocumentDto.getDocumentId());
-        log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - end | email: {}, principalId: {}", email, principalId);
+        log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - end | email: {}", email);
         return response;
     }
 
     // HELPER METHODS
 
-    private LocationDto doSaveLocation(ISubmitUserProfileRequest request, long principalId) {
+    private LocationDto doSaveLocation(ISubmitUserProfileRequest request, Long principalId) {
         var locationDto = MAPPER.toLocationDto(request);
         locationDto.setCountry(locationService.findCountryByName(request.getCountry()));
         return locationService.saveLocation(locationDto, principalId);

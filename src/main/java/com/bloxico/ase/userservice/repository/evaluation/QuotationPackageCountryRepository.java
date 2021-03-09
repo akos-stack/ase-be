@@ -10,6 +10,6 @@ import java.util.Optional;
 @Repository
 public interface QuotationPackageCountryRepository extends JpaRepository<QuotationPackageCountry, Id> {
 
-    Optional<QuotationPackageCountry> findByIdCountryId(Integer countryId);
+    Optional<QuotationPackageCountry> findByIdCountryId(Long countryId);
 
 }

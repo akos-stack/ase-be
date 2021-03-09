@@ -4,9 +4,9 @@ import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
-
-import static javax.persistence.GenerationType.IDENTITY;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Data
 @EqualsAndHashCode(of = "countryId", callSuper = false)
@@ -14,12 +14,8 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Table(name = "country_evaluation_details")
 public class CountryEvaluationDetails extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Integer id;
-
     @Column(name = "country_id")
-    private Integer countryId;
+    private Long countryId;
 
     @Column(name = "price_per_evaluation")
     private Integer pricePerEvaluation;

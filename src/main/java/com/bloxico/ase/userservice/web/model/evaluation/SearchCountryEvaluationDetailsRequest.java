@@ -1,16 +1,14 @@
 package com.bloxico.ase.userservice.web.model.evaluation;
 
 import io.swagger.annotations.ApiParam;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.util.Set;
+import java.util.List;
 
-import static lombok.AccessLevel.PRIVATE;
-
-@Value
+@Data
 @AllArgsConstructor
-@NoArgsConstructor(force = true, access = PRIVATE)
 public class SearchCountryEvaluationDetailsRequest implements ISearchCountryEvaluationDetailsRequest {
 
     @NotNull
@@ -18,6 +16,6 @@ public class SearchCountryEvaluationDetailsRequest implements ISearchCountryEval
     String search;
 
     @ApiParam(name = "regions")
-    Set<String> regions;
+    List<String> regions;
 
 }

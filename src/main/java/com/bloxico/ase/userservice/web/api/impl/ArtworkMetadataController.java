@@ -10,10 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
-
-import static com.bloxico.ase.userservice.util.Principals.extractId;
-
 @RestController
 public class ArtworkMetadataController implements ArtworkMetadataApi {
 
@@ -22,20 +18,18 @@ public class ArtworkMetadataController implements ArtworkMetadataApi {
 
     @Override
     public ResponseEntity<SaveArtworkMetadataResponse> saveArtworkMetadata(
-            SaveArtworkMetadataRequest request, Principal principal)
+            SaveArtworkMetadataRequest request)
     {
-        var id = extractId(principal);
-        var saved = artworkMetadataFacade.saveArtworkMetadata(request, id);
+        var saved = artworkMetadataFacade.saveArtworkMetadata(request);
         var response = new SaveArtworkMetadataResponse(saved);
         return ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<UpdateArtworkMetadataResponse> updateArtworkMetadata(
-            UpdateArtworkMetadataRequest request, Principal principal)
+            UpdateArtworkMetadataRequest request)
     {
-        var id = extractId(principal);
-        var updated = artworkMetadataFacade.updateArtworkMetadata(request, id);
+        var updated = artworkMetadataFacade.updateArtworkMetadata(request);
         var response = new UpdateArtworkMetadataResponse(updated);
         return ResponseEntity.ok(response);
     }

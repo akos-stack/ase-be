@@ -1,14 +1,21 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.web.model.user.*;
-import io.swagger.annotations.*;
+import com.bloxico.ase.userservice.web.model.user.BlacklistTokensRequest;
+import com.bloxico.ase.userservice.web.model.user.DisableUserRequest;
+import com.bloxico.ase.userservice.web.model.user.PagedUserDataResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.security.Principal;
 
 @Api(value = "userManagement")
 public interface UserManagementApi {
@@ -42,7 +49,7 @@ public interface UserManagementApi {
             @ApiResponse(code = 200, message = "User successfully disabled."),
             @ApiResponse(code = 404, message = "Could not find user associated with the given id.")
     })
-    ResponseEntity<Void> disableUser(@Valid @RequestBody DisableUserRequest request, Principal principal);
+    ResponseEntity<Void> disableUser(@Valid @RequestBody DisableUserRequest request);
 
     @PostMapping(
             value = USER_BLACKLIST_TOKENS,
@@ -56,6 +63,6 @@ public interface UserManagementApi {
             @ApiResponse(code = 200, message = "Tokens successfully blacklisted."),
             @ApiResponse(code = 404, message = "Could not find user associated with the given id.")
     })
-    ResponseEntity<Void> blacklistTokens(@Valid @RequestBody BlacklistTokensRequest request, Principal principal);
+    ResponseEntity<Void> blacklistTokens(@Valid @RequestBody BlacklistTokensRequest request);
 
 }

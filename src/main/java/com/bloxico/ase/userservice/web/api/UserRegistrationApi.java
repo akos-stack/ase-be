@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.security.Principal;
 
 @Api(value = "registration")
 public interface UserRegistrationApi {
@@ -91,7 +90,7 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 200, message = "Invitation is sent successfully."),
             @ApiResponse(code = 409, message = "Evaluator with given email is already invited.")
     })
-    ResponseEntity<Void> sendEvaluatorInvitation(@Valid @RequestBody EvaluatorInvitationRequest request, Principal principal);
+    ResponseEntity<Void> sendEvaluatorInvitation(@Valid @RequestBody EvaluatorInvitationRequest request);
 
     @GetMapping(value = REGISTRATION_EVALUATOR_INVITATION_CHECK)
     @ApiOperation(value = "Checks if evaluator is invited with given token.")
@@ -135,12 +134,12 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 200, message = "Invitation is sent successfully."),
             @ApiResponse(code = 409, message = "Evaluator with given email is already pending evaluator.")
     })
-    ResponseEntity<Void> requestEvaluatorRegistration(EvaluatorRegistrationRequest request, Principal principal);
+    ResponseEntity<Void> requestEvaluatorRegistration(EvaluatorRegistrationRequest request);
 
     @PostMapping(
             value = REGISTRATION_EVALUATOR_SUBMIT,
             produces = {"application/json"},
-            consumes = {"application/json"})
+            consumes = {"multipart/form-data"})
     @ApiOperation(value = "Creates new evaluator with given data. Evaluator must be invited first.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Evaluator is created successfully."),
@@ -148,19 +147,19 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "Specified country doesn't exist."),
             @ApiResponse(code = 409, message = "User with given email already exists.")
     })
-    ResponseEntity<EvaluatorDto> submitEvaluator(@Valid @RequestBody SubmitEvaluatorRequest request);
+    ResponseEntity<EvaluatorDto> submitEvaluator(@Valid SubmitEvaluatorRequest request);
 
     @PostMapping(
             value = REGISTRATION_ART_OWNER_SUBMIT,
             produces = {"application/json"},
-            consumes = {"application/json"})
+            consumes = {"multipart/form-data"})
     @ApiOperation(value = "Creates new art owner with given data.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Art owner is created successfully."),
             @ApiResponse(code = 404, message = "Specified country doesn't exist."),
             @ApiResponse(code = 409, message = "User with given email already exists.")
     })
-    ResponseEntity<ArtOwnerDto> submitArtOwner(@Valid @RequestBody SubmitArtOwnerRequest request);
+    ResponseEntity<ArtOwnerDto> submitArtOwner(@Valid SubmitArtOwnerRequest request);
 
     @GetMapping(value = REGISTRATION_EVALUATOR_SEARCH)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_users')")
@@ -183,6 +182,6 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "Pending evaluator with given email doesn't have a resume."),
             @ApiResponse(code = 400, message = "Download resume failed for some reason.")
     })
-    ResponseEntity<Resource> downloadEvaluatorResume(@Valid @RequestParam("email") String email, Principal principal);
+    ResponseEntity<Resource> downloadEvaluatorResume(@Valid @RequestParam("email") String email);
 
 }

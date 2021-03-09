@@ -10,6 +10,9 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -17,11 +20,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
-import static lombok.AccessLevel.PRIVATE;
 
-@Value
+@Data
 @AllArgsConstructor
-@NoArgsConstructor(force = true, access = PRIVATE)
+@NoArgsConstructor
 @ToString(exclude = "password")
 public class SubmitArtOwnerRequest implements ISubmitUserProfileRequest {
 
@@ -74,6 +76,7 @@ public class SubmitArtOwnerRequest implements ISubmitUserProfileRequest {
 
     @NotNull
     @JsonProperty("birthday")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     // TODO replace with default LocalDate serde config
     @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
@@ -101,5 +104,9 @@ public class SubmitArtOwnerRequest implements ISubmitUserProfileRequest {
 
     @JsonProperty("longitude")
     BigDecimal longitude;
+
+    @Nullable
+    @JsonProperty("profile_image")
+    MultipartFile profileImage;
 
 }

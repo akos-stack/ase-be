@@ -1,8 +1,9 @@
 package com.bloxico.ase.userservice.service.artwork.impl;
 
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilUser;
-import com.bloxico.ase.userservice.entity.artwork.Artist;
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
 import com.bloxico.ase.userservice.repository.artwork.ArtistRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,20 +19,19 @@ public class ArtistServiceImplTest extends AbstractSpringTest {
     @Autowired private ArtistRepository artistRepository;
 
     @Test
+    @WithMockCustomUser
     public void saveArtist_artistNull() {
-        var principalId = utilUser.savedAdmin().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> artistService.saveArtist(null, principalId));
+                () -> artistService.saveArtist(null));
     }
 
     @Test
+    @WithMockCustomUser
     public void saveArtist() {
-        var principalId = utilUser.savedAdmin().getId();
-        var artist = new Artist();
+        var artist = new ArtistDto();
         artist.setName(genUUID());
-        artist.setCreatorId(principalId);
-        artist = artistRepository.save(artist);
+        artist = artistService.saveArtist(artist);
         assertTrue(artistRepository.findById(artist.getId()).isPresent());
     }
 }

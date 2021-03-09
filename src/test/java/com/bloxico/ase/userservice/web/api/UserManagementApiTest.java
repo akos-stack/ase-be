@@ -1,8 +1,12 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
-import com.bloxico.ase.userservice.web.model.user.*;
+import com.bloxico.ase.userservice.web.model.user.BlacklistTokensRequest;
+import com.bloxico.ase.userservice.web.model.user.DisableUserRequest;
+import com.bloxico.ase.userservice.web.model.user.PagedUserDataResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,11 +28,13 @@ public class UserManagementApiTest extends AbstractSpringTest {
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilUser utilUser;
     @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private UtilSecurityContext utilSecurityContext;
 
     @Test
+    @WithMockCustomUser(role = Role.USER, auth = true)
     public void searchUsers_403_forbidden() {
         given()
-                .header("Authorization", utilAuth.doAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .param("email", "user1")
                 .param("role", "")
@@ -40,9 +46,10 @@ public class UserManagementApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void searchUsers_404_roleNotExists() {
         given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .param("email", "user1")
                 .param("role", genUUID())
@@ -77,12 +84,13 @@ public class UserManagementApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void searchUsers_byEmail_200_ok() {
         var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
         var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
         var u3 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
         var users = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .param("email", "fooBar")
                 .param("role", "")
@@ -99,15 +107,17 @@ public class UserManagementApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void searchUsers_byRole_200_ok() {
         var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
         var a1 = utilUser.savedAdminDtoWithEmail(genEmail("adminBarFoo"));
         var a2 = utilUser.savedAdminDtoWithEmail(genEmail("adminFooBar"));
         var users = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .param("email", "")
                 .param("role", "admin")
+                .param("size", Integer.MAX_VALUE)
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()
@@ -121,12 +131,13 @@ public class UserManagementApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void searchUsers_byEmailAndRole_200_ok() {
         var admin = utilUser.savedAdminDtoWithEmail(genEmail("adFooBar"));
         var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
         var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
         var users = given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .param("email", admin.getEmail())
                 .param("role", "admin")
@@ -143,9 +154,10 @@ public class UserManagementApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void disableUser_404_userNotFound() {
         given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new DisableUserRequest(-1L))
                 .when()
@@ -157,6 +169,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void disableUser_200_ok() {
         var registration = utilAuth.doConfirmedRegistration();
         var userToken = utilAuth.doAuthentication(registration);
@@ -171,7 +184,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .statusCode(200);
         // Disable user
         given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new DisableUserRequest(registration.getId()))
                 .when()
@@ -198,9 +211,10 @@ public class UserManagementApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void blacklistTokens_404_userNotFound() {
         given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new BlacklistTokensRequest(-1L))
                 .when()
@@ -212,6 +226,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(auth = true)
     public void blacklistTokens_200_ok() {
         var registration = utilAuth.doConfirmedRegistration();
         var userToken = utilAuth.doAuthentication(registration);
@@ -226,7 +241,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .statusCode(200);
         // Blacklist user's tokens
         given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new BlacklistTokensRequest(registration.getId()))
                 .when()

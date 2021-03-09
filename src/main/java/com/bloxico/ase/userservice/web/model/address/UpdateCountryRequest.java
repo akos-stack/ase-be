@@ -22,7 +22,7 @@ public class UpdateCountryRequest {
     @NotNull
     @JsonProperty("id")
     @ApiModelProperty(required = true)
-    Integer id;
+    Long id;
 
     @NotBlank
     @JsonProperty("country")

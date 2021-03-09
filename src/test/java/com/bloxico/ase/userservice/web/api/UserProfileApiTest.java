@@ -1,6 +1,8 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import com.bloxico.ase.userservice.web.model.user.UserProfileDataResponse;
 import org.junit.Test;
@@ -21,13 +23,14 @@ public class UserProfileApiTest extends AbstractSpringTest {
 
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private UtilSecurityContext utilSecurityContext;
 
     @Test
+    @WithMockCustomUser(role = Role.USER, auth = true)
     public void accessMyProfile_200_ok() {
-        var registration = utilAuth.doConfirmedRegistration();
-        var userProfileDto1 = utilUserProfile.savedUserProfileDto(registration.getId());
+        var userProfileDto1 = utilUserProfile.savedUserProfileDto(utilSecurityContext.getLoggedInUserId());
         var userProfileDto2 = given()
-                .header("Authorization", utilAuth.doAuthentication(registration))
+                .header("Authorization", utilSecurityContext.getToken())
                 .when()
                 .get(API_URL + MY_PROFILE_ENDPOINT)
                 .then()
@@ -41,14 +44,14 @@ public class UserProfileApiTest extends AbstractSpringTest {
     }
 
     @Test
+    @WithMockCustomUser(role = Role.USER, auth = true)
     public void updateMyProfile_200_ok() {
-        var registration = utilAuth.doConfirmedRegistration();
-        utilUserProfile.savedUserProfileDto(registration.getId());
+        utilUserProfile.savedUserProfileDto(utilSecurityContext.getLoggedInUserId());
         var firstName = genUUID();
         var lastName = genUUID();
         var phone = genUUID();
         var userProfileDto = given()
-                .header("Authorization", utilAuth.doAuthentication(registration))
+                .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
                 .body(new UpdateUserProfileRequest(firstName, lastName, phone))
                 .when()

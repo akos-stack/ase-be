@@ -9,7 +9,7 @@ import java.util.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.ROLE_NOT_FOUND;
 
 @Repository
-public interface RoleRepository extends JpaRepository<Role, Short> {
+public interface RoleRepository extends JpaRepository<Role, Long> {
 
     Optional<Role> findByNameIgnoreCase(String name);
 
