@@ -2,6 +2,8 @@ package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.config.ConfigDto;
 import com.bloxico.ase.userservice.entity.config.Config.Type;
+import com.bloxico.ase.userservice.service.config.impl.ConfigServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static com.bloxico.ase.testutil.Util.genUUID;
@@ -9,6 +11,16 @@ import static com.bloxico.ase.testutil.Util.randEnumConst;
 
 @Component
 public class UtilConfig {
+
+    @Autowired private ConfigServiceImpl configService;
+
+    public ConfigDto savedConfigDto() {
+        return savedConfigDto(randEnumConst(Type.class), genUUID());
+    }
+
+    public ConfigDto savedConfigDto(Type type, String value) {
+        return configService.saveOrUpdateConfig(genConfigDto(type, value));
+    }
 
     public ConfigDto genConfigDto() {
         return genConfigDto(randEnumConst(Type.class), genUUID());

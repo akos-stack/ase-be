@@ -17,6 +17,7 @@ import static com.bloxico.ase.userservice.entity.config.Config.Type.QUOTATION_PA
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
@@ -24,6 +25,7 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private UtilConfig utilConfig;
     @Autowired private EvaluationFacadeImpl evaluationFacade;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
@@ -264,6 +266,18 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void saveQuotationPackage() {
         var request = utilEvaluation.genSaveQuotationPackageRequest();
         evaluationFacade.saveQuotationPackage(request);
+    }
+
+    @Test
+    @WithMockCustomUser(role = "user")
+    public void getQuotationPackageMinEvaluations() {
+        Integer minEvaluations = 10;
+        utilConfig.savedConfigDto(QUOTATION_PACKAGE_MIN_EVALUATIONS, minEvaluations.toString());
+        var foundMinEvaluations = evaluationFacade
+                .getQuotationPackageMinEvaluations()
+                .getMinEvaluations();
+        assertNotNull(foundMinEvaluations);
+        assertEquals(minEvaluations, foundMinEvaluations);
     }
 
     @Test

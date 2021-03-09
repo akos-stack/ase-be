@@ -15,6 +15,22 @@ public class ConfigServiceImplTest extends AbstractSpringTest {
     @Autowired private ConfigServiceImpl configService;
 
     @Test
+    @WithMockCustomUser(role = "user")
+    public void findConfigByType_nullType() {
+        assertThrows(
+                NullPointerException.class,
+                () -> configService.findConfigByType(null));
+    }
+
+    @Test
+    @WithMockCustomUser(role = "user")
+    public void findConfigByType() {
+        var config = utilConfig.savedConfigDto();
+        var foundConfig = configService.findConfigByType(config.getType());
+        assertEquals(config, foundConfig);
+    }
+
+    @Test
     @WithMockCustomUser
     public void saveOrUpdateConfig_nullConfig() {
         assertThrows(

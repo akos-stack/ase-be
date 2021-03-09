@@ -31,6 +31,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private UtilConfig utilConfig;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test
@@ -368,6 +369,30 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         assertNotNull(qPackage.getId());
         assertEquals(request.getArtworkId(), qPackage.getArtworkId());
         assertEquals(request.getCountries().size(), qPackage.getCountries().size());
+    }
+
+
+    // TODO test getQuotationPackageMinEvaluations_404_notFound()
+
+    @Test
+    @WithMockCustomUser(auth = true, role = "user")
+    public void getQuotationPackageMinEvaluations_200_ok() {
+        Integer minEvaluations = 10;
+        utilConfig.savedConfigDto(QUOTATION_PACKAGE_MIN_EVALUATIONS, minEvaluations.toString());
+        var foundMinEvaluations = given()
+                .header("Authorization", utilSecurityContext.getToken())
+                .contentType(JSON)
+                .when()
+                .get(API_URL + EVALUATION_QUOTATION_PACKAGE_MIN_EVALUATIONS)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(GetQuotationPackageMinEvaluationsResponse.class)
+                .getMinEvaluations();
+        assertNotNull(foundMinEvaluations);
+        assertEquals(minEvaluations, foundMinEvaluations);
     }
 
     @Test
