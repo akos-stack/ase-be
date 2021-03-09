@@ -18,7 +18,7 @@ import static javax.persistence.EnumType.STRING;
 public class Config extends BaseEntity {
 
     public enum Type {
-        QUOTATION_PACKAGE_MIN_SIZE
+        QUOTATION_PACKAGE_MIN_EVALUATIONS
     }
 
     @Column(name = "type", unique = true)
