@@ -1,15 +1,16 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
-import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.entity.user.Role;
+import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.entity.config.Config.Type.QUOTATION_PACKAGE_MIN_EVALUATIONS;
 import static com.bloxico.ase.userservice.web.api.EvaluationApi.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.COUNTRY_NOT_FOUND;
@@ -26,16 +27,11 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 @Transactional(propagation = NOT_SUPPORTED)
 public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
-    @Autowired
-    private UtilSecurityContext utilSecurityContext;
-    @Autowired
-    private UtilEvaluation utilEvaluation;
-    @Autowired
-    private UtilLocation utilLocation;
-    @Autowired
-    private UtilUserProfile utilUserProfile;
-    @Autowired
-    private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
+    @Autowired private UtilSecurityContext utilSecurityContext;
+    @Autowired private UtilEvaluation utilEvaluation;
+    @Autowired private UtilLocation utilLocation;
+    @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test
     @WithMockCustomUser(auth = true)
@@ -372,6 +368,30 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         assertNotNull(qPackage.getId());
         assertEquals(request.getArtworkId(), qPackage.getArtworkId());
         assertEquals(request.getCountries().size(), qPackage.getCountries().size());
+    }
+
+    @Test
+    @WithMockCustomUser(auth = true)
+    public void setQuotationPackageMinEvaluations_200_ok() {
+        var minEvaluations = genPosInt(50);
+        var request = new SetQuotationPackageMinEvaluationsRequest(minEvaluations);
+        var config = given()
+                .header("Authorization", utilSecurityContext.getToken())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + EVALUATION_QUOTATION_PACKAGE_MIN_EVALUATIONS_SET)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SetQuotationPackageMinEvaluationsResponse.class)
+                .getConfig();
+        assertNotNull(config);
+        assertNotNull(config.getId());
+        assertEquals(QUOTATION_PACKAGE_MIN_EVALUATIONS, config.getType());
+        assertEquals(String.valueOf(minEvaluations), config.getValue());
     }
 
 }

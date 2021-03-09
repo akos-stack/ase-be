@@ -5,17 +5,17 @@ import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.EvaluationException;
 import com.bloxico.ase.userservice.exception.LocationException;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
+import com.bloxico.ase.userservice.web.model.evaluation.SetQuotationPackageMinEvaluationsRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.List;
 
-import static com.bloxico.ase.testutil.Util.allPages;
-import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.entity.config.Config.Type.QUOTATION_PACKAGE_MIN_EVALUATIONS;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -264,6 +264,37 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void saveQuotationPackage() {
         var request = utilEvaluation.genSaveQuotationPackageRequest();
         evaluationFacade.saveQuotationPackage(request);
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void setQuotationPackageMinEvaluations_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.setQuotationPackageMinEvaluations(null));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void setQuotationPackageMinEvaluations_nullMinEvaluations() {
+        var request = new SetQuotationPackageMinEvaluationsRequest(null);
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.setQuotationPackageMinEvaluations(request));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void setQuotationPackageMinEvaluations() {
+        var minEvaluations = genPosInt(50);
+        var request = new SetQuotationPackageMinEvaluationsRequest(minEvaluations);
+        var config = evaluationFacade
+                .setQuotationPackageMinEvaluations(request)
+                .getConfig();
+        assertNotNull(config);
+        assertNotNull(config.getId());
+        assertEquals(QUOTATION_PACKAGE_MIN_EVALUATIONS, config.getType());
+        assertEquals(String.valueOf(minEvaluations), config.getValue());
     }
 
 }
