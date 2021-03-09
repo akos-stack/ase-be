@@ -2,20 +2,27 @@ package com.bloxico.ase.userservice.service.aws.impl;
 
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
+import com.bloxico.ase.testutil.UtilS3;
 import com.bloxico.ase.userservice.exception.S3Exception;
 import com.bloxico.ase.userservice.util.FileCategory;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import static com.bloxico.ase.testutil.Util.genMultipartFile;
 import static com.bloxico.ase.testutil.Util.genUUID;
 import static com.bloxico.ase.testutil.UtilS3.findOtherCategory;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.*;
 
 public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Autowired private S3ServiceImpl s3Service;
+    @Autowired private UtilS3 utilS3;
 
     @Test
     public void validateFile_nullCategory() {
@@ -147,6 +154,36 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
                         AmazonS3Exception.class,
                         () -> amazonS3.getObject(bucketName, fileName));
             }
+    }
+
+    @Test
+    public void validateFiles() {
+        var response = s3Service.validateFiles(FileCategory.IMAGE, utilS3.savedListOfFiles());
+        assertTrue(response.isEmpty());
+    }
+
+    @Test
+    public void validateFiles_nullFileCategory() {
+        assertThrows(
+                NullPointerException.class,
+                () ->  s3Service.validateFiles(null, utilS3.savedListOfFiles()));
+    }
+
+    @Test
+    public void validateFiles_nullFiles() {
+        assertThrows(
+                NullPointerException.class,
+                () ->  s3Service.validateFiles(FileCategory.IMAGE, null));
+    }
+
+    @Test
+    public void validateFiles_typeNotSupportedForCategory() {
+        var files = utilS3.savedListOfFiles();
+        var response = s3Service.validateFiles(FileCategory.CV, files);
+        assertFalse(response.isEmpty());
+        assertEquals(response, files.stream()
+                .map(MultipartFile::getOriginalFilename)
+                .collect(Collectors.toList()));
     }
 
 }
