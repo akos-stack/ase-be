@@ -162,6 +162,56 @@ databaseChangeLog:
                     foreignKeyName: fk_aspiration_user
                     references: roles(id)
         - createTable:
+            tableName: configs
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: type
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: value
+                  type: varchar(256)
+                  constraints:
+                    nullable: false
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_category_creator
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_category_updater
+                    references: users(id)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createTable:
             tableName: regions
             columns:
               - column:
