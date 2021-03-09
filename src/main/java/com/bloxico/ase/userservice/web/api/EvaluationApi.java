@@ -17,13 +17,14 @@ import javax.validation.Valid;
 @Api(value = "evaluation")
 public interface EvaluationApi {
 
-    String EVALUATION_COUNTRY_DETAILS_SEARCH            = "/evaluation/country-details";
-    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH = "/evaluation/management/country-details";
-    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE   = "/evaluation/management/country-details/save";
-    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE = "/evaluation/management/country-details/update";
-    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE = "/evaluation/management/country-details/delete";
-    String EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH  = "/evaluation/management/region-details";
-    String EVALUATION_QUOTATION_PACKAGE_SAVE            = "/evaluation/quotation-package/save";
+    String EVALUATION_COUNTRY_DETAILS_SEARCH                = "/evaluation/country-details";
+    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH     = "/evaluation/management/country-details";
+    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE       = "/evaluation/management/country-details/save";
+    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE     = "/evaluation/management/country-details/update";
+    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE     = "/evaluation/management/country-details/delete";
+    String EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH      = "/evaluation/management/region-details";
+    String EVALUATION_QUOTATION_PACKAGE_SAVE                = "/evaluation/quotation-package/save";
+    String EVALUATION_QUOTATION_PACKAGE_MIN_EVALUATIONS_SET = "/evaluation/quotation-package/min-evaluations/set";
 
     @GetMapping(
             value = EVALUATION_COUNTRY_DETAILS_SEARCH,
@@ -113,5 +114,17 @@ public interface EvaluationApi {
     })
     ResponseEntity<SaveQuotationPackageResponse> saveQuotationPackage(
             @Valid @RequestBody SaveQuotationPackageRequest request);
+
+    @PostMapping(
+            value = EVALUATION_QUOTATION_PACKAGE_MIN_EVALUATIONS_SET,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'save_quotation_package')")
+    @ApiOperation(value = "Sets quotation package minimum evaluations in the database.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Quotation package minimum evaluations successfully set.")
+    })
+    ResponseEntity<SetQuotationPackageMinEvaluationsResponse> setQuotationPackageMinEvaluations(
+            @Valid @RequestBody SetQuotationPackageMinEvaluationsRequest request);
 
 }

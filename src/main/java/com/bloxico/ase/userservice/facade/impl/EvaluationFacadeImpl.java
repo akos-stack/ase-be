@@ -1,8 +1,10 @@
 package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
+import com.bloxico.ase.userservice.dto.entity.config.ConfigDto;
 import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
+import com.bloxico.ase.userservice.service.config.IConfigService;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.bloxico.ase.userservice.entity.config.Config.Type.QUOTATION_PACKAGE_MIN_EVALUATIONS;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.COUNTRY_EVALUATION_DETAILS_DELETE_OPERATION_NOT_SUPPORTED;
 
@@ -21,13 +24,16 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
 
     private final ILocationService locationService;
     private final IEvaluationService evaluationService;
+    private final IConfigService configService;
 
     @Autowired
     public EvaluationFacadeImpl(ILocationService locationService,
-                                IEvaluationService evaluationService)
+                                IEvaluationService evaluationService,
+                                IConfigService configService)
     {
         this.locationService = locationService;
         this.evaluationService = evaluationService;
+        this.configService = configService;
     }
 
     @Override
@@ -101,6 +107,19 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
         quotationPackage.setCountries(countries);
         var response = new SaveQuotationPackageResponse(quotationPackage);
         log.debug("EvaluationFacadeImpl.saveQuotationPackage - start | request: {}", request);
+        return response;
+    }
+
+    @Override
+    public SetQuotationPackageMinEvaluationsResponse setQuotationPackageMinEvaluations(
+            SetQuotationPackageMinEvaluationsRequest request) {
+        log.debug("EvaluationFacadeImpl.setQuotationPackageMinEvaluations - start | request: {}", request);
+        var dto = new ConfigDto();
+        dto.setType(QUOTATION_PACKAGE_MIN_EVALUATIONS);
+        dto.setValue(request.getMinEvaluations().toString());
+        var evaluationConfigDto = configService.saveOrUpdateConfig(dto);
+        var response = new SetQuotationPackageMinEvaluationsResponse(evaluationConfigDto);
+        log.debug("EvaluationFacadeImpl.setQuotationPackageMinEvaluations - end | request: {}", request);
         return response;
     }
 
