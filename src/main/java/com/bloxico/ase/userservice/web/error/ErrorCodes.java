@@ -300,4 +300,27 @@ public interface ErrorCodes {
 
     }
 
+    @Getter
+    enum Config implements ErrorCodes {
+        CONFIG_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "Config_01",
+                "Config not found.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        Config(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        };
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new ConfigException(httpStatus, code, cause);
+        }
+
+    }
+
 }

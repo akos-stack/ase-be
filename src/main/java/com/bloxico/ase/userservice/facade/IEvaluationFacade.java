@@ -24,6 +24,8 @@ public interface IEvaluationFacade {
     SaveQuotationPackageResponse saveQuotationPackage(
             SaveQuotationPackageRequest request);
 
+    GetQuotationPackageMinEvaluationsResponse getQuotationPackageMinEvaluations();
+
     SetQuotationPackageMinEvaluationsResponse setQuotationPackageMinEvaluations(
             SetQuotationPackageMinEvaluationsRequest request);
 

@@ -24,6 +24,7 @@ public interface EvaluationApi {
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE     = "/evaluation/management/country-details/delete";
     String EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH      = "/evaluation/management/region-details";
     String EVALUATION_QUOTATION_PACKAGE_SAVE                = "/evaluation/quotation-package/save";
+    String EVALUATION_QUOTATION_PACKAGE_MIN_EVALUATIONS     = "/evaluation/quotation-package/min-evaluations";
     String EVALUATION_QUOTATION_PACKAGE_MIN_EVALUATIONS_SET = "/evaluation/quotation-package/min-evaluations/set";
 
     @GetMapping(
@@ -115,11 +116,21 @@ public interface EvaluationApi {
     ResponseEntity<SaveQuotationPackageResponse> saveQuotationPackage(
             @Valid @RequestBody SaveQuotationPackageRequest request);
 
+    @GetMapping(
+            value = EVALUATION_QUOTATION_PACKAGE_MIN_EVALUATIONS,
+            produces = {"application/json"})
+    @ApiOperation(value = "Gets quotation package minimum evaluations from the database.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Quotation package minimum evaluations successfully retrieved."),
+            @ApiResponse(code = 404, message = "Quotation package minimum evaluations config not found.")
+    })
+    ResponseEntity<GetQuotationPackageMinEvaluationsResponse> getQuotationPackageMinEvaluations();
+
     @PostMapping(
             value = EVALUATION_QUOTATION_PACKAGE_MIN_EVALUATIONS_SET,
             produces = {"application/json"},
             consumes = {"application/json"})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'save_quotation_package')")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'save_quotation_package_config')")
     @ApiOperation(value = "Sets quotation package minimum evaluations in the database.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Quotation package minimum evaluations successfully set.")

@@ -111,6 +111,15 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
     }
 
     @Override
+    public GetQuotationPackageMinEvaluationsResponse getQuotationPackageMinEvaluations() {
+        log.debug("EvaluationFacadeImpl.getQuotationPackageMinEvaluations - start");
+        var config = configService.findConfigByType(QUOTATION_PACKAGE_MIN_EVALUATIONS);
+        var response = new GetQuotationPackageMinEvaluationsResponse(Integer.valueOf(config.getValue()));
+        log.debug("EvaluationFacadeImpl.getQuotationPackageMinEvaluations - end");
+        return response;
+    }
+
+    @Override
     public SetQuotationPackageMinEvaluationsResponse setQuotationPackageMinEvaluations(
             SetQuotationPackageMinEvaluationsRequest request) {
         log.debug("EvaluationFacadeImpl.setQuotationPackageMinEvaluations - start | request: {}", request);
