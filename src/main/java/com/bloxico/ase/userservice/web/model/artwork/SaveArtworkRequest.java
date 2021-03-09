@@ -1,11 +1,13 @@
 package com.bloxico.ase.userservice.web.model.artwork;
 
-import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
+import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.bloxico.ase.userservice.util.FileCategory;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
@@ -164,11 +166,7 @@ public class SaveArtworkRequest {
     @NotNull
     @JsonProperty("status")
     @ApiModelProperty(required = true)
-    ArtworkGroup.Status status;
-
-    @JsonProperty("group_id")
-    @ApiModelProperty
-    Long groupId;
+    Artwork.Status status;
 
     @JsonIgnore
     public void validateRequest() {

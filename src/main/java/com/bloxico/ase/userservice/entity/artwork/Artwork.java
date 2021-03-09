@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 
 @Data
@@ -23,6 +24,13 @@ import static javax.persistence.FetchType.LAZY;
 @Entity
 @Table(name = "artworks")
 public class Artwork extends BaseEntity {
+
+    public enum Status {
+
+        DRAFT,
+        WAITING_FOR_EVALUATION
+
+    }
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -57,9 +65,9 @@ public class Artwork extends BaseEntity {
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
-    @ManyToOne
-    @JoinColumn(name = "group_id", nullable = false)
-    private ArtworkGroup group;
+    @Column(name = "status", nullable = false)
+    @Enumerated(STRING)
+    private Status status;
 
     @OneToOne(mappedBy = "artwork")
     ArtworkHistory artworkHistory;

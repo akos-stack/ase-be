@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
+import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -46,8 +47,8 @@ public class ArtworkDto {
     @JsonProperty("location")
     private LocationDto location;
 
-    @JsonProperty("group")
-    private ArtworkGroupDto group;
+    @JsonProperty("status")
+    private Artwork.Status status;
 
     @JsonProperty("history")
     private ArtworkHistoryDto history;

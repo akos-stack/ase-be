@@ -44,7 +44,6 @@ import org.junit.runners.Suite;
         EvaluationServiceImplTest.class,
         DocumentServiceImplTest.class,
         ArtistServiceImplTest.class,
-        ArtworkGroupServiceImplTest.class,
         ArtworkServiceImplTest.class,
 
         // facade

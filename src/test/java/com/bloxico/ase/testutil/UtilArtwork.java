@@ -2,9 +2,8 @@ package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.*;
 import com.bloxico.ase.userservice.entity.artwork.Artist;
-import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
+import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.bloxico.ase.userservice.repository.artwork.ArtistRepository;
-import com.bloxico.ase.userservice.repository.artwork.ArtworkGroupRepository;
 import com.bloxico.ase.userservice.service.artwork.impl.ArtworkServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkRequest;
@@ -15,7 +14,6 @@ import java.time.Year;
 import java.util.*;
 
 import static com.bloxico.ase.testutil.Util.*;
-import static com.bloxico.ase.userservice.entity.artwork.ArtworkGroup.Status.WAITING_FOR_EVALUATION;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.PENDING;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type.*;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -30,21 +28,8 @@ public class UtilArtwork {
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private UtilArtworkMetadata utilArtworkMetadata;
     @Autowired private UserProfileServiceImpl userProfileService;
-    @Autowired private ArtworkGroupRepository artworkGroupRepository;
     @Autowired private ArtistRepository artistRepository;
     @Autowired private ArtworkServiceImpl artworkService;
-
-    public ArtworkGroup savedArtworkGroup(ArtworkGroup.Status status) {
-        var creatorId = utilUser.savedAdmin().getId();
-        var artworkGroup = new ArtworkGroup();
-        artworkGroup.setStatus(status);
-        artworkGroup.setCreatorId(creatorId);
-        return artworkGroupRepository.saveAndFlush(artworkGroup);
-    }
-
-    public ArtworkGroupDto savedArtworkGroupDto(ArtworkGroup.Status status) {
-        return MAPPER.toDto(savedArtworkGroup(status));
-    }
 
     public Artist savedArtist() {
         var creatorId = utilUser.savedAdmin().getId();
@@ -77,7 +62,7 @@ public class UtilArtwork {
         artworkDto.setWidth(genPosBigDecimal(20));
         artworkDto.setDepth(genPosBigDecimal(20));
         artworkDto.setPhone(genUUID());
-        artworkDto.setGroup(savedArtworkGroupDto(WAITING_FOR_EVALUATION));
+        artworkDto.setStatus(Artwork.Status.WAITING_FOR_EVALUATION);
         artworkDto.setOwner(utilUserProfile.savedArtOwnerDto());
         artworkDto.setLocation(utilLocation.savedLocationDto());
         artworkDto.setArtist(savedArtistDto());
@@ -97,7 +82,7 @@ public class UtilArtwork {
         return artworkService.saveArtwork(artworkDto);
     }
 
-    public SaveArtworkRequest genSaveArtworkRequest(ArtworkGroup.Status status, boolean artOwner, Long groupId) {
+    public SaveArtworkRequest genSaveArtworkRequest(Artwork.Status status, boolean artOwner) {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithRegion(region);
         var fileCategory = artOwner ? CV : CERTIFICATE;
@@ -130,12 +115,11 @@ public class UtilArtwork {
                 genUUID(),                                      // runsHistory
                 genUUID(),                                      // maintenanceHistory
                 genUUID(),                                      // notes
-                status,                                         // status
-                groupId                                         // groupId
+                status                                          // status
         );
     }
 
-    public Map<String, String> genSaveArtworkFormParams(ArtworkGroup.Status status, boolean iAmArtOwner, Long groupId) {
+    public Map<String, String> genSaveArtworkFormParams(Artwork.Status status, boolean iAmArtOwner) {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithRegion(region);
         var map = new HashMap<String, String>();
@@ -165,8 +149,6 @@ public class UtilArtwork {
         map.put("maintenanceHistory", genUUID());
         map.put("notes", genUUID());
         map.put("status", status.name());
-        if (groupId != null)
-            map.put("groupId", Long.toString(groupId));
         return map;
     }
 

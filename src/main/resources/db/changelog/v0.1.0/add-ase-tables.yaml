@@ -1023,50 +1023,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - createTable:
-            tableName: artwork_groups
-            columns:
-              - column:
-                  name: id
-                  type: bigint
-                  autoIncrement: true
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-              - column:
-                  name: status
-                  type: varchar(256)
-                  constraints:
-                    nullable: false
-              # METADATA
-              - column:
-                  name: creator_id
-                  type: bigint
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_artworks_group_creator
-                    references: users(id)
-              - column:
-                  name: created_at
-                  type: timestamp
-                  defaultValueComputed: "CURRENT_TIMESTAMP"
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updater_id
-                  type: bigint
-                  constraints:
-                    foreignKeyName: fk_artworks_group_updater
-                    references: users(id)
-              - column:
-                  name: updated_at
-                  type: timestamp
-              - column:
-                  name: version
-                  type: bigint
-                  defaultValueNumeric: 0
-                  constraints:
-                    nullable: false
-        - createTable:
             tableName: artworks
             columns:
               - column:
@@ -1133,12 +1089,10 @@ databaseChangeLog:
                     foreignKeyName: fk_artworks_location
                     references: locations(id)
               - column:
-                  name: group_id
-                  type: bigint
+                  name: status
+                  type: varchar(256)
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_artworks_artworks_group
-                    references: artwork_groups(id)
               # METADATA
               - column:
                   name: creator_id

@@ -4,7 +4,6 @@ import com.bloxico.ase.userservice.config.security.AseSecurityContextService;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
-import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkGroupDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkHistoryDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
@@ -12,7 +11,6 @@ import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
 import com.bloxico.ase.userservice.facade.IArtworkFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.artwork.IArtistService;
-import com.bloxico.ase.userservice.service.artwork.IArtworkGroupService;
 import com.bloxico.ase.userservice.service.artwork.IArtworkMetadataService;
 import com.bloxico.ase.userservice.service.artwork.IArtworkService;
 import com.bloxico.ase.userservice.service.artwork.impl.metadata.CategoryServiceImpl;
@@ -44,14 +42,13 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     private final IArtworkService artworkService;
     private final IArtistService artistService;
     private final IUserProfileService userProfileService;
-    private final IArtworkGroupService artworkGroupService;
     private final CategoryServiceImpl categoryService;
     private final MaterialServiceImpl materialService;
     private final MediumServiceImpl mediumService;
     private final StyleServiceImpl styleService;
     private final AseSecurityContextService securityContextService;
 
-    public ArtworkFacadeImpl(ILocationService locationService, IDocumentService documentService, IArtworkService artworkService, IArtistService artistService, IUserProfileService userProfileService, CategoryServiceImpl categoryService, MaterialServiceImpl materialService, MediumServiceImpl mediumService, StyleServiceImpl styleService, IArtworkGroupService artworkGroupService, AseSecurityContextService securityContextService) {
+    public ArtworkFacadeImpl(ILocationService locationService, IDocumentService documentService, IArtworkService artworkService, IArtistService artistService, IUserProfileService userProfileService, CategoryServiceImpl categoryService, MaterialServiceImpl materialService, MediumServiceImpl mediumService, StyleServiceImpl styleService, AseSecurityContextService securityContextService) {
         this.locationService = locationService;
         this.documentService = documentService;
         this.artworkService = artworkService;
@@ -61,7 +58,6 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         this.materialService = materialService;
         this.mediumService = mediumService;
         this.styleService = styleService;
-        this.artworkGroupService = artworkGroupService;
         this.securityContextService = securityContextService;
     }
 
@@ -71,7 +67,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         var artworkDto = doPrepareArtworkDto(request);
         artworkDto = artworkService.saveArtwork(artworkDto);
         log.info("ArtworkFacadeImpl.submitArtwork - end | request: {}", request);
-        return new SaveArtworkResponse(artworkDto.getGroup());
+        return new SaveArtworkResponse(artworkDto);
     }
 
     // HELPER METHODS
@@ -79,7 +75,6 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     private ArtworkDto doPrepareArtworkDto(SaveArtworkRequest request) {
         request.validateRequest();
         var artworkDto = MAPPER.toArtworkDto(request);
-        artworkDto.setGroup(doSaveGroup(request));
         artworkDto.setOwner(userProfileService.findArtOwnerByUserId(securityContextService.getPrincipalId()));
         artworkDto.setLocation(doSaveLocation(request));
         artworkDto.setArtist(doSaveArtist(request));
@@ -98,14 +93,6 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         if(request.hasHistory()) {
             return MAPPER.toArtworkHistoryDto(request);
         } else return null;
-    }
-
-    private ArtworkGroupDto doSaveGroup(SaveArtworkRequest request) {
-        var artworkGroupDto = MAPPER.toArtworkGroupDto(request);
-        if(request.getGroupId() != null) {
-            return artworkGroupService.findOrUpdateGroup(artworkGroupDto);
-        }
-        return artworkGroupService.saveGroup(artworkGroupDto);
     }
 
     private List<ArtworkMetadataDto> doSaveCategories(SaveArtworkRequest request) {
