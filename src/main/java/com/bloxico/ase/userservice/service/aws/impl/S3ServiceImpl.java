@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.service.aws.impl;
 import com.bloxico.ase.userservice.service.aws.IS3Service;
 import com.bloxico.ase.userservice.util.AWSUtil;
 import com.bloxico.ase.userservice.util.FileCategory;
+import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -10,11 +11,11 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.Map.Entry;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toMap;
 
 @Slf4j
 @Service
@@ -39,20 +40,19 @@ public class S3ServiceImpl implements IS3Service {
     }
 
     @Override
-    public List<String> validateFiles(FileCategory category, List<MultipartFile> files) {
-        var log_files = files.stream().map(MultipartFile::getOriginalFilename).collect(Collectors.toList());
-        log.debug("S3ServiceImpl.validateFile - start | category: {}, files: {}", category, log_files);
-        var checkedFiles = new ArrayList<MultipartFile>();
+    public Map<String, Set<ErrorCodes.AmazonS3>> validateFiles(FileCategory category, List<MultipartFile> files) {
+        log.debug("S3ServiceImpl.validateFile - start | category: {}, files: {}", category, files);
         requireNonNull(category);
         requireNonNull(files);
-        files.forEach(file -> {
-            requireNonNull(file);
-            if(!category.validateFiles(file, environment))
-                checkedFiles.add(file);
-        });
-        var checkedFilesNames = checkedFiles.stream().map(MultipartFile::getOriginalFilename).collect(Collectors.toList());
-        log.debug("S3ServiceImpl.validateFile - end | category: {}, files: {}", category, checkedFilesNames);
-        return checkedFilesNames;
+        var invalidFiles = files
+                .stream()
+                .map(file -> Map.entry(
+                        file.getOriginalFilename() + "",
+                        category.fileErrors(file, environment)))
+                .filter(entry -> !entry.getValue().isEmpty())
+                .collect(toMap(Entry::getKey, Entry::getValue));
+        log.debug("S3ServiceImpl.validateFile - end | category: {}, files: {}", category, files);
+        return invalidFiles;
     }
 
     @Override

@@ -4,15 +4,13 @@ import com.bloxico.ase.userservice.facade.IS3Facade;
 import com.bloxico.ase.userservice.service.aws.IS3Service;
 import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.model.aws.ValidateFilesRequest;
+import com.bloxico.ase.userservice.web.model.aws.ValidateFilesResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,12 +32,14 @@ public class S3FacadeImpl implements IS3Facade {
     }
 
     @Override
-    public List<String> validateFiles(ValidateFilesRequest validateFilesRequest) {
-        var log_files = validateFilesRequest.getFiles().stream().map(MultipartFile::getOriginalFilename).collect(Collectors.toList());
-        log.info("S3FacadeImpl.validateFiles - start | category: {}, file: {} ", validateFilesRequest.getFileCategory(), log_files);
-        var invalidFiles = s3Service.validateFiles(validateFilesRequest.getFileCategory(), validateFilesRequest.getFiles());
-        log.info("S3FacadeImpl.validateFiles - end | category: {}, file: {} ", validateFilesRequest.getFileCategory(), invalidFiles);
-        return invalidFiles;
+    public ValidateFilesResponse invalidFiles(ValidateFilesRequest validateFilesRequest) {
+        log.info("S3FacadeImpl.validateFiles - start | validateFilesRequest: {} ", validateFilesRequest);
+        var invalidFiles = s3Service.validateFiles(
+                validateFilesRequest.getFileCategory(),
+                validateFilesRequest.getFiles());
+        var response = new ValidateFilesResponse(invalidFiles);
+        log.info("S3FacadeImpl.validateFiles - end | validateFilesRequest: {} ", validateFilesRequest);
+        return response;
     }
 
     @Override

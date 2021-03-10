@@ -20,7 +20,7 @@ public class S3FacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void validateFiles() {
-        var response = s3FacadeImpl.validateFiles(utilS3.savedValidatedFilesRequest(FileCategory.IMAGE));
+        var response = s3FacadeImpl.invalidFiles(utilS3.savedValidatedFilesRequest(FileCategory.IMAGE));
         assertTrue(response.isEmpty());
     }
 
@@ -29,13 +29,13 @@ public class S3FacadeImplTest extends AbstractSpringTestWithAWS {
         var validateFilesRequest = utilS3.savedValidatedFilesRequest(null);
         assertThrows(
                 AmazonS3Exception.class,
-                () ->  s3FacadeImpl.validateFiles(validateFilesRequest));
+                () ->  s3FacadeImpl.invalidFiles(validateFilesRequest));
     }
 
     @Test
     public void validateFiles_typeNotSupportedForCategory() {
         var validateFilesRequest = utilS3.savedValidatedFilesRequest(FileCategory.CV);
-        var response = s3FacadeImpl.validateFiles(validateFilesRequest);
+        var response = s3FacadeImpl.invalidFiles(validateFilesRequest);
         assertFalse(response.isEmpty());
         assertEquals(response, validateFilesRequest.getFiles()
                 .stream()

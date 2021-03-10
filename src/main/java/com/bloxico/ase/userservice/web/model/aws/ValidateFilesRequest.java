@@ -3,10 +3,7 @@ package com.bloxico.ase.userservice.web.model.aws;
 import com.bloxico.ase.userservice.util.FileCategory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
@@ -31,4 +28,5 @@ public class ValidateFilesRequest {
     @JsonProperty("file_category")
     @ApiModelProperty(required = true)
     FileCategory fileCategory;
+
 }

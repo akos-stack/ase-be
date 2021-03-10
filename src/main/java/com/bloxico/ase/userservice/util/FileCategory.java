@@ -1,9 +1,11 @@
 package com.bloxico.ase.userservice.util;
 
+import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import lombok.Getter;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
@@ -68,12 +70,14 @@ public enum FileCategory {
             throw FILE_SIZE_EXCEEDED.newException();
     }
 
-    public boolean validateFiles(MultipartFile file, Environment environment) {
+    public Set<ErrorCodes.AmazonS3> fileErrors(MultipartFile file, Environment environment) {
+        var errors = EnumSet.noneOf(ErrorCodes.AmazonS3.class);
         if (!supportedFileExtensions.contains(getByExtension(getExtension(file.getOriginalFilename()))))
-            return false;
+            errors.add(FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY);
         long maxFileSizeKb = Long.parseLong(requireNonNull(environment.getProperty(maxSizeProperty)));
         if ((file.getSize() / 1024) > maxFileSizeKb)
-            return false;
-        return true;
+            errors.add(FILE_SIZE_EXCEEDED);
+        return errors;
     }
+
 }

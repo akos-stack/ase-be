@@ -1,16 +1,17 @@
 package com.bloxico.ase.userservice.service.aws;
 
 import com.bloxico.ase.userservice.util.FileCategory;
+import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.util.*;
 
 public interface IS3Service {
 
     void validateFile(FileCategory category, MultipartFile file);
 
-    List<String> validateFiles(FileCategory category, List<MultipartFile> files);
+    Map<String, Set<ErrorCodes.AmazonS3>> validateFiles(FileCategory category, List<MultipartFile> files);
 
     String uploadFile(FileCategory category, MultipartFile file);
 
