@@ -111,10 +111,12 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     public PendingEvaluatorDocumentDto getEvaluatorResume(String email) {
         log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - start | email: {}", email);
         requireNonNull(email);
-        var pendingEvaluatorDocument = pendingEvaluatorDocumentRepository
-                .findByPendingEvaluatorDocumentId_Email(email).orElseThrow(RESUME_NOT_FOUND::newException);
+        var pendingEvaluatorDocumentDto = pendingEvaluatorDocumentRepository
+                .findByPendingEvaluatorDocumentId_Email(email)
+                .map(MAPPER::toDto)
+                .orElseThrow(RESUME_NOT_FOUND::newException);
         log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - end | email: {}", email);
-        return MAPPER.toDto(pendingEvaluatorDocument);
+        return pendingEvaluatorDocumentDto;
     }
 
     @Override
