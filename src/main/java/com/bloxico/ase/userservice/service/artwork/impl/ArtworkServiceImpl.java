@@ -18,20 +18,24 @@ public class ArtworkServiceImpl implements IArtworkService {
     private final ArtworkRepository artworkRepository;
     private final ArtworkHistoryRepository artworkHistoryRepository;
 
-    public ArtworkServiceImpl(ArtworkRepository artworkRepository, ArtworkHistoryRepository artworkHistoryRepository) {
+    public ArtworkServiceImpl(ArtworkRepository artworkRepository,
+                              ArtworkHistoryRepository artworkHistoryRepository)
+    {
         this.artworkRepository = artworkRepository;
         this.artworkHistoryRepository = artworkHistoryRepository;
     }
 
     @Override
-    public ArtworkDto saveArtwork(ArtworkDto artworkDto) {
-        log.info("ArtworkServiceImpl.submitArtwork - start | artworkDto: {}", artworkDto);
-        requireNonNull(artworkDto);
-        var artwork = MAPPER.toEntity(artworkDto);
+    public ArtworkDto saveArtwork(ArtworkDto dto) {
+        log.info("ArtworkServiceImpl.submitArtwork - start | dto: {}", dto);
+        requireNonNull(dto);
+        var artwork = MAPPER.toEntity(dto);
         artwork = artworkRepository.saveAndFlush(artwork);
-        if(artworkDto.getHistory() != null) saveArtworkHistory(artwork, artworkDto);
-        log.info("ArtworkServiceImpl.submitArtwork - end | artworkDto: {}", artworkDto);
-        return MAPPER.toDto(artwork);
+        if (dto.getHistory() != null)
+            saveArtworkHistory(artwork, dto);
+        var artworkDto = MAPPER.toDto(artwork);
+        log.info("ArtworkServiceImpl.submitArtwork - end | dto: {}", dto);
+        return artworkDto;
     }
 
     private void saveArtworkHistory(Artwork artwork, ArtworkDto artworkDto) {
@@ -39,4 +43,5 @@ public class ArtworkServiceImpl implements IArtworkService {
         artworkHistory.setArtwork(artwork);
         artworkHistoryRepository.save(artworkHistory);
     }
+
 }
