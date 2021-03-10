@@ -4,8 +4,11 @@ import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
 import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
+import com.bloxico.ase.userservice.repository.document.DocumentRepository;
+import com.bloxico.ase.userservice.repository.token.PendingEvaluatorDocumentRepository;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
+import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.*;
@@ -46,6 +49,9 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Autowired private PendingEvaluatorRepository pendingEvaluatorRepository;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UserRegistrationFacadeImpl userRegistrationFacade;
+    @Autowired private DocumentRepository documentRepository;
+    @Autowired private PendingEvaluatorDocumentRepository pendingEvaluatorDocumentRepository;
+    @Autowired private UserProfileRepository userProfileRepository;
 
     @Test
     public void registration_400_passwordMismatch() {
@@ -405,6 +411,9 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .then()
                 .assertThat()
                 .statusCode(200);
+        var pendingEvaluatorDocument = pendingEvaluatorDocumentRepository.findByPendingEvaluatorDocumentId_Email(registration.getEmail());
+        var foundDokument = documentRepository.findById(pendingEvaluatorDocument.get().getPendingEvaluatorDocumentId().getDocumentId());
+        assertNotNull(amazonS3.getObject(bucketName, foundDokument.get().getPath()));
     }
 
     @Test
@@ -476,6 +485,9 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
         assertEquals(evaluatorDto.getUserProfile().getGender(), request.get("gender"));
         assertEquals(evaluatorDto.getUserProfile().getLocation().getCountry().getName(), request.get("country"));
         assertEquals(evaluatorDto.getUserProfile().getLocation().getAddress(), request.get("address"));
+        var userProfile = userProfileRepository.findById(evaluatorDto.getUserProfile().getId());
+        var foundDokument = documentRepository.findById(userProfile.get().getDocument().getId());
+        assertNotNull(amazonS3.getObject(bucketName, foundDokument.get().getPath()));
     }
 
     @Test
@@ -538,6 +550,9 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
         assertEquals(artOwnerDto.getUserProfile().getGender(), request.get("gender"));
         assertEquals(artOwnerDto.getUserProfile().getLocation().getCountry().getName(), request.get("country"));
         assertEquals(artOwnerDto.getUserProfile().getLocation().getAddress(), request.get("address"));
+        var userProfile = userProfileRepository.findById(artOwnerDto.getUserProfile().getId());
+        var foundDokument = documentRepository.findById(userProfile.get().getDocument().getId());
+        assertNotNull(amazonS3.getObject(bucketName, foundDokument.get().getPath()));
     }
 
     @Test

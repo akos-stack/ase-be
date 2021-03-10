@@ -2,11 +2,16 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
+import com.bloxico.ase.userservice.entity.document.Document;
 import com.bloxico.ase.userservice.exception.ArtworkException;
+import com.bloxico.ase.userservice.repository.artwork.ArtworkGroupRepository;
+import com.bloxico.ase.userservice.repository.artwork.ArtworkRepository;
+import com.bloxico.ase.userservice.repository.document.DocumentRepository;
 import com.bloxico.ase.userservice.service.artwork.impl.ArtworkGroupServiceImpl;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
@@ -15,6 +20,9 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilArtwork utilArtwork;
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private ArtworkGroupServiceImpl artworkGroupService;
+    @Autowired private ArtworkGroupRepository artworkGroupRepository;
+    @Autowired private ArtworkRepository artworkRepository;
+    @Autowired private DocumentRepository documentRepository;
 
     @Test
     public void submitArtwork_groupNotFound() {
@@ -50,9 +58,16 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     public void submitArtwork_createNewGroup() {
         var artOwnerDto = utilUserProfile.savedArtOwnerDto();
         var submitArtworkRequest = utilArtwork.genSaveArtworkRequest(ArtworkGroup.Status.DRAFT, true, null);
-        var saveArtworkResponse = artworkFacade.submitArtwork(submitArtworkRequest, artOwnerDto.getUserProfile().getUserId());
+        var saveArtworkResponse = artworkFacade.submitArtwork(submitArtworkRequest, artOwnerDto.getUserProfile().getUserId());;
         assertNotNull(saveArtworkResponse);
         assertNotNull(saveArtworkResponse.getGroupDto().getId());
+
+        var artwork = artworkRepository.findByGroup_Id(saveArtworkResponse.getGroupDto().getId());
+        var listOfDocuments = artwork.getDocuments();
+        for (Document dok: listOfDocuments) {
+            var foundDokument = documentRepository.findById(dok.getId());
+            assertNotNull(amazonS3.getObject(bucketName, foundDokument.get().getPath()));
+        }
     }
 
     @Test
@@ -63,6 +78,13 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
         var saveArtworkResponse = artworkFacade.submitArtwork(submitArtworkRequest, artOwnerDto.getUserProfile().getUserId());
         assertNotNull(saveArtworkResponse);
         assertSame(artworkGroupService.findGroupById(saveArtworkResponse.getGroupDto().getId()).getStatus(), ArtworkGroup.Status.DRAFT);
+
+        var artwork = artworkRepository.findByGroup_Id(saveArtworkResponse.getGroupDto().getId());
+        var listOfDocuments = artwork.getDocuments();
+        for (Document dok: listOfDocuments) {
+            var foundDokument = documentRepository.findById(dok.getId());
+            assertNotNull(amazonS3.getObject(bucketName, foundDokument.get().getPath()));
+        }
     }
 
     @Test
@@ -73,6 +95,13 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
         var saveArtworkResponse = artworkFacade.submitArtwork(submitArtworkRequest, artOwnerDto.getUserProfile().getUserId());
         assertNotNull(saveArtworkResponse);
         assertSame(artworkGroupService.findGroupById(saveArtworkResponse.getGroupDto().getId()).getStatus(), ArtworkGroup.Status.WAITING_FOR_EVALUATION);
+
+        var artwork = artworkRepository.findByGroup_Id(saveArtworkResponse.getGroupDto().getId());
+        var listOfDocuments = artwork.getDocuments();
+        for (Document dok: listOfDocuments) {
+            var foundDokument = documentRepository.findById(dok.getId());
+            assertNotNull(amazonS3.getObject(bucketName, foundDokument.get().getPath()));
+        }
     }
 
 }

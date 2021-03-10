@@ -32,6 +32,7 @@ public class DocumentServiceImplTest extends AbstractSpringTestWithAWS {
         assertNotNull(newlyCreatedDoc);
         assertTrue(documentRepository.findById(newlyCreatedDoc.getId()).isPresent());
         assertNotNull(s3Service.downloadFile(newlyCreatedDoc.getPath()));
+        assertNotNull(amazonS3.getObject(bucketName, newlyCreatedDoc.getPath()));
     }
 
     @Test
@@ -52,5 +53,6 @@ public class DocumentServiceImplTest extends AbstractSpringTestWithAWS {
     public void getDocument() {
         var documentDto = utilDocument.savedDocumentDto(FileCategory.CV);
         assertNotNull(documentService.getDocumentById(documentDto.getId()));
+        assertNotNull(amazonS3.getObject(bucketName, documentDto.getPath()));
     }
 }

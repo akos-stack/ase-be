@@ -2,10 +2,13 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.exception.*;
+import com.bloxico.ase.userservice.repository.document.DocumentRepository;
+import com.bloxico.ase.userservice.repository.token.PendingEvaluatorDocumentRepository;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
 import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
+import com.bloxico.ase.userservice.repository.user.profile.UserProfileDocumentRepository;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import com.bloxico.ase.userservice.web.model.token.*;
@@ -38,6 +41,9 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private ArtOwnerRepository artOwnerRepository;
     @Autowired private PendingEvaluatorRepository pendingEvaluatorRepository;
     @Autowired private UserRegistrationFacadeImpl userRegistrationFacade;
+    @Autowired private UserProfileDocumentRepository userProfileDocumentRepository;
+    @Autowired private DocumentRepository documentRepository;
+    @Autowired private PendingEvaluatorDocumentRepository pendingEvaluatorDocumentRepository;
 
     @Test
     public void registerUserWithVerificationToken_nullRequest() {
@@ -368,10 +374,14 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void submitEvaluator_evaluatorPending() {
+    public void submitEvaluator_evaluatorPending(){
         var request = utilToken.submitInvitedEvaluatorRequest();
-        var evaluatorId = userRegistrationFacade.submitEvaluator(request).getId();
-        assertTrue(evaluatorRepository.findById(evaluatorId).isPresent());
+        var evaluatorDto = userRegistrationFacade.submitEvaluator(request);
+        assertTrue(evaluatorRepository.findById( evaluatorDto.getId()).isPresent());
+
+        var userProfileDocument = userProfileDocumentRepository.findByUserProfileDocumentId_UserProfileId(evaluatorDto.getUserProfile().getId());
+        var foundDokument = documentRepository.findById(userProfileDocument.get().getUserProfileDocumentId().getDocumentId());
+        assertNotNull(amazonS3.getObject(bucketName, foundDokument.get().getPath()));
     }
 
     @Test
@@ -402,8 +412,14 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void submitArtOwner() {
         var request = utilUserProfile.newSubmitArtOwnerRequest();
         assertTrue(artOwnerRepository.findAll().isEmpty());
-        var artOwnerId = userRegistrationFacade.submitArtOwner(request).getId();
-        assertTrue(artOwnerRepository.findById(artOwnerId).isPresent());
+        var artOwnerDto = userRegistrationFacade.submitArtOwner(request);
+        assertTrue(artOwnerRepository.findById(artOwnerDto.getId()).isPresent());
+
+        var userProfileDocument = userProfileDocumentRepository
+                .findByUserProfileDocumentId_UserProfileId(artOwnerDto.getUserProfile().getId());
+        var foundDokument = documentRepository
+                .findById(userProfileDocument.get().getUserProfileDocumentId().getDocumentId());
+        assertNotNull(amazonS3.getObject(bucketName, foundDokument.get().getPath()));
     }
 
     @Test
@@ -445,7 +461,6 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Test
     public void requestEvaluatorRegistration() {
         var user = utilUser.savedUser();
-
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         userRegistrationFacade.requestEvaluatorRegistration(request, user.getId());
 
@@ -457,6 +472,12 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertEquals(user.getEmail(), newlyCreatedPendingEvaluator.getEmail());
         assertEquals(user.getId(), newlyCreatedPendingEvaluator.getCreatorId());
         assertSame(REQUESTED, newlyCreatedPendingEvaluator.getStatus());
+
+        var pendingEvaluatorDocument = pendingEvaluatorDocumentRepository
+                .findByPendingEvaluatorDocumentId_Email(user.getEmail());
+        var foundDokument = documentRepository
+                .findById(pendingEvaluatorDocument.get().getPendingEvaluatorDocumentId().getDocumentId());
+        assertNotNull(amazonS3.getObject(bucketName, foundDokument.get().getPath()));
     }
 
     @Test

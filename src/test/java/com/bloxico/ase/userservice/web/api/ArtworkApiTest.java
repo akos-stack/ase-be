@@ -2,6 +2,9 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
+import com.bloxico.ase.userservice.repository.artwork.ArtworkGroupRepository;
+import com.bloxico.ase.userservice.repository.artwork.ArtworkRepository;
+import com.bloxico.ase.userservice.repository.document.DocumentRepository;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
 import org.junit.Test;
@@ -25,6 +28,9 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilArtwork utilArtwork;
     @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private ArtworkRepository artworkRepository;
+    @Autowired private DocumentRepository documentRepository;
+    @Autowired private ArtworkGroupRepository artworkGroupRepository;
 
     @Test
     public void submitArtwork_notAuthorized() {
