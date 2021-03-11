@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Api(value = "system")
 public interface SystemApi {
 
+    // @formatter:off
     String SYSTEM_CONSTANTS = "/system/constants";
+    // @formatter:on
 
     @GetMapping(
             value = SYSTEM_CONSTANTS,

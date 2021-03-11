@@ -12,9 +12,11 @@ import org.springframework.web.multipart.MultipartFile;
 @Api(value = "s3")
 public interface S3Api {
 
+    // @formatter:off
     String S3_VALIDATE = "/s3/validate";
     String S3_DOWNLOAD = "/s3/download";
     String S3_DELETE   = "/s3/delete";
+    // @formatter:on
 
     @PostMapping(
             value = S3_VALIDATE,

@@ -19,6 +19,7 @@ import javax.validation.constraints.Min;
 @Api(value = "registration")
 public interface UserRegistrationApi {
 
+    // @formatter:off
     String REGISTRATION_ENDPOINT                      = "/user/registration";
     String REGISTRATION_CONFIRM_ENDPOINT              = "/user/registration/confirm";
     String REGISTRATION_TOKEN_REFRESH_ENDPOINT        = "/user/registration/token/refresh";
@@ -32,6 +33,7 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_REQUEST             = "/user/registration/evaluator/request";
     String REGISTRATION_EVALUATOR_SEARCH              = "/user/registration/evaluator/search";
     String REGISTRATION_EVALUATOR_RESUME_DOWNLOAD     = "/user/registration/evaluator/resume";
+    // @formatter:on
 
     String TOKEN_PARAM = "token";
 
