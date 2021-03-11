@@ -28,7 +28,9 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     private final PendingEvaluatorDocumentRepository pendingEvaluatorDocumentRepository;
 
     @Autowired
-    public PendingEvaluatorServiceImpl(PendingEvaluatorRepository pendingEvaluatorRepository, PendingEvaluatorDocumentRepository pendingEvaluatorDocumentRepository) {
+    public PendingEvaluatorServiceImpl(PendingEvaluatorRepository pendingEvaluatorRepository,
+                                       PendingEvaluatorDocumentRepository pendingEvaluatorDocumentRepository)
+    {
         this.pendingEvaluatorRepository = pendingEvaluatorRepository;
         this.pendingEvaluatorDocumentRepository = pendingEvaluatorDocumentRepository;
     }

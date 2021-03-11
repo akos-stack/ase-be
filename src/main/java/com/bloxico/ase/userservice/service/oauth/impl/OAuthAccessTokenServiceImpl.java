@@ -15,8 +15,12 @@ import static java.util.Objects.requireNonNull;
 @Service
 public class OAuthAccessTokenServiceImpl implements IOAuthAccessTokenService {
 
+    private final OAuthAccessTokenRepository oAuthAccessTokenRepository;
+
     @Autowired
-    private OAuthAccessTokenRepository oAuthAccessTokenRepository;
+    public OAuthAccessTokenServiceImpl(OAuthAccessTokenRepository oAuthAccessTokenRepository) {
+        this.oAuthAccessTokenRepository = oAuthAccessTokenRepository;
+    }
 
     @Override
     public List<OAuthAccessTokenDto> deleteTokensByEmail(String email) {
