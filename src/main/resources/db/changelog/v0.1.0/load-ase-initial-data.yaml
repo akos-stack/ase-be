@@ -28,6 +28,10 @@ databaseChangeLog:
         file: db/changelog/v0.1.0/initial_data/permissions/05_evaluation.csv
         tableName: permissions
     - loadData:
+          encoding: UTF-8
+          file: db/changelog/v0.1.0/initial_data/permissions/06_config.csv
+          tableName: permissions
+    - loadData:
         encoding: UTF-8
         file: db/changelog/v0.1.0/initial_data/roles_permissions/01_user.csv
         tableName: roles_permissions

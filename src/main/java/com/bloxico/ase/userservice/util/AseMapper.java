@@ -52,6 +52,7 @@ import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
 import com.bloxico.ase.userservice.web.model.address.UpdateCountryRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkRequest;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.IArtworkMetadataRequest;
+import com.bloxico.ase.userservice.web.model.config.SaveConfigRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveQuotationPackageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsRequest;
@@ -229,5 +230,7 @@ public interface AseMapper {
 
     @Mapping(source = "groupId", target = "id")
     ArtworkGroupDto toArtworkGroupDto(SaveArtworkRequest request);
+
+    ConfigDto toDto(SaveConfigRequest request);
 
 }
