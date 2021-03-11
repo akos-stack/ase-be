@@ -231,6 +231,11 @@ public interface AseMapper {
     @Mapping(source = "groupId", target = "id")
     ArtworkGroupDto toArtworkGroupDto(SaveArtworkRequest request);
 
-    ConfigDto toDto(SaveConfigRequest request);
+    default ConfigDto toDto(SaveConfigRequest request) {
+        var dto = new ConfigDto();
+        dto.setType(request.getType());
+        dto.setValue(request.getValue().toString());
+        return dto;
+    }
 
 }

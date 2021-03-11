@@ -18,7 +18,16 @@ import static javax.persistence.EnumType.STRING;
 public class Config extends BaseEntity {
 
     public enum Type {
-        QUOTATION_PACKAGE_MIN_EVALUATIONS
+        QUOTATION_PACKAGE_MIN_EVALUATIONS {
+            @Override
+            public boolean validate(Object value) {
+                if (!Integer.class.isAssignableFrom(value.getClass())) return false;
+                var intValue = (int) value;
+                return intValue > 0;
+            }
+        };
+
+        public abstract boolean validate(Object value);
     }
 
     @Column(name = "type", unique = true)

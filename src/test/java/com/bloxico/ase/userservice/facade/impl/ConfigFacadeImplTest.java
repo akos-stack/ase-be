@@ -71,7 +71,7 @@ public class ConfigFacadeImplTest extends AbstractSpringTest {
     public void saveConfig_nullValue() {
         var request = utilConfig.genSaveConfigRequest(randEnumConst(Type.class), null);
         assertThrows(
-                DataIntegrityViolationException.class,
+                NullPointerException.class,
                 () -> configFacade.saveConfig(request));
     }
 

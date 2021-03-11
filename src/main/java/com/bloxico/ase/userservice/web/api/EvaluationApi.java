@@ -24,8 +24,6 @@ public interface EvaluationApi {
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE     = "/evaluation/management/country-details/delete";
     String EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH      = "/evaluation/management/region-details";
     String EVALUATION_QUOTATION_PACKAGE_SAVE                = "/evaluation/quotation-package/save";
-    String EVALUATION_QUOTATION_PACKAGE_MIN_EVALUATIONS     = "/evaluation/quotation-package/min-evaluations";
-    String EVALUATION_QUOTATION_PACKAGE_MIN_EVALUATIONS_SET = "/evaluation/quotation-package/min-evaluations/set";
 
     @GetMapping(
             value = EVALUATION_COUNTRY_DETAILS_SEARCH,
