@@ -43,4 +43,4 @@
 
 ---
 
-[<: Application Setup](application_setup.md) | [Codebase Overview :>](codebase_overview.md)
+[<: Postman Setup](postman_setup.md) | [Codebase Overview :>](codebase_overview.md)

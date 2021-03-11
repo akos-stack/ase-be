@@ -29,7 +29,7 @@ public class DocumentServiceImpl implements IDocumentService {
 
     @Override
     public DocumentDto saveDocument(MultipartFile file, FileCategory type) {
-         return saveDocument(file, type, null);
+        return saveDocument(file, type, null);
     }
 
     @Override
@@ -39,19 +39,25 @@ public class DocumentServiceImpl implements IDocumentService {
         var document = new Document();
         document.setPath(path);
         document.setType(type);
-        if(principalId != null) {
+        if (principalId != null) {
             document.setCreatorId(principalId);
         }
+        var documentDto = MAPPER.toDto(documentRepository.save(document));
         log.info("DocumentServiceImpl.saveDocument - end | file: {}, fileCategory: {}", file, type);
-        return MAPPER.toDto(documentRepository.save(document));
+        return documentDto;
     }
 
     @Override
     public ByteArrayResource getDocumentById(Long id) {
         log.info("DocumentServiceImpl.getDocumentById - start | id: {} ", id);
         requireNonNull(id);
-        var document = documentRepository.findById(id).orElseThrow(DOCUMENT_NOT_FOUND::newException);
+        var document = documentRepository
+                .findById(id)
+                .map(Document::getPath)
+                .map(s3Service::downloadFile)
+                .orElseThrow(DOCUMENT_NOT_FOUND::newException);
         log.info("DocumentServiceImpl.getDocumentById - start | id: {} ", id);
-        return s3Service.downloadFile(document.getPath());
+        return document;
     }
+
 }

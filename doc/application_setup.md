@@ -47,4 +47,4 @@
 
 ---
 
-[<: Home](../README.md) | [IntelliJ IDEA Setup :>](intellij_idea_setup.md)
+[<: Home](../README.md) | [Postman Setup :>](postman_setup.md)

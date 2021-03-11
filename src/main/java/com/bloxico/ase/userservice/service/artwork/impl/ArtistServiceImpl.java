@@ -20,11 +20,13 @@ public class ArtistServiceImpl implements IArtistService {
     }
 
     @Override
-    public ArtistDto saveArtist(ArtistDto artistDto) {
-        log.info("ArtistService.saveArtist - start | artistDto: {}, principalId: {} ", artistDto);
-        requireNonNull(artistDto);
-        var artist = MAPPER.toEntity(artistDto);
-        log.info("ArtistService.saveArtist - end | artistDto: {}, principalId: {} ", artistDto);
-        return MAPPER.toDto(artistRepository.save(artist));
+    public ArtistDto saveArtist(ArtistDto dto) {
+        log.info("ArtistService.saveArtist - start | dto: {}", dto);
+        requireNonNull(dto);
+        var artist = MAPPER.toEntity(dto);
+        var artistDto = MAPPER.toDto(artistRepository.save(artist));
+        log.info("ArtistService.saveArtist - end | dto: {}", dto);
+        return artistDto;
     }
+
 }

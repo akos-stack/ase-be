@@ -163,7 +163,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(2, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertThat(
                     page.getContent(),
                     allOf(
@@ -187,7 +187,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(1, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertThat(
                     page.getContent(),
                     allOf(
@@ -241,7 +241,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(2, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r2, r3), page.getContent());
         }
         {
@@ -262,7 +262,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(1, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r1), page.getContent());
         }
     }
@@ -292,7 +292,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(2, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r1, r2), page.getContent());
         }
         {
@@ -313,7 +313,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(1, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r3), page.getContent());
         }
     }
@@ -344,7 +344,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(2, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r3, r2), page.getContent());
         }
         {
@@ -366,7 +366,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(1, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r1), page.getContent());
         }
     }
@@ -397,7 +397,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(2, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r1, r2), page.getContent());
         }
         {
@@ -419,7 +419,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(1, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r3), page.getContent());
         }
     }

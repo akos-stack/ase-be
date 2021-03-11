@@ -40,12 +40,13 @@ public class ArtworkGroupServiceImpl implements IArtworkGroupService {
         var group = artworkGroupRepository
                 .findById(dto.getId())
                 .orElseThrow(ARTWORK_GROUP_NOT_FOUND::newException);
-        if(group.getStatus() != dto.getStatus()) {
+        if (group.getStatus() != dto.getStatus()) {
             group.setStatus(dto.getStatus());
             group = artworkGroupRepository.saveAndFlush(group);
         }
+        var groupDto = MAPPER.toDto(group);
         log.info("ArtworkGroupServiceImpl.findOrUpdateGroup - end | dto: {}", dto);
-        return MAPPER.toDto(group);
+        return groupDto;
     }
 
     @Override
@@ -53,7 +54,9 @@ public class ArtworkGroupServiceImpl implements IArtworkGroupService {
         log.info("ArtworkGroupServiceImpl.saveGroup - start | dto: {} ", dto);
         requireNonNull(dto);
         var artworkGroup = MAPPER.toEntity(dto);
+        var artworkGroupDto = MAPPER.toDto(artworkGroupRepository.save(artworkGroup));
         log.info("ArtworkGroupServiceImpl.saveGroup - end | dto: {} ", dto);
-        return MAPPER.toDto(artworkGroupRepository.save(artworkGroup));
+        return artworkGroupDto;
     }
+
 }
