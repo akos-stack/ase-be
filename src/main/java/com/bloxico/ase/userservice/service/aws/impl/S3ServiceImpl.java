@@ -41,7 +41,7 @@ public class S3ServiceImpl implements IS3Service {
 
     @Override
     public Map<String, Set<ErrorCodes.AmazonS3>> validateFiles(FileCategory category, List<MultipartFile> files) {
-        log.debug("S3ServiceImpl.validateFile - start | category: {}, files: {}", category, files);
+        log.debug("S3ServiceImpl.validateFile - start | category: {}, files: {}", category, files.listIterator().next().getOriginalFilename());
         requireNonNull(category);
         requireNonNull(files);
         var invalidFiles = files
@@ -51,7 +51,7 @@ public class S3ServiceImpl implements IS3Service {
                         category.fileErrors(file, environment)))
                 .filter(entry -> !entry.getValue().isEmpty())
                 .collect(toMap(Entry::getKey, Entry::getValue));
-        log.debug("S3ServiceImpl.validateFile - end | category: {}, files: {}", category, files);
+        log.debug("S3ServiceImpl.validateFile - end | category: {}, files: {}", category, files.listIterator().next().getOriginalFilename());
         return invalidFiles;
     }
 

@@ -1,7 +1,5 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.util.FileCategory;
-import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.aws.ValidateFilesRequest;
 import com.bloxico.ase.userservice.web.model.aws.ValidateFilesResponse;
 import io.swagger.annotations.*;
@@ -10,10 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.util.*;
 
 @Api(value = "s3")
 public interface S3Api {

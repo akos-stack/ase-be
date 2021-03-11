@@ -2,7 +2,6 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.facade.IS3Facade;
 import com.bloxico.ase.userservice.service.aws.IS3Service;
-import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.model.aws.ValidateFilesRequest;
 import com.bloxico.ase.userservice.web.model.aws.ValidateFilesResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service

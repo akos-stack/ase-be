@@ -32,11 +32,13 @@ public class ValidateFilesRequest {
 
     @Override
     public String toString() {
-        var newList = new ArrayList<String>();
-        for (MultipartFile file : files) { newList.add(file.getOriginalFilename()); }
+        var fileNames = new ArrayList<String>();
+        for (MultipartFile file : files) { fileNames.add(file.getOriginalFilename()); }
         return "ValidateFilesRequest{" +
-                "files=" + newList +
+                "files=" + fileNames +
                 ", fileCategory=" + fileCategory +
                 '}';
     }
+
+
 }
