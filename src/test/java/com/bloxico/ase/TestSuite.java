@@ -60,6 +60,7 @@ import org.junit.runners.Suite;
         EvaluationFacadeImplTest.class,
         ArtworkFacadeImplTest.class,
         AWSUtilTest.class,
+        ConfigFacadeImplTest.class,
 
         // filter
         JwtAuthorizationFilterTest.class,
@@ -72,7 +73,8 @@ import org.junit.runners.Suite;
         UserManagementApiTest.class,
         ArtworkMetadataApiTest.class,
         ArtworkApiTest.class,
-        EvaluationApiTest.class
+        EvaluationApiTest.class,
+        ConfigApiTest.class
 })
 public class TestSuite {
 }

@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.service.config.impl;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilConfig;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
+import com.bloxico.ase.userservice.exception.ConfigException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,6 +21,16 @@ public class ConfigServiceImplTest extends AbstractSpringTest {
         assertThrows(
                 NullPointerException.class,
                 () -> configService.findConfigByType(null));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void findConfigByType_notFound() {
+        var config = utilConfig.savedConfigDto();
+        utilConfig.deleteConfigById(config.getId());
+        assertThrows(
+                ConfigException .class,
+                () -> configService.findConfigByType(config.getType()));
     }
 
     @Test

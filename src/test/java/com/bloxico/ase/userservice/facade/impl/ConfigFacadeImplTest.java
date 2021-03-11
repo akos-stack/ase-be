@@ -4,6 +4,7 @@ import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilConfig;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.entity.config.Config.Type;
+import com.bloxico.ase.userservice.exception.ConfigException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -16,6 +17,37 @@ public class ConfigFacadeImplTest extends AbstractSpringTest {
 
     @Autowired private UtilConfig utilConfig;
     @Autowired private ConfigFacadeImpl configFacade;
+
+    @Test
+    @WithMockCustomUser
+    public void searchConfig_nullType() {
+        assertThrows(
+                NullPointerException.class,
+                () -> configFacade.searchConfig(null));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchConfig_notFound() {
+        var config = utilConfig.savedConfigDto();
+        utilConfig.deleteConfigById(config.getId());
+        assertThrows(
+                ConfigException.class,
+                () -> configFacade.searchConfig(config.getType()));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchConfig() {
+        var config = utilConfig.savedConfigDto();
+        var foundConfig = configFacade
+                .searchConfig(config.getType())
+                .getConfig();
+        assertNotNull(foundConfig);
+        assertEquals(config.getId(), foundConfig.getId());
+        assertEquals(config.getType(), foundConfig.getType());
+        assertEquals(config.getValue(), foundConfig.getValue());
+    }
 
     @Test
     @WithMockCustomUser
