@@ -3,6 +3,7 @@ package com.bloxico.ase.testutil;
 import com.bloxico.ase.userservice.dto.entity.config.ConfigDto;
 import com.bloxico.ase.userservice.entity.config.Config.Type;
 import com.bloxico.ase.userservice.service.config.impl.ConfigServiceImpl;
+import com.bloxico.ase.userservice.web.model.config.SaveConfigRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,14 @@ public class UtilConfig {
         configDto.setType(type);
         configDto.setValue(value);
         return configDto;
+    }
+
+    public SaveConfigRequest genSaveConfigRequest() {
+        return genSaveConfigRequest(randEnumConst(Type.class), genUUID());
+    }
+
+    public SaveConfigRequest genSaveConfigRequest(Type type, String value) {
+        return new SaveConfigRequest(type, value);
     }
 
 }

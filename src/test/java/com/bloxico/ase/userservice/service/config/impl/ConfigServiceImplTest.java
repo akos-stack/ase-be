@@ -15,7 +15,7 @@ public class ConfigServiceImplTest extends AbstractSpringTest {
     @Autowired private ConfigServiceImpl configService;
 
     @Test
-    @WithMockCustomUser(role = "user")
+    @WithMockCustomUser
     public void findConfigByType_nullType() {
         assertThrows(
                 NullPointerException.class,
@@ -23,7 +23,7 @@ public class ConfigServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
-    @WithMockCustomUser(role = "user")
+    @WithMockCustomUser
     public void findConfigByType() {
         var config = utilConfig.savedConfigDto();
         var foundConfig = configService.findConfigByType(config.getType());
@@ -62,11 +62,11 @@ public class ConfigServiceImplTest extends AbstractSpringTest {
     @WithMockCustomUser
     public void saveOrUpdateConfig() {
         var dto = utilConfig.genConfigDto();
-        var saveOrUpdatedConfig = configService.saveOrUpdateConfig(dto);
-        assertNotNull(saveOrUpdatedConfig);
-        assertNotNull(saveOrUpdatedConfig.getId());
-        assertEquals(dto.getType(), saveOrUpdatedConfig.getType());
-        assertEquals(dto.getValue(), saveOrUpdatedConfig.getValue());
+        var config = configService.saveOrUpdateConfig(dto);
+        assertNotNull(config);
+        assertNotNull(config.getId());
+        assertEquals(dto.getType(), config.getType());
+        assertEquals(dto.getValue(), config.getValue());
     }
 
 }
