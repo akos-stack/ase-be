@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiParam;
 import lombok.*;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.JpaSort;
 
 import javax.validation.constraints.Min;
@@ -12,7 +13,6 @@ import javax.validation.constraints.NotNull;
 
 import static lombok.AccessLevel.PRIVATE;
 import static org.springframework.data.domain.Sort.Direction.ASC;
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Value
 @AllArgsConstructor
@@ -33,21 +33,16 @@ public class PageRequest {
     @ApiParam(name = "sort")
     String sort;
 
-    @NullOrNotBlank
     @ApiParam(name = "order")
-    String order;
+    Direction order;
 
     @JsonIgnore
     @SuppressWarnings("ConstantConditions")
     public Pageable toPageable() {
-        if (sort == null)
-            return org.springframework.data.domain.PageRequest.of(page, size);
-        var unsafeSortProperty = String.format("(%s)", sort);
-        return org.springframework.data.domain.PageRequest.of(
-                page, size,
-                "desc".equalsIgnoreCase(order == null ? "asc" : order)
-                        ? JpaSort.unsafe(DESC, unsafeSortProperty)
-                        : JpaSort.unsafe(ASC, unsafeSortProperty));
+        return sort == null
+                ? org.springframework.data.domain.PageRequest.of(page, size)
+                : org.springframework.data.domain.PageRequest.of(page, size,
+                JpaSort.unsafe(order == null ? ASC : order, "(" + sort + ")"));
     }
 
 }

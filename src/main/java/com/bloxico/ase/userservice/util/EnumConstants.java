@@ -5,6 +5,7 @@ import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
+import org.springframework.data.domain.Sort;
 
 import java.util.*;
 
@@ -75,6 +76,13 @@ public enum EnumConstants {
         @Override
         protected List<ArtworkGroup.Status> constants() {
             return List.of(ArtworkGroup.Status.values());
+        }
+    },
+
+    SORT_ORDER {
+        @Override
+        protected List<Sort.Direction> constants() {
+            return List.of(Sort.Direction.values());
         }
     };
 
