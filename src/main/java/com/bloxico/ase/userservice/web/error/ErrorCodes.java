@@ -4,12 +4,27 @@ import com.bloxico.ase.userservice.exception.*;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import java.util.Map;
+
 public interface ErrorCodes {
 
     AseRuntimeException newException(Throwable cause);
 
     default AseRuntimeException newException() {
         return newException(null);
+    }
+
+    HttpStatus getHttpStatus();
+
+    String getCode();
+
+    String getDescription();
+
+    default Map<String, String> asMap() {
+        return Map.of(
+                "code", getCode(),
+                "description", getDescription(),
+                "http_status", getHttpStatus().toString());
     }
 
     @Getter

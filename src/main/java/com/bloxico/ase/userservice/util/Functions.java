@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.util;
 
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 
 public class Functions {
 
@@ -13,6 +12,12 @@ public class Functions {
         return x -> {
             c.accept(x);
             return x;
+        };
+    }
+
+    public static <T> BinaryOperator<T> throwingMerger() {
+        return (u, v) -> {
+            throw new IllegalStateException(String.format("Duplicate key %s", u));
         };
     }
 
