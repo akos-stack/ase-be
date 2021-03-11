@@ -18,32 +18,18 @@ import java.util.*;
 @Api(value = "s3")
 public interface S3Api {
 
-    String S3_VALIDATE      = "/s3/validate";
     String S3_INVALID_FILES = "/s3/invalid_files";
     String S3_DOWNLOAD      = "/s3/download";
     String S3_DELETE        = "/s3/delete";
-
-    @PostMapping(
-            value = S3_VALIDATE,
-            produces = {"application/json"},
-            consumes = {"multipart/form-data"})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'upload_file')")
-    @ApiOperation(value = "Uploads file to S3 bucket.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "File successfully uploaded.")
-    })
-    ResponseEntity<Void> validateFile(@RequestParam(name = "fileCategory") FileCategory category,
-                                      @RequestPart(value = "file") MultipartFile file);
 
     @PostMapping(
             value = S3_INVALID_FILES,
             produces = {"application/json"},
             consumes = {"multipart/form-data"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'upload_file')")
-    @ApiOperation(value = "Upload multiple files to S3 bucket.") // TODO fix message
+    @ApiOperation(value = "Validate multiple files before uploading to S3 bucket.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Files successfully uploaded."),
-            @ApiResponse(code = 400, message = "Invalid files.")
+            @ApiResponse(code = 200, message = "Returned list of incorrect files and error codes or empty list.")
     })
     ResponseEntity<ValidateFilesResponse> invalidFiles(@Valid ValidateFilesRequest validateFilesRequest);
 

@@ -32,11 +32,11 @@ public class S3ServiceImpl implements IS3Service {
 
     @Override
     public void validateFile(FileCategory category, MultipartFile file) {
-        log.debug("S3ServiceImpl.validateFile - start | category: {}, file: {}", category, file.getName());
+        log.debug("S3ServiceImpl.validateFile - start | category: {}, file: {}", category, file.getOriginalFilename());
         requireNonNull(category);
         requireNonNull(file);
         category.validate(file, environment);
-        log.debug("S3ServiceImpl.validateFile - end | category: {}, file: {}", category, file.getName());
+        log.debug("S3ServiceImpl.validateFile - end | category: {}, file: {}", category, file.getOriginalFilename());
     }
 
     @Override

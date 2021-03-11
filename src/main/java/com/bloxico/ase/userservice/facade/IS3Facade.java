@@ -8,8 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IS3Facade {
 
-    void validateFile(FileCategory category, MultipartFile file);
-
     ValidateFilesResponse invalidFiles(ValidateFilesRequest validateFilesRequest);
 
     ByteArrayResource downloadFile(String path);

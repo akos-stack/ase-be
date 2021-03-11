@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -29,4 +30,13 @@ public class ValidateFilesRequest {
     @ApiModelProperty(required = true)
     FileCategory fileCategory;
 
+    @Override
+    public String toString() {
+        var newList = new ArrayList<String>();
+        for (MultipartFile file : files) { newList.add(file.getOriginalFilename()); }
+        return "ValidateFilesRequest{" +
+                "files=" + newList +
+                ", fileCategory=" + fileCategory +
+                '}';
+    }
 }

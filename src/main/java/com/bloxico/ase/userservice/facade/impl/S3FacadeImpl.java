@@ -25,20 +25,13 @@ public class S3FacadeImpl implements IS3Facade {
     }
 
     @Override
-    public void validateFile(FileCategory category, MultipartFile file) {
-        log.info("S3FacadeImpl.validateFile - start | category: {}, file: {} ", category, file.getName());
-        s3Service.validateFile(category, file);
-        log.info("S3FacadeImpl.validateFile - end | category: {}, file: {} ", category, file.getName());
-    }
-
-    @Override
     public ValidateFilesResponse invalidFiles(ValidateFilesRequest validateFilesRequest) {
-        log.info("S3FacadeImpl.validateFiles - start | validateFilesRequest: {} ", validateFilesRequest);
+        log.info("S3FacadeImpl.invalidFiles - start | validateFilesRequest: {} ", validateFilesRequest.toString());
         var invalidFiles = s3Service.validateFiles(
                 validateFilesRequest.getFileCategory(),
                 validateFilesRequest.getFiles());
         var response = new ValidateFilesResponse(invalidFiles);
-        log.info("S3FacadeImpl.validateFiles - end | validateFilesRequest: {} ", validateFilesRequest);
+        log.info("S3FacadeImpl.invalidFiles - end | validateFilesRequest: {} ", validateFilesRequest.toString());
         return response;
     }
 
