@@ -74,17 +74,4 @@ public class EvaluationController implements EvaluationApi {
         return ResponseEntity.ok(response);
     }
 
-    @Override
-    public ResponseEntity<GetQuotationPackageMinEvaluationsResponse> getQuotationPackageMinEvaluations() {
-        var response= evaluationFacade.getQuotationPackageMinEvaluations();
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<SetQuotationPackageMinEvaluationsResponse> setQuotationPackageMinEvaluations(
-            SetQuotationPackageMinEvaluationsRequest request) {
-        var response= evaluationFacade.setQuotationPackageMinEvaluations(request);
-        return ResponseEntity.ok(response);
-    }
-
 }
