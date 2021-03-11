@@ -39,7 +39,7 @@ public interface S3Api {
             value = S3_INVALID_FILES,
             produces = {"application/json"},
             consumes = {"multipart/form-data"})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'upload_files')")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'upload_file')")
     @ApiOperation(value = "Upload multiple files to S3 bucket.") // TODO fix message
     @ApiResponses({
             @ApiResponse(code = 200, message = "Files successfully uploaded."),
