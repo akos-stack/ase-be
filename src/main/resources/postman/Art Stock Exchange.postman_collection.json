@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "5a0b4d77-4f25-45ad-a81b-718ab0e4d1f2",
+		"_postman_id": "3fa21845-abcc-4f1f-859c-156579bf1b37",
 		"name": "Art Stock Exchange",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -57,12 +57,12 @@
 								},
 								{
 									"key": "username",
-									"value": "sekuloskimilos@gmail.com",
+									"value": "ase.admin@mailinator.com",
 									"type": "text"
 								},
 								{
 									"key": "password",
-									"value": "Nikola123!",
+									"value": "Aser_Pr0",
 									"type": "text"
 								},
 								{
@@ -1237,81 +1237,6 @@
 							"response": []
 						}
 					]
-				},
-				{
-					"name": "Quotation Packages",
-					"item": [
-						{
-							"name": "Get minimum number of evaluations",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access_token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{endpoint_ase}}/api/evaluation/quotation-package/min-evaluations",
-									"host": [
-										"{{endpoint_ase}}"
-									],
-									"path": [
-										"api",
-										"evaluation",
-										"quotation-package",
-										"min-evaluations"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Set minimum number of evaluations",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{access_token}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"min_evaluations\": 10\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{endpoint_ase}}/api/evaluation/quotation-package/min-evaluations/set",
-									"host": [
-										"{{endpoint_ase}}"
-									],
-									"path": [
-										"api",
-										"evaluation",
-										"quotation-package",
-										"min-evaluations",
-										"set"
-									]
-								}
-							},
-							"response": []
-						}
-					]
 				}
 			]
 		},
@@ -1495,6 +1420,83 @@
 							"path": [
 								"api",
 								"artwork"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Config",
+			"item": [
+				{
+					"name": "Save Config",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"QUOTATION_PACKAGE_MIN_EVALUATIONS\",\r\n    \"value\": 15\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{endpoint_ase}}/api/config/save",
+							"host": [
+								"{{endpoint_ase}}"
+							],
+							"path": [
+								"api",
+								"config",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Config",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint_ase}}/api/config?type=QUOTATION_PACKAGE_MIN_EVALUATIONS",
+							"host": [
+								"{{endpoint_ase}}"
+							],
+							"path": [
+								"api",
+								"config"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "QUOTATION_PACKAGE_MIN_EVALUATIONS"
+								}
 							]
 						}
 					},
