@@ -1,9 +1,11 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.userservice.entity.config.Config.Type;
 import com.bloxico.ase.userservice.facade.IConfigFacade;
 import com.bloxico.ase.userservice.service.config.IConfigService;
 import com.bloxico.ase.userservice.web.model.config.SaveConfigRequest;
 import com.bloxico.ase.userservice.web.model.config.SaveConfigResponse;
+import com.bloxico.ase.userservice.web.model.config.SearchConfigResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,15 @@ public class ConfigFacadeImpl implements IConfigFacade {
     @Autowired
     public ConfigFacadeImpl(IConfigService configService) {
         this.configService = configService;
+    }
+
+    @Override
+    public SearchConfigResponse searchConfig(Type type) {
+        log.debug("ConfigFacadeImpl.searchConfig - start | type: {}", type);
+        var configDto = configService.findConfigByType(type);
+        var response = new SearchConfigResponse(configDto);
+        log.debug("ConfigFacadeImpl.searchConfig - end | type: {}", type);
+        return response;
     }
 
     @Override
