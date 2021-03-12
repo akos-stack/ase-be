@@ -4,10 +4,7 @@ import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import static javax.persistence.EnumType.STRING;
 
@@ -18,16 +15,17 @@ import static javax.persistence.EnumType.STRING;
 public class Config extends BaseEntity {
 
     public enum Type {
+
         QUOTATION_PACKAGE_MIN_EVALUATIONS {
             @Override
-            public boolean validate(Object value) {
-                if (!Integer.class.isAssignableFrom(value.getClass())) return false;
-                var intValue = (int) value;
-                return intValue > 0;
+            public boolean isValid(Object value) {
+                return !Integer.class.isAssignableFrom(value.getClass())
+                        && (int) value > 0;
             }
         };
 
-        public abstract boolean validate(Object value);
+        public abstract boolean isValid(Object value);
+
     }
 
     @Column(name = "type", unique = true)

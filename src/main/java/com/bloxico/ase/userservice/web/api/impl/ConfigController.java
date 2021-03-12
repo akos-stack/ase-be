@@ -2,14 +2,10 @@ package com.bloxico.ase.userservice.web.api.impl;
 
 import com.bloxico.ase.userservice.facade.IConfigFacade;
 import com.bloxico.ase.userservice.web.api.ConfigApi;
-import com.bloxico.ase.userservice.web.model.config.SaveConfigRequest;
-import com.bloxico.ase.userservice.web.model.config.SaveConfigResponse;
-import com.bloxico.ase.userservice.web.model.config.SearchConfigResponse;
+import com.bloxico.ase.userservice.web.model.config.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
 
 import static com.bloxico.ase.userservice.entity.config.Config.Type;
 
@@ -24,13 +20,13 @@ public class ConfigController implements ConfigApi {
     }
 
     @Override
-    public ResponseEntity<SearchConfigResponse> searchConfig(@Valid Type type) {
+    public ResponseEntity<SearchConfigResponse> searchConfig(Type type) {
         var response = configFacade.searchConfig(type);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<SaveConfigResponse> saveConfig(@Valid SaveConfigRequest request) {
+    public ResponseEntity<SaveConfigResponse> saveConfig(SaveConfigRequest request) {
         var response = configFacade.saveConfig(request);
         return ResponseEntity.ok(response);
     }
