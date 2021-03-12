@@ -183,7 +183,7 @@ public class UtilToken {
     }
 
     public static SearchPendingEvaluatorsRequest genSearchPendingEvaluatorsRequest(String email) {
-        return new SearchPendingEvaluatorsRequest(genEmail());
+        return new SearchPendingEvaluatorsRequest(email);
     }
 
 }
