@@ -8,7 +8,7 @@ import javax.validation.ConstraintValidatorContext;
 public class EmailValidator implements ConstraintValidator<ValidEmail, String> {
 
     @Override
-    public boolean isValid(String email, ConstraintValidatorContext context) {
+    public boolean isValid(String email, ConstraintValidatorContext __) {
         return email != null
             && email.contains("@")
             && (email.length() - email.replace("@", "").length()) == 1;

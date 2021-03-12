@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.user.UserDto;
 import com.bloxico.ase.userservice.entity.user.User;
 import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
+import com.bloxico.ase.userservice.web.model.user.SearchUsersRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -105,6 +106,18 @@ public class UtilUser {
         user.addRole(role);
         user.setUpdaterId(userId);
         userRepository.saveAndFlush(user);
+    }
+
+    public static SearchUsersRequest genSearchUsersRequest() {
+        return new SearchUsersRequest(genEmail(), null);
+    }
+
+    public static SearchUsersRequest genSearchUsersRequest(String email) {
+        return new SearchUsersRequest(email, null);
+    }
+
+    public static SearchUsersRequest genSearchUsersRequest(String email, String role) {
+        return new SearchUsersRequest(email, role);
     }
 
 }

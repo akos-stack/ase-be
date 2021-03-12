@@ -8,11 +8,11 @@ import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDocumentDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkHistoryDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
+import com.bloxico.ase.userservice.dto.entity.config.ConfigDto;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.*;
 import com.bloxico.ase.userservice.dto.entity.oauth.OAuthAccessTokenDto;
+import com.bloxico.ase.userservice.dto.entity.user.*;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDocumentDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
@@ -29,20 +29,13 @@ import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkDocument;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkHistory;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
+import com.bloxico.ase.userservice.entity.config.Config;
 import com.bloxico.ase.userservice.entity.document.Document;
-import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
-import com.bloxico.ase.userservice.entity.evaluation.QuotationPackage;
-import com.bloxico.ase.userservice.entity.evaluation.QuotationPackageCountry;
+import com.bloxico.ase.userservice.entity.evaluation.*;
 import com.bloxico.ase.userservice.entity.oauth.OAuthAccessToken;
-import com.bloxico.ase.userservice.entity.token.BlacklistedToken;
-import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
-import com.bloxico.ase.userservice.entity.token.PendingEvaluatorDocument;
-import com.bloxico.ase.userservice.entity.token.Token;
-import com.bloxico.ase.userservice.entity.user.Role;
-import com.bloxico.ase.userservice.entity.user.User;
-import com.bloxico.ase.userservice.entity.user.profile.ArtOwner;
-import com.bloxico.ase.userservice.entity.user.profile.Evaluator;
-import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
+import com.bloxico.ase.userservice.entity.token.*;
+import com.bloxico.ase.userservice.entity.user.*;
+import com.bloxico.ase.userservice.entity.user.profile.*;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsCountedTransferProj;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.web.model.address.SaveCountryRequest;
@@ -50,14 +43,13 @@ import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
 import com.bloxico.ase.userservice.web.model.address.UpdateCountryRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDataRequest;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.IArtworkMetadataRequest;
+import com.bloxico.ase.userservice.web.model.config.SaveConfigRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveQuotationPackageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
-import com.bloxico.ase.userservice.web.model.user.ISubmitUserProfileRequest;
-import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
-import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
+import com.bloxico.ase.userservice.web.model.user.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -72,6 +64,8 @@ public interface AseMapper {
     // ENTITY -> DTO
 
     UserDto toDto(User user);
+
+    PermissionDto toDto(Permission entity);
 
     RoleDto toDto(Role entity);
 
@@ -116,6 +110,8 @@ public interface AseMapper {
     @Mapping(target = "documentId", source = "pendingEvaluatorDocument.pendingEvaluatorDocumentId.documentId")
     PendingEvaluatorDocumentDto toDto(PendingEvaluatorDocument pendingEvaluatorDocument);
 
+    ConfigDto toDto(Config entity);
+
     ArtworkDocumentDto toDto(ArtworkDocument artworkDocument);
 
     // DTO -> ENTITY
@@ -154,6 +150,8 @@ public interface AseMapper {
     ArtworkHistory toEntity(ArtworkHistoryDto dto);
 
     ArtworkDocument toEntity(ArtworkDocumentDto dto);
+
+    Config toEntity(ConfigDto dto);
 
     // OTHER
 
@@ -208,12 +206,19 @@ public interface AseMapper {
     default String toString(Region region) {
         return region.getName();
     }
+
     QuotationPackageDto toQuotationPackageDto(SaveQuotationPackageRequest request);
 
     PendingEvaluatorDto toPendingEvaluatorDto(IPendingEvaluatorRequest request);
 
     ArtworkHistoryDto toArtworkHistoryDto(SaveArtworkDataRequest request);
 
+    default ConfigDto toDto(SaveConfigRequest request) {
+        var dto = new ConfigDto();
+        dto.setType(request.getType());
+        dto.setValue(request.getValue().toString());
+        return dto;
+    }
     @Mapping(ignore = true, target = "artist")
     @Mapping(ignore = true, target = "ownerId")
     @Mapping(ignore = true, target = "location")
@@ -234,4 +239,5 @@ public interface AseMapper {
     @Mapping(source = "locationDto", target = "location")
     @Mapping(source = "documents", target = "documents")
     ArtworkDto toArtworkDto(ArtworkDto artworkDto, LocationDto locationDto, Set<DocumentDto> documents);
+
 }

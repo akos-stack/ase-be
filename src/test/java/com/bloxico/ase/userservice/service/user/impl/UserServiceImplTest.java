@@ -1,8 +1,8 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilUser;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
 import org.junit.Test;
@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Set;
 
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.testutil.UtilUser.genSearchUsersRequest;
 import static com.bloxico.ase.testutil.UtilUser.genUserDto;
 import static com.bloxico.ase.userservice.entity.user.Role.*;
-import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -65,23 +65,79 @@ public class UserServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
+    public void findUsersByEmailOrRole_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userService.findUsersByEmailOrRole(null, allPages()));
+    }
+
+    @Test
+    public void findUsersByEmailOrRole_nullPages() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userService.findUsersByEmailOrRole(genSearchUsersRequest(), null));
+    }
+
+    @Test
     public void findUsersByEmailOrRole_nullEmail() {
-        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
-        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
-        var u3 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
-        assertThat(
-                userService.findUsersByEmailOrRole(u1.getEmail(), null, 0, MAX_VALUE, "name").getContent(),
-                not(hasItems(u1, u2, u3)));
+        assertThrows(
+                NullPointerException.class,
+                () -> userService.findUsersByEmailOrRole(genSearchUsersRequest(null), allPages()));
     }
 
     @Test
     public void findUsersByEmailOrRole_emptyEmail() {
-        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
-        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
-        var u3 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedUserDto();
+        var u3 = utilUser.savedUserDto();
         assertThat(
-                userService.findUsersByEmailOrRole(u1.getEmail(), "", 0, MAX_VALUE, "name").getContent(),
-                not(hasItems(u1, u2, u3)));
+                userService
+                        .findUsersByEmailOrRole(genSearchUsersRequest(""), allPages())
+                        .getContent(),
+                hasItems(u1, u2, u3));
+    }
+
+    @Test
+    public void findUsersByEmailOrRole_nullRole() {
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedUserDto();
+        var u3 = utilUser.savedUserDto();
+        assertThat(
+                userService
+                        .findUsersByEmailOrRole(genSearchUsersRequest("", null), allPages())
+                        .getContent(),
+                hasItems(u1, u2, u3));
+    }
+
+    @Test
+    public void findUsersByEmailOrRole_emptyRole() {
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedUserDto();
+        var u3 = utilUser.savedUserDto();
+        assertThat(
+                userService
+                        .findUsersByEmailOrRole(genSearchUsersRequest("", ""), allPages())
+                        .getContent(),
+                hasItems(u1, u2, u3));
+    }
+
+    @Test
+    public void findUsersByEmailOrRole_blankRole() {
+        var u1 = utilUser.savedUserDto();
+        var u2 = utilUser.savedUserDto();
+        var u3 = utilUser.savedUserDto();
+        assertThat(
+                userService
+                        .findUsersByEmailOrRole(genSearchUsersRequest("", " "), allPages())
+                        .getContent(),
+                hasItems(u1, u2, u3));
+    }
+
+    @Test
+    public void findUsersByEmailOrRole_invalidRole() {
+        assertThrows(
+                UserException.class,
+                () -> userService.findUsersByEmailOrRole(genSearchUsersRequest("", genUUID()), allPages()));
     }
 
     @Test
@@ -90,18 +146,20 @@ public class UserServiceImplTest extends AbstractSpringTest {
         var u2 = utilUser.savedUserDto();
         var u3 = utilUser.savedUserDto();
         assertThat(
-                userService.findUsersByEmailOrRole("", "admin", 0, MAX_VALUE, "name").getContent(),
+                userService
+                        .findUsersByEmailOrRole(genSearchUsersRequest(genUUID()), allPages())
+                        .getContent(),
                 not(hasItems(u1, u2, u3)));
     }
 
     @Test
-    public void findUsersByEmailOrRole_byEmail() {
+    public void findUsersByEmailOrRole_foundByEmail() {
         var u1 = utilUser.savedUserDto();
         var u2 = utilUser.savedUserDto();
         var u3 = utilUser.savedUserDto();
         assertThat(
                 userService
-                        .findUsersByEmailOrRole(u1.getEmail(), null, 0, MAX_VALUE, "name")
+                        .findUsersByEmailOrRole(genSearchUsersRequest(u1.getEmail()), allPages())
                         .getContent(),
                 allOf(
                         hasItems(u1),
@@ -109,13 +167,13 @@ public class UserServiceImplTest extends AbstractSpringTest {
     }
 
     @Test
-    public void findUsersByEmailOrRole_byRole() {
+    public void findUsersByEmailOrRole_foundByRole() {
         var u1 = utilUser.savedUserDto();
         var u2 = utilUser.savedAdminDto();
         var u3 = utilUser.savedAdminDto();
         assertThat(
                 userService
-                        .findUsersByEmailOrRole("", ADMIN, 0, MAX_VALUE, "name")
+                        .findUsersByEmailOrRole(genSearchUsersRequest("", ADMIN), allPages())
                         .getContent(),
                 allOf(
                         hasItems(u2, u3),
@@ -129,7 +187,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
         var u3 = utilUser.savedAdminDto();
         assertThat(
                 userService
-                        .findUsersByEmailOrRole(u3.getEmail(), ADMIN, 0, MAX_VALUE, "name")
+                        .findUsersByEmailOrRole(genSearchUsersRequest(u3.getEmail(), ADMIN), allPages())
                         .getContent(),
                 allOf(
                         hasItems(u3),

@@ -2,6 +2,8 @@ package com.bloxico.ase.userservice.service.token;
 
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDocumentDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
+import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.token.SearchPendingEvaluatorsRequest;
 import org.springframework.data.domain.Page;
 
 public interface IPendingEvaluatorService {
@@ -16,9 +18,10 @@ public interface IPendingEvaluatorService {
 
     void consumePendingEvaluator(String email, String token);
 
-    Page<PendingEvaluatorDto> searchPendingEvaluators(String email, int page, int size, String sort);
+    Page<PendingEvaluatorDto> searchPendingEvaluators(SearchPendingEvaluatorsRequest request, PageRequest page);
 
     PendingEvaluatorDocumentDto getEvaluatorResume(String email);
 
     void savePendingEvaluatorDocument(String email, long documentId);
+
 }

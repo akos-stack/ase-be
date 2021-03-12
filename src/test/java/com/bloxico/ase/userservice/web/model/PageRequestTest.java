@@ -163,7 +163,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(2, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertThat(
                     page.getContent(),
                     allOf(
@@ -187,7 +187,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(1, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertThat(
                     page.getContent(),
                     allOf(
@@ -211,7 +211,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(0, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(), page.getContent());
         }
     }
@@ -241,7 +241,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(2, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r2, r3), page.getContent());
         }
         {
@@ -262,7 +262,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(1, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r1), page.getContent());
         }
     }
@@ -292,7 +292,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(2, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r1, r2), page.getContent());
         }
         {
@@ -313,7 +313,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(1, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r3), page.getContent());
         }
     }
@@ -344,7 +344,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(2, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r3, r2), page.getContent());
         }
         {
@@ -366,62 +366,25 @@ public class PageRequestTest extends AbstractSpringTest {
                     .getPage();
             assertEquals(2, page.getNumberOfPages());
             assertEquals(2, page.getSize());
-            assertEquals(1, page.getTotalSize());
+            assertEquals(3, page.getTotalSize());
             assertEquals(List.of(r1), page.getContent());
         }
     }
 
     @Test
     public void pageRequest_200_sortedByIdAndNameWithInvalidOrder() {
-        var region = genUUID();
-        var r1 = utilEvaluation.savedRegionCountedProj("ac" + region);
-        var r2 = utilEvaluation.savedRegionCountedProj("aa" + region);
-        var r3 = utilEvaluation.savedRegionCountedProj("ab" + region);
-        utilEvaluation.savedRegionCountedProj(genUUID());
-        {
-            var page = given()
-                    .header("Authorization", utilAuth.doAdminAuthentication())
-                    .queryParam("search", region)
-                    .queryParam("page", 0)
-                    .queryParam("size", 2)
-                    .queryParam("sort", "id,name")
-                    .queryParam("order", "foo")
-                    .when()
-                    .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
-                    .then()
-                    .assertThat()
-                    .statusCode(200)
-                    .extract()
-                    .body()
-                    .as(SearchRegionEvaluationDetailsResponse.class)
-                    .getPage();
-            assertEquals(2, page.getNumberOfPages());
-            assertEquals(2, page.getSize());
-            assertEquals(2, page.getTotalSize());
-            assertEquals(List.of(r1, r2), page.getContent());
-        }
-        {
-            var page = given()
-                    .header("Authorization", utilAuth.doAdminAuthentication())
-                    .queryParam("search", region)
-                    .queryParam("page", 1)
-                    .queryParam("size", 2)
-                    .queryParam("sort", "id,name")
-                    .queryParam("order", "foo")
-                    .when()
-                    .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
-                    .then()
-                    .assertThat()
-                    .statusCode(200)
-                    .extract()
-                    .body()
-                    .as(SearchRegionEvaluationDetailsResponse.class)
-                    .getPage();
-            assertEquals(2, page.getNumberOfPages());
-            assertEquals(2, page.getSize());
-            assertEquals(1, page.getTotalSize());
-            assertEquals(List.of(r3), page.getContent());
-        }
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .queryParam("search", genUUID())
+                .queryParam("page", 0)
+                .queryParam("size", 2)
+                .queryParam("sort", "id,name")
+                .queryParam("order", "foo")
+                .when()
+                .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                .then()
+                .assertThat()
+                .statusCode(400);
     }
 
     @Test

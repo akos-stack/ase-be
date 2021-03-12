@@ -14,10 +14,10 @@ public class SearchCountryEvaluationDetailsForManagementRequest implements ISear
 
     @NotNull
     @ApiParam(name = "search", required = true)
-    String search;
+    private String search;
 
     @ApiParam(name = "regions")
-    List<String> regions;
+    private List<String> regions;
 
     @JsonIgnore
     @Override

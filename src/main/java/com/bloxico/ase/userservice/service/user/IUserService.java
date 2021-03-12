@@ -1,6 +1,8 @@
 package com.bloxico.ase.userservice.service.user;
 
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
+import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.user.SearchUsersRequest;
 import org.springframework.data.domain.Page;
 
 import java.util.Collection;
@@ -12,7 +14,7 @@ public interface IUserService {
 
     UserDto findUserByEmail(String email);
 
-    Page<UserDto> findUsersByEmailOrRole(String email, String role, int page, int size, String sort);
+    Page<UserDto> findUsersByEmailOrRole(SearchUsersRequest request, PageRequest page);
 
     UserDto saveUser(UserDto userDto);
 

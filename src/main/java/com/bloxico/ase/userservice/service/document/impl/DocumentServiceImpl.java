@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.service.aws.IS3Service;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
 import com.bloxico.ase.userservice.util.FileCategory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +26,7 @@ public class DocumentServiceImpl implements IDocumentService {
     private final IS3Service s3Service;
     private final DocumentRepository documentRepository;
 
+    @Autowired
     public DocumentServiceImpl(IS3Service s3Service, DocumentRepository documentRepository) {
         this.s3Service = s3Service;
         this.documentRepository = documentRepository;
@@ -32,7 +34,7 @@ public class DocumentServiceImpl implements IDocumentService {
 
     @Override
     public DocumentDto saveDocument(MultipartFile file, FileCategory type) {
-         return saveDocument(file, type, null);
+        return saveDocument(file, type, null);
     }
 
     @Override
@@ -42,20 +44,24 @@ public class DocumentServiceImpl implements IDocumentService {
         var document = new Document();
         document.setPath(path);
         document.setType(type);
-        if(principalId != null) {
+        if (principalId != null)
             document.setCreatorId(principalId);
-        }
+        var documentDto = MAPPER.toDto(documentRepository.save(document));
         log.info("DocumentServiceImpl.saveDocument - end | file: {}, fileCategory: {}", file, type);
-        return MAPPER.toDto(documentRepository.save(document));
+        return documentDto;
     }
 
     @Override
     public ByteArrayResource getDocumentById(Long id) {
         log.info("DocumentServiceImpl.getDocumentById - start | id: {} ", id);
         requireNonNull(id);
-        var document = documentRepository.findById(id).orElseThrow(DOCUMENT_NOT_FOUND::newException);
+        var document = documentRepository
+                .findById(id)
+                .map(Document::getPath)
+                .map(s3Service::downloadFile)
+                .orElseThrow(DOCUMENT_NOT_FOUND::newException);
         log.info("DocumentServiceImpl.getDocumentById - end | id: {} ", id);
-        return s3Service.downloadFile(document.getPath());
+        return document;
     }
 
     @Override

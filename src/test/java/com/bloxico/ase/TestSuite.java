@@ -8,6 +8,8 @@ import com.bloxico.ase.userservice.service.address.impl.LocationServiceImplTest;
 import com.bloxico.ase.userservice.service.artwork.impl.*;
 import com.bloxico.ase.userservice.service.artwork.impl.metadata.*;
 import com.bloxico.ase.userservice.service.aws.impl.S3ServiceImplTest;
+import com.bloxico.ase.userservice.service.config.impl.ConfigServiceImplTest;
+import com.bloxico.ase.userservice.service.constant.ConstantServiceImplTest;
 import com.bloxico.ase.userservice.service.document.impl.DocumentServiceImplTest;
 import com.bloxico.ase.userservice.service.evaluation.impl.EvaluationServiceImplTest;
 import com.bloxico.ase.userservice.service.oauth.impl.OAuthAccessTokenServiceImplTest;
@@ -16,11 +18,15 @@ import com.bloxico.ase.userservice.service.token.impl.*;
 import com.bloxico.ase.userservice.service.user.impl.*;
 import com.bloxico.ase.userservice.util.AWSUtilTest;
 import com.bloxico.ase.userservice.web.api.*;
+import com.bloxico.ase.userservice.web.model.PageRequestTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses(value = {
+        // model
+        PageRequestTest.class,
+
         // config
         PersistentJwtTokenStoreTest.class,
         AseSecurityServiceTest.class,
@@ -45,6 +51,8 @@ import org.junit.runners.Suite;
         DocumentServiceImplTest.class,
         ArtistServiceImplTest.class,
         ArtworkServiceImplTest.class,
+        ConfigServiceImplTest.class,
+        ConstantServiceImplTest.class,
 
         // facade
         QuartzOperationsFacadeImplTest.class,
@@ -57,6 +65,7 @@ import org.junit.runners.Suite;
         EvaluationFacadeImplTest.class,
         ArtworkFacadeImplTest.class,
         AWSUtilTest.class,
+        SystemFacadeImplTest.class,
 
         // filter
         JwtAuthorizationFilterTest.class,
@@ -69,7 +78,8 @@ import org.junit.runners.Suite;
         UserManagementApiTest.class,
         ArtworkMetadataApiTest.class,
         ArtworkApiTest.class,
-        EvaluationApiTest.class
+        EvaluationApiTest.class,
+        SystemApiTest.class
 })
 public class TestSuite {
 }

@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.exception.EvaluationException;
 import com.bloxico.ase.userservice.exception.LocationException;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
@@ -24,6 +24,7 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private UtilSystem utilSystem;
     @Autowired private EvaluationFacadeImpl evaluationFacade;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
@@ -265,5 +266,4 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
         var request = utilEvaluation.genSaveQuotationPackageRequest();
         evaluationFacade.saveQuotationPackage(request);
     }
-
 }

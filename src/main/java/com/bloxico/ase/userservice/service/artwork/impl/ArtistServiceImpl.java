@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
 import com.bloxico.ase.userservice.repository.artwork.ArtistRepository;
 import com.bloxico.ase.userservice.service.artwork.IArtistService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -15,16 +16,19 @@ public class ArtistServiceImpl implements IArtistService {
 
     private final ArtistRepository artistRepository;
 
+    @Autowired
     public ArtistServiceImpl(ArtistRepository artistRepository) {
         this.artistRepository = artistRepository;
     }
 
     @Override
-    public ArtistDto saveArtist(ArtistDto artistDto) {
-        log.info("ArtistService.saveArtist - start | artistDto: {}, principalId: {} ", artistDto);
-        requireNonNull(artistDto);
-        var artist = MAPPER.toEntity(artistDto);
-        log.info("ArtistService.saveArtist - end | artistDto: {}, principalId: {} ", artistDto);
-        return MAPPER.toDto(artistRepository.save(artist));
+    public ArtistDto saveArtist(ArtistDto dto) {
+        log.info("ArtistService.saveArtist - start | dto: {}", dto);
+        requireNonNull(dto);
+        var artist = MAPPER.toEntity(dto);
+        var artistDto = MAPPER.toDto(artistRepository.save(artist));
+        log.info("ArtistService.saveArtist - end | dto: {}", dto);
+        return artistDto;
     }
+
 }

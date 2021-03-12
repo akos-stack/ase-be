@@ -12,8 +12,7 @@ import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
 import com.bloxico.ase.userservice.repository.oauth.OAuthAccessTokenRepository;
 import com.bloxico.ase.userservice.repository.token.*;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
-import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
-import com.bloxico.ase.userservice.web.model.token.EvaluatorRegistrationRequest;
+import com.bloxico.ase.userservice.web.model.token.*;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -177,6 +176,14 @@ public class UtilToken {
                 genUUID(), country,
                 genUUID(), ONE, TEN,
                 genMultipartFile(IMAGE));
+    }
+
+    public static SearchPendingEvaluatorsRequest genSearchPendingEvaluatorsRequest() {
+        return new SearchPendingEvaluatorsRequest(genEmail());
+    }
+
+    public static SearchPendingEvaluatorsRequest genSearchPendingEvaluatorsRequest(String email) {
+        return new SearchPendingEvaluatorsRequest(email);
     }
 
 }

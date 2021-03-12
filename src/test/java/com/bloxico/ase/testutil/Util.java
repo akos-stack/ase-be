@@ -136,12 +136,16 @@ public class Util {
         to.setUpdatedAt(from.getUpdatedAt());
     }
 
-    public static Map<String, Object> allPages(String k, Object v) {
+    public static Map<String, Object> allPages(Map<String, Object> m) {
         var queryParams = new HashMap<String, Object>();
         queryParams.put("page", 0);
         queryParams.put("size", Integer.MAX_VALUE);
-        queryParams.put(k, v);
+        queryParams.putAll(m);
         return queryParams;
+    }
+
+    public static Map<String, Object> allPages(String k, Object v) {
+        return allPages(Map.of(k, v));
     }
 
     public static PageRequest allPages() {

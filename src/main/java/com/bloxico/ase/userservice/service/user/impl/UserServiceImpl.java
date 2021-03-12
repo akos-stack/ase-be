@@ -7,9 +7,11 @@ import com.bloxico.ase.userservice.repository.user.RoleRepository;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
 import com.bloxico.ase.userservice.service.user.IUserService;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
+import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.user.SearchUsersRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -65,19 +67,18 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public Page<UserDto> findUsersByEmailOrRole(String email, String role, int page, int size, String sort) {
-        log.debug("UserServiceImpl.findUsersByEmailOrRole - start | email: {}, role {}, page: {}, size: {}", email, role, page, size);
-        role = Optional
-                .ofNullable(role)
-                .map(String::trim)
-                .filter(not(String::isEmpty))
-                .map(doto(roleRepository::getRole))
-                .orElse("");
-        var pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
+    public Page<UserDto> findUsersByEmailOrRole(SearchUsersRequest request, PageRequest page) {
+        log.debug("UserServiceImpl.findUsersByEmailOrRole - start | request: {}, page: {}", request, page);
+        requireNonNull(request);
+        requireNonNull(request.getEmail());
+        requireNonNull(page);
         var userDtos = userRepository
-                .findDistinctByEmailContainingAndRoles_NameContaining(email, role, pageable)
+                .findDistinctByEmailContainingAndRoles_NameContaining(
+                        request.getEmail(),
+                        requireNullOrEmptyOrExists(request.getRole()),
+                        page.toPageable())
                 .map(MAPPER::toDto);
-        log.debug("UserServiceImpl.findUsersByEmailOrRole - end | email: {}, role {}, page: {}, size: {}", email, role, page, size);
+        log.debug("UserServiceImpl.findUsersByEmailOrRole - end | request: {}, page: {}", request, page);
         return userDtos;
     }
 
@@ -175,6 +176,15 @@ public class UserServiceImpl implements IUserService {
         if (aspiredRoles.size() != names.size())
             throw ROLE_NOT_FOUND.newException();
         return aspiredRoles;
+    }
+
+    private String requireNullOrEmptyOrExists(String role) {
+        return Optional
+                .ofNullable(role)
+                .map(String::trim)
+                .filter(not(String::isEmpty))
+                .map(doto(roleRepository::getRole))
+                .orElse("");
     }
 
 }

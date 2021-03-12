@@ -28,6 +28,7 @@ import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDataRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDocumentsRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -57,6 +58,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     private final AseSecurityContextService securityContextService;
     private final IArtworkDocumentService artworkDocumentService;
 
+    @Autowired
     public ArtworkFacadeImpl(ILocationService locationService, IDocumentService documentService, IArtworkService artworkService, IArtistService artistService, IUserProfileService userProfileService, CategoryServiceImpl categoryService, MaterialServiceImpl materialService, MediumServiceImpl mediumService, StyleServiceImpl styleService, AseSecurityContextService securityContextService, IArtworkDocumentService artworkDocumentService) {
         this.locationService = locationService;
         this.documentService = documentService;

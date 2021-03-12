@@ -5,6 +5,7 @@ import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
 import com.bloxico.ase.userservice.repository.artwork.metadata.*;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -91,6 +92,22 @@ public class UtilArtworkMetadata {
                 .stream()
                 .map(MAPPER::toDto)
                 .collect(toList());
+    }
+
+    public static DeleteArtworkMetadataRequest genDeleteArtworkMetadataRequest(Type type, String name) {
+        return new DeleteArtworkMetadataRequest(type, name);
+    }
+
+    public static SearchArtworkMetadataRequest genSearchMetadataRequest(Type type) {
+        return new SearchArtworkMetadataRequest(type, null, "");
+    }
+
+    public static SearchApprovedArtworkMetadataRequest genSearchApprovedMetadataRequest(Type type) {
+        return new SearchApprovedArtworkMetadataRequest(type, "");
+    }
+
+    public static SearchApprovedArtworkMetadataRequest genSearchApprovedMetadataRequest(Type type, String name) {
+        return new SearchApprovedArtworkMetadataRequest(type, "");
     }
 
 }

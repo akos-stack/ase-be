@@ -1,8 +1,7 @@
 package com.bloxico.ase.userservice.facade;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
-import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
-import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.*;
 
 public interface IArtworkMetadataFacade {
@@ -11,10 +10,10 @@ public interface IArtworkMetadataFacade {
 
     ArtworkMetadataDto updateArtworkMetadata(UpdateArtworkMetadataRequest request);
 
-    void deleteArtworkMetadata(String name, Type type);
+    void deleteArtworkMetadata(DeleteArtworkMetadataRequest request);
 
-    PagedArtworkMetadataResponse searchArtworkMetadata(Type type, Status status, String name, int page, int size, String sort);
+    SearchArtworkMetadataResponse searchArtworkMetadata(SearchArtworkMetadataRequest request, PageRequest page);
 
-    SearchArtworkMetadataResponse searchApprovedArtworkMetadata(String name, Type type);
+    SearchApprovedArtworkMetadataResponse searchApprovedArtworkMetadata(SearchApprovedArtworkMetadataRequest request);
 
 }

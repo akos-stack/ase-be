@@ -44,9 +44,7 @@
 - [Application root path](http://localhost:8089/api)
 - [Swagger](http://localhost:8089/api/swagger-ui.html)
 - [Postman collection](../src/main/resources/postman/Art%20Stock%20Exchange.postman_collection.json)
-    - Admin email: `ase.admin@mailinator.com`
-    - Admin password: `Aser_Pr0`
 
 ---
 
-[<: Home](../README.md) | [IntelliJ IDEA Setup :>](intellij_idea_setup.md)
+[<: Home](../README.md) | [Postman Setup :>](postman_setup.md)

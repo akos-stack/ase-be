@@ -1,9 +1,9 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
-import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.entity.user.Role;
+import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,16 +26,12 @@ import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORT
 @Transactional(propagation = NOT_SUPPORTED)
 public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
-    @Autowired
-    private UtilSecurityContext utilSecurityContext;
-    @Autowired
-    private UtilEvaluation utilEvaluation;
-    @Autowired
-    private UtilLocation utilLocation;
-    @Autowired
-    private UtilUserProfile utilUserProfile;
-    @Autowired
-    private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
+    @Autowired private UtilSecurityContext utilSecurityContext;
+    @Autowired private UtilEvaluation utilEvaluation;
+    @Autowired private UtilLocation utilLocation;
+    @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private UtilSystem utilSystem;
+    @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test
     @WithMockCustomUser(auth = true)

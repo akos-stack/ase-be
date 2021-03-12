@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.repository.artwork.ArtworkHistoryRepository;
 import com.bloxico.ase.userservice.repository.artwork.ArtworkRepository;
 import com.bloxico.ase.userservice.service.artwork.IArtworkService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,21 +24,23 @@ public class ArtworkServiceImpl implements IArtworkService {
     private final ArtworkRepository artworkRepository;
     private final ArtworkHistoryRepository artworkHistoryRepository;
 
-    public ArtworkServiceImpl(ArtworkRepository artworkRepository, ArtworkHistoryRepository artworkHistoryRepository) {
+    @Autowired
+    public ArtworkServiceImpl(ArtworkRepository artworkRepository,
+                              ArtworkHistoryRepository artworkHistoryRepository) {
         this.artworkRepository = artworkRepository;
         this.artworkHistoryRepository = artworkHistoryRepository;
     }
 
     @Override
-    public ArtworkDto saveArtwork(ArtworkDto artworkDto) {
-        log.info("ArtworkServiceImpl.submitArtwork - start | artworkDto: {}", artworkDto);
-        requireNonNull(artworkDto);
-        var artwork = MAPPER.toEntity(artworkDto);
+    public ArtworkDto saveArtwork(ArtworkDto dto) {
+        log.info("ArtworkServiceImpl.submitArtwork - start | dto: {}", dto);
+        requireNonNull(dto);
+        var artwork = MAPPER.toEntity(dto);
         artwork = artworkRepository.saveAndFlush(artwork);
-        var artworkHistoryDto = saveArtworkHistory(artworkDto.getArtworkHistory(), artwork);
+        var artworkHistoryDto = saveArtworkHistory(dto.getArtworkHistory(), artwork);
         var response = MAPPER.toDto(artwork);
         response.setArtworkHistory(artworkHistoryDto);
-        log.info("ArtworkServiceImpl.submitArtwork - end | artworkDto: {}", artworkDto);
+        log.info("ArtworkServiceImpl.submitArtwork - end | artworkDto: {}", dto);
         return response;
     }
 
@@ -77,4 +80,5 @@ public class ArtworkServiceImpl implements IArtworkService {
         }
         return artworkHistoryDto;
     }
+
 }

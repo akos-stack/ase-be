@@ -23,13 +23,13 @@ public class ResponsePage<T> {
     int numberOfPages;
 
     @JsonProperty("total_size")
-    int totalSize;
+    long totalSize;
 
     public ResponsePage(Page<T> page) {
         content = page.getContent();
         size = page.getSize();
         numberOfPages = page.getTotalPages();
-        totalSize = page.getNumberOfElements();
+        totalSize = page.getTotalElements();
     }
 
 }

@@ -4,12 +4,27 @@ import com.bloxico.ase.userservice.exception.*;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+import java.util.Map;
+
 public interface ErrorCodes {
 
     AseRuntimeException newException(Throwable cause);
 
     default AseRuntimeException newException() {
         return newException(null);
+    }
+
+    HttpStatus getHttpStatus();
+
+    String getCode();
+
+    String getDescription();
+
+    default Map<String, String> asMap() {
+        return Map.of(
+                "code", getCode(),
+                "description", getDescription(),
+                "http_status", getHttpStatus().toString());
     }
 
     @Getter
@@ -316,6 +331,29 @@ public interface ErrorCodes {
         @Override
         public AseRuntimeException newException(Throwable cause) {
             return new DocumentException(httpStatus, code, cause);
+        }
+
+    }
+
+    @Getter
+    enum Config implements ErrorCodes {
+        CONFIG_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "Config_01",
+                "Config not found.");
+
+        private final HttpStatus httpStatus;
+        private final String code, description;
+
+        Config(HttpStatus httpStatus, String code, String description) {
+            this.httpStatus = httpStatus;
+            this.code = code;
+            this.description = description;
+        };
+
+        @Override
+        public AseRuntimeException newException(Throwable cause) {
+            return new ConfigException(httpStatus, code, cause);
         }
 
     }

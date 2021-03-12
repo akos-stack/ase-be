@@ -2,21 +2,17 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @Api(value = "evaluation")
 public interface EvaluationApi {
 
+    // @formatter:off
     String EVALUATION_COUNTRY_DETAILS_SEARCH            = "/evaluation/country-details";
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH = "/evaluation/management/country-details";
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE   = "/evaluation/management/country-details/save";
@@ -24,6 +20,7 @@ public interface EvaluationApi {
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE = "/evaluation/management/country-details/delete";
     String EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH  = "/evaluation/management/region-details";
     String EVALUATION_QUOTATION_PACKAGE_SAVE            = "/evaluation/quotation-package/save";
+    // @formatter:on
 
     @GetMapping(
             value = EVALUATION_COUNTRY_DETAILS_SEARCH,

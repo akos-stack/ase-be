@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.service.token.impl;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserException;
@@ -10,14 +10,13 @@ import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorRegistrationRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mapping.PropertyReferenceException;
 
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.testutil.UtilToken.genSearchPendingEvaluatorsRequest;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.SupportedFileExtension.pdf;
-import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -308,63 +307,51 @@ public class PendingEvaluatorServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    public void searchPendingEvaluators_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.searchPendingEvaluators(null, allPages()));
+    }
+
+    @Test
+    public void searchPendingEvaluators_nullPage() {
+        assertThrows(
+                NullPointerException.class,
+                () -> service.searchPendingEvaluators(
+                        genSearchPendingEvaluatorsRequest(),
+                        null));
+    }
+
+    @Test
     public void searchPendingEvaluators_nullEmail() {
         assertThrows(
                 NullPointerException.class,
-                () -> service.searchPendingEvaluators(null, 0, 10, "email"));
-    }
-
-    @Test
-    public void searchPendingEvaluators_pageIndexLessThanZero() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> service.searchPendingEvaluators(genEmail(), -1, 10, "email"));
-    }
-
-    @Test
-    public void searchPendingEvaluators_pageSizeLessThanOne() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> service.searchPendingEvaluators(genEmail(), 0, 0, "email"));
-    }
-
-    @Test
-    public void searchPendingEvaluators_nullSortCriteria() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> service.searchPendingEvaluators(genEmail(), 0, 10, null));
-    }
-
-    @Test
-    public void searchPendingEvaluators_emptySortCriteria() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> service.searchPendingEvaluators(genEmail(), 0, 10, ""));
-    }
-
-    @Test
-    public void searchPendingEvaluators_sortCriteriaDoesNotMatchAnyProperty() {
-        assertThrows(
-                PropertyReferenceException.class,
-                () -> service.searchPendingEvaluators(genEmail(), 0, 10, genUUID()));
+                () -> service.searchPendingEvaluators(
+                        genSearchPendingEvaluatorsRequest(null),
+                        null));
     }
 
     @Test
     @WithMockCustomUser
     public void searchPendingEvaluators_emptyResultSet() {
         utilToken.savedInvitedPendingEvaluatorDto();
-        var list = service.searchPendingEvaluators(genEmail(), 0, 10, "email");
+        var list = service.searchPendingEvaluators(
+                genSearchPendingEvaluatorsRequest(genEmail()),
+                allPages());
         assertEquals(0, list.getContent().size());
     }
 
     @Test
     @WithMockCustomUser
     public void searchPendingEvaluators() {
-        var p1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
-        var p2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
-        var p3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
+        var email = genEmail();
+        var p1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail(email));
+        var p2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail(email));
+        var p3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail());
         assertThat(
-                service.searchPendingEvaluators("fooBar", 0, MAX_VALUE, "email").getContent(),
+                service
+                        .searchPendingEvaluators(genSearchPendingEvaluatorsRequest(email), allPages())
+                        .getContent(),
                 allOf(
                         hasItems(p1, p2),
                         not(hasItems(p3))));

@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.service.artwork.impl.metadata;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.testutil.UtilArtworkMetadata.genSearchApprovedMetadataRequest;
+import static com.bloxico.ase.testutil.UtilArtworkMetadata.genSearchMetadataRequest;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.PENDING;
 import static java.util.stream.Collectors.toList;
@@ -128,15 +130,36 @@ public abstract class AbstractArtworkMetadataServiceImplTest extends AbstractSpr
     }
 
     @Test
+    public void searchArtworkMetadata_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> getService().searchArtworkMetadata(null, allPages()));
+    }
+
+    @Test
+    public void searchArtworkMetadata_nullPage() {
+        assertThrows(
+                NullPointerException.class,
+                () -> getService().searchArtworkMetadata(genSearchMetadataRequest(getType()), null));
+    }
+
+    @Test
     public void searchArtworkMetadata() {
         var metadata1 = utilArtworkMetadata.savedArtworkMetadataDto(getType(), randEnumConst(Status.class));
         assertThat(
-                getService().searchArtworkMetadata(null, "", 0, 10, "name").getContent(),
+                getService().searchArtworkMetadata(genSearchMetadataRequest(getType()), allPages()).getContent(),
                 hasItems(metadata1));
         var metadata2 = utilArtworkMetadata.savedArtworkMetadataDto(getType(), randEnumConst(Status.class));
         assertThat(
-                getService().searchArtworkMetadata(null, "", 0, 10, "name").getContent(),
+                getService().searchArtworkMetadata(genSearchMetadataRequest(getType()), allPages()).getContent(),
                 hasItems(metadata1, metadata2));
+    }
+
+    @Test
+    public void searchApprovedArtworkMetadata_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> getService().searchApprovedArtworkMetadata(null));
     }
 
     @Test
@@ -144,7 +167,7 @@ public abstract class AbstractArtworkMetadataServiceImplTest extends AbstractSpr
         var metadata1 = utilArtworkMetadata.savedArtworkMetadataDto(getType(), APPROVED);
         var metadata2 = utilArtworkMetadata.savedArtworkMetadataDto(getType(), PENDING);
         assertThat(
-                getService().searchApprovedArtworkMetadata(null),
+                getService().searchApprovedArtworkMetadata(genSearchApprovedMetadataRequest(getType(), null)),
                 not(hasItems(metadata1, metadata2)));
     }
 
@@ -153,7 +176,7 @@ public abstract class AbstractArtworkMetadataServiceImplTest extends AbstractSpr
         var metadata1 = utilArtworkMetadata.savedArtworkMetadataDto(getType(), APPROVED);
         var metadata2 = utilArtworkMetadata.savedArtworkMetadataDto(getType(), PENDING);
         assertThat(
-                getService().searchApprovedArtworkMetadata(""),
+                getService().searchApprovedArtworkMetadata(genSearchApprovedMetadataRequest(getType())),
                 allOf(
                         hasItems(metadata1),
                         not(hasItems(metadata2))));

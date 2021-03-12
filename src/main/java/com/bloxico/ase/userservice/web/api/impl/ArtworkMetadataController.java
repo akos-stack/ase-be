@@ -1,9 +1,9 @@
 package com.bloxico.ase.userservice.web.api.impl;
 
-import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
 import com.bloxico.ase.userservice.facade.IArtworkMetadataFacade;
 import com.bloxico.ase.userservice.web.api.ArtworkMetadataApi;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,22 +35,24 @@ public class ArtworkMetadataController implements ArtworkMetadataApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteArtworkMetadata(String name, Type type) {
-        artworkMetadataFacade.deleteArtworkMetadata(name, type);
+    public ResponseEntity<Void> deleteArtworkMetadata(DeleteArtworkMetadataRequest request) {
+        artworkMetadataFacade.deleteArtworkMetadata(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<PagedArtworkMetadataResponse> searchMetadata(
-            Type type, Status status, String name, int page, int size, String sort)
+    public ResponseEntity<SearchArtworkMetadataResponse> searchArtworkMetadata(
+            SearchArtworkMetadataRequest request, PageRequest page)
     {
-        var response = artworkMetadataFacade.searchArtworkMetadata(type, status, name, page, size, sort);
+        var response = artworkMetadataFacade.searchArtworkMetadata(request, page);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<SearchArtworkMetadataResponse> searchApprovedArtworkMetadata(Type type, String name) {
-        var response = artworkMetadataFacade.searchApprovedArtworkMetadata(name, type);
+    public ResponseEntity<SearchApprovedArtworkMetadataResponse> searchApprovedArtworkMetadata(
+            SearchApprovedArtworkMetadataRequest request)
+    {
+        var response = artworkMetadataFacade.searchApprovedArtworkMetadata(request);
         return ResponseEntity.ok(response);
     }
 
