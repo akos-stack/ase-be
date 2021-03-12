@@ -1,13 +1,16 @@
 package com.bloxico.ase.userservice.util;
 
-import com.bloxico.ase.userservice.entity.artwork.ArtworkGroup;
+import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import org.springframework.data.domain.Sort;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static com.bloxico.ase.userservice.util.Functions.throwingMerger;
 import static java.util.Comparator.comparing;
@@ -72,10 +75,10 @@ public enum EnumConstants {
         }
     },
 
-    ARTWORK_GROUP_STATUS {
+    ARTWORK_STATUS {
         @Override
-        protected List<ArtworkGroup.Status> constants() {
-            return List.of(ArtworkGroup.Status.values());
+        protected List<Artwork.Status> constants() {
+            return List.of(Artwork.Status.values());
         }
     },
 

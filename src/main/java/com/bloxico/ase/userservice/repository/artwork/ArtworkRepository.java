@@ -15,9 +15,10 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
     @Query(value = "SELECT m                                        " +
             "  FROM Artwork m                         " +
             " WHERE (:status IS NULL OR m.status = :status)  " +
-            "   AND (:title   IS NULL OR m.title LIKE %:title%) ")
+            "   AND (:title   IS NULL OR m.title LIKE %:title%) " +
+            "   AND (:owner   IS NULL OR m.ownerId = :owner) ")
         // @formatter:on
     Page<Artwork> search(@Param("status") Artwork.Status status,
-                   @Param("title") String title,
+                   @Param("title") String title, @Param("owner") Long owner,
                    Pageable pageable);
 }

@@ -18,4 +18,8 @@ public interface IDocumentService {
     DocumentDto updateDocumentType(Long id, FileCategory type);
 
     List<DocumentDto> getDocumentsById(List<Long> ids);
+
+    void deleteDocumentById(Long id);
+
+    void deleteDocumentsByIds(List<Long> id);
 }

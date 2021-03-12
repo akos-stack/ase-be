@@ -1,17 +1,18 @@
 package com.bloxico.ase.userservice.web.api.impl;
 
-import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.bloxico.ase.userservice.facade.IArtworkFacade;
 import com.bloxico.ase.userservice.web.api.ArtworkApi;
-import com.bloxico.ase.userservice.web.model.artwork.PagedArtworkResponse;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDataRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkRequest;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 
 @RestController
 public class ArtworkController implements ArtworkApi {
@@ -38,8 +39,16 @@ public class ArtworkController implements ArtworkApi {
     }
 
     @Override
-    public ResponseEntity<PagedArtworkResponse> searchArtworks(Artwork.@Valid Status status, @Valid String title, @Valid int page, @Valid @Min(1) int size, @Valid String sort) {
-        var response = artworkFacade.searchMyArtworks(status, title, page, size, sort);
+    public ResponseEntity<SearchArtworkResponse> searchArtworks(@Valid SearchArtworkRequest request, @Valid PageRequest page) {
+        var response = artworkFacade.searchArtworks(request, page);
         return ResponseEntity.ok(response);
     }
+
+    @Override
+    public ResponseEntity<Void> deleteArtwork(@Valid Long artworkId) {
+        artworkFacade.deleteArtwork(artworkId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
 }

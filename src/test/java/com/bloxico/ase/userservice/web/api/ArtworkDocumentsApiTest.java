@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.util.FileCategory.*;
-import static com.bloxico.ase.userservice.web.api.ArtworkDocumentsApi.SAVE_ARTWORK_DOCUMENTS;
+import static com.bloxico.ase.userservice.web.api.ArtworkDocumentsApi.ARTWORK_SAVE_DOCUMENTS;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -38,7 +38,7 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
                 .formParams(formParams)
                 .multiPart("documents", genUUID() + ".jpg", image)
                 .when()
-                .post(API_URL + SAVE_ARTWORK_DOCUMENTS)
+                .post(API_URL + ARTWORK_SAVE_DOCUMENTS)
                 .then()
                 .assertThat()
                 .statusCode(403);
@@ -54,7 +54,7 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
                 .formParams("fileCategory", IMAGE)
                 .multiPart("documents", genUUID() + ".jpg", image)
                 .when()
-                .post(API_URL + SAVE_ARTWORK_DOCUMENTS)
+                .post(API_URL + ARTWORK_SAVE_DOCUMENTS)
                 .then()
                 .assertThat()
                 .statusCode(404);
@@ -71,11 +71,11 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
                 .formParams("fileCategory", IMAGE)
                 .multiPart("documents", genUUID() + ".jpg", image)
                 .when()
-                .post(API_URL + SAVE_ARTWORK_DOCUMENTS)
+                .post(API_URL + ARTWORK_SAVE_DOCUMENTS)
                 .then()
                 .assertThat()
                 .statusCode(401)
-                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_ACCESS_NOT_AUTHORIZED.getCode()));
+                .body(ERROR_CODE, is(ErrorCodes.User.ACCESS_NOT_ALLOWED.getCode()));
     }
 
     @Test
@@ -89,7 +89,7 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
                 .formParams("fileCategory", CERTIFICATE)
                 .multiPart("documents", genUUID() + ".jpg", image)
                 .when()
-                .post(API_URL + SAVE_ARTWORK_DOCUMENTS)
+                .post(API_URL + ARTWORK_SAVE_DOCUMENTS)
                 .then()
                 .assertThat()
                 .statusCode(400)
@@ -110,7 +110,7 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
                     .formParam("fileCategory", type)
                     .multiPart("documents", name, doc1)
                     .when()
-                    .post(API_URL + SAVE_ARTWORK_DOCUMENTS)
+                    .post(API_URL + ARTWORK_SAVE_DOCUMENTS)
                     .then()
                     .assertThat()
                     .statusCode(200);
@@ -121,7 +121,7 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
                     .formParam("fileCategory", type)
                     .multiPart("documents", name, doc2)
                     .when()
-                    .post(API_URL + SAVE_ARTWORK_DOCUMENTS)
+                    .post(API_URL + ARTWORK_SAVE_DOCUMENTS)
                     .then()
                     .assertThat()
                     .statusCode(409)
@@ -145,7 +145,7 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
                     .multiPart("documents", name, doc1)
                     .multiPart("documents", name, doc2)
                     .when()
-                    .post(API_URL + SAVE_ARTWORK_DOCUMENTS)
+                    .post(API_URL + ARTWORK_SAVE_DOCUMENTS)
                     .then()
                     .assertThat()
                     .statusCode(400)
@@ -163,7 +163,7 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
                 .formParams(formParams)
                 .multiPart("documents", genUUID() + ".jpg", image)
                 .when()
-                .post(API_URL + SAVE_ARTWORK_DOCUMENTS)
+                .post(API_URL + ARTWORK_SAVE_DOCUMENTS)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -184,7 +184,7 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
                 .formParams(formParams)
                 .multiPart("documents", genUUID() + ".jpg", image)
                 .when()
-                .post(API_URL + SAVE_ARTWORK_DOCUMENTS)
+                .post(API_URL + ARTWORK_SAVE_DOCUMENTS)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -201,7 +201,7 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
                 .formParams(formParams)
                 .multiPart("documents", genUUID() + ".jpg", image2)
                 .when()
-                .post(API_URL + SAVE_ARTWORK_DOCUMENTS)
+                .post(API_URL + ARTWORK_SAVE_DOCUMENTS)
                 .then()
                 .assertThat()
                 .statusCode(200)

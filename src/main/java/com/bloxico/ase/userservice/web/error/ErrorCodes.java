@@ -58,8 +58,12 @@ public interface ErrorCodes {
         RESUME_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "User_06",
-                "When downloading user resume, if resume path is null or empty."
-        );
+                "When downloading user resume, if resume path is null or empty."),
+
+        ACCESS_NOT_ALLOWED(
+                HttpStatus.UNAUTHORIZED,
+                "User_07",
+                "Access not allowed.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
@@ -236,11 +240,6 @@ public interface ErrorCodes {
                 "Artworks_05",
                 "Artwork not found."),
 
-        ARTWORK_ACCESS_NOT_AUTHORIZED(
-                HttpStatus.UNAUTHORIZED,
-                "Artworks_06",
-                "Artwork submit not authorized."),
-
         ARTWORK_DOCUMENT_ALREADY_ATTACHED(
                 HttpStatus.CONFLICT,
                 "Artworks_07",
@@ -249,7 +248,12 @@ public interface ErrorCodes {
         ARTWORK_ONLY_ONE_DOCUMENT_ALLOWED_FOR_CATEGORY(
                 HttpStatus.BAD_REQUEST,
                 "Artworks_08",
-                "Artwork only one document allowed.");
+                "Artwork only one document allowed."),
+
+        ARTWORK_DOCUMENT_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "Artworks_09",
+                "Artwork document not found.");
 
         private final HttpStatus httpStatus;
         private final String code, description;

@@ -2,3 +2,6 @@ id,name
 401,manage_artwork_metadata
 402,submit_artwork
 403,preview_artwork
+404,search_artwork
+405,remove_artwork_document
+406,delete_artwork

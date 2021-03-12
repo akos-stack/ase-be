@@ -7,9 +7,8 @@ import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkHistoryDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
-import com.bloxico.ase.userservice.entity.artwork.Artwork;
+import com.bloxico.ase.userservice.entity.artwork.ArtworkDocument;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
-import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.facade.IArtworkFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.artwork.IArtistService;
@@ -23,15 +22,15 @@ import com.bloxico.ase.userservice.service.artwork.impl.metadata.StyleServiceImp
 import com.bloxico.ase.userservice.service.document.IDocumentService;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.util.FileCategory;
-import com.bloxico.ase.userservice.web.model.artwork.PagedArtworkResponse;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDataRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDocumentsRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkRequest;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,8 @@ import java.util.Set;
 
 import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.DRAFT;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.*;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_MISSING_CERTIFICATE;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_MISSING_RESUME;
 
 @Slf4j
 @Service
@@ -77,7 +77,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     public SaveArtworkResponse getArtworkById(Long id) {
         log.info("ArtworkFacadeImpl.saveArtworkDraft - start | id: {}", id);
         var artworkDto = artworkService.getArtworkById(id);
-        validateOwner(artworkDto);
+        securityContextService.validateOwner(artworkDto.getOwnerId());
         log.info("ArtworkFacadeImpl.saveArtworkDraft - end | id: {}", id);
         return new SaveArtworkResponse(prepareResponse(artworkDto));
     }
@@ -97,7 +97,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     public SaveArtworkResponse saveArtworkData(SaveArtworkDataRequest request) {
         log.info("ArtworkFacadeImpl.saveArtworkData - start | request: {}", request);
         var artworkDto = artworkService.getArtworkById(request.getArtworkId());
-        validateOwner(artworkDto);
+        securityContextService.validateOwner(artworkDto.getOwnerId());
         artworkDto = doPrepareArtworkDto(request, artworkDto);
         artworkDto = artworkService.saveArtwork(artworkDto);
         log.info("ArtworkFacadeImpl.saveArtworkData - end | request: {}", request);
@@ -105,25 +105,24 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     }
 
     @Override
-    public PagedArtworkResponse searchMyArtworks(Artwork.Status status, String title, int page, int size, String sort) {
-        log.info("ArtworkFacadeImpl.searchArtworks - start | status: {}, title: {}, page: {}, size: {}, sort: {}", status, title, page, size, sort);
-        var pagedDto = artworkService.searchMyArtworks(status, title, page, size, sort);
-        var response = new PagedArtworkResponse(pagedDto.getContent(), pagedDto.getContent().size(), pagedDto.getTotalElements(), pagedDto.getTotalPages());
-        log.info("ArtworkFacadeImpl.searchArtworks - end | status: {}, title: {}, page: {}, size: {}, sort: {}", status, title, page, size, sort);
+    public SearchArtworkResponse searchArtworks(SearchArtworkRequest request, PageRequest page) {
+        log.info("ArtworkFacadeImpl.searchArtworks - start | request: {}, page: {}", request, page);
+        var result = artworkService.searchArtworks(request, page);
+        var response = new SearchArtworkResponse(result);
+        log.info("ArtworkFacadeImpl.searchArtworks - end | request: {}, page: {}", request, page);
         return response;
     }
 
     @Override
-    public SaveArtworkResponse saveArtworkDocuments(SaveArtworkDocumentsRequest request) {
-        log.info("ArtworkDocumentFacadeImpl.saveArtworkDocuments - start | request: {}", request);
-        request.validateDocuments();
-        var artworkDto = artworkService.getArtworkById(request.getArtworkId());
-        validateOwner(artworkDto);
-        var documentDtos = documentService.getDocumentsById(artworkDocumentService.findDocumentsByArtworkId(request.getArtworkId()));
-        var toSaveDocuments = doSaveDocuments(documentDtos, request.getDocuments(), request.getFileCategory());
-        artworkDocumentService.saveArtworkDocuments(request.getArtworkId(), toSaveDocuments);
-        log.info("ArtworkDocumentFacadeImpl.saveArtworkDocuments - end | request: {}", request);
-        return new SaveArtworkResponse(prepareResponse(artworkDto));
+    public void deleteArtwork(Long id) {
+        log.info("ArtworkFacadeImpl.deleteArtwork - start | id: {}", id);
+        var artworkDto = artworkService.getArtworkById(id);
+        securityContextService.validateOwner(artworkDto.getOwnerId());
+        var documentIDs = artworkDocumentService.findDocumentsByArtworkId(id);
+        documentIDs.forEach(docId -> artworkDocumentService.removeArtworkDocument(new ArtworkDocument.Id(id, docId)));
+        documentService.deleteDocumentsByIds(documentIDs);
+        artworkService.deleteArtworkById(id);
+        log.info("ArtworkFacadeImpl.deleteArtwork - end | id: {}", id);
     }
 
     private ArtworkDto prepareResponse(ArtworkDto artworkDto) {
@@ -133,43 +132,6 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         }
         List<DocumentDto> documentDtos = documentService.getDocumentsById(artworkDocumentService.findDocumentsByArtworkId(artworkDto.getId()));
         return MAPPER.toArtworkDto(artworkDto, locationDto, Set.copyOf(documentDtos));
-    }
-
-    private List<DocumentDto> doSaveDocuments(List<DocumentDto> savedDocuments, List<MultipartFile> documents, FileCategory fileCategory) {
-        // validation if this artwork already has certificate or resume
-        if(FileCategory.CERTIFICATE.equals(fileCategory)
-                && hasDocumentByType(savedDocuments, FileCategory.CERTIFICATE)) {
-            throw ARTWORK_DOCUMENT_ALREADY_ATTACHED.newException();
-        }
-
-        if(FileCategory.CV.equals(fileCategory)
-                && hasDocumentByType(savedDocuments, FileCategory.CV)) {
-            throw ARTWORK_DOCUMENT_ALREADY_ATTACHED.newException();
-        }
-
-        if(FileCategory.PRINCIPAL_IMAGE.equals(fileCategory)
-                && hasDocumentByType(savedDocuments, FileCategory.PRINCIPAL_IMAGE)) {
-            throw ARTWORK_DOCUMENT_ALREADY_ATTACHED.newException();
-        }
-
-        List<DocumentDto> documentDtoList = new ArrayList<>();
-
-        documents.forEach(image -> {
-            var documentDto = documentService.saveDocument(image, fileCategory);
-            documentDtoList.add(documentDto);
-        });
-        return documentDtoList;
-    }
-
-    private boolean hasDocumentByType(List<DocumentDto> documentDtos, FileCategory fileCategory) {
-        return documentDtos.stream().anyMatch(documentDto -> fileCategory.equals(documentDto.getType()));
-    }
-
-    private void validateOwner(ArtworkDto artworkDto) {
-        if(securityContextService.getPrincipal().getRoles().stream().noneMatch(role -> Role.ADMIN.equals(role.getName()))
-                && !userProfileService.findUserProfileById(artworkDto.getOwnerId()).getUserId().equals(securityContextService.getPrincipalId())) {
-            throw ARTWORK_ACCESS_NOT_AUTHORIZED.newException();
-        }
     }
 
     private void validateRequiredDocuments(Long artworkId, boolean iAmArtOwner) {

@@ -1,10 +1,10 @@
 package com.bloxico.ase.userservice.facade;
 
-import com.bloxico.ase.userservice.entity.artwork.Artwork;
-import com.bloxico.ase.userservice.web.model.artwork.PagedArtworkResponse;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDataRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDocumentsRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkRequest;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkResponse;
 
 public interface IArtworkFacade {
 
@@ -12,9 +12,9 @@ public interface IArtworkFacade {
 
     SaveArtworkResponse saveArtworkDraft();
 
-    SaveArtworkResponse saveArtworkDocuments(SaveArtworkDocumentsRequest request);
-
     SaveArtworkResponse saveArtworkData(SaveArtworkDataRequest request);
 
-    PagedArtworkResponse searchMyArtworks(Artwork.Status status, String title, int page, int size, String sort);
+    SearchArtworkResponse searchArtworks(SearchArtworkRequest request, PageRequest page);
+
+    void deleteArtwork(Long id);
 }

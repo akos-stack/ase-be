@@ -1,7 +1,8 @@
 package com.bloxico.ase.userservice.service.artwork;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
-import com.bloxico.ase.userservice.entity.artwork.Artwork;
+import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkRequest;
 import org.springframework.data.domain.Page;
 
 public interface IArtworkService {
@@ -10,5 +11,7 @@ public interface IArtworkService {
 
     ArtworkDto getArtworkById(Long id);
 
-    Page<ArtworkDto> searchMyArtworks(Artwork.Status status, String title, int page, int size, String sort);
+    Page<ArtworkDto> searchArtworks(SearchArtworkRequest request, PageRequest page);
+
+    void deleteArtworkById(Long id);
 }

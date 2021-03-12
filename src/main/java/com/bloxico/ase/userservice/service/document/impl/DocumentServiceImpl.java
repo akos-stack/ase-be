@@ -83,4 +83,27 @@ public class DocumentServiceImpl implements IDocumentService {
         log.info("DocumentServiceImpl.findAllByIds - start | ids: {}", ids);
         return documents.stream().map(MAPPER::toDto).collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteDocumentById(Long id) {
+        log.info("DocumentServiceImpl.deleteDocumentById - start | id: {} ", id);
+        requireNonNull(id);
+        var document = documentRepository
+                .findById(id)
+                .orElseThrow(DOCUMENT_NOT_FOUND::newException);
+        s3Service.deleteFile(document.getPath());
+        documentRepository.delete(document);
+        log.info("DocumentServiceImpl.deleteDocumentById - end | id: {} ", id);
+    }
+
+    @Override
+    public void deleteDocumentsByIds(List<Long> id) {
+        log.info("DocumentServiceImpl.deleteDocumentById - start | id: {} ", id);
+        requireNonNull(id);
+        var documents = documentRepository
+                .findAllById(id);
+        documents.forEach(document -> s3Service.deleteFile(document.getPath()));
+        documentRepository.deleteAll(documents);
+        log.info("DocumentServiceImpl.deleteDocumentById - end | id: {} ", id);
+    }
 }
