@@ -70,6 +70,7 @@ public class UserServiceImpl implements IUserService {
     public Page<UserDto> findUsersByEmailOrRole(SearchUsersRequest request, PageRequest page) {
         log.debug("UserServiceImpl.findUsersByEmailOrRole - start | request: {}, page: {}", request, page);
         requireNonNull(request);
+        requireNonNull(request.getEmail());
         requireNonNull(page);
         var userDtos = userRepository
                 .findDistinctByEmailContainingAndRoles_NameContaining(

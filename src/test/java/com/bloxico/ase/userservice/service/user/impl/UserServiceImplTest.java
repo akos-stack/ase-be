@@ -7,7 +7,6 @@ import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -82,7 +81,7 @@ public class UserServiceImplTest extends AbstractSpringTest {
     @Test
     public void findUsersByEmailOrRole_nullEmail() {
         assertThrows(
-                InvalidDataAccessApiUsageException.class,
+                NullPointerException.class,
                 () -> userService.findUsersByEmailOrRole(genSearchUsersRequest(null), allPages()));
     }
 

@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
 import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
@@ -28,7 +28,6 @@ import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_F
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_EXISTS;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -159,7 +158,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void registrationTokenRefresh_404_tokenNotFound() {
         given()
                 .when()
-                .param(TOKEN_PARAM, genUUID())
+                .param("token", genUUID())
                 .get(API_URL + REGISTRATION_TOKEN_REFRESH_ENDPOINT)
                 .then()
                 .assertThat()
@@ -171,7 +170,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     public void registrationTokenRefresh_200_ok() {
         given()
                 .when()
-                .param(TOKEN_PARAM, utilAuth.doRegistration().getToken())
+                .param("token", utilAuth.doRegistration().getToken())
                 .get(API_URL + REGISTRATION_TOKEN_REFRESH_ENDPOINT)
                 .then()
                 .assertThat()
@@ -554,7 +553,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
         given()
                 .header("Authorization", utilAuth.doAuthentication())
                 .contentType(JSON)
-                .param("email", "aseUser")
+                .params(allPages("email", genEmail()))
                 .when()
                 .get(API_URL + REGISTRATION_EVALUATOR_SEARCH)
                 .then()
@@ -565,15 +564,14 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser(auth = true)
     public void searchPendingEvaluators_200_ok() {
-        var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
-        var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
-        var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
+        var email = genEmail();
+        var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail(email));
+        var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail(email));
+        var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail());
         var pendingEvaluators = given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .param("email", "fooBar")
-                .param("page", 0)
-                .param("size", MAX_VALUE)
+                .params(allPages("email", email))
                 .when()
                 .get(API_URL + REGISTRATION_EVALUATOR_SEARCH)
                 .then()
@@ -581,8 +579,9 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(PagedPendingEvaluatorDataResponse.class)
-                .getPendingEvaluators();
+                .as(SearchPendingEvaluatorsResponse.class)
+                .getPage()
+                .getContent();
         assertThat(
                 pendingEvaluators,
                 allOf(
@@ -624,7 +623,8 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .get(API_URL + REGISTRATION_EVALUATOR_RESUME_DOWNLOAD)
                 .then()
                 .assertThat()
-                .statusCode(200).body(notNullValue());
+                .statusCode(200)
+                .body(notNullValue());
     }
 
 }

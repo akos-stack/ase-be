@@ -7,9 +7,11 @@ import com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorDocumentRepository;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
+import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.token.SearchPendingEvaluatorsRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -98,14 +100,14 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
     }
 
     @Override
-    public Page<PendingEvaluatorDto> searchPendingEvaluators(String email, int page, int size, String sort) {
-        log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - start | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
-        requireNonNull(email);
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
+    public Page<PendingEvaluatorDto> searchPendingEvaluators(SearchPendingEvaluatorsRequest request, PageRequest page) {
+        log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - start | request: {}, page: {}", request, page);
+        requireNonNull(request);
+        requireNonNull(request.getEmail());
         var pendingEvaluatorsDto = pendingEvaluatorRepository
-                .findAllByEmailContaining(email, pageable)
+                .findAllByEmailContaining(request.getEmail(), page.toPageable())
                 .map(MAPPER::toDto);
-        log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - end | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
+        log.debug("PendingEvaluatorServiceImpl.searchPendingEvaluators - end | request: {}, page: {}", request, page);
         return pendingEvaluatorsDto;
     }
 
@@ -133,7 +135,6 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
         pendingEvaluatorDocumentRepository.saveAndFlush(pendingEvaluatorDocument);
         log.debug("PendingEvaluatorServiceImpl.savePendingEvaluatorDocument - end | email: {}, documentId {}", email, documentId);
     }
-
 
     private PendingEvaluator updateStatus(PendingEvaluator pendingEvaluator, Status status) {
         pendingEvaluator.setStatus(status);

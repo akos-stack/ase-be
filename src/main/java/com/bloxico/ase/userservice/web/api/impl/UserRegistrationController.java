@@ -4,11 +4,11 @@ import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
 import com.bloxico.ase.userservice.web.api.UserRegistrationApi;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
-import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
-import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
+import com.bloxico.ase.userservice.web.model.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -34,8 +34,8 @@ public class UserRegistrationController implements UserRegistrationApi {
     }
 
     @Override
-    public ResponseEntity<Void> refreshRegistrationToken(String token) {
-        userRegistrationFacade.refreshExpiredToken(token);
+    public ResponseEntity<Void> refreshRegistrationToken(RefreshRegistrationTokenRequest request) {
+        userRegistrationFacade.refreshExpiredToken(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -88,14 +88,16 @@ public class UserRegistrationController implements UserRegistrationApi {
     }
 
     @Override
-    public ResponseEntity<PagedPendingEvaluatorDataResponse> searchPendingEvaluators(String email, int page, int size, String sort) {
-        var arrayPendingEvaluatorDataResponse = userRegistrationFacade.searchPendingEvaluators(email, page, size, sort);
+    public ResponseEntity<SearchPendingEvaluatorsResponse> searchPendingEvaluators(
+            SearchPendingEvaluatorsRequest request, PageRequest page)
+    {
+        var arrayPendingEvaluatorDataResponse = userRegistrationFacade.searchPendingEvaluators(request, page);
         return ResponseEntity.ok(arrayPendingEvaluatorDataResponse);
     }
 
     @Override
-    public ResponseEntity<Resource> downloadEvaluatorResume(String email) {
-        var response = userRegistrationFacade.downloadEvaluatorResume(email);
+    public ResponseEntity<Resource> downloadEvaluatorResume(DownloadEvaluatorResumeRequest request) {
+        var response = userRegistrationFacade.downloadEvaluatorResume(request);
         return ResponseEntity.ok(response);
     }
 

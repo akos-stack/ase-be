@@ -11,6 +11,7 @@ import com.bloxico.ase.userservice.service.token.ITokenService;
 import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImpl;
 import com.bloxico.ase.userservice.service.user.*;
 import com.bloxico.ase.userservice.util.MailUtil;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
@@ -85,12 +86,12 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     }
 
     @Override
-    public void refreshExpiredToken(String expiredTokenValue) {
-        log.info("UserRegistrationFacadeImpl.refreshExpiredToken - start | expiredTokenValue: {}", expiredTokenValue);
-        var tokenDto = registrationTokenService.refreshToken(expiredTokenValue);
+    public void refreshExpiredToken(RefreshRegistrationTokenRequest request) {
+        log.info("UserRegistrationFacadeImpl.refreshExpiredToken - start | request: {}", request);
+        var tokenDto = registrationTokenService.refreshToken(request.getToken());
         var userDto = userService.findUserById(tokenDto.getUserId());
         mailUtil.sendTokenEmail(VERIFICATION, userDto.getEmail(), tokenDto.getValue());
-        log.info("UserRegistrationFacadeImpl.refreshExpiredToken - end | expiredTokenValue: {}", expiredTokenValue);
+        log.info("UserRegistrationFacadeImpl.refreshExpiredToken - end | request: {}", request);
     }
 
     @Override
@@ -176,20 +177,20 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     }
 
     @Override
-    public PagedPendingEvaluatorDataResponse searchPendingEvaluators(String email, int page, int size, String sort) {
-        log.info("UserRegistrationFacadeImpl.searchPendingEvaluators - start | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
-        var pendingEvaluators = pendingEvaluatorService.searchPendingEvaluators(email, page, size, sort);
-        var response = new PagedPendingEvaluatorDataResponse(pendingEvaluators.getContent(), pendingEvaluators.getContent().size(), pendingEvaluators.getTotalElements(), pendingEvaluators.getTotalPages());
-        log.info("UserRegistrationFacadeImpl.searchPendingEvaluators - end | email: {}, page: {}, size: {}, sort {}", email, page, size, sort);
+    public SearchPendingEvaluatorsResponse searchPendingEvaluators(SearchPendingEvaluatorsRequest request, PageRequest page) {
+        log.info("UserRegistrationFacadeImpl.searchPendingEvaluators - start | request: {}, page {}", request, page);
+        var result = pendingEvaluatorService.searchPendingEvaluators(request, page);
+        var response = new SearchPendingEvaluatorsResponse(result);
+        log.info("UserRegistrationFacadeImpl.searchPendingEvaluators - end | request: {}, page {}", request, page);
         return response;
     }
 
     @Override
-    public ByteArrayResource downloadEvaluatorResume(String email) {
-        log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - start | email: {}", email);
-        var pendingEvaluatorDocumentDto = pendingEvaluatorService.getEvaluatorResume(email);
+    public ByteArrayResource downloadEvaluatorResume(DownloadEvaluatorResumeRequest request) {
+        log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - start | request: {}", request);
+        var pendingEvaluatorDocumentDto = pendingEvaluatorService.getEvaluatorResume(request.getEmail());
         var response = documentService.getDocumentById(pendingEvaluatorDocumentDto.getDocumentId());
-        log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - end | email: {}", email);
+        log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - end | request: {}", request);
         return response;
     }
 

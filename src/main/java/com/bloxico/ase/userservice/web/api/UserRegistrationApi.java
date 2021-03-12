@@ -2,11 +2,11 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
-import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
-import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
+import com.bloxico.ase.userservice.web.model.user.*;
 import io.swagger.annotations.*;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 
 @Api(value = "registration")
 public interface UserRegistrationApi {
@@ -34,8 +33,6 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_SEARCH              = "/user/registration/evaluator/search";
     String REGISTRATION_EVALUATOR_RESUME_DOWNLOAD     = "/user/registration/evaluator/resume";
     // @formatter:on
-
-    String TOKEN_PARAM = "token";
 
     @PostMapping(
             value = REGISTRATION_ENDPOINT,
@@ -67,8 +64,7 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "Provided token is not found.")
     })
     @GetMapping(value = REGISTRATION_TOKEN_REFRESH_ENDPOINT)
-    ResponseEntity<Void> refreshRegistrationToken(@ApiParam(value = "Expired token value", required = true)
-                                                  @RequestParam(TOKEN_PARAM) String token);
+    ResponseEntity<Void> refreshRegistrationToken(@Valid RefreshRegistrationTokenRequest request);
 
     @PostMapping(
             value = REGISTRATION_TOKEN_RESEND_ENDPOINT,
@@ -136,7 +132,7 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 200, message = "Invitation is sent successfully."),
             @ApiResponse(code = 409, message = "Evaluator with given email is already pending evaluator.")
     })
-    ResponseEntity<Void> requestEvaluatorRegistration(EvaluatorRegistrationRequest request);
+    ResponseEntity<Void> requestEvaluatorRegistration(@Valid EvaluatorRegistrationRequest request);
 
     @PostMapping(
             value = REGISTRATION_EVALUATOR_SUBMIT,
@@ -169,11 +165,9 @@ public interface UserRegistrationApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Paginated list of pending evaluators successfully retrieved.")
     })
-    ResponseEntity<PagedPendingEvaluatorDataResponse> searchPendingEvaluators(
-            @Valid @RequestParam("email") String email,
-            @Valid @RequestParam(required = false, defaultValue = "0") int page,
-            @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size,
-            @Valid @RequestParam(required = false, defaultValue = "email") String sort);
+    ResponseEntity<SearchPendingEvaluatorsResponse> searchPendingEvaluators(
+            @Valid SearchPendingEvaluatorsRequest request,
+            @Valid PageRequest page);
 
     @GetMapping(value = REGISTRATION_EVALUATOR_RESUME_DOWNLOAD)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'download_user_resume')")
@@ -184,6 +178,6 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "Pending evaluator with given email doesn't have a resume."),
             @ApiResponse(code = 400, message = "Download resume failed for some reason.")
     })
-    ResponseEntity<Resource> downloadEvaluatorResume(@Valid @RequestParam("email") String email);
+    ResponseEntity<Resource> downloadEvaluatorResume(@Valid DownloadEvaluatorResumeRequest request);
 
 }
