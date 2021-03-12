@@ -19,8 +19,7 @@ public class Config extends BaseEntity {
         QUOTATION_PACKAGE_MIN_EVALUATIONS {
             @Override
             public boolean isValid(Object value) {
-                return !Integer.class.isAssignableFrom(value.getClass())
-                        && (int) value > 0;
+                return Integer.class.isAssignableFrom(value.getClass()) && (int) value > 0;
             }
         };
 
