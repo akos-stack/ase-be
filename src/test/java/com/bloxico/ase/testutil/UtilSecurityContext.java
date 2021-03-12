@@ -2,6 +2,9 @@ package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.config.security.AsePrincipal;
 import com.bloxico.ase.userservice.entity.user.User;
+import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
+import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -9,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UtilSecurityContext {
+
+    @Autowired
+    private UserProfileRepository userProfileRepository;
 
     public String getToken() {
         if(SecurityContextHolder.getContext().getAuthentication() != null) {
@@ -38,5 +44,9 @@ public class UtilSecurityContext {
             return (User) user.getUser();
         }
         return null;
+    }
+
+    public UserProfile getLoggedInUserProfile() {
+        return userProfileRepository.findByUserId(getLoggedInUserId()).orElse(null);
     }
 }

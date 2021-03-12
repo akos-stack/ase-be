@@ -78,6 +78,7 @@ import org.junit.runners.Suite;
         UserManagementApiTest.class,
         ArtworkMetadataApiTest.class,
         ArtworkApiTest.class,
+        ArtworkDocumentsApiTest.class,
         EvaluationApiTest.class,
         SystemApiTest.class
 })

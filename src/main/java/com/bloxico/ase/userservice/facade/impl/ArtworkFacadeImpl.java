@@ -141,7 +141,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
             throw ARTWORK_MISSING_RESUME.newException();
         }
 
-        if(iAmArtOwner && documentDtos.stream().noneMatch(documentDto -> FileCategory.CERTIFICATE == documentDto.getType())) {
+        if(!iAmArtOwner && documentDtos.stream().noneMatch(documentDto -> FileCategory.CERTIFICATE == documentDto.getType())) {
             throw ARTWORK_MISSING_CERTIFICATE.newException();
         }
     }

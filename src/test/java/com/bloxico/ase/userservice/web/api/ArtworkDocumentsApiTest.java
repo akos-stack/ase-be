@@ -14,11 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.util.FileCategory.*;
-import static com.bloxico.ase.userservice.web.api.ArtworkDocumentsApi.ARTWORK_SAVE_DOCUMENTS;
+import static com.bloxico.ase.userservice.web.api.ArtworkApi.ARTWORK_PREVIEW;
+import static com.bloxico.ase.userservice.web.api.ArtworkDocumentsApi.*;
 import static io.restassured.RestAssured.given;
+import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 // Because RestAssured executes in another transaction
@@ -213,4 +214,143 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
         assertEquals(2, response2.getArtworkDto().getDocuments().size());
     }
 
+    @Test
+    @WithMockCustomUser(role = Role.USER, auth = true)
+    public void downloadArtworkDocument_403_notAuthorized() {
+        given()
+                .header("Authorization", securityContext.getToken())
+                .param("artworkId", 1L)
+                .param("documentId", 1L)
+                .when()
+                .get(API_URL + ARTWORK_DOCUMENTS_DOWNLOAD)
+                .then()
+                .assertThat()
+                .statusCode(403);
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
+    public void downloadArtworkDocument_401_notAllowed() {
+        var artworkDto = utilArtwork.savedArtworkDtoWithOwner();
+        given()
+                .header("Authorization", securityContext.getToken())
+                .param("artworkId", artworkDto.getId())
+                .param("documentId", 1L)
+                .when()
+                .get(API_URL + ARTWORK_DOCUMENTS_DOWNLOAD)
+                .then()
+                .assertThat()
+                .statusCode(401)
+                .body(ERROR_CODE, is(ErrorCodes.User.ACCESS_NOT_ALLOWED.getCode()));
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
+    public void downloadArtworkDocument_404_notFound() {
+        var artworkDto = utilArtwork.savedArtworkDtoDraftWithDocuments();
+        given()
+                .header("Authorization", securityContext.getToken())
+                .param("artworkId", artworkDto.getId())
+                .param("documentId", -1L)
+                .when()
+                .get(API_URL + ARTWORK_DOCUMENTS_DOWNLOAD)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_DOCUMENT_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
+    public void downloadArtworkDocument() {
+        var artworkDto = utilArtwork.savedArtworkDtoDraftWithDocuments();
+        var documentDto = artworkDto.getDocuments().stream().findFirst().get();
+        given()
+                .header("Authorization", securityContext.getToken())
+                .param("artworkId", artworkDto.getId())
+                .param("documentId", documentDto.getId())
+                .when()
+                .get(API_URL + ARTWORK_DOCUMENTS_DOWNLOAD)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.USER, auth = true)
+    public void removeArtworkDocument_403_notAuthorized() {
+        given()
+                .header("Authorization", securityContext.getToken())
+                .param("artworkId", -1L)
+                .param("documentId", -1L)
+                .when()
+                .delete(API_URL + ARTWORK_DOCUMENTS_REMOVE)
+                .then()
+                .assertThat()
+                .statusCode(403);
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
+    public void removeArtworkDocument_401_notAllowed() {
+        var artworkDto = utilArtwork.savedArtworkDtoWithOwner();
+        given()
+                .header("Authorization", securityContext.getToken())
+                .param("artworkId", artworkDto.getId())
+                .param("documentId", 1L)
+                .when()
+                .delete(API_URL + ARTWORK_DOCUMENTS_REMOVE)
+                .then()
+                .assertThat()
+                .statusCode(401)
+                .body(ERROR_CODE, is(ErrorCodes.User.ACCESS_NOT_ALLOWED.getCode()));
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
+    public void removeArtworkDocument_404_notFound() {
+        var artworkDto = utilArtwork.savedArtworkDto();
+        given()
+                .header("Authorization", securityContext.getToken())
+                .param("artworkId", artworkDto.getId())
+                .param("documentId", -1L)
+                .when()
+                .delete(API_URL + ARTWORK_DOCUMENTS_REMOVE)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_DOCUMENT_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
+    public void removeArtworkDocument() {
+        var artworkDto = utilArtwork.savedArtworkDtoDraftWithDocuments();
+        var documentDto = artworkDto.getDocuments().stream().findFirst().get();
+        given()
+                .header("Authorization", securityContext.getToken())
+                .param("artworkId", artworkDto.getId())
+                .param("documentId", documentDto.getId())
+                .when()
+                .delete(API_URL + ARTWORK_DOCUMENTS_REMOVE)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        var response = given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(JSON)
+                .param("id", artworkDto.getId())
+                .when()
+                .get(API_URL + ARTWORK_PREVIEW)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SaveArtworkResponse.class);
+
+        var documents = response.getArtworkDto().getDocuments();
+        assertTrue(documents.stream().noneMatch(documentDto1 -> documentDto1.getId().equals(documentDto.getId())));
+
+    }
 }

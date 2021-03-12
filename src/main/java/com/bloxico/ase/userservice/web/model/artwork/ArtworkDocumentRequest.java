@@ -15,11 +15,11 @@ import static lombok.AccessLevel.PRIVATE;
 public class ArtworkDocumentRequest {
 
     @NotNull
-    @ApiParam(name = "artwork_id", required = true)
+    @ApiParam(name = "artworkId", required = true)
     Long artworkId;
 
     @NotNull
-    @ApiParam(name = "document_id", required = true)
+    @ApiParam(name = "documentId", required = true)
     Long documentId;
 
 }

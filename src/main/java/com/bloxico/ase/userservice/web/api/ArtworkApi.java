@@ -55,7 +55,11 @@ public interface ArtworkApi {
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'submit_artwork')")
     @ApiOperation(value = "User submits artwork data.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "User successfully submitted artwork data.")
+            @ApiResponse(code = 200, message = "User successfully submitted artwork data."),
+            @ApiResponse(code = 400, message = "User submitted bad data."),
+            @ApiResponse(code = 401, message = "User not authorized to update artwork."),
+            @ApiResponse(code = 403, message = "User has no permission."),
+            @ApiResponse(code = 404, message = "Artwork not found.")
     })
     ResponseEntity<SaveArtworkResponse> saveArtworkData(@Valid @RequestBody SaveArtworkDataRequest request);
 
