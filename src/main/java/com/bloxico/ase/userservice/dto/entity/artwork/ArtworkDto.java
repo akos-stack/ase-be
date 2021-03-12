@@ -1,21 +1,22 @@
 package com.bloxico.ase.userservice.dto.entity.artwork;
 
+import com.bloxico.ase.userservice.dto.entity.BaseEntityDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
-public class ArtworkDto {
-
-    @JsonProperty("id")
-    private Long id;
+public class ArtworkDto extends BaseEntityDto {
 
     @JsonProperty("title")
     private String title;
@@ -23,8 +24,8 @@ public class ArtworkDto {
     @JsonProperty("artist")
     private ArtistDto artist;
 
-    @JsonProperty("owner")
-    private ArtOwnerDto owner;
+    @JsonProperty("owner_id")
+    private Long ownerId;
 
     @JsonProperty("year")
     private Integer year;
@@ -51,7 +52,7 @@ public class ArtworkDto {
     private Artwork.Status status;
 
     @JsonProperty("history")
-    private ArtworkHistoryDto history;
+    private ArtworkHistoryDto artworkHistory;
 
     @JsonProperty("categories")
     private Set<ArtworkMetadataDto> categories = new HashSet<>();

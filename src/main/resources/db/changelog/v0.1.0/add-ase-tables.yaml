@@ -1035,13 +1035,10 @@ databaseChangeLog:
               - column:
                   name: title
                   type: varchar(256)
-                  constraints:
-                    nullable: false
               - column:
                   name: artist_id
                   type: bigint
                   constraints:
-                    nullable: false
                     foreignKeyName: fk_artworks_artist
                     references: artists(id)
               - column:
@@ -1054,38 +1051,25 @@ databaseChangeLog:
               - column:
                   name: year
                   type: integer
-                  constraints:
-                    nullable: false
               - column:
                   name: weight
                   type: numeric
-                  constraints:
-                    nullable: false
               - column:
                   name: height
                   type: numeric
-                  constraints:
-                    nullable: false
               - column:
                   name: width
                   type: numeric
-                  constraints:
-                    nullable: false
               - column:
                   name: depth
                   type: numeric
-                  constraints:
-                    nullable: false
               - column:
                   name: phone_number
                   type: varchar(256)
-                  constraints:
-                    nullable: false
               - column:
                   name: location_id
                   type: bigint
                   constraints:
-                    nullable: false
                     foreignKeyName: fk_artworks_location
                     references: locations(id)
               - column:
@@ -1243,6 +1227,35 @@ databaseChangeLog:
                     primaryKey: true
                     foreignKeyName: fk_document_artworks
                     references: documents(id)
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_quotation_packages_countries_creator
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_quotation_packages_countries_updater
+                    references: users(id)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
         - createTable:
             tableName: quotation_packages
             columns:

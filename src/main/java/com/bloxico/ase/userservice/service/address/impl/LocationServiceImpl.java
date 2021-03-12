@@ -194,6 +194,17 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
+    public LocationDto findLocationById(Long id) {
+        log.debug("LocationServiceImpl.findLocationById - start | id: {}", id);
+        requireNonNull(id);
+        var location = locationRepository.findById(id)
+                .map(MAPPER::toDto)
+                .orElseThrow(LOCATION_NOT_FOUND::newException);
+        log.debug("LocationServiceImpl.findLocationById - end | id: {}", id);
+        return location;
+    }
+
+    @Override
     public int countCountriesByRegionId(Long regionId) {
         log.debug("LocationServiceImpl.countCountriesByRegionId - start | regionId: {}", regionId);
         var count = countryRepository.countByRegionsIdEquals(regionId);

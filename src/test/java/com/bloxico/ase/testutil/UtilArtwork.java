@@ -1,11 +1,17 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.*;
+import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.entity.artwork.Artist;
 import com.bloxico.ase.userservice.entity.artwork.Artwork;
+import com.bloxico.ase.userservice.facade.impl.ArtworkFacadeImpl;
 import com.bloxico.ase.userservice.repository.artwork.ArtistRepository;
+import com.bloxico.ase.userservice.service.artwork.document.impl.ArtworkDocumentServiceImpl;
 import com.bloxico.ase.userservice.service.artwork.impl.ArtworkServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
+import com.bloxico.ase.userservice.util.FileCategory;
+import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDataRequest;
+import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDocumentsRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,6 +36,8 @@ public class UtilArtwork {
     @Autowired private UserProfileServiceImpl userProfileService;
     @Autowired private ArtistRepository artistRepository;
     @Autowired private ArtworkServiceImpl artworkService;
+    @Autowired private ArtworkFacadeImpl artworkFacade;
+    @Autowired private ArtworkDocumentServiceImpl artworkDocumentService;
 
     public Artist savedArtist() {
         var creatorId = utilUser.savedAdmin().getId();
@@ -63,14 +71,14 @@ public class UtilArtwork {
         artworkDto.setDepth(genPosBigDecimal(20));
         artworkDto.setPhone(genUUID());
         artworkDto.setStatus(Artwork.Status.WAITING_FOR_EVALUATION);
-        artworkDto.setOwner(utilUserProfile.savedArtOwnerDto());
+        artworkDto.setOwnerId(utilUserProfile.savedArtOwnerDto().getId());
         artworkDto.setLocation(utilLocation.savedLocationDto());
         artworkDto.setArtist(savedArtistDto());
         artworkDto.addCategories(List.of(utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, PENDING)));
         artworkDto.addMaterials(List.of(utilArtworkMetadata.savedArtworkMetadataDto(MATERIAL, PENDING)));
         artworkDto.addMediums(List.of(utilArtworkMetadata.savedArtworkMetadataDto(MEDIUM, PENDING)));
         artworkDto.addStyles(List.of(utilArtworkMetadata.savedArtworkMetadataDto(STYLE, PENDING)));
-        artworkDto.setHistory(genArtworkHistory());
+        artworkDto.setArtworkHistory(genArtworkHistory());
         artworkDto.addDocuments(List.of(utilDocument.savedDocumentDto(IMAGE)));
         artworkDto.addDocuments(List.of(utilDocument.savedDocumentDto(PRINCIPAL_IMAGE)));
         artworkDto.addDocuments(List.of(utilDocument.savedDocumentDto(CERTIFICATE)));
@@ -80,6 +88,87 @@ public class UtilArtwork {
     public ArtworkDto savedArtworkDto() {
         var artworkDto = genArtworkDto();
         return artworkService.saveArtwork(artworkDto);
+    }
+
+    public ArtworkDto savedArtworkDtoDraft() {
+        return artworkFacade.saveArtworkDraft().getArtworkDto();
+    }
+
+    public ArtworkDto savedArtworkDtoWithOwner() {
+        var artOwner = utilUserProfile.savedArtOwnerDto(utilUser.savedUser().getId());
+        var artworkDto = new ArtworkDto();
+        artworkDto.setStatus(Artwork.Status.DRAFT);
+        artworkDto.setOwnerId(artOwner.getId());
+        return artworkService.saveArtwork(artworkDto);
+    }
+
+    public ArtworkDto savedArtworkDtoDraftWithDocuments() {
+        var artworkDto = savedArtworkDtoDraft();
+        List<DocumentDto> documentIds = new ArrayList<>();
+        for (var category : FileCategory.values()) {
+            var documentDto = utilDocument.savedDocumentDto(category);
+            documentIds.add(documentDto);
+        }
+        artworkDocumentService.saveArtworkDocuments(artworkDto.getId(), documentIds);
+        return artworkFacade.getArtworkById(artworkDto.getId()).getArtworkDto();
+    }
+
+    public SaveArtworkDocumentsRequest genSaveArtworkDocumentsRequest() {
+        var request = new SaveArtworkDocumentsRequest();
+        request.setArtworkId(savedArtworkDtoDraft().getId());
+        request.setDocuments(List.of(genMultipartFile(IMAGE)));
+        request.setFileCategory(IMAGE);
+        return request;
+    }
+
+    public SaveArtworkDataRequest genSaveArtworkDataRequest(Artwork.Status status, boolean artOwner) {
+        var artworkDto = savedArtworkDtoDraftWithDocuments();
+        var imageId = artworkDto.getDocuments().stream().filter(documentDto -> IMAGE.equals(documentDto.getType())).findFirst().get().getId();
+        var region = utilLocation.savedRegion();
+        var country = utilLocation.savedCountryWithRegion(region);
+        return new SaveArtworkDataRequest(
+                artworkDto.getId(),                   // artworkId
+                imageId,                              // principal_image_id
+                genUUID(),                            // title
+                Arrays.asList(genUUID(), genUUID()),  // categories
+                genUUID(),                            // artist
+                artOwner,                             // iAmArtOwner
+                genPosInt(Year.now().getValue()),     // year
+                Arrays.asList(genUUID(), genUUID()),  // materials
+                Arrays.asList(genUUID(), genUUID()),  // mediums
+                Arrays.asList(genUUID(), genUUID()),  // styles
+                genPosBigDecimal(100),                          // weight
+                genPosBigDecimal(100),                          // height
+                genPosBigDecimal(100),                          // width
+                genPosBigDecimal(100),                          // depth
+                genUUID(),                             // address
+                genUUID(),                             // address2
+                genUUID(),                             // city
+                country.getName(),                     // country
+                region.getName(),                      // region
+                genUUID(),                             // zipCode
+                genUUID(),                             // phone
+                genUUID(),                             // appraisalHistory
+                genUUID(),                             // locationHistory
+                genUUID(),                             // runsHistory
+                genUUID(),                             // maintenanceHistory
+                genUUID(),                             // notes
+                status                                 // status
+        );
+    }
+
+    public Map<String, String> genSaveArtworkDocumentsFormParams(FileCategory fileCategory) {
+        var map = new HashMap<String, String>();
+        map.put("artworkId", String.valueOf(savedArtworkDtoDraft().getId()));
+        map.put("fileCategory", fileCategory.name());
+        return map;
+    }
+
+    public Map<String, String> genSaveArtworkDocumentsFormParamsWithOwner(FileCategory fileCategory) {
+        var map = new HashMap<String, String>();
+        map.put("artworkId", String.valueOf(savedArtworkDtoWithOwner().getId()));
+        map.put("fileCategory", fileCategory.name());
+        return map;
     }
 
     public SaveArtworkRequest genSaveArtworkRequest(Artwork.Status status, boolean artOwner) {

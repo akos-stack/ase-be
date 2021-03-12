@@ -52,6 +52,17 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     @Override
+    public UserProfileDto findUserProfileById(Long id) {
+        log.debug("UserProfileServiceImpl.findUserProfileById - start | id: {}", id);
+        var userProfileDto = userProfileRepository
+                .findById(id)
+                .map(MAPPER::toDto)
+                .orElseThrow(USER_NOT_FOUND::newException);
+        log.debug("UserProfileServiceImpl.findUserProfileById - end | id: {}", id);
+        return userProfileDto;
+    }
+
+    @Override
     public UserProfileDto updateUserProfile(long id, UpdateUserProfileRequest request) {
         log.debug("UserProfileServiceImpl.updateUserProfile - start | id: {}, request: {}", id, request);
         requireNonNull(request);

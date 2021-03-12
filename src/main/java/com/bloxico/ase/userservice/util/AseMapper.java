@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDocumentDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkHistoryDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
@@ -25,6 +26,7 @@ import com.bloxico.ase.userservice.entity.address.Location;
 import com.bloxico.ase.userservice.entity.address.Region;
 import com.bloxico.ase.userservice.entity.artwork.Artist;
 import com.bloxico.ase.userservice.entity.artwork.Artwork;
+import com.bloxico.ase.userservice.entity.artwork.ArtworkDocument;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkHistory;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
 import com.bloxico.ase.userservice.entity.document.Document;
@@ -46,7 +48,7 @@ import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithE
 import com.bloxico.ase.userservice.web.model.address.SaveCountryRequest;
 import com.bloxico.ase.userservice.web.model.address.SaveRegionRequest;
 import com.bloxico.ase.userservice.web.model.address.UpdateCountryRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkRequest;
+import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDataRequest;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.IArtworkMetadataRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SaveQuotationPackageRequest;
@@ -59,6 +61,8 @@ import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+
+import java.util.Set;
 
 @Mapper
 public interface AseMapper {
@@ -103,6 +107,7 @@ public interface AseMapper {
 
     ArtistDto toDto(Artist artist);
 
+    @Mapping(target = "location.id", source = "locationId")
     ArtworkDto toDto(Artwork artwork);
 
     ArtworkHistoryDto toDto(ArtworkHistory artworkHistory);
@@ -110,6 +115,8 @@ public interface AseMapper {
     @Mapping(target = "email", source = "pendingEvaluatorDocument.pendingEvaluatorDocumentId.email")
     @Mapping(target = "documentId", source = "pendingEvaluatorDocument.pendingEvaluatorDocumentId.documentId")
     PendingEvaluatorDocumentDto toDto(PendingEvaluatorDocument pendingEvaluatorDocument);
+
+    ArtworkDocumentDto toDto(ArtworkDocument artworkDocument);
 
     // DTO -> ENTITY
 
@@ -141,9 +148,12 @@ public interface AseMapper {
 
     Artist toEntity(ArtistDto dto);
 
+    @Mapping(source = "dto.location.id", target = "locationId")
     Artwork toEntity(ArtworkDto dto);
 
     ArtworkHistory toEntity(ArtworkHistoryDto dto);
+
+    ArtworkDocument toEntity(ArtworkDocumentDto dto);
 
     // OTHER
 
@@ -164,7 +174,7 @@ public interface AseMapper {
     LocationDto toLocationDto(ISubmitUserProfileRequest request);
 
     @Mapping(ignore = true, target = "country")
-    LocationDto toLocationDto(SaveArtworkRequest request);
+    LocationDto toLocationDto(SaveArtworkDataRequest request);
 
     UserProfileDto toUserProfileDto(ISubmitUserProfileRequest request);
 
@@ -202,16 +212,26 @@ public interface AseMapper {
 
     PendingEvaluatorDto toPendingEvaluatorDto(IPendingEvaluatorRequest request);
 
+    ArtworkHistoryDto toArtworkHistoryDto(SaveArtworkDataRequest request);
+
     @Mapping(ignore = true, target = "artist")
-    @Mapping(ignore = true, target = "owner")
+    @Mapping(ignore = true, target = "ownerId")
     @Mapping(ignore = true, target = "location")
-    @Mapping(ignore = true, target = "history")
+    @Mapping(ignore = true, target = "artworkHistory")
     @Mapping(ignore = true, target = "categories")
     @Mapping(ignore = true, target = "materials")
     @Mapping(ignore = true, target = "mediums")
     @Mapping(ignore = true, target = "styles")
-    ArtworkDto toArtworkDto(SaveArtworkRequest request);
+    @Mapping(source = "artworkId", target = "id")
+    ArtworkDto toArtworkDto(SaveArtworkDataRequest request);
 
-    ArtworkHistoryDto toArtworkHistoryDto(SaveArtworkRequest request);
-
+    @Mapping(source = "artworkDto.id", target = "id")
+    @Mapping(source = "artworkDto.creatorId", target = "creatorId")
+    @Mapping(source = "artworkDto.updaterId", target = "updaterId")
+    @Mapping(source = "artworkDto.createdAt", target = "createdAt")
+    @Mapping(source = "artworkDto.updatedAt", target = "updatedAt")
+    @Mapping(source = "artworkDto.version", target = "version")
+    @Mapping(source = "locationDto", target = "location")
+    @Mapping(source = "documents", target = "documents")
+    ArtworkDto toArtworkDto(ArtworkDto artworkDto, LocationDto locationDto, Set<DocumentDto> documents);
 }

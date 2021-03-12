@@ -1,13 +1,10 @@
 package com.bloxico.ase.userservice.entity.artwork;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
-import com.bloxico.ase.userservice.entity.address.Location;
 import com.bloxico.ase.userservice.entity.artwork.metadata.Category;
 import com.bloxico.ase.userservice.entity.artwork.metadata.Material;
 import com.bloxico.ase.userservice.entity.artwork.metadata.Medium;
 import com.bloxico.ase.userservice.entity.artwork.metadata.Style;
-import com.bloxico.ase.userservice.entity.document.Document;
-import com.bloxico.ase.userservice.entity.user.profile.ArtOwner;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -28,49 +25,45 @@ public class Artwork extends BaseEntity {
     public enum Status {
 
         DRAFT,
+        READY_FOR_EVALUATION,
         WAITING_FOR_EVALUATION
 
     }
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     private String title;
 
     @ManyToOne
-    @JoinColumn(name = "artist_id", nullable = false)
+    @JoinColumn(name = "artist_id")
     private Artist artist;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
-    private ArtOwner owner;
+    @Column(name = "owner_id")
+    private Long ownerId;
 
-    @Column(name = "year", nullable = false)
+    @Column(name = "year")
     private Integer year;
 
-    @Column(name = "weight", nullable = false)
+    @Column(name = "weight")
     private BigDecimal weight;
 
-    @Column(name = "height", nullable = false)
+    @Column(name = "height")
     private BigDecimal height;
 
-    @Column(name = "width", nullable = false)
+    @Column(name = "width")
     private BigDecimal width;
 
-    @Column(name = "depth", nullable = false)
+    @Column(name = "depth")
     private BigDecimal depth;
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number")
     private String phone;
 
-    @ManyToOne
-    @JoinColumn(name = "location_id", nullable = false)
-    private Location location;
+    @Column(name = "location_id")
+    private Long locationId;
 
     @Column(name = "status", nullable = false)
     @Enumerated(STRING)
     private Status status;
-
-    @OneToOne(mappedBy = "artwork")
-    ArtworkHistory artworkHistory;
 
     @ManyToMany(fetch = LAZY, cascade = MERGE)
     @JoinTable(
@@ -99,11 +92,4 @@ public class Artwork extends BaseEntity {
             joinColumns = @JoinColumn(name = "artwork_id"),
             inverseJoinColumns = @JoinColumn(name = "style_id"))
     private List<Style> styles;
-
-    @ManyToMany(fetch = LAZY, cascade = MERGE)
-    @JoinTable(
-            name = "artworks_documents",
-            joinColumns = @JoinColumn(name = "artwork_id"),
-            inverseJoinColumns = @JoinColumn(name = "document_id"))
-    private List<Document> documents;
 }

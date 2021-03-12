@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.dto.entity.address;
 
+import com.bloxico.ase.userservice.dto.entity.BaseEntityDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -10,8 +11,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(of = "name")
-public class CountryDto {
+@EqualsAndHashCode(of = "name", callSuper = false)
+public class CountryDto extends BaseEntityDto {
 
     @JsonProperty("id")
     private Long id;

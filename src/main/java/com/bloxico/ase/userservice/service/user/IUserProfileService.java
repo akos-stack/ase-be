@@ -9,6 +9,8 @@ public interface IUserProfileService {
 
     UserProfileDto findUserProfileByUserId(long id);
 
+    UserProfileDto findUserProfileById(Long id);
+
     UserProfileDto updateUserProfile(long id, UpdateUserProfileRequest request);
 
     UserProfileDto saveUserProfile(UserProfileDto userProfileDto, long principalId);

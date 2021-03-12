@@ -33,5 +33,7 @@ public interface ILocationService {
 
     LocationDto saveLocation(LocationDto locationDto, Long principalId);
 
+    LocationDto findLocationById(Long id);
+
     int countCountriesByRegionId(Long regionId);
 }
