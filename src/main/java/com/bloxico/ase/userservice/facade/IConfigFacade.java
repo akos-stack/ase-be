@@ -1,14 +1,10 @@
 package com.bloxico.ase.userservice.facade;
 
-import com.bloxico.ase.userservice.web.model.config.SaveConfigRequest;
-import com.bloxico.ase.userservice.web.model.config.SaveConfigResponse;
-import com.bloxico.ase.userservice.web.model.config.SearchConfigResponse;
-
-import static com.bloxico.ase.userservice.entity.config.Config.Type;
+import com.bloxico.ase.userservice.web.model.config.*;
 
 public interface IConfigFacade {
 
-    SearchConfigResponse searchConfig(Type type);
+    SearchConfigResponse searchConfig(SearchConfigRequest request);
 
     SaveConfigResponse saveConfig(SaveConfigRequest request);
 

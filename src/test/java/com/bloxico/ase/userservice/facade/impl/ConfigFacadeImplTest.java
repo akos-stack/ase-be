@@ -5,6 +5,7 @@ import com.bloxico.ase.testutil.UtilConfig;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.entity.config.Config.Type;
 import com.bloxico.ase.userservice.exception.ConfigException;
+import com.bloxico.ase.userservice.web.model.config.SearchConfigRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -33,7 +34,7 @@ public class ConfigFacadeImplTest extends AbstractSpringTest {
         utilConfig.deleteConfigById(config.getId());
         assertThrows(
                 ConfigException.class,
-                () -> configFacade.searchConfig(config.getType()));
+                () -> configFacade.searchConfig(new SearchConfigRequest(config.getType())));
     }
 
     @Test
@@ -41,7 +42,7 @@ public class ConfigFacadeImplTest extends AbstractSpringTest {
     public void searchConfig() {
         var config = utilConfig.savedConfigDto();
         var foundConfig = configFacade
-                .searchConfig(config.getType())
+                .searchConfig(new SearchConfigRequest(config.getType()))
                 .getConfig();
         assertNotNull(foundConfig);
         assertEquals(config.getId(), foundConfig.getId());

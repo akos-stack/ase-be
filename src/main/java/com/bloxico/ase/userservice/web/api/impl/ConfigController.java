@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.bloxico.ase.userservice.entity.config.Config.Type;
-
 @RestController
 public class ConfigController implements ConfigApi {
 
@@ -20,8 +18,8 @@ public class ConfigController implements ConfigApi {
     }
 
     @Override
-    public ResponseEntity<SearchConfigResponse> searchConfig(Type type) {
-        var response = configFacade.searchConfig(type);
+    public ResponseEntity<SearchConfigResponse> searchConfig(SearchConfigRequest request) {
+        var response = configFacade.searchConfig(request);
         return ResponseEntity.ok(response);
     }
 

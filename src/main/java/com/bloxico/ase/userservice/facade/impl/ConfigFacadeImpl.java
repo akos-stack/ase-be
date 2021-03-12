@@ -1,6 +1,5 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.userservice.entity.config.Config.Type;
 import com.bloxico.ase.userservice.facade.IConfigFacade;
 import com.bloxico.ase.userservice.service.config.IConfigService;
 import com.bloxico.ase.userservice.web.model.config.*;
@@ -24,11 +23,11 @@ public class ConfigFacadeImpl implements IConfigFacade {
     }
 
     @Override
-    public SearchConfigResponse searchConfig(Type type) {
-        log.debug("ConfigFacadeImpl.searchConfig - start | type: {}", type);
-        var configDto = configService.findConfigByType(type);
+    public SearchConfigResponse searchConfig(SearchConfigRequest request) {
+        log.debug("ConfigFacadeImpl.searchConfig - start | request: {}", request);
+        var configDto = configService.findConfigByType(request.getType());
         var response = new SearchConfigResponse(configDto);
-        log.debug("ConfigFacadeImpl.searchConfig - end | type: {}", type);
+        log.debug("ConfigFacadeImpl.searchConfig - end | request: {}", request);
         return response;
     }
 

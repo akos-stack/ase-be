@@ -1,6 +1,5 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.entity.config.Config.Type;
 import com.bloxico.ase.userservice.web.model.config.*;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,7 @@ public interface ConfigApi {
             @ApiResponse(code = 200, message = "Config of specified type successfully found."),
             @ApiResponse(code = 404, message = "Config of specified type not found.")
     })
-    ResponseEntity<SearchConfigResponse> searchConfig(@Valid @RequestParam("type") Type type);
+    ResponseEntity<SearchConfigResponse> searchConfig(@Valid SearchConfigRequest request);
 
     @PostMapping(
             value = CONFIG_SAVE,
