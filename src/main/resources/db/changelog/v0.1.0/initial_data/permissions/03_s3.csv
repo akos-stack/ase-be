@@ -2,3 +2,4 @@ id,name
 301,upload_file
 302,download_file
 303,delete_file
+304,validate_file
