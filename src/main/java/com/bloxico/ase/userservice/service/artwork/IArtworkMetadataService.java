@@ -1,7 +1,9 @@
 package com.bloxico.ase.userservice.service.artwork;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
-import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
+import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.SearchApprovedArtworkMetadataRequest;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.SearchArtworkMetadataRequest;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -14,8 +16,8 @@ public interface IArtworkMetadataService {
 
     void deleteArtworkMetadata(String name);
 
-    Page<ArtworkMetadataDto> searchArtworkMetadata(Status status, String name, int page, int size, String sort);
+    Page<ArtworkMetadataDto> searchArtworkMetadata(SearchArtworkMetadataRequest request, PageRequest page);
 
-    List<ArtworkMetadataDto> searchApprovedArtworkMetadata(String name);
+    List<ArtworkMetadataDto> searchApprovedArtworkMetadata(SearchApprovedArtworkMetadataRequest request);
 
 }

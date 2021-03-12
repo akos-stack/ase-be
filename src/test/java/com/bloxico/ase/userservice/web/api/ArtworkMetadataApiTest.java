@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
 import com.bloxico.ase.userservice.entity.user.Role;
@@ -145,8 +145,7 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
             var response = given()
                     .header("Authorization", utilSecurityContext.getToken())
                     .contentType(JSON)
-                    .param("type", type.name())
-                    .param("size", Integer.MAX_VALUE)
+                    .params(allPages("type", type.name()))
                     .when()
                     .get(API_URL + ARTWORK_METADATA_SEARCH)
                     .then()
@@ -154,9 +153,9 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
                     .statusCode(200)
                     .extract()
                     .body()
-                    .as(PagedArtworkMetadataResponse.class);
+                    .as(SearchArtworkMetadataResponse.class);
             assertThat(
-                    response.getEntries(),
+                    response.getPage().getContent(),
                     allOf(
                             hasItems(m1, m2, m3, m4),
                             not(hasItems(m5))));
@@ -175,8 +174,7 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
             var response = given()
                     .header("Authorization", utilSecurityContext.getToken())
                     .contentType(JSON)
-                    .param("type", type.name())
-                    .param("size", Integer.MAX_VALUE)
+                    .params(allPages("type", type.name()))
                     .when()
                     .get(API_URL + ARTWORK_METADATA_APPROVED)
                     .then()
@@ -184,7 +182,7 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
                     .statusCode(200)
                     .extract()
                     .body()
-                    .as(SearchArtworkMetadataResponse.class);
+                    .as(SearchApprovedArtworkMetadataResponse.class);
             assertThat(
                     response.getEntries(),
                     allOf(

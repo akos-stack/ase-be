@@ -1,27 +1,24 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
-import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 
 @Api(value = "artworksMetadataManagement")
 public interface ArtworkMetadataApi {
 
+    // @formatter:off
     String ARTWORK_METADATA_SAVE     = "/artwork/management/metadata/save";
     String ARTWORK_METADATA_UPDATE   = "/artwork/management/metadata/update";
     String ARTWORK_METADATA_DELETE   = "/artwork/management/metadata/delete";
     String ARTWORK_METADATA_SEARCH   = "/artwork/management/metadata";
     String ARTWORK_METADATA_APPROVED = "/artwork/approved-metadata";
+    // @formatter:on
 
     @PostMapping(
             value = ARTWORK_METADATA_SAVE,
@@ -57,9 +54,7 @@ public interface ArtworkMetadataApi {
             @ApiResponse(code = 200, message = "Artwork metadata successfully deleted."),
             @ApiResponse(code = 404, message = "Artwork metadata not found.")
     })
-    ResponseEntity<Void> deleteArtworkMetadata(
-            @RequestParam(value = "name") String name,
-            @RequestParam(value = "type") Type type);
+    ResponseEntity<Void> deleteArtworkMetadata(@Valid DeleteArtworkMetadataRequest request);
 
     @GetMapping(value = ARTWORK_METADATA_SEARCH)
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'manage_artwork_metadata')")
@@ -67,21 +62,16 @@ public interface ArtworkMetadataApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Artwork metadata successfully searched.")
     })
-    ResponseEntity<PagedArtworkMetadataResponse> searchMetadata(
-            @Valid @RequestParam(value = "type") Type type,
-            @Valid @RequestParam(value = "status", required = false) Status status,
-            @Valid @RequestParam(value = "name", required = false) String name,
-            @Valid @RequestParam(required = false, defaultValue = "0") int page,
-            @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size,
-            @Valid @RequestParam(required = false, defaultValue = "name") String sort);
+    ResponseEntity<SearchArtworkMetadataResponse> searchArtworkMetadata(
+            @Valid SearchArtworkMetadataRequest request,
+            @Valid PageRequest page);
 
     @GetMapping(value = ARTWORK_METADATA_APPROVED)
-    @ApiOperation(value = "Fetches approved artwork metadata.")
+    @ApiOperation(value = "Searches approved artwork metadata.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Artwork metadata successfully fetched.")
+            @ApiResponse(code = 200, message = "Approved artwork metadata successfully searched.")
     })
-    ResponseEntity<SearchArtworkMetadataResponse> searchApprovedArtworkMetadata(
-            @Valid @RequestParam(value = "type") Type type,
-            @Valid @RequestParam(value = "name", required = false) String name);
+    ResponseEntity<SearchApprovedArtworkMetadataResponse> searchApprovedArtworkMetadata(
+            @Valid SearchApprovedArtworkMetadataRequest request);
 
 }

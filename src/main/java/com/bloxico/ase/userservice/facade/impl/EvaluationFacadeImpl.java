@@ -33,12 +33,12 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
     @Override
     public SearchCountryEvaluationDetailsResponse searchCountryEvaluationDetails(
             ISearchCountryEvaluationDetailsRequest request,
-            PageRequest pageDetails)
+            PageRequest page)
     {
-        log.debug("EvaluationFacadeImpl.searchCountriesWithEvaluationDetails - start | request: {}, pageDetails: {}", request, pageDetails);
-        var page = evaluationService.searchCountryEvaluationDetails(request, pageDetails);
-        var response = new SearchCountryEvaluationDetailsResponse(page);
-        log.debug("EvaluationFacadeImpl.searchCountriesWithEvaluationDetails - end | request: {}, pageDetails: {}", request, pageDetails);
+        log.debug("EvaluationFacadeImpl.searchCountriesWithEvaluationDetails - start | request: {}, page: {}", request, page);
+        var result = evaluationService.searchCountryEvaluationDetails(request, page);
+        var response = new SearchCountryEvaluationDetailsResponse(result);
+        log.debug("EvaluationFacadeImpl.searchCountriesWithEvaluationDetails - end | request: {}, page: {}", request, page);
         return response;
     }
 
@@ -81,12 +81,12 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
     @Override
     public SearchRegionEvaluationDetailsResponse searchRegionEvaluationDetails(
             SearchRegionEvaluationDetailsRequest request,
-            PageRequest pageDetails)
+            PageRequest page)
     {
-        log.info("EvaluationFacadeImpl.searchRegions - start | request: {}, pageDetails: {}", request, pageDetails);
-        var page = evaluationService.searchRegionEvaluationDetails(request, pageDetails);
-        var response = new SearchRegionEvaluationDetailsResponse(page);
-        log.info("EvaluationFacadeImpl.searchRegions - end | request: {}, pageDetails: {}", request, pageDetails);
+        log.info("EvaluationFacadeImpl.searchRegions - start | request: {}, page: {}", request, page);
+        var result = evaluationService.searchRegionEvaluationDetails(request, page);
+        var response = new SearchRegionEvaluationDetailsResponse(result);
+        log.info("EvaluationFacadeImpl.searchRegions - end | request: {}, page: {}", request, page);
         return response;
     }
 
