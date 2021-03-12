@@ -28,7 +28,7 @@ public class SystemFacadeImplTest extends AbstractSpringTest {
 
     @Test
     @WithMockCustomUser
-    public void searchConfig_nullType() {
+    public void searchConfig_nullRequest() {
         assertThrows(
                 NullPointerException.class,
                 () -> systemFacade.searchConfig(null));
@@ -41,7 +41,8 @@ public class SystemFacadeImplTest extends AbstractSpringTest {
         utilSystem.deleteConfigById(config.getId());
         assertThrows(
                 ConfigException.class,
-                () -> systemFacade.searchConfig(new SearchConfigRequest(config.getType())));
+                () -> systemFacade.searchConfig(
+                        new SearchConfigRequest(config.getType())));
     }
 
     @Test
