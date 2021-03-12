@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.user.*;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
@@ -7,7 +8,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 
 @Api(value = "userManagement")
 public interface UserManagementApi {
@@ -24,12 +24,7 @@ public interface UserManagementApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Paginated list of users successfully retrieved.")
     })
-    ResponseEntity<PagedUserDataResponse> searchUsers(
-            @Valid @RequestParam(value = "email") String email,
-            @Valid @RequestParam(value = "role", required = false) String role,
-            @Valid @RequestParam(required = false, defaultValue = "0") int page,
-            @Valid @RequestParam(required = false, defaultValue = "10") @Min(1) int size,
-            @Valid @RequestParam(required = false, defaultValue = "name") String sort);
+    ResponseEntity<SearchUsersResponse> searchUsers(@Valid SearchUsersRequest request, @Valid PageRequest page);
 
     @PostMapping(
             value = USER_DISABLE,

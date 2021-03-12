@@ -1,17 +1,17 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.service.token.impl.TokenBlacklistServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 
+import static com.bloxico.ase.testutil.Util.allPages;
 import static com.bloxico.ase.testutil.Util.genEmail;
+import static com.bloxico.ase.testutil.UtilUser.genSearchUsersRequest;
 import static com.bloxico.ase.userservice.entity.user.Role.ADMIN;
-import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,15 +25,17 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
     @Autowired private UserManagementFacadeImpl userManagementFacade;
 
     @Test
-    public void searchUsers_nullArgs() {
-        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
-        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
-        var u3 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
-        assertThat(userManagementFacade.searchUsers(u1.getEmail(), null, 0, MAX_VALUE, "name").getUsers(),
-                not(hasItems(u1, u2, u3)));
+    public void searchUsers_nullRequest() {
         assertThrows(
-                InvalidDataAccessApiUsageException.class,
-                () -> userManagementFacade.searchUsers(null, "user", 0, MAX_VALUE, "name"));
+                NullPointerException.class,
+                () -> userManagementFacade.searchUsers(null, allPages()));
+    }
+
+    @Test
+    public void searchUsers_nullPage() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userManagementFacade.searchUsers(genSearchUsersRequest(genEmail()), null));
     }
 
     @Test
@@ -42,27 +44,36 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
         var u2 = utilUser.savedUserDto();
         var u3 = utilUser.savedUserDto();
         assertThat(
-                userManagementFacade.searchUsers(u1.getEmail(), "admin", 0, MAX_VALUE, "name").getUsers(),
+                userManagementFacade
+                        .searchUsers(genSearchUsersRequest(u1.getEmail(), ADMIN), allPages())
+                        .getPage()
+                        .getContent(),
                 not(hasItems(u1, u2, u3)));
     }
 
     @Test
-    public void searchUsers_byEmail() {
+    public void searchUsers_foundByEmailOnly() {
         var u1 = utilUser.savedUserDto();
         var u2 = utilUser.savedUserDto();
         var u3 = utilUser.savedUserDto();
         assertThat(
-                userManagementFacade.searchUsers(u1.getEmail(), null, 0, MAX_VALUE, "name").getUsers(),
+                userManagementFacade
+                        .searchUsers(genSearchUsersRequest(u1.getEmail()), allPages())
+                        .getPage()
+                        .getContent(),
                 allOf(hasItems(u1), not(hasItems(u2, u3))));
     }
 
     @Test
-    public void searchUsers_byRole() {
+    public void searchUsers_foundByRoleOnly() {
         var u1 = utilUser.savedUserDto();
         var u2 = utilUser.savedAdminDto();
         var u3 = utilUser.savedAdminDto();
         assertThat(
-                userManagementFacade.searchUsers("", ADMIN, 0, MAX_VALUE, "name").getUsers(),
+                userManagementFacade
+                        .searchUsers(genSearchUsersRequest("", ADMIN), allPages())
+                        .getPage()
+                        .getContent(),
                 allOf(hasItems(u2, u3), not(hasItems(u1))));
     }
 
@@ -72,7 +83,10 @@ public class UserManagementFacadeImplTest extends AbstractSpringTest {
         var u2 = utilUser.savedAdminDto();
         var u3 = utilUser.savedAdminDto();
         assertThat(
-                userManagementFacade.searchUsers(u3.getEmail(), ADMIN, 0, MAX_VALUE, "name").getUsers(),
+                userManagementFacade
+                        .searchUsers(genSearchUsersRequest(u3.getEmail(), ADMIN), allPages())
+                        .getPage()
+                        .getContent(),
                 allOf(hasItems(u3), not(hasItems(u1, u2))));
     }
 

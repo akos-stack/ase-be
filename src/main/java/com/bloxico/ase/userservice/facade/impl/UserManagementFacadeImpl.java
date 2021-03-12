@@ -4,7 +4,9 @@ import com.bloxico.ase.userservice.facade.IUserManagementFacade;
 import com.bloxico.ase.userservice.service.oauth.IOAuthAccessTokenService;
 import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
 import com.bloxico.ase.userservice.service.user.IUserService;
-import com.bloxico.ase.userservice.web.model.user.PagedUserDataResponse;
+import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.user.SearchUsersRequest;
+import com.bloxico.ase.userservice.web.model.user.SearchUsersResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,11 +32,11 @@ public class UserManagementFacadeImpl implements IUserManagementFacade {
     }
 
     @Override
-    public PagedUserDataResponse searchUsers(String email, String role, int page, int size, String sort) {
-        log.info("UserManagementFacadeImpl.searchUsers - start | email: {}, role: {}, page: {}, size: {}, sort: {}", email, role, page, size, sort);
-        var userDtos = userService.findUsersByEmailOrRole(email, role, page, size, sort);
-        var response = new PagedUserDataResponse(userDtos.getContent(), userDtos.getContent().size(), userDtos.getTotalElements(), userDtos.getTotalPages());
-        log.info("UserManagementFacadeImpl.searchUsers - end | email: {}, role: {}, page: {}, size: {}, sort: {}", email, role, page, size, sort);
+    public SearchUsersResponse searchUsers(SearchUsersRequest request, PageRequest page) {
+        log.info("UserManagementFacadeImpl.searchUsers - start | request: {}, page: {}, page", request, page);
+        var result = userService.findUsersByEmailOrRole(request, page);
+        var response = new SearchUsersResponse(result);
+        log.info("UserManagementFacadeImpl.searchUsers - end | request: {}, page: {}, page", request, page);
         return response;
     }
 
