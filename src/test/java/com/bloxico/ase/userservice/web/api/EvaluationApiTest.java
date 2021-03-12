@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.testutil.Util.*;
-import static com.bloxico.ase.userservice.entity.config.Config.Type.QUOTATION_PACKAGE_MIN_EVALUATIONS;
 import static com.bloxico.ase.userservice.web.api.EvaluationApi.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.COUNTRY_NOT_FOUND;
@@ -31,7 +30,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilUserProfile utilUserProfile;
-    @Autowired private UtilConfig utilConfig;
+    @Autowired private UtilSystem utilSystem;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test

@@ -29,7 +29,7 @@ databaseChangeLog:
         tableName: permissions
     - loadData:
           encoding: UTF-8
-          file: db/changelog/v0.1.0/initial_data/permissions/06_config.csv
+          file: db/changelog/v0.1.0/initial_data/permissions/06_system.csv
           tableName: permissions
     - loadData:
         encoding: UTF-8

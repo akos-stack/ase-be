@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.service.config.impl;
 
 import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.UtilConfig;
+import com.bloxico.ase.testutil.UtilSystem;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.exception.ConfigException;
 import org.junit.Test;
@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ConfigServiceImplTest extends AbstractSpringTest {
 
-    @Autowired private UtilConfig utilConfig;
+    @Autowired private UtilSystem utilSystem;
     @Autowired private ConfigServiceImpl configService;
 
     @Test
@@ -26,17 +26,17 @@ public class ConfigServiceImplTest extends AbstractSpringTest {
     @Test
     @WithMockCustomUser
     public void findConfigByType_notFound() {
-        var config = utilConfig.savedConfigDto();
-        utilConfig.deleteConfigById(config.getId());
+        var config = utilSystem.savedConfigDto();
+        utilSystem.deleteConfigById(config.getId());
         assertThrows(
-                ConfigException .class,
+                ConfigException.class,
                 () -> configService.findConfigByType(config.getType()));
     }
 
     @Test
     @WithMockCustomUser
     public void findConfigByType() {
-        var config = utilConfig.savedConfigDto();
+        var config = utilSystem.savedConfigDto();
         var foundConfig = configService.findConfigByType(config.getType());
         assertEquals(config, foundConfig);
     }
@@ -52,7 +52,7 @@ public class ConfigServiceImplTest extends AbstractSpringTest {
     @Test
     @WithMockCustomUser
     public void saveOrUpdateConfig_nullType() {
-        var dto = utilConfig.genConfigDto();
+        var dto = utilSystem.genConfigDto();
         dto.setType(null);
         assertThrows(
                 DataIntegrityViolationException.class,
@@ -62,7 +62,7 @@ public class ConfigServiceImplTest extends AbstractSpringTest {
     @Test
     @WithMockCustomUser
     public void saveOrUpdateConfig_nullValue() {
-        var dto = utilConfig.genConfigDto();
+        var dto = utilSystem.genConfigDto();
         dto.setValue(null);
         assertThrows(
                 DataIntegrityViolationException.class,
@@ -72,7 +72,7 @@ public class ConfigServiceImplTest extends AbstractSpringTest {
     @Test
     @WithMockCustomUser
     public void saveOrUpdateConfig() {
-        var dto = utilConfig.genConfigDto();
+        var dto = utilSystem.genConfigDto();
         var config = configService.saveOrUpdateConfig(dto);
         assertNotNull(config);
         assertNotNull(config.getId());

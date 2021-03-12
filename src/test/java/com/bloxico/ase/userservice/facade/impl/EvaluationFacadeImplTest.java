@@ -24,7 +24,7 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private UtilUserProfile utilUserProfile;
-    @Autowired private UtilConfig utilConfig;
+    @Autowired private UtilSystem utilSystem;
     @Autowired private EvaluationFacadeImpl evaluationFacade;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 

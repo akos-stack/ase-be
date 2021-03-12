@@ -66,7 +66,6 @@ import org.junit.runners.Suite;
         EvaluationFacadeImplTest.class,
         ArtworkFacadeImplTest.class,
         AWSUtilTest.class,
-        ConfigFacadeImplTest.class,
         SystemFacadeImplTest.class,
 
         // filter
@@ -81,7 +80,6 @@ import org.junit.runners.Suite;
         ArtworkMetadataApiTest.class,
         ArtworkApiTest.class,
         EvaluationApiTest.class,
-        ConfigApiTest.class,
         SystemApiTest.class
 })
 public class TestSuite {
