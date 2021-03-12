@@ -2,12 +2,14 @@ package com.bloxico.ase.userservice.service.artwork.impl.metadata;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
-import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
 import com.bloxico.ase.userservice.repository.artwork.metadata.ArtworkMetadataRepository;
 import com.bloxico.ase.userservice.service.artwork.IArtworkMetadataService;
+import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.SearchApprovedArtworkMetadataRequest;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.SearchArtworkMetadataRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -71,27 +73,28 @@ abstract class AbstractArtworkMetadataServiceImpl<T extends ArtworkMetadata> imp
     }
 
     @Override
-    public Page<ArtworkMetadataDto> searchArtworkMetadata(Status status, String name, int page, int size, String sort) {
-        log.debug("AbstractArtworkMetadataServiceImpl[{}].searchArtworkMetadata - start | status: {}, name:{}, page: {}, size: {}, sort {}",
-                getType(), status, name, page, size, sort);
-        var pageable = PageRequest.of(page, size, Sort.by(sort).ascending());
+    public Page<ArtworkMetadataDto> searchArtworkMetadata(SearchArtworkMetadataRequest request, PageRequest page) {
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].searchArtworkMetadata - start | request: {}, page: {}", getType(), request, page);
+        requireNonNull(request);
+        requireNonNull(page);
+        var pageable = page.toPageable();
         var artworkMetadataDtos = repository
-                .search(status, name, pageable)
+                .search(request.getStatus(), request.getName(), pageable)
                 .map(MAPPER::toDto);
-        log.debug("AbstractArtworkMetadataServiceImpl[{}].searchArtworkMetadata - end | status: {}, name:{}, page: {}, size: {}, sort {}",
-                getType(), status, name, page, size, sort);
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].searchArtworkMetadata - end | request: {}, page: {}", getType(), request, page);
         return artworkMetadataDtos;
     }
 
     @Override
-    public List<ArtworkMetadataDto> searchApprovedArtworkMetadata(String name) {
-        log.debug("AbstractArtworkMetadataServiceImpl[{}].searchApprovedArtworkMetadata - start | name: {}", getType(), name);
+    public List<ArtworkMetadataDto> searchApprovedArtworkMetadata(SearchApprovedArtworkMetadataRequest request) {
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].searchApprovedArtworkMetadata - start | request: {}", getType(), request);
+        requireNonNull(request);
         var artworkMetadataDtos = repository
-                .findAllByStatusAndNameContains(APPROVED, name != null ? name : "")
+                .findAllByStatusAndNameContains(APPROVED, request.getName() != null ? request.getName() : "")
                 .stream()
                 .map(MAPPER::toDto)
                 .collect(toList());
-        log.debug("AbstractArtworkMetadataServiceImpl[{}].searchApprovedArtworkMetadata - end | name: {}", getType(), name);
+        log.debug("AbstractArtworkMetadataServiceImpl[{}].searchApprovedArtworkMetadata - end | request: {}", getType(), request);
         return artworkMetadataDtos;
     }
 

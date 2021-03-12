@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.exception.*;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
@@ -10,10 +10,13 @@ import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
 import com.bloxico.ase.userservice.service.token.impl.PendingEvaluatorServiceImpl;
 import com.bloxico.ase.userservice.service.user.impl.UserServiceImpl;
 import com.bloxico.ase.userservice.web.model.token.*;
+import com.bloxico.ase.userservice.web.model.user.DownloadEvaluatorResumeRequest;
+import com.bloxico.ase.userservice.web.model.user.RefreshRegistrationTokenRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.testutil.UtilToken.genSearchPendingEvaluatorsRequest;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
@@ -21,7 +24,6 @@ import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.entity.user.Role.USER;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.SupportedFileExtension.pdf;
-import static java.lang.Integer.MAX_VALUE;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -126,7 +128,8 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void refreshExpiredToken_tokenNotFound() {
         assertThrows(
                 TokenException.class,
-                () -> userRegistrationFacade.refreshExpiredToken(genUUID()));
+                () -> userRegistrationFacade.refreshExpiredToken(
+                        new RefreshRegistrationTokenRequest(genUUID())));
     }
 
     @Test
@@ -139,7 +142,8 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
                 .findByValue(tokenValue)
                 .map(MAPPER::toDto)
                 .orElseThrow();
-        userRegistrationFacade.refreshExpiredToken(tokenValue);
+        userRegistrationFacade.refreshExpiredToken(
+                new RefreshRegistrationTokenRequest(tokenValue));
         var refreshedTokenDto = tokenRepository
                 .findByTypeAndUserId(REGISTRATION, originalTokenDto.getUserId())
                 .map(MAPPER::toDto)
@@ -470,36 +474,53 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void searchPendingEvaluators_nullEmail() {
+    @WithMockCustomUser
+    public void searchPendingEvaluators_nullRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> userRegistrationFacade
-                        .searchPendingEvaluators(null, 0, 2, "email"));
+                () -> userRegistrationFacade.searchPendingEvaluators(null, allPages()));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchPendingEvaluators_nullPage() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userRegistrationFacade.searchPendingEvaluators(
+                        genSearchPendingEvaluatorsRequest(genEmail()),
+                        null));
     }
 
     @Test
     @WithMockCustomUser
     public void searchPendingEvaluators_emptyResultSet() {
-        var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
-        var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
-        var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
+        var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail());
+        var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail());
+        var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail());
         assertThat(
                 userRegistrationFacade
-                        .searchPendingEvaluators("barFoo", 0, 2, "email")
-                        .getPendingEvaluators(),
+                        .searchPendingEvaluators(
+                                genSearchPendingEvaluatorsRequest(genEmail()),
+                                allPages())
+                        .getPage()
+                        .getContent(),
                 not(hasItems(pe1, pe2, pe3)));
     }
 
     @Test
     @WithMockCustomUser
     public void searchPendingEvaluators() {
-        var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
-        var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("fooBar"));
-        var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail("barFoo"));
+        var email = genEmail();
+        var pe1 = utilToken.savedInvitedPendingEvaluatorDto(genEmail(email));
+        var pe2 = utilToken.savedInvitedPendingEvaluatorDto(genEmail(email));
+        var pe3 = utilToken.savedInvitedPendingEvaluatorDto(genEmail());
         assertThat(
                 userRegistrationFacade
-                        .searchPendingEvaluators("fooBar", 0, MAX_VALUE, "email")
-                        .getPendingEvaluators(),
+                        .searchPendingEvaluators(
+                                genSearchPendingEvaluatorsRequest(email),
+                                allPages())
+                        .getPage()
+                        .getContent(),
                 allOf(
                         hasItems(pe1, pe2),
                         not(hasItems(pe3))));
@@ -507,7 +528,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser
-    public void downloadEvaluatorResume_nullEmail() {
+    public void downloadEvaluatorResume_nullRequest() {
         assertThrows(
                 NullPointerException.class,
                 () -> userRegistrationFacade.downloadEvaluatorResume(null));
@@ -518,7 +539,8 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void downloadEvaluatorResume_resumeNotFound() {
         assertThrows(
                 UserException.class,
-                () -> userRegistrationFacade.downloadEvaluatorResume(genEmail()));
+                () -> userRegistrationFacade.downloadEvaluatorResume(
+                        new DownloadEvaluatorResumeRequest(genEmail())));
     }
 
     @Test
@@ -527,7 +549,8 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         var user = utilSecurityContext.getLoggedInPrincipal();
         var request = new EvaluatorRegistrationRequest(user.getEmail(), genMultipartFile(pdf));
         userRegistrationFacade.requestEvaluatorRegistration(request);
-        var response = userRegistrationFacade.downloadEvaluatorResume(user.getEmail());
+        var response = userRegistrationFacade.downloadEvaluatorResume(
+                new DownloadEvaluatorResumeRequest(user.getEmail()));
         assertNotNull(response);
     }
 

@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.SaveArtworkMetadataRequest;
@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.testutil.UtilArtworkMetadata.*;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -59,7 +60,7 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
             for (var status : Status.values()) {
                 var metadata = utilArtworkMetadata.savedArtworkMetadataDto(type, status);
                 assertNotNull(utilArtworkMetadata.findArtworkMetadataDto(type, metadata.getName()));
-                facade.deleteArtworkMetadata(metadata.getName(), type);
+                facade.deleteArtworkMetadata(genDeleteArtworkMetadataRequest(type, metadata.getName()));
                 assertNull(utilArtworkMetadata.findArtworkMetadataDto(type, metadata.getName()));
             }
         }
@@ -71,7 +72,7 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
             var metadata1 = utilArtworkMetadata.savedArtworkMetadataDto(type, randEnumConst(Status.class));
             var metadata2 = utilArtworkMetadata.savedArtworkMetadataDto(type, randEnumConst(Status.class));
             assertThat(
-                    facade.searchArtworkMetadata(type, null, "", 0, 10, "name").getEntries(),
+                    facade.searchArtworkMetadata(genSearchMetadataRequest(type), allPages()).getPage().getContent(),
                     hasItems(metadata1, metadata2));
         }
     }
@@ -81,15 +82,15 @@ public class ArtworkMetadataFacadeImplTest extends AbstractSpringTest {
         for (var type : Type.values()) {
             var metadata1 = utilArtworkMetadata.savedArtworkMetadataDto(type, APPROVED);
             assertThat(
-                    facade.searchApprovedArtworkMetadata("", type).getEntries(),
+                    facade.searchApprovedArtworkMetadata(genSearchApprovedMetadataRequest(type)).getEntries(),
                     hasItems(metadata1));
             var metadata2 = utilArtworkMetadata.savedArtworkMetadataDto(type, APPROVED);
             assertThat(
-                    facade.searchApprovedArtworkMetadata("", type).getEntries(),
+                    facade.searchApprovedArtworkMetadata(genSearchApprovedMetadataRequest(type)).getEntries(),
                     hasItems(metadata1, metadata2));
             var metadata3 = utilArtworkMetadata.savedArtworkMetadataDto(type, randOtherEnumConst(APPROVED));
             assertThat(
-                    facade.searchApprovedArtworkMetadata("", type).getEntries(),
+                    facade.searchApprovedArtworkMetadata(genSearchApprovedMetadataRequest(type)).getEntries(),
                     allOf(
                             hasItems(metadata1, metadata2),
                             not(hasItems(metadata3))));

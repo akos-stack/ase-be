@@ -1,10 +1,12 @@
 package com.bloxico.ase.userservice.facade;
 
-import com.bloxico.ase.userservice.web.model.user.PagedUserDataResponse;
+import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.user.SearchUsersResponse;
+import com.bloxico.ase.userservice.web.model.user.SearchUsersRequest;
 
 public interface IUserManagementFacade {
 
-    PagedUserDataResponse searchUsers(String email, String role, int page, int size, String sort);
+    SearchUsersResponse searchUsers(SearchUsersRequest request, PageRequest page);
 
     void disableUser(long userId);
 

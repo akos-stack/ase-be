@@ -7,6 +7,7 @@ import com.bloxico.ase.userservice.service.aws.IS3Service;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
 import com.bloxico.ase.userservice.util.FileCategory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,7 @@ public class DocumentServiceImpl implements IDocumentService {
     private final IS3Service s3Service;
     private final DocumentRepository documentRepository;
 
+    @Autowired
     public DocumentServiceImpl(IS3Service s3Service, DocumentRepository documentRepository) {
         this.s3Service = s3Service;
         this.documentRepository = documentRepository;
@@ -39,9 +41,8 @@ public class DocumentServiceImpl implements IDocumentService {
         var document = new Document();
         document.setPath(path);
         document.setType(type);
-        if (principalId != null) {
+        if (principalId != null)
             document.setCreatorId(principalId);
-        }
         var documentDto = MAPPER.toDto(documentRepository.save(document));
         log.info("DocumentServiceImpl.saveDocument - end | file: {}, fileCategory: {}", file, type);
         return documentDto;

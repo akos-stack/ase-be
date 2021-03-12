@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
 import com.bloxico.ase.userservice.repository.artwork.ArtistRepository;
 import com.bloxico.ase.userservice.service.artwork.IArtistService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -15,6 +16,7 @@ public class ArtistServiceImpl implements IArtistService {
 
     private final ArtistRepository artistRepository;
 
+    @Autowired
     public ArtistServiceImpl(ArtistRepository artistRepository) {
         this.artistRepository = artistRepository;
     }

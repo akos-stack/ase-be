@@ -6,6 +6,7 @@ import com.bloxico.ase.userservice.repository.artwork.ArtworkHistoryRepository;
 import com.bloxico.ase.userservice.repository.artwork.ArtworkRepository;
 import com.bloxico.ase.userservice.service.artwork.IArtworkService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -18,6 +19,7 @@ public class ArtworkServiceImpl implements IArtworkService {
     private final ArtworkRepository artworkRepository;
     private final ArtworkHistoryRepository artworkHistoryRepository;
 
+    @Autowired
     public ArtworkServiceImpl(ArtworkRepository artworkRepository,
                               ArtworkHistoryRepository artworkHistoryRepository)
     {

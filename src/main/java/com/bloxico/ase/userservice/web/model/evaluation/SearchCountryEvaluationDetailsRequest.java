@@ -13,9 +13,9 @@ public class SearchCountryEvaluationDetailsRequest implements ISearchCountryEval
 
     @NotNull
     @ApiParam(name = "search", required = true)
-    String search;
+    private String search;
 
     @ApiParam(name = "regions")
-    List<String> regions;
+    private List<String> regions;
 
 }

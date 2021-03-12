@@ -4,6 +4,7 @@ import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkGroupDto;
 import com.bloxico.ase.userservice.repository.artwork.ArtworkGroupRepository;
 import com.bloxico.ase.userservice.service.artwork.IArtworkGroupService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -16,6 +17,7 @@ public class ArtworkGroupServiceImpl implements IArtworkGroupService {
 
     private final ArtworkGroupRepository artworkGroupRepository;
 
+    @Autowired
     public ArtworkGroupServiceImpl(ArtworkGroupRepository artworkGroupRepository) {
         this.artworkGroupRepository = artworkGroupRepository;
     }

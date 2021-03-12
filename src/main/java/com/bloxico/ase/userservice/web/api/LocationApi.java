@@ -1,27 +1,24 @@
 package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.userservice.web.model.address.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @Api(value = "location")
 public interface LocationApi {
 
+    // @formatter:off
     String REGIONS                   = "/regions";
     String REGION_MANAGEMENT_SAVE    = "/region/management/save";
     String REGION_MANAGEMENT_DELETE  = "/region/management/delete";
     String COUNTRIES                 = "/countries";
     String COUNTRY_MANAGEMENT_SAVE   = "/country/management/save";
     String COUNTRY_MANAGEMENT_UPDATE = "/country/management/update";
+    // @formatter:on
 
     @GetMapping(
             value = REGIONS,
@@ -59,7 +56,7 @@ public interface LocationApi {
 
     @GetMapping(
             value = COUNTRIES,
-            produces = { "application/json" })
+            produces = {"application/json"})
     @ApiOperation(value = "Fetches all countries from the database.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Countries successfully fetched.")

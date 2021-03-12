@@ -1,17 +1,18 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
-import com.bloxico.ase.userservice.web.model.user.BlacklistTokensRequest;
-import com.bloxico.ase.userservice.web.model.user.DisableUserRequest;
-import com.bloxico.ase.userservice.web.model.user.PagedUserDataResponse;
+import com.bloxico.ase.userservice.web.model.user.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.entity.user.Role.ADMIN;
 import static com.bloxico.ase.userservice.web.api.UserManagementApi.*;
 import static com.bloxico.ase.userservice.web.api.UserProfileApi.MY_PROFILE_ENDPOINT;
 import static io.restassured.RestAssured.given;
@@ -36,8 +37,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .param("email", "user1")
-                .param("role", "")
+                .params(allPages(Map.of("email", genEmail(), "role", ADMIN)))
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()
@@ -51,8 +51,7 @@ public class UserManagementApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .param("email", "user1")
-                .param("role", genUUID())
+                .params(allPages(Map.of("email", "user1", "role", genUUID())))
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()
@@ -63,14 +62,13 @@ public class UserManagementApiTest extends AbstractSpringTest {
 
     @Test
     public void searchUsers_nothingFound_200_ok() {
-        utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
-        utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
-        utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        utilUser.savedUserDtoWithEmail(genEmail());
+        utilUser.savedUserDtoWithEmail(genEmail());
+        utilUser.savedUserDtoWithEmail(genEmail());
         var users = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .param("email", genEmail())
-                .param("role", "admin")
+                .params(allPages(Map.of("email", genEmail(), "role", ADMIN)))
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()
@@ -78,22 +76,23 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(PagedUserDataResponse.class)
-                .getUsers();
+                .as(SearchUsersResponse.class)
+                .getPage()
+                .getContent();
         assertTrue(users.isEmpty());
     }
 
     @Test
     @WithMockCustomUser(auth = true)
     public void searchUsers_byEmail_200_ok() {
-        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
-        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
-        var u3 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
+        var email = genUUID();
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail(email));
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail(email));
+        var u3 = utilUser.savedUserDtoWithEmail(genEmail());
         var users = given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .param("email", "fooBar")
-                .param("role", "")
+                .params(allPages(Map.of("email", email, "role", "")))
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()
@@ -101,22 +100,22 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(PagedUserDataResponse.class)
-                .getUsers();
+                .as(SearchUsersResponse.class)
+                .getPage()
+                .getContent();
         assertThat(users, allOf(hasItems(u1, u2), not(hasItems(u3))));
     }
 
     @Test
     @WithMockCustomUser(auth = true)
     public void searchUsers_byRole_200_ok() {
-        var u1 = utilUser.savedUserDtoWithEmail(genEmail("barFoo"));
-        var a1 = utilUser.savedAdminDtoWithEmail(genEmail("adminBarFoo"));
-        var a2 = utilUser.savedAdminDtoWithEmail(genEmail("adminFooBar"));
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail());
+        var a1 = utilUser.savedAdminDtoWithEmail(genEmail());
+        var a2 = utilUser.savedAdminDtoWithEmail(genEmail());
         var users = given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .param("email", "")
-                .param("role", "admin")
+                .params(allPages(Map.of("email", "", "role", ADMIN)))
                 .param("size", Integer.MAX_VALUE)
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
@@ -125,22 +124,22 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(PagedUserDataResponse.class)
-                .getUsers();
+                .as(SearchUsersResponse.class)
+                .getPage()
+                .getContent();
         assertThat(users, allOf(hasItems(a1, a2), not(hasItems(u1))));
     }
 
     @Test
     @WithMockCustomUser(auth = true)
     public void searchUsers_byEmailAndRole_200_ok() {
-        var admin = utilUser.savedAdminDtoWithEmail(genEmail("adFooBar"));
-        var u1 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
-        var u2 = utilUser.savedUserDtoWithEmail(genEmail("fooBar"));
+        var admin = utilUser.savedAdminDtoWithEmail(genEmail());
+        var u1 = utilUser.savedUserDtoWithEmail(genEmail());
+        var u2 = utilUser.savedUserDtoWithEmail(genEmail());
         var users = given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .param("email", admin.getEmail())
-                .param("role", "admin")
+                .params(allPages(Map.of("email", admin.getEmail(), "role", ADMIN)))
                 .when()
                 .get(API_URL + USER_SEARCH_ENDPOINT)
                 .then()
@@ -148,8 +147,9 @@ public class UserManagementApiTest extends AbstractSpringTest {
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(PagedUserDataResponse.class)
-                .getUsers();
+                .as(SearchUsersResponse.class)
+                .getPage()
+                .getContent();
         assertThat(users, allOf(hasItems(admin), not(hasItems(u1, u2))));
     }
 

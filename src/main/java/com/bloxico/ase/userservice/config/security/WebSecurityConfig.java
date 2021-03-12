@@ -3,8 +3,7 @@ package com.bloxico.ase.userservice.config.security;
 import com.bloxico.ase.userservice.filter.JwtAuthorizationFilter;
 import com.bloxico.ase.userservice.filter.RepeatableReadRequestFilter;
 import com.bloxico.ase.userservice.service.token.ITokenBlacklistService;
-import com.bloxico.ase.userservice.web.api.UserPasswordApi;
-import com.bloxico.ase.userservice.web.api.UserRegistrationApi;
+import com.bloxico.ase.userservice.web.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -115,6 +114,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/swagger-ui.html",
                 "/api-docs",
                 "/webjars/**",
+
+                SystemApi.SYSTEM_CONSTANTS,
 
                 UserRegistrationApi.REGISTRATION_ENDPOINT,
                 UserRegistrationApi.REGISTRATION_CONFIRM_ENDPOINT,

@@ -1,15 +1,14 @@
 package com.bloxico.ase.userservice.facade;
 
-import com.bloxico.ase.userservice.util.FileCategory;
+import com.bloxico.ase.userservice.web.model.s3.*;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface IS3Facade {
 
-    void validateFile(FileCategory category, MultipartFile file);
+    void validateFile(ValidateFileRequest request);
 
-    ByteArrayResource downloadFile(String path);
+    ByteArrayResource downloadFile(DownloadFileRequest request);
 
-    void deleteFile(String path);
+    void deleteFile(DeleteFileRequest request);
 
 }
