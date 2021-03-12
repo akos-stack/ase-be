@@ -88,6 +88,14 @@ public class Util {
                 genUUID().getBytes());
     }
 
+    public static MultipartFile genMultipartFile(SupportedFileExtension extension, byte[] bytes) {
+        var fileName = genUUID() + "." + extension.toString();
+        return new MockMultipartFile(
+                fileName, fileName,
+                extension.getContentType(),
+                bytes);
+    }
+
     public static String getTestFilePath(FileCategory category) {
         switch (category) {
             case CV:
@@ -102,6 +110,26 @@ public class Util {
     public static byte[] genFileBytes(FileCategory category) {
         try {
             return toByteArray(Util.class.getResourceAsStream(getTestFilePath(category)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getInvalidTestFilePath(FileCategory category) {
+        switch (category) {
+            case CERTIFICATE:
+            case CV:
+                return "/testFiles/testInvalidFilePdf.pdf";
+            case IMAGE:
+                return "/testFiles/testInvalidFilePng.png";
+            default:
+                throw new IllegalArgumentException(category.toString());
+        }
+    }
+
+    public static byte[] genInvalidFileBytes(FileCategory category) {
+        try {
+            return toByteArray(Util.class.getResourceAsStream(getInvalidTestFilePath(category)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
