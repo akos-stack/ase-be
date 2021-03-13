@@ -2,8 +2,10 @@ package com.bloxico.ase.userservice.service.token.impl;
 
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDocumentDto;
 import com.bloxico.ase.userservice.dto.entity.token.PendingEvaluatorDto;
-import com.bloxico.ase.userservice.entity.token.*;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluatorDocument;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluatorDocument.Id;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorDocumentRepository;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
@@ -116,7 +118,7 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
         log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - start | email: {}", email);
         requireNonNull(email);
         var pendingEvaluatorDocumentDto = pendingEvaluatorDocumentRepository
-                .findByPendingEvaluatorDocumentId_Email(email)
+                .findByIdEmail(email)
                 .map(MAPPER::toDto)
                 .orElseThrow(RESUME_NOT_FOUND::newException);
         log.debug("PendingEvaluatorServiceImpl.getEvaluatorResume - end | email: {}", email);
@@ -128,10 +130,7 @@ public class PendingEvaluatorServiceImpl implements IPendingEvaluatorService {
         log.debug("PendingEvaluatorServiceImpl.savePendingEvaluatorDocument - start | email: {}, documentId {}", email, documentId);
         requireNonNull(email);
         var pendingEvaluatorDocument = new PendingEvaluatorDocument();
-        var pendingEvaluatorDocumentId = new PendingEvaluatorDocumentId();
-        pendingEvaluatorDocumentId.setDocumentId(documentId);
-        pendingEvaluatorDocumentId.setEmail(email);
-        pendingEvaluatorDocument.setPendingEvaluatorDocumentId(pendingEvaluatorDocumentId);
+        pendingEvaluatorDocument.setId(new Id(email, documentId));
         pendingEvaluatorDocumentRepository.saveAndFlush(pendingEvaluatorDocument);
         log.debug("PendingEvaluatorServiceImpl.savePendingEvaluatorDocument - end | email: {}, documentId {}", email, documentId);
     }

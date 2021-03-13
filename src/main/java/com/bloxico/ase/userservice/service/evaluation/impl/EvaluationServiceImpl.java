@@ -1,13 +1,9 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
-import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.*;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
-import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
-import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageCountryRepository;
-import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageRepository;
+import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.ISearchCountryEvaluationDetailsRequest;
@@ -68,7 +64,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
             ISearchCountryEvaluationDetailsRequest request,
             PageRequest pageDetails)
     {
-        log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - start | request: {}, pageDetails: {}", request, pageDetails);
+        log.debug("EvaluationServiceImpl.searchCountryEvaluationDetails - start | request: {}, pageDetails: {}", request, pageDetails);
         requireNonNull(request);
         requireNonNull(pageDetails);
         var page = countryEvaluationDetailsRepository
@@ -78,7 +74,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
                         request.includeCountriesWithoutEvaluationDetails(),
                         pageDetails.toPageable())
                 .map(MAPPER::toCountedProj);
-        log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - end | request: {}, pageDetails: {}", request, pageDetails);
+        log.debug("EvaluationServiceImpl.searchCountryEvaluationDetails - end | request: {}, pageDetails: {}", request, pageDetails);
         return page;
     }
 
@@ -123,14 +119,14 @@ public class EvaluationServiceImpl implements IEvaluationService {
             SearchRegionEvaluationDetailsRequest request,
             PageRequest pageDetails)
     {
-        log.debug("EvaluationServiceImpl.findAllRegions - start | request: {}, pageDetails: {}", request, pageDetails);
+        log.debug("EvaluationServiceImpl.searchRegionEvaluationDetails - start | request: {}, pageDetails: {}", request, pageDetails);
         requireNonNull(request);
         requireNonNull(pageDetails);
         var page = countryEvaluationDetailsRepository
                 .findAllRegionsWithCountriesAndEvaluatorsCount(
                         request.getSearch(),
                         pageDetails.toPageable());
-        log.debug("EvaluationServiceImpl.findAllRegions - end | request: {}, pageDetails: {}", request, pageDetails);
+        log.debug("EvaluationServiceImpl.searchRegionEvaluationDetails - end | request: {}, pageDetails: {}", request, pageDetails);
         return page;
     }
 
@@ -147,8 +143,8 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public Set<QuotationPackageCountryDto> saveQuotationPackageCountries(long packageId,
-                                                                         Collection<QuotationPackageCountryDto> dtos)
+    public Set<QuotationPackageCountryDto> saveQuotationPackageCountries(
+            long packageId, Collection<QuotationPackageCountryDto> dtos)
     {
         log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - start | packageId: {}, dtos: {}",
                 packageId, dtos);
