@@ -6,16 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @EqualsAndHashCode(of = "name", callSuper = false)
 public class CountryDto extends BaseEntityDto {
-
-    @JsonProperty("id")
-    private Long id;
 
     @JsonProperty("name")
     private String name;
