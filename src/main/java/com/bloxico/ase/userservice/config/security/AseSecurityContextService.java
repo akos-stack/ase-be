@@ -2,8 +2,10 @@ package com.bloxico.ase.userservice.config.security;
 
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
+import com.bloxico.ase.userservice.entity.user.profile.ArtOwner;
 import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
 import com.bloxico.ase.userservice.repository.user.UserRepository;
+import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
 import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ public class AseSecurityContextService {
     private UserRepository userRepository;
     @Autowired
     private UserProfileRepository userProfileRepository;
+    @Autowired
+    private ArtOwnerRepository artOwnerRepository;
 
     public Long getPrincipalId() {
         if(SecurityContextHolder.getContext().getAuthentication() != null) {
@@ -59,10 +63,18 @@ public class AseSecurityContextService {
         throw USER_NOT_FOUND.newException();
     }
 
+    public ArtOwner getArtOwner() {
+        var principalId = getPrincipalId();
+        if(principalId != null) {
+            return artOwnerRepository.findByUserProfile_UserId(principalId).orElseThrow(USER_NOT_FOUND::newException);
+        }
+        throw USER_NOT_FOUND.newException();
+    }
+
     public void validateOwner(Long ownerId) {
-        var userProfile = userProfileRepository.findById(ownerId);
+        var artOwner = artOwnerRepository.findById(ownerId);
         if (getPrincipal().getRoles().stream().noneMatch(role -> Role.ADMIN.equals(role.getName()))
-                && userProfile.isPresent() && !userProfile.get().getUserId().equals(getPrincipalId())) {
+                && artOwner.isPresent() && !artOwner.get().getUserProfile().getUserId().equals(getPrincipalId())) {
             throw ACCESS_NOT_ALLOWED.newException();
         }
     }

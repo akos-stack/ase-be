@@ -1,9 +1,10 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.config.security.AsePrincipal;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.entity.user.User;
-import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
-import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
+import com.bloxico.ase.userservice.entity.user.profile.ArtOwner;
+import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class UtilSecurityContext {
 
     @Autowired
-    private UserProfileRepository userProfileRepository;
+    private ArtOwnerRepository artOwnerRepository;
 
     public String getToken() {
         if(SecurityContextHolder.getContext().getAuthentication() != null) {
@@ -41,12 +42,16 @@ public class UtilSecurityContext {
             OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
             UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken) auth.getUserAuthentication();
             AsePrincipal user = (AsePrincipal) authentication.getPrincipal();
-            return (User) user.getUser();
+            return user.getUser();
         }
         return null;
     }
 
-    public UserProfile getLoggedInUserProfile() {
-        return userProfileRepository.findByUserId(getLoggedInUserId()).orElse(null);
+    public ArtOwner getLoggedInArtOwner() {
+        return artOwnerRepository.findByUserProfile_UserId(getLoggedInUserId()).orElse(null);
+    }
+
+    public boolean isArtOwner() {
+        return getLoggedInPrincipal().getRoles().stream().anyMatch(role -> Role.ART_OWNER.equals(role.getName()));
     }
 }

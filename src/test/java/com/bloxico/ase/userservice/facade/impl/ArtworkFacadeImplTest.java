@@ -63,7 +63,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
         assertNotNull(response);
         assertNotNull(response.getArtworkDto().getId());
         assertSame(Artwork.Status.DRAFT, response.getArtworkDto().getStatus());
-        assertSame(utilSecurityContext.getLoggedInUserProfile().getId(), response.getArtworkDto().getOwnerId());
+        assertSame(utilSecurityContext.getLoggedInArtOwner().getId(), response.getArtworkDto().getOwnerId());
     }
 
     @Test
@@ -129,7 +129,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser()
+    @WithMockCustomUser
     public void searchArtworks_ok_admin() {
         var m1 = utilArtwork.savedArtworkDtoDraftWithOwner();
         var m2 = utilArtwork.savedArtworkDtoDraftWithOwner();

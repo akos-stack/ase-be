@@ -63,13 +63,13 @@ public class UtilArtwork {
         return artworkHistoryDto;
     }
 
-    public ArtworkDto genArtworkDto(Boolean withOwner, Artwork.Status status) {
+    public ArtworkDto genArtworkDto(Artwork.Status status) {
         Long ownerId;
-        if(withOwner) {
+        if(!utilSecurityContext.isArtOwner()) {
             var artOwner = utilUserProfile.savedArtOwnerDto(utilUser.savedUser().getId());
             ownerId = artOwner.getId();
         } else {
-            ownerId = utilSecurityContext.getLoggedInUserProfile().getId();
+            ownerId = utilSecurityContext.getLoggedInArtOwner().getId();
         }
         var artworkDto = new ArtworkDto();
         artworkDto.setTitle(genUUID());
@@ -95,12 +95,7 @@ public class UtilArtwork {
     }
 
     public ArtworkDto savedArtworkDto(Artwork.Status ... status) {
-        var artworkDto = genArtworkDto(false, status.length > 0 ? status[0] : Artwork.Status.DRAFT);
-        return savedArtworkDocuments(artworkService.saveArtwork(artworkDto));
-    }
-
-    public ArtworkDto savedArtworkDtoWithOwner(Artwork.Status ... status) {
-        var artworkDto = genArtworkDto(true, status.length > 0 ? status[0] : Artwork.Status.DRAFT);
+        var artworkDto = genArtworkDto(status.length > 0 ? status[0] : Artwork.Status.DRAFT);
         return savedArtworkDocuments(artworkService.saveArtwork(artworkDto));
     }
 

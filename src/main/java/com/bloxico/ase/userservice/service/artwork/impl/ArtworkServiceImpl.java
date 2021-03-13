@@ -70,7 +70,7 @@ public class ArtworkServiceImpl implements IArtworkService {
         requireNonNull(request);
         requireNonNull(page);
         var pageable = page.toPageable();
-        var ownerId = securityContextService.isAdmin() ? null : securityContextService.getUserProfile().getId();
+        var ownerId = securityContextService.isAdmin() ? null : securityContextService.getArtOwner().getId();
         var artworkMetadataDtos = artworkRepository
                 .search(request.getStatus(), request.getTitle(), ownerId, pageable)
                 .map(MAPPER::toDto);
@@ -81,6 +81,7 @@ public class ArtworkServiceImpl implements IArtworkService {
     @Override
     public void deleteArtworkById(Long id) {
         log.info("ArtworkServiceImpl.deleteArtworkById - start | id: {}", id);
+        requireNonNull(id);
         if(artworkHistoryRepository.existsById(id)) artworkHistoryRepository.deleteById(id);
         artworkRepository.deleteById(id);
         log.info("ArtworkServiceImpl.deleteArtworkById - end | id: {}", id);

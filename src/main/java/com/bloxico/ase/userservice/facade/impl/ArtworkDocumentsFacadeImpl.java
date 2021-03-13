@@ -55,7 +55,7 @@ public class ArtworkDocumentsFacadeImpl implements IArtworkDocumentsFacade {
         request.validateDocuments();
         var artworkDto = artworkService.getArtworkById(request.getArtworkId());
         securityContextService.validateOwner(artworkDto.getOwnerId());
-        var documentDtos = documentService.getDocumentsById(artworkDocumentService.findDocumentsByArtworkId(request.getArtworkId()));
+        var documentDtos = documentService.getDocumentsByIds(artworkDocumentService.findDocumentsByArtworkId(request.getArtworkId()));
         var toSaveDocuments = doSaveDocuments(documentDtos, request.getDocuments(), request.getFileCategory());
         artworkDocumentService.saveArtworkDocuments(request.getArtworkId(), toSaveDocuments);
         log.info("ArtworkDocumentFacadeImpl.saveArtworkDocuments - end | request: {}", request);
@@ -96,7 +96,7 @@ public class ArtworkDocumentsFacadeImpl implements IArtworkDocumentsFacade {
         if(artworkDto.getLocation().getId() != null) {
             locationDto = locationService.findLocationById(artworkDto.getLocation().getId());
         }
-        List<DocumentDto> documentDtos = documentService.getDocumentsById(artworkDocumentService.findDocumentsByArtworkId(artworkDto.getId()));
+        List<DocumentDto> documentDtos = documentService.getDocumentsByIds(artworkDocumentService.findDocumentsByArtworkId(artworkDto.getId()));
         return MAPPER.toArtworkDto(artworkDto, locationDto, Set.copyOf(documentDtos));
     }
 

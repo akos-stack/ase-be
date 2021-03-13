@@ -130,13 +130,13 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         if(artworkDto.getLocation().getId() != null) {
             locationDto = locationService.findLocationById(artworkDto.getLocation().getId());
         }
-        List<DocumentDto> documentDtos = documentService.getDocumentsById(artworkDocumentService.findDocumentsByArtworkId(artworkDto.getId()));
+        List<DocumentDto> documentDtos = documentService.getDocumentsByIds(artworkDocumentService.findDocumentsByArtworkId(artworkDto.getId()));
         return MAPPER.toArtworkDto(artworkDto, locationDto, Set.copyOf(documentDtos));
     }
 
     private void validateRequiredDocuments(Long artworkId, boolean iAmArtOwner) {
         var documents =  artworkDocumentService.findDocumentsByArtworkId(artworkId);
-        var documentDtos = documentService.getDocumentsById(documents);
+        var documentDtos = documentService.getDocumentsByIds(documents);
         if(iAmArtOwner && documentDtos.stream().noneMatch(documentDto -> FileCategory.CV == documentDto.getType())) {
             throw ARTWORK_MISSING_RESUME.newException();
         }

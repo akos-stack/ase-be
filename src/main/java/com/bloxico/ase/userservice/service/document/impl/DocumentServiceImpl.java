@@ -77,8 +77,9 @@ public class DocumentServiceImpl implements IDocumentService {
     }
 
     @Override
-    public List<DocumentDto> getDocumentsById(List<Long> ids) {
+    public List<DocumentDto> getDocumentsByIds(List<Long> ids) {
         log.info("DocumentServiceImpl.findAllByIds - start | ids: {}", ids);
+        requireNonNull(ids);
         var documents = documentRepository.findAllById(ids);
         log.info("DocumentServiceImpl.findAllByIds - start | ids: {}", ids);
         return documents.stream().map(MAPPER::toDto).collect(Collectors.toList());
