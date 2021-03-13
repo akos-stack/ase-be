@@ -67,7 +67,8 @@ public interface ArtworkApi {
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_artwork')")
     @ApiOperation(value = "Searches artwork metadata.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Artworks successfully searched.")
+            @ApiResponse(code = 200, message = "Artworks successfully searched."),
+            @ApiResponse(code = 403, message = "User has no permission.")
     })
     ResponseEntity<SearchArtworkResponse> searchArtworks(
             @Valid SearchArtworkRequest request,

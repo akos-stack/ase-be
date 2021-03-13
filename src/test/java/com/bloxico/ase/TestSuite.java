@@ -64,6 +64,7 @@ import org.junit.runners.Suite;
         ArtworkMetadataFacadeImplTest.class,
         EvaluationFacadeImplTest.class,
         ArtworkFacadeImplTest.class,
+        ArtworkDocumentsFacadeImplTest.class,
         AWSUtilTest.class,
         SystemFacadeImplTest.class,
 

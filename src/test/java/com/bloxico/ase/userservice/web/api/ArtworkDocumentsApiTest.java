@@ -64,7 +64,7 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void saveArtworkDocuments_401_notAllowed() {
-        var artworkDto = utilArtwork.savedArtworkDtoWithOwner();
+        var artworkDto = utilArtwork.savedArtworkDtoDraftWithOwner();
         byte[] image = genFileBytes(IMAGE);
         given()
                 .header("Authorization", securityContext.getToken())
@@ -231,7 +231,7 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void downloadArtworkDocument_401_notAllowed() {
-        var artworkDto = utilArtwork.savedArtworkDtoWithOwner();
+        var artworkDto = utilArtwork.savedArtworkDtoDraftWithOwner();
         given()
                 .header("Authorization", securityContext.getToken())
                 .param("artworkId", artworkDto.getId())
@@ -293,7 +293,7 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void removeArtworkDocument_401_notAllowed() {
-        var artworkDto = utilArtwork.savedArtworkDtoWithOwner();
+        var artworkDto = utilArtwork.savedArtworkDtoDraftWithOwner();
         given()
                 .header("Authorization", securityContext.getToken())
                 .param("artworkId", artworkDto.getId())

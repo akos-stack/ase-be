@@ -33,7 +33,7 @@ public class ArtworkServiceImplTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser
     public void saveArtwork() {
-        var dto = utilArtwork.genArtworkDto(Artwork.Status.DRAFT);
+        var dto = utilArtwork.genArtworkDto(false, Artwork.Status.DRAFT);
         var newlyCreatedDto = artworkService.saveArtwork(dto);
         assertNotNull(newlyCreatedDto);
         assertTrue(artworkRepository.findById(newlyCreatedDto.getId()).isPresent());

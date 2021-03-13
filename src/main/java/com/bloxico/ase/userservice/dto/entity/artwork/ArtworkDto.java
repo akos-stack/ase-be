@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(exclude = {"location", "artworkHistory", "documents"}, callSuper = false)
 @Data
 public class ArtworkDto extends BaseEntityDto {
 

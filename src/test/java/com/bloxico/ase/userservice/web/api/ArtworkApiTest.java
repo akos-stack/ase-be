@@ -34,7 +34,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void previewArtwork_401_notAllowed() {
-        var artworkDto = utilArtwork.savedArtworkDtoWithOwner();
+        var artworkDto = utilArtwork.savedArtworkDtoDraftWithOwner();
         given()
                 .header("Authorization", securityContext.getToken())
                 .contentType(JSON)
@@ -50,7 +50,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser(role = Role.USER, auth = true)
     public void previewArtwork_403_notAuthorized() {
-        var artworkDto = utilArtwork.savedArtworkDtoWithOwner();
+        var artworkDto = utilArtwork.savedArtworkDtoDraftWithOwner();
         given()
                 .header("Authorization", securityContext.getToken())
                 .contentType(JSON)
@@ -229,13 +229,27 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(role = Role.USER, auth = true)
+    public void searchArtworks_403_notAuthorized() {
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(JSON)
+                .params(allPages("status", Artwork.Status.DRAFT))
+                .when()
+                .get(API_URL + ARTWORK_SEARCH)
+                .then()
+                .assertThat()
+                .statusCode(403);
+    }
+
+    @Test
     @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void searchArtworks_200_ok() {
         var m1 = utilArtwork.savedArtworkDto();
         var m2 = utilArtwork.savedArtworkDto();
         var m3 = utilArtwork.savedArtworkDto();
         var m4 = utilArtwork.savedArtworkDto(Artwork.Status.WAITING_FOR_EVALUATION);
-        var m5 = utilArtwork.savedArtworkDtoWithOwner();
+        var m5 = utilArtwork.savedArtworkDtoDraftWithOwner();
         var response = given()
                 .header("Authorization", securityContext.getToken())
                 .contentType(JSON)
@@ -258,7 +272,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void deleteArtwork_401_notAllowed() {
-        var request = utilArtwork.savedArtworkDtoWithOwner();
+        var request = utilArtwork.savedArtworkDtoDraftWithOwner();
         given()
                 .header("Authorization", securityContext.getToken())
                 .contentType(JSON)
@@ -273,7 +287,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser(role = Role.USER, auth = true)
     public void deleteArtwork_403_notAuthorized() {
-        var request = utilArtwork.savedArtworkDtoWithOwner();
+        var request = utilArtwork.savedArtworkDtoDraftWithOwner();
         given()
                 .header("Authorization", securityContext.getToken())
                 .contentType(JSON)
@@ -286,7 +300,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser(role = Role.USER, auth = true)
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void deleteArtwork_404_notFound() {
         given()
                 .header("Authorization", securityContext.getToken())

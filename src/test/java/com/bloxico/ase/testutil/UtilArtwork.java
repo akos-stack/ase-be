@@ -13,7 +13,7 @@ import com.bloxico.ase.userservice.service.artwork.impl.ArtworkServiceImpl;
 import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDataRequest;
 import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDocumentsRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkRequest;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -63,7 +63,14 @@ public class UtilArtwork {
         return artworkHistoryDto;
     }
 
-    public ArtworkDto genArtworkDto(Artwork.Status status) {
+    public ArtworkDto genArtworkDto(Boolean withOwner, Artwork.Status status) {
+        Long ownerId;
+        if(withOwner) {
+            var artOwner = utilUserProfile.savedArtOwnerDto(utilUser.savedUser().getId());
+            ownerId = artOwner.getId();
+        } else {
+            ownerId = utilSecurityContext.getLoggedInUserProfile().getId();
+        }
         var artworkDto = new ArtworkDto();
         artworkDto.setTitle(genUUID());
         artworkDto.setYear(genPosInt(Year.now().getValue()));
@@ -73,7 +80,7 @@ public class UtilArtwork {
         artworkDto.setDepth(genPosBigDecimal(20));
         artworkDto.setPhone(genUUID());
         artworkDto.setStatus(status);
-        artworkDto.setOwnerId(utilSecurityContext.getLoggedInUserProfile().getId());
+        artworkDto.setOwnerId(ownerId);
         artworkDto.setLocation(utilLocation.savedLocationDto());
         artworkDto.setArtist(savedArtistDto());
         artworkDto.addCategories(List.of(utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, PENDING)));
@@ -88,7 +95,12 @@ public class UtilArtwork {
     }
 
     public ArtworkDto savedArtworkDto(Artwork.Status ... status) {
-        var artworkDto = genArtworkDto(status.length > 0 ? status[0] : Artwork.Status.DRAFT);
+        var artworkDto = genArtworkDto(false, status.length > 0 ? status[0] : Artwork.Status.DRAFT);
+        return savedArtworkDocuments(artworkService.saveArtwork(artworkDto));
+    }
+
+    public ArtworkDto savedArtworkDtoWithOwner(Artwork.Status ... status) {
+        var artworkDto = genArtworkDto(true, status.length > 0 ? status[0] : Artwork.Status.DRAFT);
         return savedArtworkDocuments(artworkService.saveArtwork(artworkDto));
     }
 
@@ -96,10 +108,10 @@ public class UtilArtwork {
         return artworkFacade.saveArtworkDraft().getArtworkDto();
     }
 
-    public ArtworkDto savedArtworkDtoWithOwner() {
+    public ArtworkDto savedArtworkDtoDraftWithOwner(Artwork.Status ... status) {
         var artOwner = utilUserProfile.savedArtOwnerDto(utilUser.savedUser().getId());
         var artworkDto = new ArtworkDto();
-        artworkDto.setStatus(Artwork.Status.DRAFT);
+        artworkDto.setStatus(status.length > 0 ? status[0] : Artwork.Status.DRAFT);
         artworkDto.setOwnerId(artOwner.getId());
         return artworkService.saveArtwork(artworkDto);
     }
@@ -132,7 +144,7 @@ public class UtilArtwork {
     }
 
     public SaveArtworkDataRequest genSaveArtworkDataRequestWithOwner(Artwork.Status status, boolean artOwner) {
-        return genSaveArtworkDataRequestWithDocuments(savedArtworkDtoWithOwner(),
+        return genSaveArtworkDataRequestWithDocuments(savedArtworkDtoDraftWithOwner(),
                 status, artOwner);
     }
 
@@ -188,79 +200,13 @@ public class UtilArtwork {
 
     public Map<String, String> genSaveArtworkDocumentsFormParamsWithOwner(FileCategory fileCategory) {
         var map = new HashMap<String, String>();
-        map.put("artworkId", String.valueOf(savedArtworkDtoWithOwner().getId()));
+        map.put("artworkId", String.valueOf(savedArtworkDtoDraftWithOwner().getId()));
         map.put("fileCategory", fileCategory.name());
         return map;
     }
 
-    public SaveArtworkRequest genSaveArtworkRequest(Artwork.Status status, boolean artOwner) {
-        var region = utilLocation.savedRegion();
-        var country = utilLocation.savedCountryWithRegion(region);
-        var fileCategory = artOwner ? CV : CERTIFICATE;
-        return new SaveArtworkRequest(
-                List.of(genMultipartFile(IMAGE)),               // images
-                genMultipartFile(PRINCIPAL_IMAGE),              // principalImage
-                genUUID(),                                      // title
-                new String[]{genUUID(), genUUID()},             // categories
-                genUUID(),                                      // artist
-                artOwner,                                       // iAmArtOwner
-                genPosInt(Year.now().getValue()),               // year
-                new String[]{genUUID(), genUUID()},             // materials
-                new String[]{genUUID(), genUUID()},             // mediums
-                new String[]{genUUID(), genUUID()},             // styles
-                genMultipartFile(fileCategory),                 // document
-                fileCategory,                                   // fileCategory
-                genPosBigDecimal(100),                          // weight
-                genPosBigDecimal(100),                          // height
-                genPosBigDecimal(100),                          // width
-                genPosBigDecimal(100),                          // depth
-                genUUID(),                                      // address
-                genUUID(),                                      // address2
-                genUUID(),                                      // city
-                country.getName(),                              // country
-                region.getName(),                               // region
-                genUUID(),                                      // zipCode
-                genUUID(),                                      // phone
-                genUUID(),                                      // appraisalHistory
-                genUUID(),                                      // locationHistory
-                genUUID(),                                      // runsHistory
-                genUUID(),                                      // maintenanceHistory
-                genUUID(),                                      // notes
-                status                                          // status
-        );
-    }
-
-    public Map<String, String> genSaveArtworkFormParams(Artwork.Status status, boolean iAmArtOwner) {
-        var region = utilLocation.savedRegion();
-        var country = utilLocation.savedCountryWithRegion(region);
-        var map = new HashMap<String, String>();
-        map.put("title", genUUID());
-        map.put("categories", genUUID());
-        map.put("artist", genUUID());
-        map.put("iAmArtOwner", Boolean.toString(iAmArtOwner));
-        map.put("year", "2010");
-        map.put("materials", genUUID());
-        map.put("mediums", genUUID());
-        map.put("styles", genUUID());
-        map.put("fileCategory", iAmArtOwner ? CV.name() : CERTIFICATE.name());
-        map.put("weight", genPosBigDecimal(100).toString());
-        map.put("height", genPosBigDecimal(100).toString());
-        map.put("width", genPosBigDecimal(100).toString());
-        map.put("depth", genPosBigDecimal(100).toString());
-        map.put("address", genUUID());
-        map.put("address2", genUUID());
-        map.put("city", genUUID());
-        map.put("country", country.getName());
-        map.put("region", region.getName());
-        map.put("zipCode", genUUID());
-        map.put("phone", genUUID());
-        map.put("appraisalHistory", genUUID());
-        map.put("locationHistory", genUUID());
-        map.put("runsHistory", genUUID());
-        map.put("maintenanceHistory", genUUID());
-        map.put("notes", genUUID());
-        map.put("status", status.name());
-        return map;
+    public static SearchArtworkRequest genSearchArtworksRequest(Artwork.Status status) {
+        return new SearchArtworkRequest(status, null);
     }
 
 }
