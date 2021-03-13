@@ -1283,7 +1283,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_quotation_packages_countries_creator
+                    foreignKeyName: fk_artworks_documents_creator
                     references: users(id)
               - column:
                   name: created_at
@@ -1295,7 +1295,7 @@ databaseChangeLog:
                   name: updater_id
                   type: bigint
                   constraints:
-                    foreignKeyName: fk_quotation_packages_countries_updater
+                    foreignKeyName: fk_artworks_documents_updater
                     references: users(id)
               - column:
                   name: updated_at
