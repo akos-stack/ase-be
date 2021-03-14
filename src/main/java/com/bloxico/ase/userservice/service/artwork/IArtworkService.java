@@ -13,5 +13,6 @@ public interface IArtworkService {
 
     Page<ArtworkDto> searchArtworks(SearchArtworkRequest request, PageRequest page);
 
-    void deleteArtworkById(Long id);
+    void deleteArtworkById(long id);
+
 }

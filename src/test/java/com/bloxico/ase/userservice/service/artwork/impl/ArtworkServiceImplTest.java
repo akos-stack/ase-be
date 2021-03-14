@@ -6,7 +6,6 @@ import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.exception.ArtworkException;
-import com.bloxico.ase.userservice.repository.artwork.ArtworkHistoryRepository;
 import com.bloxico.ase.userservice.repository.artwork.ArtworkRepository;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -24,7 +23,6 @@ public class ArtworkServiceImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilArtwork utilArtwork;
     @Autowired private ArtworkServiceImpl artworkService;
     @Autowired private ArtworkRepository artworkRepository;
-    @Autowired private ArtworkHistoryRepository artworkHistoryRepository;
 
     @Test
     public void saveArtwork_nullArtwork() {
@@ -40,7 +38,6 @@ public class ArtworkServiceImplTest extends AbstractSpringTestWithAWS {
         var newlyCreatedDto = artworkService.saveArtwork(dto);
         assertNotNull(newlyCreatedDto);
         assertTrue(artworkRepository.findById(newlyCreatedDto.getId()).isPresent());
-        assertTrue(artworkHistoryRepository.findById(newlyCreatedDto.getId()).isPresent());
     }
 
     @Test
@@ -94,13 +91,6 @@ public class ArtworkServiceImplTest extends AbstractSpringTestWithAWS {
                 Matchers.allOf(
                         hasItems(m1, m2, m3, m5),
                         not(hasItems(m4))));
-    }
-
-    @Test
-    public void deleteArtworkById_nullId() {
-        assertThrows(
-                NullPointerException.class,
-                () -> artworkService.deleteArtworkById(null));
     }
 
     @Test

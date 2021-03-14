@@ -84,8 +84,6 @@ public interface AseMapper {
     @Mapping(target = "location.id", source = "locationId")
     ArtworkDto toDto(Artwork artwork);
 
-    ArtworkHistoryDto toDto(ArtworkHistory entity);
-
     @Mapping(target = "email", source = "id.email")
     @Mapping(target = "documentId", source = "id.documentId")
     PendingEvaluatorDocumentDto toDto(PendingEvaluatorDocument entity);
@@ -130,8 +128,6 @@ public interface AseMapper {
 
     @Mapping(source = "dto.location.id", target = "locationId")
     Artwork toEntity(ArtworkDto dto);
-
-    ArtworkHistory toEntity(ArtworkHistoryDto dto);
 
     ArtworkDocument toEntity(ArtworkDocumentDto dto);
 
@@ -195,8 +191,6 @@ public interface AseMapper {
 
     PendingEvaluatorDto toPendingEvaluatorDto(IPendingEvaluatorRequest request);
 
-    ArtworkHistoryDto toArtworkHistoryDto(SaveArtworkDataRequest request);
-
     default ConfigDto toDto(SaveConfigRequest request) {
         var dto = new ConfigDto();
         dto.setType(request.getType());
@@ -207,7 +201,6 @@ public interface AseMapper {
     @Mapping(ignore = true, target = "artist")
     @Mapping(ignore = true, target = "ownerId")
     @Mapping(ignore = true, target = "location")
-    @Mapping(ignore = true, target = "artworkHistory")
     @Mapping(ignore = true, target = "categories")
     @Mapping(ignore = true, target = "materials")
     @Mapping(ignore = true, target = "mediums")

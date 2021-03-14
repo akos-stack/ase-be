@@ -2,7 +2,6 @@ package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
-import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkHistoryDto;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.entity.artwork.Artist;
 import com.bloxico.ase.userservice.entity.artwork.Artwork;
@@ -53,19 +52,9 @@ public class UtilArtwork {
         return MAPPER.toDto(savedArtist());
     }
 
-    public ArtworkHistoryDto genArtworkHistory() {
-        var artworkHistoryDto = new ArtworkHistoryDto();
-        artworkHistoryDto.setAppraisalHistory(genUUID());
-        artworkHistoryDto.setLocationHistory(genUUID());
-        artworkHistoryDto.setRunsHistory(genUUID());
-        artworkHistoryDto.setMaintenanceHistory(genUUID());
-        artworkHistoryDto.setNotes(genUUID());
-        return artworkHistoryDto;
-    }
-
     public ArtworkDto genArtworkDto(Artwork.Status status) {
         Long ownerId;
-        if(!utilSecurityContext.isArtOwner()) {
+        if (!utilSecurityContext.isArtOwner()) {
             var artOwner = utilUserProfile.savedArtOwnerDto(utilUser.savedUser().getId());
             ownerId = artOwner.getId();
         } else {
@@ -87,14 +76,18 @@ public class UtilArtwork {
         artworkDto.addMaterials(List.of(utilArtworkMetadata.savedArtworkMetadataDto(MATERIAL, PENDING)));
         artworkDto.addMediums(List.of(utilArtworkMetadata.savedArtworkMetadataDto(MEDIUM, PENDING)));
         artworkDto.addStyles(List.of(utilArtworkMetadata.savedArtworkMetadataDto(STYLE, PENDING)));
-        artworkDto.setArtworkHistory(genArtworkHistory());
+        artworkDto.setAppraisalHistory(genUUID());
+        artworkDto.setLocationHistory(genUUID());
+        artworkDto.setRunsHistory(genUUID());
+        artworkDto.setMaintenanceHistory(genUUID());
+        artworkDto.setNotes(genUUID());
         artworkDto.addDocuments(List.of(utilDocument.savedDocumentDto(IMAGE)));
         artworkDto.addDocuments(List.of(utilDocument.savedDocumentDto(PRINCIPAL_IMAGE)));
         artworkDto.addDocuments(List.of(utilDocument.savedDocumentDto(CERTIFICATE)));
         return artworkDto;
     }
 
-    public ArtworkDto savedArtworkDto(Artwork.Status ... status) {
+    public ArtworkDto savedArtworkDto(Artwork.Status... status) {
         var artworkDto = genArtworkDto(status.length > 0 ? status[0] : Artwork.Status.DRAFT);
         return savedArtworkDocuments(artworkService.saveArtwork(artworkDto));
     }
@@ -103,7 +96,7 @@ public class UtilArtwork {
         return artworkFacade.saveArtworkDraft().getArtworkDto();
     }
 
-    public ArtworkDto savedArtworkDtoDraftWithOwner(Artwork.Status ... status) {
+    public ArtworkDto savedArtworkDtoDraftWithOwner(Artwork.Status... status) {
         var artOwner = utilUserProfile.savedArtOwnerDto(utilUser.savedUser().getId());
         var artworkDto = new ArtworkDto();
         artworkDto.setStatus(status.length > 0 ? status[0] : Artwork.Status.DRAFT);
@@ -150,7 +143,7 @@ public class UtilArtwork {
 
     public SaveArtworkDataRequest genSaveArtworkDataRequestWithDocuments(ArtworkDto artworkDto, Artwork.Status status, boolean artOwner) {
         var imageId = -1L;
-        if(!CollectionUtils.isEmpty(artworkDto.getDocuments())) {
+        if (!CollectionUtils.isEmpty(artworkDto.getDocuments())) {
             imageId = artworkDto.getDocuments().stream().filter(documentDto -> IMAGE.equals(documentDto.getType())).findFirst().get().getId();
         }
         var region = utilLocation.savedRegion();

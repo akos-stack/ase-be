@@ -62,6 +62,21 @@ public class Artwork extends BaseEntity {
     @Enumerated(STRING)
     private Status status;
 
+    @Column(name = "appraisal_history")
+    private String appraisalHistory;
+
+    @Column(name = "location_history")
+    private String locationHistory;
+
+    @Column(name = "runs_history")
+    private String runsHistory;
+
+    @Column(name = "maintenance_history")
+    private String maintenanceHistory;
+
+    @Column(name = "notes")
+    private String notes;
+
     @ManyToMany(fetch = LAZY, cascade = MERGE)
     @JoinTable(
             name = "artworks_categories",

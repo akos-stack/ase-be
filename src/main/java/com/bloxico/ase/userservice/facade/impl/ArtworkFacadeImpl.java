@@ -4,37 +4,25 @@ import com.bloxico.ase.userservice.config.security.AseSecurityContextService;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
-import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkHistoryDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
-import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.entity.artwork.ArtworkDocument;
 import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
 import com.bloxico.ase.userservice.facade.IArtworkFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
-import com.bloxico.ase.userservice.service.artwork.IArtistService;
-import com.bloxico.ase.userservice.service.artwork.IArtworkMetadataService;
-import com.bloxico.ase.userservice.service.artwork.IArtworkService;
+import com.bloxico.ase.userservice.service.artwork.*;
 import com.bloxico.ase.userservice.service.artwork.document.IArtworkDocumentService;
-import com.bloxico.ase.userservice.service.artwork.impl.metadata.CategoryServiceImpl;
-import com.bloxico.ase.userservice.service.artwork.impl.metadata.MaterialServiceImpl;
-import com.bloxico.ase.userservice.service.artwork.impl.metadata.MediumServiceImpl;
-import com.bloxico.ase.userservice.service.artwork.impl.metadata.StyleServiceImpl;
+import com.bloxico.ase.userservice.service.artwork.impl.metadata.*;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.model.PageRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDataRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
-import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkResponse;
+import com.bloxico.ase.userservice.web.model.artwork.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.DRAFT;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -59,7 +47,18 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     private final IArtworkDocumentService artworkDocumentService;
 
     @Autowired
-    public ArtworkFacadeImpl(ILocationService locationService, IDocumentService documentService, IArtworkService artworkService, IArtistService artistService, IUserProfileService userProfileService, CategoryServiceImpl categoryService, MaterialServiceImpl materialService, MediumServiceImpl mediumService, StyleServiceImpl styleService, AseSecurityContextService securityContextService, IArtworkDocumentService artworkDocumentService) {
+    public ArtworkFacadeImpl(ILocationService locationService,
+                             IDocumentService documentService,
+                             IArtworkService artworkService,
+                             IArtistService artistService,
+                             IUserProfileService userProfileService,
+                             CategoryServiceImpl categoryService,
+                             MaterialServiceImpl materialService,
+                             MediumServiceImpl mediumService,
+                             StyleServiceImpl styleService,
+                             AseSecurityContextService securityContextService,
+                             IArtworkDocumentService artworkDocumentService)
+    {
         this.locationService = locationService;
         this.documentService = documentService;
         this.artworkService = artworkService;
@@ -75,10 +74,10 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
 
     @Override
     public SaveArtworkResponse getArtworkById(Long id) {
-        log.info("ArtworkFacadeImpl.saveArtworkDraft - start | id: {}", id);
+        log.info("ArtworkFacadeImpl.getArtworkById - start | id: {}", id);
         var artworkDto = artworkService.getArtworkById(id);
         securityContextService.validateOwner(artworkDto.getOwnerId());
-        log.info("ArtworkFacadeImpl.saveArtworkDraft - end | id: {}", id);
+        log.info("ArtworkFacadeImpl.getArtworkById - end | id: {}", id);
         return new SaveArtworkResponse(prepareResponse(artworkDto));
     }
 
@@ -118,7 +117,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         log.info("ArtworkFacadeImpl.deleteArtwork - start | id: {}", id);
         var artworkDto = artworkService.getArtworkById(id);
         securityContextService.validateOwner(artworkDto.getOwnerId());
-        var documentIDs = artworkDocumentService.findDocumentsByArtworkId(id);
+        var documentIDs = artworkDocumentService.findDocumentIdsByArtworkId(id);
         documentIDs.forEach(docId -> artworkDocumentService.removeArtworkDocument(new ArtworkDocument.Id(id, docId)));
         documentService.deleteDocumentsByIds(documentIDs);
         artworkService.deleteArtworkById(id);
@@ -127,27 +126,29 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
 
     private ArtworkDto prepareResponse(ArtworkDto artworkDto) {
         LocationDto locationDto = null;
-        if(artworkDto.getLocation().getId() != null) {
+        if (artworkDto.getLocation().getId() != null) {
             locationDto = locationService.findLocationById(artworkDto.getLocation().getId());
         }
-        List<DocumentDto> documentDtos = documentService.getDocumentsByIds(artworkDocumentService.findDocumentsByArtworkId(artworkDto.getId()));
+        var documentDtos = documentService.getDocumentsByIds(
+                artworkDocumentService
+                        .findDocumentIdsByArtworkId(artworkDto.getId()));
         return MAPPER.toArtworkDto(artworkDto, locationDto, Set.copyOf(documentDtos));
     }
 
     private void validateRequiredDocuments(Long artworkId, boolean iAmArtOwner) {
-        var documents =  artworkDocumentService.findDocumentsByArtworkId(artworkId);
+        var documents = artworkDocumentService.findDocumentIdsByArtworkId(artworkId);
         var documentDtos = documentService.getDocumentsByIds(documents);
-        if(iAmArtOwner && documentDtos.stream().noneMatch(documentDto -> FileCategory.CV == documentDto.getType())) {
+        if (iAmArtOwner && documentDtos.stream().noneMatch(documentDto -> FileCategory.CV == documentDto.getType())) {
             throw ARTWORK_MISSING_RESUME.newException();
         }
 
-        if(!iAmArtOwner && documentDtos.stream().noneMatch(documentDto -> FileCategory.CERTIFICATE == documentDto.getType())) {
+        if (!iAmArtOwner && documentDtos.stream().noneMatch(documentDto -> FileCategory.CERTIFICATE == documentDto.getType())) {
             throw ARTWORK_MISSING_CERTIFICATE.newException();
         }
     }
 
     private ArtworkDto doPrepareArtworkDto(SaveArtworkDataRequest request, ArtworkDto artworkDtoDb) {
-        if(DRAFT != request.getStatus()) {
+        if (DRAFT != request.getStatus()) {
             validateRequiredDocuments(request.getArtworkId(), request.getIAmArtOwner());
         }
         var artworkDto = MAPPER.toArtworkDto(request);
@@ -159,7 +160,6 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         artworkDto.addMaterials(doSaveMaterials(request));
         artworkDto.addMediums(doSaveMediums(request));
         artworkDto.addStyles(doSaveStyles(request));
-        artworkDto.setArtworkHistory(doPrepareArtworkHistory(artworkDtoDb.getArtworkHistory(), request));
 
         artworkDto.setCreatorId(artworkDtoDb.getCreatorId());
         artworkDto.setCreatedAt(artworkDtoDb.getCreatedAt());
@@ -167,21 +167,6 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         artworkDto.setUpdaterId(artworkDtoDb.getUpdaterId());
         artworkDto.setVersion(artworkDtoDb.getVersion());
         return artworkDto;
-    }
-
-    private ArtworkHistoryDto doPrepareArtworkHistory(ArtworkHistoryDto artworkHistoryDtoDb, SaveArtworkDataRequest request) {
-        if(request.hasHistory()) {
-            if(artworkHistoryDtoDb != null) {
-                artworkHistoryDtoDb.setRunsHistory(request.getRunsHistory());
-                artworkHistoryDtoDb.setMaintenanceHistory(request.getMaintenanceHistory());
-                artworkHistoryDtoDb.setAppraisalHistory(request.getAppraisalHistory());
-                artworkHistoryDtoDb.setLocationHistory(request.getLocationHistory());
-                artworkHistoryDtoDb.setNotes(request.getNotes());
-                return artworkHistoryDtoDb;
-            } else {
-                return MAPPER.toArtworkHistoryDto(request);
-            }
-        } else return null;
     }
 
     private List<ArtworkMetadataDto> doSaveCategories(SaveArtworkDataRequest request) {
@@ -199,9 +184,10 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     private List<ArtworkMetadataDto> doSaveStyles(SaveArtworkDataRequest request) {
         return doSaveArtworkMetadata(styleService, request.getStyles());
     }
+
     private List<ArtworkMetadataDto> doSaveArtworkMetadata(IArtworkMetadataService service, List<String> artworkMetadataDtos) {
         List<ArtworkMetadataDto> result = new ArrayList<>();
-        for(String s: artworkMetadataDtos) {
+        for (String s : artworkMetadataDtos) {
             var dto = new ArtworkMetadataDto();
             dto.setName(s);
             dto.setStatus(ArtworkMetadata.Status.PENDING);
@@ -225,4 +211,5 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         locationDto.setCountry(locationService.findCountryByName(request.getCountry()));
         return locationService.saveLocation(locationDto, null);
     }
+
 }

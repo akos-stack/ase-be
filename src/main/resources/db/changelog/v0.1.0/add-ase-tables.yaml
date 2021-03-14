@@ -1185,46 +1185,6 @@ databaseChangeLog:
                   type: varchar(256)
                   constraints:
                     nullable: false
-              # METADATA
-              - column:
-                  name: creator_id
-                  type: bigint
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_artwork_creator
-                    references: users(id)
-              - column:
-                  name: created_at
-                  type: timestamp
-                  defaultValueComputed: "CURRENT_TIMESTAMP"
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updater_id
-                  type: bigint
-                  constraints:
-                    foreignKeyName: fk_artwork_updater
-                    references: users(id)
-              - column:
-                  name: updated_at
-                  type: timestamp
-              - column:
-                  name: version
-                  type: bigint
-                  defaultValueNumeric: 0
-                  constraints:
-                    nullable: false
-        - createTable:
-            tableName: artwork_histories
-            columns:
-              - column:
-                  name: artwork_id
-                  type: bigint
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-                    foreignKeyName: fk_artwork_history_artwork
-                    references: artworks(id)
               - column:
                   name: appraisal_history
                   type: varchar(256)
@@ -1246,7 +1206,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_artwork_history_creator
+                    foreignKeyName: fk_artwork_creator
                     references: users(id)
               - column:
                   name: created_at
@@ -1258,7 +1218,7 @@ databaseChangeLog:
                   name: updater_id
                   type: bigint
                   constraints:
-                    foreignKeyName: fk_artwork_history_updater
+                    foreignKeyName: fk_artwork_updater
                     references: users(id)
               - column:
                   name: updated_at

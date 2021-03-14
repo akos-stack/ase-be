@@ -1,12 +1,10 @@
 package com.bloxico.ase.userservice.web.model.artwork;
 
-import com.bloxico.ase.userservice.entity.artwork.Artwork;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.bloxico.ase.userservice.entity.artwork.Artwork.Status;
+import com.bloxico.ase.userservice.validator.NullOrNotBlank;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -14,7 +12,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static lombok.AccessLevel.PRIVATE;
-import static org.springframework.util.StringUtils.isEmpty;
 
 @Value
 @AllArgsConstructor
@@ -43,6 +40,8 @@ public class SaveArtworkDataRequest {
     @ApiModelProperty(required = true)
     List<String> categories;
 
+    @NotNull
+    @NotEmpty
     @JsonProperty("artist")
     @ApiModelProperty(required = true)
     String artist;
@@ -101,6 +100,7 @@ public class SaveArtworkDataRequest {
     @ApiModelProperty(required = true)
     String address;
 
+    @NullOrNotBlank
     @JsonProperty("address2")
     String address2;
 
@@ -134,33 +134,29 @@ public class SaveArtworkDataRequest {
     @ApiModelProperty(required = true)
     String phone;
 
+    @NullOrNotBlank
     @JsonProperty("appraisal_history")
     String appraisalHistory;
 
+    @NullOrNotBlank
     @JsonProperty("location_history")
     String locationHistory;
 
+    @NullOrNotBlank
     @JsonProperty("runs_history")
     String runsHistory;
 
+    @NullOrNotBlank
     @JsonProperty("maintenance_history")
     String maintenanceHistory;
 
+    @NullOrNotBlank
     @JsonProperty("notes")
     String notes;
 
     @NotNull
     @JsonProperty("status")
     @ApiModelProperty(required = true)
-    Artwork.Status status;
-
-    @JsonIgnore
-    public boolean hasHistory() {
-        return !isEmpty(appraisalHistory)
-                || !isEmpty(locationHistory)
-                || !isEmpty(runsHistory)
-                || !isEmpty(maintenanceHistory)
-                || !isEmpty(notes);
-    }
+    Status status;
 
 }

@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Data
-@EqualsAndHashCode(exclude = {"location", "artworkHistory", "documents"}, callSuper = false)
+@EqualsAndHashCode(exclude = {"location", "documents"}, callSuper = false)
 public class ArtworkDto extends BaseEntityDto {
 
     @JsonProperty("title")
@@ -49,8 +49,20 @@ public class ArtworkDto extends BaseEntityDto {
     @JsonProperty("status")
     private Status status;
 
-    @JsonProperty("history")
-    private ArtworkHistoryDto artworkHistory;
+    @JsonProperty("appraisal_history")
+    private String appraisalHistory;
+
+    @JsonProperty("location_history")
+    private String locationHistory;
+
+    @JsonProperty("runs_history")
+    private String runsHistory;
+
+    @JsonProperty("maintenance_history")
+    private String maintenanceHistory;
+
+    @JsonProperty("notes")
+    private String notes;
 
     @JsonProperty("categories")
     private Set<ArtworkMetadataDto> categories = new HashSet<>();
