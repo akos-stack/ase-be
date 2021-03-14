@@ -13,7 +13,7 @@ import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.FetchType.LAZY;
 
 @Data
-@EqualsAndHashCode(of = "userId", callSuper = false)
+@EqualsAndHashCode(exclude = "location", callSuper = false)
 @ToString(exclude = "location")
 @Entity
 @Table(name = "user_profiles")
@@ -47,4 +47,5 @@ public class UserProfile extends BaseEntity {
             joinColumns = @JoinColumn(name = "user_profile_id"),
             inverseJoinColumns = @JoinColumn(name = "document_id"))
     private Document document;
+
 }

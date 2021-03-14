@@ -1,14 +1,16 @@
 package com.bloxico.ase.userservice.entity.user.profile;
 
+import com.bloxico.ase.userservice.entity.BaseEntityAudit;
 import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "user_profiles_documents")
-public class UserProfileDocument implements Serializable {
+public class UserProfileDocument extends BaseEntityAudit {
 
     @Data
     @NoArgsConstructor

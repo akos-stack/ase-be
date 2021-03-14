@@ -22,4 +22,5 @@ public class PendingEvaluatorDto extends BaseEntityAuditDto {
 
     @JsonProperty("document")
     DocumentDto document;
+
 }

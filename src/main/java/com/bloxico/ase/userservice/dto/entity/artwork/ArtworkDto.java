@@ -4,18 +4,16 @@ import com.bloxico.ase.userservice.dto.entity.BaseEntityDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
-import com.bloxico.ase.userservice.entity.artwork.Artwork;
+import com.bloxico.ase.userservice.entity.artwork.Artwork.Status;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-@EqualsAndHashCode(exclude = {"location", "artworkHistory", "documents"}, callSuper = false)
 @Data
+@EqualsAndHashCode(exclude = {"location", "artworkHistory", "documents"}, callSuper = false)
 public class ArtworkDto extends BaseEntityDto {
 
     @JsonProperty("title")
@@ -49,7 +47,7 @@ public class ArtworkDto extends BaseEntityDto {
     private LocationDto location;
 
     @JsonProperty("status")
-    private Artwork.Status status;
+    private Status status;
 
     @JsonProperty("history")
     private ArtworkHistoryDto artworkHistory;

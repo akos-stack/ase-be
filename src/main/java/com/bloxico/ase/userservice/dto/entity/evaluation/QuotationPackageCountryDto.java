@@ -1,12 +1,13 @@
 package com.bloxico.ase.userservice.dto.entity.evaluation;
 
+import com.bloxico.ase.userservice.dto.entity.BaseEntityAuditDto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 @Data
-@EqualsAndHashCode(of = {"quotationPackageId", "countryId"})
-public class QuotationPackageCountryDto {
+@EqualsAndHashCode(callSuper = false)
+public class QuotationPackageCountryDto extends BaseEntityAuditDto {
 
     @JsonProperty("quotation_package_id")
     private Long quotationPackageId;

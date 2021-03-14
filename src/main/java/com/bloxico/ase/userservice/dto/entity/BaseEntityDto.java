@@ -4,10 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode(callSuper = false)
 @Data
-public class BaseEntityDto extends BaseEntityAuditDto{
+@EqualsAndHashCode(callSuper = false)
+public class BaseEntityDto extends BaseEntityAuditDto {
 
     @JsonProperty("id")
     private Long id;
+
 }

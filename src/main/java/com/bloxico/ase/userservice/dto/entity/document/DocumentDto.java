@@ -15,4 +15,5 @@ public class DocumentDto extends BaseEntityDto {
 
     @JsonProperty("type")
     private FileCategory type;
+
 }

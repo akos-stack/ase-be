@@ -1,20 +1,20 @@
 package com.bloxico.ase.userservice.entity.artwork;
 
+import com.bloxico.ase.userservice.entity.BaseEntityAudit;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "artworks_history")
-public class ArtworkHistory {
+@Table(name = "artwork_histories")
+public class ArtworkHistory extends BaseEntityAudit {
 
     @Id
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "artwork_id")
+    private Long artworkId;
 
     @Column(name = "appraisal_history")
     private String appraisalHistory;
@@ -30,4 +30,5 @@ public class ArtworkHistory {
 
     @Column(name = "notes")
     private String notes;
+
 }

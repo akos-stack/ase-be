@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode(callSuper = false)
 @Data
+@EqualsAndHashCode(of = "name", callSuper = false)
 public class ArtistDto extends BaseEntityDto {
 
     @JsonProperty("name")

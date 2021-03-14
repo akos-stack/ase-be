@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.dto.entity.user.profile;
 
+import com.bloxico.ase.userservice.dto.entity.BaseEntityDto;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -16,11 +17,8 @@ import java.time.LocalDate;
 import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
 
 @Data
-@EqualsAndHashCode(of = "userId")
-public class UserProfileDto {
-
-    @JsonProperty("id")
-    private Long id;
+@EqualsAndHashCode(exclude = "location", callSuper = false)
+public class UserProfileDto extends BaseEntityDto {
 
     @JsonProperty("user_id")
     private Long userId;

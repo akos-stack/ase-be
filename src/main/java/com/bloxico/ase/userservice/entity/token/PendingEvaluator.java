@@ -13,7 +13,7 @@ import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.EAGER;
 
 @Data
-@EqualsAndHashCode(of = "token", callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "pending_evaluators")
 public class PendingEvaluator extends BaseEntityAudit {
@@ -48,4 +48,5 @@ public class PendingEvaluator extends BaseEntityAudit {
             joinColumns = @JoinColumn(name = "email"),
             inverseJoinColumns = @JoinColumn(name = "document_id"))
     private Document document;
+
 }

@@ -22,4 +22,5 @@ public class BaseEntityAuditDto {
 
     @JsonIgnore
     private long version;
+
 }

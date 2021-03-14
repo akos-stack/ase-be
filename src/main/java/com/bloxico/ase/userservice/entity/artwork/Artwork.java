@@ -1,10 +1,7 @@
 package com.bloxico.ase.userservice.entity.artwork;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
-import com.bloxico.ase.userservice.entity.artwork.metadata.Category;
-import com.bloxico.ase.userservice.entity.artwork.metadata.Material;
-import com.bloxico.ase.userservice.entity.artwork.metadata.Medium;
-import com.bloxico.ase.userservice.entity.artwork.metadata.Style;
+import com.bloxico.ase.userservice.entity.artwork.metadata.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -92,4 +89,5 @@ public class Artwork extends BaseEntity {
             joinColumns = @JoinColumn(name = "artwork_id"),
             inverseJoinColumns = @JoinColumn(name = "style_id"))
     private List<Style> styles;
+
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(of = {"artworkId", "documentId"}, callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 public class ArtworkDocumentDto extends BaseEntityAuditDto {
 
     @JsonProperty("artwork_id")
@@ -14,4 +14,5 @@ public class ArtworkDocumentDto extends BaseEntityAuditDto {
 
     @JsonProperty("document_id")
     Long documentId;
+
 }

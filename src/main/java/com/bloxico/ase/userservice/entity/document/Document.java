@@ -21,4 +21,5 @@ public class Document extends BaseEntity {
     @Column(name = "type")
     @Enumerated(STRING)
     private FileCategory type;
+
 }
