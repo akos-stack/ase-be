@@ -24,9 +24,9 @@ public interface CountryEvaluationDetailsRepository extends JpaRepository<Countr
     @Query(value =
             "SELECT DISTINCT new com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsCountedTransferProj( " +
             "         c1,                                                                                                 " +
-            "         c1.id,                                                                                              " +
+            "         c1.id as country_id,                                                                                " +
             "         c1.name as country,                                                                                 " +
-            "         ced.id,                                                                                             " +
+            "         ced.id as evaluation_id,                                                                            " +
             "         ced.pricePerEvaluation AS price_per_evaluation,                                                     " +
             "         ced.availabilityPercentage AS availability_percentage,                                              " +
             "         (SELECT COUNT(*)                                                                                    " +
