@@ -184,7 +184,7 @@ public class LocationServiceImpl implements ILocationService {
         log.debug("LocationServiceImpl.saveLocation - start | dto: {}", dto);
         requireNonNull(dto);
         var location = MAPPER.toEntity(dto);
-        if(principalId != null) {
+        if (principalId != null) {
             location.setCreatorId(principalId);
         }
         location = locationRepository.saveAndFlush(location);

@@ -77,9 +77,8 @@ abstract class AbstractArtworkMetadataServiceImpl<T extends ArtworkMetadata> imp
         log.debug("AbstractArtworkMetadataServiceImpl[{}].searchArtworkMetadata - start | request: {}, page: {}", getType(), request, page);
         requireNonNull(request);
         requireNonNull(page);
-        var pageable = page.toPageable();
         var artworkMetadataDtos = repository
-                .search(request.getStatus(), request.getName(), pageable)
+                .search(request.getStatus(), request.getName(), page.toPageable())
                 .map(MAPPER::toDto);
         log.debug("AbstractArtworkMetadataServiceImpl[{}].searchArtworkMetadata - end | request: {}, page: {}", getType(), request, page);
         return artworkMetadataDtos;

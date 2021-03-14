@@ -62,20 +62,20 @@ public class EvaluationServiceImpl implements IEvaluationService {
     @Override
     public Page<CountryEvaluationDetailsWithEvaluatorsCountProj> searchCountryEvaluationDetails(
             ISearchCountryEvaluationDetailsRequest request,
-            PageRequest pageDetails)
+            PageRequest page)
     {
-        log.debug("EvaluationServiceImpl.searchCountryEvaluationDetails - start | request: {}, pageDetails: {}", request, pageDetails);
+        log.debug("EvaluationServiceImpl.searchCountryEvaluationDetails - start | request: {}, page: {}", request, page);
         requireNonNull(request);
-        requireNonNull(pageDetails);
-        var page = countryEvaluationDetailsRepository
+        requireNonNull(page);
+        var result = countryEvaluationDetailsRepository
                 .findAllCountryEvaluationDetailsWithEvaluatorsCount(
                         request.getSearch(),
                         request.getRegions(),
                         request.includeCountriesWithoutEvaluationDetails(),
-                        pageDetails.toPageable())
+                        page.toPageable())
                 .map(MAPPER::toCountedProj);
-        log.debug("EvaluationServiceImpl.searchCountryEvaluationDetails - end | request: {}, pageDetails: {}", request, pageDetails);
-        return page;
+        log.debug("EvaluationServiceImpl.searchCountryEvaluationDetails - end | request: {}, page: {}", request, page);
+        return result;
     }
 
     @Override
@@ -117,19 +117,20 @@ public class EvaluationServiceImpl implements IEvaluationService {
     @Override
     public Page<RegionWithCountriesAndEvaluatorsCountProj> searchRegionEvaluationDetails(
             SearchRegionEvaluationDetailsRequest request,
-            PageRequest pageDetails)
+            PageRequest page)
     {
-        log.debug("EvaluationServiceImpl.searchRegionEvaluationDetails - start | request: {}, pageDetails: {}", request, pageDetails);
+        log.debug("EvaluationServiceImpl.searchRegionEvaluationDetails - start | request: {}, page: {}", request, page);
         requireNonNull(request);
-        requireNonNull(pageDetails);
-        var page = countryEvaluationDetailsRepository
+        requireNonNull(page);
+        var result = countryEvaluationDetailsRepository
                 .findAllRegionsWithCountriesAndEvaluatorsCount(
                         request.getSearch(),
-                        pageDetails.toPageable());
-        log.debug("EvaluationServiceImpl.searchRegionEvaluationDetails - end | request: {}, pageDetails: {}", request, pageDetails);
-        return page;
+                        page.toPageable());
+        log.debug("EvaluationServiceImpl.searchRegionEvaluationDetails - end | request: {}, page: {}", request, page);
+        return result;
     }
 
+    @Override
     public QuotationPackageDto saveQuotationPackage(QuotationPackageDto dto) {
         log.debug("EvaluationServiceImpl.saveQuotationPackageDto - start | dto: {}", dto);
         requireNonNull(dto);
@@ -146,8 +147,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
     public Set<QuotationPackageCountryDto> saveQuotationPackageCountries(
             long packageId, Collection<QuotationPackageCountryDto> dtos)
     {
-        log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - start | packageId: {}, dtos: {}",
-                packageId, dtos);
+        log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - start | packageId: {}, dtos: {}", packageId, dtos);
         requireNonNull(dtos);
         var quotationPackageCountryDtos = dtos
                 .stream()
@@ -157,8 +157,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
                 .map(quotationPackageCountryRepository::saveAndFlush)
                 .map(MAPPER::toDto)
                 .collect(toSet());
-        log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - end | packageId: {}, dtos: {}",
-                packageId, dtos);
+        log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - end | packageId: {}, dtos: {}", packageId, dtos);
         return quotationPackageCountryDtos;
     }
 

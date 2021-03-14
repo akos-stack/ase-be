@@ -21,5 +21,5 @@ public interface IUserProfileService {
 
     ArtOwnerDto findArtOwnerByUserId(long id);
 
-    void saveUserProfileDocument(Long userId, long documentId);
+    void saveUserProfileDocument(long userProfileId, long documentId, long principalId);
 }

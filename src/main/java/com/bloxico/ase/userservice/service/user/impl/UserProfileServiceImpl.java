@@ -118,12 +118,15 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     @Override
-    public void saveUserProfileDocument(Long userId, long documentId) {
-        log.debug("UserServiceImpl.saveUserProfileDocument - start | userId: {}, documentId {}", userId, documentId);
+    public void saveUserProfileDocument(long userProfileId, long documentId, long principalId) {
+        log.debug("UserServiceImpl.saveUserProfileDocument - start | userProfileId: {}, documentId: {}, principalId: {}",
+                userProfileId, documentId, principalId);
         var userProfileDocument = new UserProfileDocument();
-        userProfileDocument.setId(new Id(documentId, userId));
+        userProfileDocument.setId(new Id(userProfileId, documentId));
+        userProfileDocument.setCreatorId(principalId);
         userProfileDocumentRepository.saveAndFlush(userProfileDocument);
-        log.debug("UserServiceImpl.saveUserProfileDocument - end | userId: {}, documentId {}", userId, documentId);
+        log.debug("UserServiceImpl.saveUserProfileDocument - end | userProfileId: {}, documentId: {}, principalId: {}",
+                userProfileId, documentId, principalId);
     }
 
 }
