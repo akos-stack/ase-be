@@ -23,9 +23,9 @@ public class WithOwner<R> {
         return new WithOwner<>(null, requireNonNull(request));
     }
 
-    public <R2> WithOwner<R2> update(Function<R, R2> updater) {
-        requireNonNull(updater);
-        return new WithOwner<>(owner, requireNonNull(updater.apply(request)));
+    public <R2> WithOwner<R2> convert(Function<R, R2> converter) {
+        requireNonNull(converter);
+        return new WithOwner<>(owner, requireNonNull(converter.apply(request)));
     }
 
 }

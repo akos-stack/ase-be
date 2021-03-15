@@ -25,49 +25,49 @@ public class ArtworkController implements ArtworkApi {
 
     @Override
     public ResponseEntity<DetailedArtworkResponse> findArtworkById(FindByArtworkIdRequest request) {
-        var response = artworkFacade.findArtworkById(WithOwner.any(request));
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<DetailedArtworkResponse> findArtworkByIdMng(FindByArtworkIdRequest request) {
         var response = artworkFacade.findArtworkById(WithOwner.of(security.getArtOwnerId(), request));
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<DetailedArtworkResponse> updateArtworkData(UpdateArtworkDataRequest request) {
-        var response = artworkFacade.updateArtworkData(WithOwner.any(request));
+    public ResponseEntity<DetailedArtworkResponse> findArtworkByIdMng(FindByArtworkIdRequest request) {
+        var response = artworkFacade.findArtworkById(WithOwner.any(request));
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<DetailedArtworkResponse> updateArtworkDataMng(UpdateArtworkDataRequest request) {
+    public ResponseEntity<DetailedArtworkResponse> updateArtworkData(UpdateArtworkDataRequest request) {
         var response = artworkFacade.updateArtworkData(WithOwner.of(security.getArtOwnerId(), request));
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<SearchArtworkResponse> searchArtworks(SearchArtworkRequest request, PageRequest page) {
-        var response = artworkFacade.searchArtworks(WithOwner.any(request), page);
+    public ResponseEntity<DetailedArtworkResponse> updateArtworkDataMng(UpdateArtworkDataRequest request) {
+        var response = artworkFacade.updateArtworkData(WithOwner.any(request));
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<SearchArtworkResponse> searchArtworksMng(SearchArtworkRequest request, PageRequest page) {
+    public ResponseEntity<SearchArtworkResponse> searchArtworks(SearchArtworkRequest request, PageRequest page) {
         var response = artworkFacade.searchArtworks(WithOwner.of(security.getArtOwnerId(), request), page);
         return ResponseEntity.ok(response);
     }
 
     @Override
+    public ResponseEntity<SearchArtworkResponse> searchArtworksMng(SearchArtworkRequest request, PageRequest page) {
+        var response = artworkFacade.searchArtworks(WithOwner.any(request), page);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
     public ResponseEntity<Void> deleteArtwork(DeleteArtworkRequest request) {
-        artworkFacade.deleteArtwork(WithOwner.any(request));
+        artworkFacade.deleteArtwork(WithOwner.of(security.getArtOwnerId(), request));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Void> deleteArtworkMng(DeleteArtworkRequest request) {
-        artworkFacade.deleteArtwork(WithOwner.of(security.getArtOwnerId(), request));
+        artworkFacade.deleteArtwork(WithOwner.any(request));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

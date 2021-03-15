@@ -88,7 +88,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     public DetailedArtworkResponse findArtworkById(WithOwner<FindByArtworkIdRequest> withOwner) {
         log.info("ArtworkFacadeImpl.findArtworkById - start | withOwner: {}", withOwner);
         var artwork = artworkService.findArtworkById(withOwner
-                .update(FindByArtworkIdRequest::getId));
+                .convert(FindByArtworkIdRequest::getId));
         var response = toDetailedArtworkResponse(artwork);
         log.info("ArtworkFacadeImpl.findArtworkById - end | withOwner: {}", withOwner);
         return response;
@@ -116,7 +116,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     public void deleteArtwork(WithOwner<DeleteArtworkRequest> withOwner) {
         log.info("ArtworkFacadeImpl.deleteArtwork - start | withOwner: {}", withOwner);
         var artworkId = artworkService.findArtworkById(withOwner
-                .update(DeleteArtworkRequest::getArtworkId))
+                .convert(DeleteArtworkRequest::getArtworkId))
                 .getId();
         var documentIDs = artworkDocumentService.findDocumentIdsByArtworkId(artworkId);
         artworkDocumentService.deleteArtworkDocumentsByArtworkId(artworkId);
@@ -129,7 +129,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
 
     private ArtworkDto doUpdateArtwork(WithOwner<UpdateArtworkDataRequest> withOwner) {
         var artwork = artworkService.findArtworkById(withOwner
-                .update(UpdateArtworkDataRequest::getArtworkId));
+                .convert(UpdateArtworkDataRequest::getArtworkId));
         var request = withOwner.getRequest();
         if (DRAFT != request.getStatus())
             validateRequiredDocuments(request);
@@ -163,6 +163,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         documentService.updateDocumentType(documentId, PRINCIPAL_IMAGE);
     }
 
+    // TODO findOrSave?
     private LocationDto doSaveLocation(UpdateArtworkDataRequest request) {
         var locationDto = MAPPER.toLocationDto(request);
         var countryDto = locationService.findCountryByName(request.getCountry());

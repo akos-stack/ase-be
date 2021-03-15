@@ -10,18 +10,14 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Set;
 
-import static com.bloxico.ase.userservice.util.FileCategory.*;
+import static com.bloxico.ase.userservice.facade.impl.ArtworkDocumentsFacadeImpl.SINGLETONS;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_ONLY_ONE_DOCUMENT_ALLOWED_FOR_CATEGORY;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UploadArtworkDocumentsRequest {
-
-    @JsonIgnore
-    public static final Set<FileCategory> SINGLETONS = Set.of(CERTIFICATE, CV, PRINCIPAL_IMAGE);
 
     @NotNull
     @JsonProperty("artwork_id")

@@ -2,9 +2,10 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.facade.IArtworkDocumentsFacade;
-import com.bloxico.ase.userservice.service.artwork.IArtworkService;
 import com.bloxico.ase.userservice.service.artwork.IArtworkDocumentService;
+import com.bloxico.ase.userservice.service.artwork.IArtworkService;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
+import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.model.WithOwner;
 import com.bloxico.ase.userservice.web.model.artwork.*;
 import lombok.extern.slf4j.Slf4j;
@@ -13,15 +14,19 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
+import static com.bloxico.ase.userservice.util.FileCategory.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_DOCUMENT_ALREADY_ATTACHED;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_DOCUMENT_NOT_FOUND;
-import static com.bloxico.ase.userservice.web.model.artwork.UploadArtworkDocumentsRequest.SINGLETONS;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
 @Transactional
 public class ArtworkDocumentsFacadeImpl implements IArtworkDocumentsFacade {
+
+    public static final Set<FileCategory> SINGLETONS = Set.of(CERTIFICATE, CV, PRINCIPAL_IMAGE);
 
     private final IDocumentService documentService;
     private final IArtworkService artworkService;
@@ -42,7 +47,7 @@ public class ArtworkDocumentsFacadeImpl implements IArtworkDocumentsFacade {
         log.info("ArtworkFacadeImpl.downloadArtworkDocument - start | request: {}", request);
         requireArtworkHasDocument(request);
         var response = documentService.findDocumentById(request.getDocumentId());
-        log.info("ArtworkFacadeImpl.downloadArtworkDocument - start | request: {}", request);
+        log.info("ArtworkFacadeImpl.downloadArtworkDocument - end | request: {}", request);
         return response;
     }
 
@@ -52,7 +57,7 @@ public class ArtworkDocumentsFacadeImpl implements IArtworkDocumentsFacade {
         var request = withOwner.getRequest();
         request.validateSingletonDocuments();
         var artworkId = artworkService.findArtworkById(withOwner
-                .update(UploadArtworkDocumentsRequest::getArtworkId))
+                .convert(UploadArtworkDocumentsRequest::getArtworkId))
                 .getId();
         requireNoDuplicateSingletons(request);
         var category = request.getFileCategory();
@@ -62,15 +67,16 @@ public class ArtworkDocumentsFacadeImpl implements IArtworkDocumentsFacade {
                 .map(doc -> documentService.saveDocument(doc, category))
                 .collect(toList());
         artworkDocumentService.saveArtworkDocuments(artworkId, documents);
+        var response = new UploadArtworkDocumentsResponse(documents);
         log.info("ArtworkDocumentFacadeImpl.saveArtworkDocuments - end | withOwner: {}", withOwner);
-        return new UploadArtworkDocumentsResponse(documents);
+        return response;
     }
 
     @Override
     public void deleteArtworkDocument(WithOwner<ArtworkDocumentRequest> withOwner) {
         log.info("ArtworkFacadeImpl.deleteArtworkDocument - start | withOwner: {}", withOwner);
         var artworkId = artworkService.findArtworkById(withOwner
-                .update(ArtworkDocumentRequest::getArtworkId))
+                .convert(ArtworkDocumentRequest::getArtworkId))
                 .getId();
         var request = withOwner.getRequest();
         requireArtworkHasDocument(request);

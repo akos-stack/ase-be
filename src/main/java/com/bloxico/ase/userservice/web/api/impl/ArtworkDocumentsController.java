@@ -25,25 +25,25 @@ public class ArtworkDocumentsController implements ArtworkDocumentsApi {
 
     @Override
     public ResponseEntity<UploadArtworkDocumentsResponse> uploadArtworkDocuments(UploadArtworkDocumentsRequest request) {
-        var response = artworkDocumentsFacade.uploadArtworkDocuments(WithOwner.any(request));
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<UploadArtworkDocumentsResponse> uploadArtworkDocumentsMng(UploadArtworkDocumentsRequest request) {
         var response = artworkDocumentsFacade.uploadArtworkDocuments(WithOwner.of(security.getArtOwnerId(), request));
         return ResponseEntity.ok(response);
     }
 
     @Override
+    public ResponseEntity<UploadArtworkDocumentsResponse> uploadArtworkDocumentsMng(UploadArtworkDocumentsRequest request) {
+        var response = artworkDocumentsFacade.uploadArtworkDocuments(WithOwner.any(request));
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
     public ResponseEntity<Void> deleteArtworkDocument(ArtworkDocumentRequest request) {
-        artworkDocumentsFacade.deleteArtworkDocument(WithOwner.any(request));
+        artworkDocumentsFacade.deleteArtworkDocument(WithOwner.of(security.getArtOwnerId(), request));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Void> deleteArtworkDocumentMng(ArtworkDocumentRequest request) {
-        artworkDocumentsFacade.deleteArtworkDocument(WithOwner.of(security.getArtOwnerId(), request));
+        artworkDocumentsFacade.deleteArtworkDocument(WithOwner.any(request));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
