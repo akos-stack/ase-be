@@ -1,8 +1,10 @@
 package com.bloxico.ase.userservice.web.api.impl;
 
+import com.bloxico.ase.userservice.config.security.AseSecurityContextService;
 import com.bloxico.ase.userservice.facade.IArtworkFacade;
 import com.bloxico.ase.userservice.web.api.ArtworkApi;
 import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.WithOwner;
 import com.bloxico.ase.userservice.web.model.artwork.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,36 +14,60 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ArtworkController implements ArtworkApi {
 
-    @Autowired
-    private IArtworkFacade artworkFacade;
+    @Autowired private IArtworkFacade artworkFacade;
+    @Autowired private AseSecurityContextService security;
 
     @Override
-    public ResponseEntity<SaveArtworkResponse> previewArtwork(Long artworkId) {
-        var response = artworkFacade.getArtworkById(artworkId);
+    public ResponseEntity<ArtworkResponse> createArtworkDraft() {
+        var response = artworkFacade.createArtworkDraft();
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<SaveArtworkResponse> saveArtworkDraft() {
-        var response = artworkFacade.saveArtworkDraft();
+    public ResponseEntity<DetailedArtworkResponse> findArtworkById(FindByArtworkIdRequest request) {
+        var response = artworkFacade.findArtworkById(WithOwner.any(request));
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<SaveArtworkResponse> saveArtworkData(SaveArtworkDataRequest request) {
-        var response = artworkFacade.saveArtworkData(request);
+    public ResponseEntity<DetailedArtworkResponse> findArtworkByIdMng(FindByArtworkIdRequest request) {
+        var response = artworkFacade.findArtworkById(WithOwner.of(security.getArtOwnerId(), request));
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<DetailedArtworkResponse> updateArtworkData(UpdateArtworkDataRequest request) {
+        var response = artworkFacade.updateArtworkData(WithOwner.any(request));
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<DetailedArtworkResponse> updateArtworkDataMng(UpdateArtworkDataRequest request) {
+        var response = artworkFacade.updateArtworkData(WithOwner.of(security.getArtOwnerId(), request));
         return ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<SearchArtworkResponse> searchArtworks(SearchArtworkRequest request, PageRequest page) {
-        var response = artworkFacade.searchArtworks(request, page);
+        var response = artworkFacade.searchArtworks(WithOwner.any(request), page);
         return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<Void> deleteArtwork(Long artworkId) {
-        artworkFacade.deleteArtwork(artworkId);
+    public ResponseEntity<SearchArtworkResponse> searchArtworksMng(SearchArtworkRequest request, PageRequest page) {
+        var response = artworkFacade.searchArtworks(WithOwner.of(security.getArtOwnerId(), request), page);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteArtwork(DeleteArtworkRequest request) {
+        artworkFacade.deleteArtwork(WithOwner.any(request));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteArtworkMng(DeleteArtworkRequest request) {
+        artworkFacade.deleteArtwork(WithOwner.of(security.getArtOwnerId(), request));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

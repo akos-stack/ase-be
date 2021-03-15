@@ -21,4 +21,12 @@ public class Functions {
         };
     }
 
+    public static <T> T ifNull(T check, T replacement) {
+        return check == null ? replacement : check;
+    }
+
+    public static <T, U> U ifNotNull(T value, Function<T, U> fn) {
+        return value == null ? null : fn.apply(value);
+    }
+
 }

@@ -23,18 +23,15 @@ import com.bloxico.ase.userservice.entity.user.profile.*;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsCountedTransferProj;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.web.model.address.*;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDataRequest;
+import com.bloxico.ase.userservice.web.model.artwork.UpdateArtworkDataRequest;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.IArtworkMetadataRequest;
 import com.bloxico.ase.userservice.web.model.config.SaveConfigRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import com.bloxico.ase.userservice.web.model.user.*;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
-
-import java.util.Set;
 
 @Mapper
 public interface AseMapper {
@@ -81,7 +78,6 @@ public interface AseMapper {
 
     ArtistDto toDto(Artist artist);
 
-    @Mapping(target = "location.id", source = "locationId")
     ArtworkDto toDto(Artwork artwork);
 
     @Mapping(target = "email", source = "id.email")
@@ -126,7 +122,6 @@ public interface AseMapper {
 
     Artist toEntity(ArtistDto dto);
 
-    @Mapping(source = "dto.location.id", target = "locationId")
     Artwork toEntity(ArtworkDto dto);
 
     ArtworkDocument toEntity(ArtworkDocumentDto dto);
@@ -152,7 +147,7 @@ public interface AseMapper {
     LocationDto toLocationDto(ISubmitUserProfileRequest request);
 
     @Mapping(ignore = true, target = "country")
-    LocationDto toLocationDto(SaveArtworkDataRequest request);
+    LocationDto toLocationDto(UpdateArtworkDataRequest request);
 
     UserProfileDto toUserProfileDto(ISubmitUserProfileRequest request);
 
@@ -198,24 +193,12 @@ public interface AseMapper {
         return dto;
     }
 
+    @Mapping(ignore = true, target = "id")
     @Mapping(ignore = true, target = "artist")
-    @Mapping(ignore = true, target = "ownerId")
-    @Mapping(ignore = true, target = "location")
     @Mapping(ignore = true, target = "categories")
     @Mapping(ignore = true, target = "materials")
     @Mapping(ignore = true, target = "mediums")
     @Mapping(ignore = true, target = "styles")
-    @Mapping(source = "artworkId", target = "id")
-    ArtworkDto toArtworkDto(SaveArtworkDataRequest request);
-
-    @Mapping(source = "artworkDto.id", target = "id")
-    @Mapping(source = "artworkDto.creatorId", target = "creatorId")
-    @Mapping(source = "artworkDto.updaterId", target = "updaterId")
-    @Mapping(source = "artworkDto.createdAt", target = "createdAt")
-    @Mapping(source = "artworkDto.updatedAt", target = "updatedAt")
-    @Mapping(source = "artworkDto.version", target = "version")
-    @Mapping(source = "locationDto", target = "location")
-    @Mapping(source = "documents", target = "documents")
-    ArtworkDto toArtworkDto(ArtworkDto artworkDto, LocationDto locationDto, Set<DocumentDto> documents);
+    void update(UpdateArtworkDataRequest request, @MappingTarget ArtworkDto artwork);
 
 }

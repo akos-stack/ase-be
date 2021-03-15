@@ -1,10 +1,10 @@
 package com.bloxico.ase.userservice.service.artwork.impl;
 
-import com.bloxico.ase.userservice.config.security.AseSecurityContextService;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
 import com.bloxico.ase.userservice.repository.artwork.ArtworkRepository;
 import com.bloxico.ase.userservice.service.artwork.IArtworkService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.WithOwner;
 import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +20,10 @@ import static java.util.Objects.requireNonNull;
 public class ArtworkServiceImpl implements IArtworkService {
 
     private final ArtworkRepository artworkRepository;
-    private final AseSecurityContextService securityContextService;
 
     @Autowired
-    public ArtworkServiceImpl(ArtworkRepository artworkRepository,
-                              AseSecurityContextService securityContextService)
-    {
+    public ArtworkServiceImpl(ArtworkRepository artworkRepository) {
         this.artworkRepository = artworkRepository;
-        this.securityContextService = securityContextService;
     }
 
     @Override
@@ -42,28 +38,29 @@ public class ArtworkServiceImpl implements IArtworkService {
     }
 
     @Override
-    public ArtworkDto getArtworkById(Long id) {
-        log.info("ArtworkServiceImpl.getArtworkById - start | id: {}", id);
-        requireNonNull(id);
+    public ArtworkDto findArtworkById(WithOwner<Long> withOwner) {
+        log.info("ArtworkServiceImpl.getArtworkById - start | withOwner: {}", withOwner);
         var artworkDto = artworkRepository
-                .findById(id)
+                .findByIdForOwner(withOwner.getRequest(), withOwner.getOwner())
                 .map(MAPPER::toDto)
                 .orElseThrow(ARTWORK_NOT_FOUND::newException);
-        log.info("ArtworkServiceImpl.getArtworkById - end | id: {}", id);
+        log.info("ArtworkServiceImpl.getArtworkById - end | withOwner: {}", withOwner);
         return artworkDto;
     }
 
     @Override
-    public Page<ArtworkDto> searchArtworks(SearchArtworkRequest request, PageRequest page) {
-        log.debug("ArtworkServiceImpl.searchArtworks - start | request: {}, page: {}", request, page);
-        requireNonNull(request);
+    public Page<ArtworkDto> searchArtworks(WithOwner<SearchArtworkRequest> withOwner, PageRequest page) {
+        log.debug("ArtworkServiceImpl.searchArtworks - start | request: {}, page: {}", withOwner, page);
+        requireNonNull(withOwner);
         requireNonNull(page);
-        var pageable = page.toPageable();
-        var ownerId = securityContextService.isAdmin() ? null : securityContextService.getArtOwner().getId();
+        var request = withOwner.getRequest();
         var artworkMetadataDtos = artworkRepository
-                .search(request.getStatus(), request.getTitle(), ownerId, pageable)
+                .search(request.getStatus(),
+                        request.getTitle(),
+                        withOwner.getOwner(),
+                        page.toPageable())
                 .map(MAPPER::toDto);
-        log.debug("ArtworkServiceImpl.searchArtworks - end | request: {}, page: {}", request, page);
+        log.debug("ArtworkServiceImpl.searchArtworks - end | request: {}, page: {}", withOwner, page);
         return artworkMetadataDtos;
     }
 

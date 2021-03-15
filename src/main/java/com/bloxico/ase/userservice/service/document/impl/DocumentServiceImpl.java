@@ -13,11 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.util.Functions.doto;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Document.DOCUMENT_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 @Service
@@ -34,17 +35,17 @@ public class DocumentServiceImpl implements IDocumentService {
 
     @Override
     public DocumentDto saveDocument(MultipartFile file, FileCategory type) {
-        return saveDocument(file, type, null);
+        return saveDocument(file, type, 0);
     }
 
     @Override
-    public DocumentDto saveDocument(MultipartFile file, FileCategory type, Long principalId) {
+    public DocumentDto saveDocument(MultipartFile file, FileCategory type, long principalId) {
         log.info("DocumentServiceImpl.saveDocument - start | file: {}, fileCategory: {}", file, type);
         var path = s3Service.uploadFile(type, file);
         var document = new Document();
         document.setPath(path);
         document.setType(type);
-        if (principalId != null)
+        if (principalId > 0)
             document.setCreatorId(principalId);
         var documentDto = MAPPER.toDto(documentRepository.save(document));
         log.info("DocumentServiceImpl.saveDocument - end | file: {}, fileCategory: {}", file, type);
@@ -52,9 +53,8 @@ public class DocumentServiceImpl implements IDocumentService {
     }
 
     @Override
-    public ByteArrayResource getDocumentById(Long id) {
+    public ByteArrayResource findDocumentById(long id) {
         log.info("DocumentServiceImpl.getDocumentById - start | id: {} ", id);
-        requireNonNull(id);
         var document = documentRepository
                 .findById(id)
                 .map(Document::getPath)
@@ -65,30 +65,47 @@ public class DocumentServiceImpl implements IDocumentService {
     }
 
     @Override
-    public DocumentDto updateDocumentType(Long id, FileCategory type) {
+    public DocumentDto updateDocumentType(long id, FileCategory type) {
         log.info("DocumentServiceImpl.updateDocumentType - start | id: {}, type: {}", id, type);
-        requireNonNull(id);
         requireNonNull(type);
-        var document = documentRepository.findById(id).orElseThrow(DOCUMENT_NOT_FOUND::newException);
-        document.setType(type);
-        document = documentRepository.save(document);
+        var documentDto = documentRepository
+                .findById(id)
+                .map(doto(doc -> doc.setType(type)))
+                .map(documentRepository::saveAndFlush)
+                .map(MAPPER::toDto)
+                .orElseThrow(DOCUMENT_NOT_FOUND::newException);
         log.info("DocumentServiceImpl.updateDocumentType - end | id: {}, type: {}", id, type);
-        return MAPPER.toDto(document);
+        return documentDto;
     }
 
     @Override
-    public List<DocumentDto> getDocumentsByIds(List<Long> ids) {
+    public List<DocumentDto> findDocumentsByIds(List<Long> ids) {
         log.info("DocumentServiceImpl.findAllByIds - start | ids: {}", ids);
         requireNonNull(ids);
-        var documents = documentRepository.findAllById(ids);
+        var documents = documentRepository
+                .findAllById(ids)
+                .stream()
+                .map(MAPPER::toDto)
+                .collect(toList());
         log.info("DocumentServiceImpl.findAllByIds - start | ids: {}", ids);
-        return documents.stream().map(MAPPER::toDto).collect(Collectors.toList());
+        return documents;
     }
 
     @Override
-    public void deleteDocumentById(Long id) {
+    public List<DocumentDto> findDocumentsByArtworkId(long id) {
+        log.info("DocumentServiceImpl.findDocumentsByArtworkId - start | id: {}", id);
+        var documents = documentRepository
+                .findAllByArtworkId(id)
+                .stream()
+                .map(MAPPER::toDto)
+                .collect(toList());
+        log.info("DocumentServiceImpl.findDocumentsByArtworkId - end | id: {}", id);
+        return documents;
+    }
+
+    @Override
+    public void deleteDocumentById(long id) {
         log.info("DocumentServiceImpl.deleteDocumentById - start | id: {} ", id);
-        requireNonNull(id);
         var document = documentRepository
                 .findById(id)
                 .orElseThrow(DOCUMENT_NOT_FOUND::newException);

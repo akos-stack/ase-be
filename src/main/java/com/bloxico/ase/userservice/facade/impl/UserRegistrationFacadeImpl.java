@@ -189,7 +189,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public ByteArrayResource downloadEvaluatorResume(DownloadEvaluatorResumeRequest request) {
         log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - start | request: {}", request);
         var pendingEvaluatorDocumentDto = pendingEvaluatorService.getEvaluatorResume(request.getEmail());
-        var response = documentService.getDocumentById(pendingEvaluatorDocumentDto.getDocumentId());
+        var response = documentService.findDocumentById(pendingEvaluatorDocumentDto.getDocumentId());
         log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - end | request: {}", request);
         return response;
     }

@@ -29,7 +29,7 @@ public class AseSecurityContextService {
     private ArtOwnerRepository artOwnerRepository;
 
     public Long getPrincipalId() {
-        if(SecurityContextHolder.getContext().getAuthentication() != null) {
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
             OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
             var details = auth.getDetails();
             return details instanceof Long
@@ -40,11 +40,11 @@ public class AseSecurityContextService {
     }
 
     public User getPrincipal() {
-        if(SecurityContextHolder.getContext().getAuthentication() != null) {
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
             OAuth2Authentication auth = (OAuth2Authentication) SecurityContextHolder.getContext().getAuthentication();
             var principal = auth.getPrincipal();
-            if(principal instanceof AsePrincipal) {
-                var aseUser= (AsePrincipal) principal;
+            if (principal instanceof AsePrincipal) {
+                var aseUser = (AsePrincipal) principal;
                 return aseUser.getUser();
             } else {
                 var aseUser = (String) principal;
@@ -57,24 +57,27 @@ public class AseSecurityContextService {
 
     public UserProfile getUserProfile() {
         var principalId = getPrincipalId();
-        if(principalId != null) {
+        if (principalId != null) {
             return userProfileRepository.findByUserId(principalId).orElseThrow(USER_NOT_FOUND::newException);
         }
         throw USER_NOT_FOUND.newException();
     }
 
-    public ArtOwner getArtOwner() {
+    public long getArtOwnerId() {
         var principalId = getPrincipalId();
-        if(principalId != null) {
-            return artOwnerRepository.findByUserProfile_UserId(principalId).orElseThrow(USER_NOT_FOUND::newException);
-        }
+        if (principalId != null)
+            return artOwnerRepository
+                    .findByUserProfile_UserId(principalId)
+                    .map(ArtOwner::getId)
+                    .orElseThrow(USER_NOT_FOUND::newException);
         throw USER_NOT_FOUND.newException();
     }
 
     public void validateOwner(Long ownerId) {
         var artOwner = artOwnerRepository.findById(ownerId);
         if (getPrincipal().getRoles().stream().noneMatch(role -> Role.ADMIN.equals(role.getName()))
-                && artOwner.isPresent() && !artOwner.get().getUserProfile().getUserId().equals(getPrincipalId())) {
+                && artOwner.isPresent() && !artOwner.get().getUserProfile().getUserId().equals(getPrincipalId()))
+        {
             throw ACCESS_NOT_ALLOWED.newException();
         }
     }

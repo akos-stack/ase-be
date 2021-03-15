@@ -1,15 +1,15 @@
 package com.bloxico.ase.userservice.facade;
 
-import com.bloxico.ase.userservice.web.model.artwork.ArtworkDocumentRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDocumentsRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
+import com.bloxico.ase.userservice.web.model.WithOwner;
+import com.bloxico.ase.userservice.web.model.artwork.*;
 import org.springframework.core.io.ByteArrayResource;
 
 public interface IArtworkDocumentsFacade {
 
-    SaveArtworkResponse saveArtworkDocuments(SaveArtworkDocumentsRequest request);
-
     ByteArrayResource downloadArtworkDocument(ArtworkDocumentRequest request);
 
-    SaveArtworkResponse deleteArtworkDocument(ArtworkDocumentRequest request);
+    UploadArtworkDocumentsResponse uploadArtworkDocuments(WithOwner<UploadArtworkDocumentsRequest> withOwner);
+
+    void deleteArtworkDocument(WithOwner<ArtworkDocumentRequest> withOwner);
+
 }

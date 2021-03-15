@@ -1,9 +1,7 @@
 package com.bloxico.ase.userservice.dto.entity.artwork;
 
 import com.bloxico.ase.userservice.dto.entity.BaseEntityDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
-import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.entity.artwork.Artwork.Status;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -13,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Data
-@EqualsAndHashCode(exclude = {"location", "documents"}, callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 public class ArtworkDto extends BaseEntityDto {
 
     @JsonProperty("title")
@@ -43,8 +41,8 @@ public class ArtworkDto extends BaseEntityDto {
     @JsonProperty("phone_number")
     private String phone;
 
-    @JsonProperty("location")
-    private LocationDto location;
+    @JsonProperty("location_id")
+    private Long locationId;
 
     @JsonProperty("status")
     private Status status;
@@ -75,13 +73,6 @@ public class ArtworkDto extends BaseEntityDto {
 
     @JsonProperty("styles")
     private Set<ArtworkMetadataDto> styles = new HashSet<>();
-
-    @JsonProperty("documents")
-    private Set<DocumentDto> documents = new HashSet<>();
-
-    public void addDocuments(Collection<DocumentDto> documentDto) {
-        documents.addAll(documentDto);
-    }
 
     public void addStyles(Collection<ArtworkMetadataDto> artworkMetadataDto) {
         styles.addAll(artworkMetadataDto);

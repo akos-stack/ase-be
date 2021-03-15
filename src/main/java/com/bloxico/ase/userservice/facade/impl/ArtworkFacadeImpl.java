@@ -5,29 +5,32 @@ import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
-import com.bloxico.ase.userservice.entity.artwork.ArtworkDocument;
-import com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata;
+import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.facade.IArtworkFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.artwork.*;
-import com.bloxico.ase.userservice.service.artwork.document.IArtworkDocumentService;
+import com.bloxico.ase.userservice.service.artwork.IArtworkDocumentService;
 import com.bloxico.ase.userservice.service.artwork.impl.metadata.*;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
-import com.bloxico.ase.userservice.service.user.IUserProfileService;
-import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.WithOwner;
 import com.bloxico.ase.userservice.web.model.artwork.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
 
 import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.DRAFT;
+import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.PENDING;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
+import static com.bloxico.ase.userservice.util.FileCategory.*;
+import static com.bloxico.ase.userservice.util.Functions.ifNotNull;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_MISSING_CERTIFICATE;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_MISSING_RESUME;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Slf4j
 @Service
@@ -38,12 +41,11 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     private final IDocumentService documentService;
     private final IArtworkService artworkService;
     private final IArtistService artistService;
-    private final IUserProfileService userProfileService;
     private final CategoryServiceImpl categoryService;
     private final MaterialServiceImpl materialService;
     private final MediumServiceImpl mediumService;
     private final StyleServiceImpl styleService;
-    private final AseSecurityContextService securityContextService;
+    private final AseSecurityContextService security;
     private final IArtworkDocumentService artworkDocumentService;
 
     @Autowired
@@ -51,165 +53,143 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
                              IDocumentService documentService,
                              IArtworkService artworkService,
                              IArtistService artistService,
-                             IUserProfileService userProfileService,
                              CategoryServiceImpl categoryService,
                              MaterialServiceImpl materialService,
                              MediumServiceImpl mediumService,
                              StyleServiceImpl styleService,
-                             AseSecurityContextService securityContextService,
+                             AseSecurityContextService security,
                              IArtworkDocumentService artworkDocumentService)
     {
         this.locationService = locationService;
         this.documentService = documentService;
         this.artworkService = artworkService;
         this.artistService = artistService;
-        this.userProfileService = userProfileService;
         this.categoryService = categoryService;
         this.materialService = materialService;
         this.mediumService = mediumService;
         this.styleService = styleService;
-        this.securityContextService = securityContextService;
+        this.security = security;
         this.artworkDocumentService = artworkDocumentService;
     }
 
     @Override
-    public SaveArtworkResponse getArtworkById(Long id) {
-        log.info("ArtworkFacadeImpl.getArtworkById - start | id: {}", id);
-        var artworkDto = artworkService.getArtworkById(id);
-        securityContextService.validateOwner(artworkDto.getOwnerId());
-        log.info("ArtworkFacadeImpl.getArtworkById - end | id: {}", id);
-        return new SaveArtworkResponse(prepareResponse(artworkDto));
-    }
-
-    @Override
-    public SaveArtworkResponse saveArtworkDraft() {
-        log.info("ArtworkFacadeImpl.saveArtworkDraft - start");
-        var artworkDto = new ArtworkDto();
-        artworkDto.setStatus(DRAFT);
-        artworkDto.setOwnerId(userProfileService.findArtOwnerByUserId(securityContextService.getPrincipalId()).getId());
-        artworkDto = artworkService.saveArtwork(artworkDto);
-        log.info("ArtworkFacadeImpl.saveArtworkDraft - end");
-        return new SaveArtworkResponse(prepareResponse(artworkDto));
-    }
-
-    @Override
-    public SaveArtworkResponse saveArtworkData(SaveArtworkDataRequest request) {
-        log.info("ArtworkFacadeImpl.saveArtworkData - start | request: {}", request);
-        var artworkDto = artworkService.getArtworkById(request.getArtworkId());
-        securityContextService.validateOwner(artworkDto.getOwnerId());
-        artworkDto = doPrepareArtworkDto(request, artworkDto);
-        artworkDto = artworkService.saveArtwork(artworkDto);
-        log.info("ArtworkFacadeImpl.saveArtworkData - end | request: {}", request);
-        return new SaveArtworkResponse(prepareResponse(artworkDto));
-    }
-
-    @Override
-    public SearchArtworkResponse searchArtworks(SearchArtworkRequest request, PageRequest page) {
-        log.info("ArtworkFacadeImpl.searchArtworks - start | request: {}, page: {}", request, page);
-        var result = artworkService.searchArtworks(request, page);
-        var response = new SearchArtworkResponse(result);
-        log.info("ArtworkFacadeImpl.searchArtworks - end | request: {}, page: {}", request, page);
+    public ArtworkResponse createArtworkDraft() {
+        log.info("ArtworkFacadeImpl.createArtworkDraft - start");
+        var artwork = new ArtworkDto();
+        artwork.setStatus(DRAFT);
+        artwork.setOwnerId(security.getArtOwnerId());
+        artwork = artworkService.saveArtwork(artwork);
+        var response = new ArtworkResponse(artwork);
+        log.info("ArtworkFacadeImpl.createArtworkDraft - end");
         return response;
     }
 
     @Override
-    public void deleteArtwork(Long id) {
-        log.info("ArtworkFacadeImpl.deleteArtwork - start | id: {}", id);
-        var artworkDto = artworkService.getArtworkById(id);
-        securityContextService.validateOwner(artworkDto.getOwnerId());
-        var documentIDs = artworkDocumentService.findDocumentIdsByArtworkId(id);
-        documentIDs.forEach(docId -> artworkDocumentService.removeArtworkDocument(new ArtworkDocument.Id(id, docId)));
+    public DetailedArtworkResponse findArtworkById(WithOwner<FindByArtworkIdRequest> withOwner) {
+        log.info("ArtworkFacadeImpl.findArtworkById - start | withOwner: {}", withOwner);
+        var artwork = artworkService.findArtworkById(withOwner
+                .update(FindByArtworkIdRequest::getId));
+        var response = toDetailedArtworkResponse(artwork);
+        log.info("ArtworkFacadeImpl.findArtworkById - end | withOwner: {}", withOwner);
+        return response;
+    }
+
+    @Override
+    public DetailedArtworkResponse updateArtworkData(WithOwner<UpdateArtworkDataRequest> withOwner) {
+        log.info("ArtworkFacadeImpl.updateArtworkData - start | withOwner: {}", withOwner);
+        var artwork = doUpdateArtwork(withOwner);
+        var response = toDetailedArtworkResponse(artwork);
+        log.info("ArtworkFacadeImpl.updateArtworkData - end | withOwner: {}", withOwner);
+        return response;
+    }
+
+    @Override
+    public SearchArtworkResponse searchArtworks(WithOwner<SearchArtworkRequest> withOwner, PageRequest page) {
+        log.info("ArtworkFacadeImpl.searchArtworks - start | withOwner: {}, page: {}", withOwner, page);
+        var result = artworkService.searchArtworks(withOwner, page);
+        var response = new SearchArtworkResponse(result);
+        log.info("ArtworkFacadeImpl.searchArtworks - end | withOwner: {}, page: {}", withOwner, page);
+        return response;
+    }
+
+    @Override
+    public void deleteArtwork(WithOwner<DeleteArtworkRequest> withOwner) {
+        log.info("ArtworkFacadeImpl.deleteArtwork - start | withOwner: {}", withOwner);
+        var artworkId = artworkService.findArtworkById(withOwner
+                .update(DeleteArtworkRequest::getArtworkId))
+                .getId();
+        var documentIDs = artworkDocumentService.findDocumentIdsByArtworkId(artworkId);
+        artworkDocumentService.deleteArtworkDocumentsByArtworkId(artworkId);
         documentService.deleteDocumentsByIds(documentIDs);
-        artworkService.deleteArtworkById(id);
-        log.info("ArtworkFacadeImpl.deleteArtwork - end | id: {}", id);
+        artworkService.deleteArtworkById(artworkId);
+        log.info("ArtworkFacadeImpl.deleteArtwork - end | withOwner: {}", withOwner);
     }
 
-    private ArtworkDto prepareResponse(ArtworkDto artworkDto) {
-        LocationDto locationDto = null;
-        if (artworkDto.getLocation().getId() != null) {
-            locationDto = locationService.findLocationById(artworkDto.getLocation().getId());
-        }
-        var documentDtos = documentService.getDocumentsByIds(
-                artworkDocumentService
-                        .findDocumentIdsByArtworkId(artworkDto.getId()));
-        return MAPPER.toArtworkDto(artworkDto, locationDto, Set.copyOf(documentDtos));
-    }
+    // HELPER METHODS
 
-    private void validateRequiredDocuments(Long artworkId, boolean iAmArtOwner) {
-        var documents = artworkDocumentService.findDocumentIdsByArtworkId(artworkId);
-        var documentDtos = documentService.getDocumentsByIds(documents);
-        if (iAmArtOwner && documentDtos.stream().noneMatch(documentDto -> FileCategory.CV == documentDto.getType())) {
-            throw ARTWORK_MISSING_RESUME.newException();
-        }
-
-        if (!iAmArtOwner && documentDtos.stream().noneMatch(documentDto -> FileCategory.CERTIFICATE == documentDto.getType())) {
-            throw ARTWORK_MISSING_CERTIFICATE.newException();
-        }
-    }
-
-    private ArtworkDto doPrepareArtworkDto(SaveArtworkDataRequest request, ArtworkDto artworkDtoDb) {
-        if (DRAFT != request.getStatus()) {
-            validateRequiredDocuments(request.getArtworkId(), request.getIAmArtOwner());
-        }
-        var artworkDto = MAPPER.toArtworkDto(request);
+    private ArtworkDto doUpdateArtwork(WithOwner<UpdateArtworkDataRequest> withOwner) {
+        var artwork = artworkService.findArtworkById(withOwner
+                .update(UpdateArtworkDataRequest::getArtworkId));
+        var request = withOwner.getRequest();
+        if (DRAFT != request.getStatus())
+            validateRequiredDocuments(request);
+        MAPPER.update(request, artwork);
         doSetPrincipalImage(request.getPrincipalImageId());
-        artworkDto.setOwnerId(artworkDtoDb.getOwnerId());
-        artworkDto.setLocation(doSaveLocation(request));
-        artworkDto.setArtist(doSaveArtist(request));
-        artworkDto.addCategories(doSaveCategories(request));
-        artworkDto.addMaterials(doSaveMaterials(request));
-        artworkDto.addMediums(doSaveMediums(request));
-        artworkDto.addStyles(doSaveStyles(request));
-
-        artworkDto.setCreatorId(artworkDtoDb.getCreatorId());
-        artworkDto.setCreatedAt(artworkDtoDb.getCreatedAt());
-        artworkDto.setUpdatedAt(artworkDtoDb.getUpdatedAt());
-        artworkDto.setUpdaterId(artworkDtoDb.getUpdaterId());
-        artworkDto.setVersion(artworkDtoDb.getVersion());
-        return artworkDto;
+        artwork.setLocationId(doSaveLocation(request).getId());
+        artwork.setArtist(doSaveArtist(request));
+        artwork.addCategories(doSaveArtworkMetadata(categoryService, request.getCategories()));
+        artwork.addMaterials(doSaveArtworkMetadata(materialService, request.getMaterials()));
+        artwork.addMediums(doSaveArtworkMetadata(mediumService, request.getMediums()));
+        artwork.addStyles(doSaveArtworkMetadata(styleService, request.getStyles()));
+        return artworkService.saveArtwork(artwork);
     }
 
-    private List<ArtworkMetadataDto> doSaveCategories(SaveArtworkDataRequest request) {
-        return doSaveArtworkMetadata(categoryService, request.getCategories());
-    }
-
-    private List<ArtworkMetadataDto> doSaveMaterials(SaveArtworkDataRequest request) {
-        return doSaveArtworkMetadata(materialService, request.getMaterials());
-    }
-
-    private List<ArtworkMetadataDto> doSaveMediums(SaveArtworkDataRequest request) {
-        return doSaveArtworkMetadata(mediumService, request.getMediums());
-    }
-
-    private List<ArtworkMetadataDto> doSaveStyles(SaveArtworkDataRequest request) {
-        return doSaveArtworkMetadata(styleService, request.getStyles());
-    }
-
-    private List<ArtworkMetadataDto> doSaveArtworkMetadata(IArtworkMetadataService service, List<String> artworkMetadataDtos) {
-        List<ArtworkMetadataDto> result = new ArrayList<>();
-        for (String s : artworkMetadataDtos) {
-            var dto = new ArtworkMetadataDto();
-            dto.setName(s);
-            dto.setStatus(ArtworkMetadata.Status.PENDING);
-            result.add(service.findOrSaveArtworkMetadata(dto));
-        }
-        return result;
+    private void validateRequiredDocuments(UpdateArtworkDataRequest request) {
+        var artworkId = request.getArtworkId();
+        var documents = artworkDocumentService.findDocumentIdsByArtworkId(artworkId);
+        var documentTypes = documentService
+                .findDocumentsByIds(documents)
+                .stream()
+                .map(DocumentDto::getType)
+                .collect(toSet());
+        var iAmArtOwner = request.getIAmArtOwner();
+        if (iAmArtOwner && !documentTypes.contains(CV))
+            throw ARTWORK_MISSING_RESUME.newException();
+        if (!iAmArtOwner && !documentTypes.contains(CERTIFICATE))
+            throw ARTWORK_MISSING_CERTIFICATE.newException();
     }
 
     private void doSetPrincipalImage(Long documentId) {
-        documentService.updateDocumentType(documentId, FileCategory.PRINCIPAL_IMAGE);
+        documentService.updateDocumentType(documentId, PRINCIPAL_IMAGE);
     }
 
-    private ArtistDto doSaveArtist(SaveArtworkDataRequest request) {
+    private LocationDto doSaveLocation(UpdateArtworkDataRequest request) {
+        var locationDto = MAPPER.toLocationDto(request);
+        var countryDto = locationService.findCountryByName(request.getCountry());
+        locationDto.setCountry(countryDto);
+        return locationService.saveLocation(locationDto);
+    }
+
+    private ArtistDto doSaveArtist(UpdateArtworkDataRequest request) {
         var artistDto = new ArtistDto();
         artistDto.setName(request.getArtist());
         return artistService.saveArtist(artistDto);
     }
 
-    private LocationDto doSaveLocation(SaveArtworkDataRequest request) {
-        var locationDto = MAPPER.toLocationDto(request);
-        locationDto.setCountry(locationService.findCountryByName(request.getCountry()));
-        return locationService.saveLocation(locationDto, null);
+    private List<ArtworkMetadataDto> doSaveArtworkMetadata(IArtworkMetadataService service,
+                                                           List<String> artworkMetadataDtos)
+    {
+        return artworkMetadataDtos
+                .stream()
+                .map(name -> new ArtworkMetadataDto(name, PENDING))
+                .map(service::findOrSaveArtworkMetadata)
+                .collect(toList());
+    }
+
+    private DetailedArtworkResponse toDetailedArtworkResponse(ArtworkDto artwork) {
+        var location = ifNotNull(artwork.getLocationId(), locationService::findLocationById);
+        var documents = documentService.findDocumentsByArtworkId(artwork.getId());
+        return new DetailedArtworkResponse(artwork, location, documents);
     }
 
 }

@@ -1,68 +1,89 @@
 package com.bloxico.ase.userservice.web.api;
 
-import com.bloxico.ase.userservice.web.model.artwork.ArtworkDocumentRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDocumentsRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import com.bloxico.ase.userservice.web.model.artwork.*;
+import io.swagger.annotations.*;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @Api(value = "artworkDocuments")
 public interface ArtworkDocumentsApi {
 
-    String ARTWORK_SAVE_DOCUMENTS     = "/artwork/documents";
-    String ARTWORK_DOCUMENTS_DOWNLOAD = "/artwork/documents/download";
-    String ARTWORK_DOCUMENTS_REMOVE   = "/artwork/documents/remove";
-
-    @PostMapping(
-            value = ARTWORK_SAVE_DOCUMENTS,
-            produces = {"application/json"},
-            consumes = {"multipart/form-data"})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'submit_artwork')")
-    @ApiOperation(value = "User submits artwork documents.")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "User successfully submitted artwork documents."),
-            @ApiResponse(code = 400, message = "Documents are not valid."),
-            @ApiResponse(code = 401, message = "User not authorized to edit desired artwork."),
-            @ApiResponse(code = 403, message = "User has no permission."),
-            @ApiResponse(code = 404, message = "Artwork not found."),
-            @ApiResponse(code = 409, message = "Artwork already has document of category.")
-    })
-    ResponseEntity<SaveArtworkResponse> saveArtworkDocuments(SaveArtworkDocumentsRequest request);
+    // @formatter:off
+    String ARTWORK_DOCUMENT_DOWNLOAD   = "/artwork/document/download";
+    String ARTWORK_DOCUMENT_UPLOAD     = "/artwork/document/upload";
+    String MNG_ARTWORK_DOCUMENT_UPLOAD = "/management/artwork/document/upload";
+    String ARTWORK_DOCUMENT_DELETE     = "/artwork/document/delete";
+    String MNG_ARTWORK_DOCUMENT_DELETE = "/management/artwork/document/delete";
+    // @formatter:on
 
     @GetMapping(
-            value = ARTWORK_DOCUMENTS_DOWNLOAD,
+            value = ARTWORK_DOCUMENT_DOWNLOAD,
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'preview_artwork')")
-    @ApiOperation(value = "User downloads file.")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'download_artwork_document')")
+    @ApiOperation(value = "Downloads artwork document.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "User successfully fetched artwork document."),
-            @ApiResponse(code = 401, message = "User not authorized to fetch desired artwork document."),
-            @ApiResponse(code = 403, message = "User has no permission."),
+            @ApiResponse(code = 200, message = "Artwork document successfully downloaded."),
             @ApiResponse(code = 404, message = "Document not found.")
     })
     ResponseEntity<Resource> downloadArtworkDocument(@Valid ArtworkDocumentRequest request);
 
+    @PostMapping(
+            value = ARTWORK_DOCUMENT_UPLOAD,
+            produces = {"application/json"},
+            consumes = {"multipart/form-data"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'upload_artwork_document')")
+    @ApiOperation(value = "Uploads artwork documents.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Artwork documents successfully submitted."),
+            @ApiResponse(code = 400, message = "Document(s) are not valid."),
+            @ApiResponse(code = 401, message = "User not authorized to edit desired artwork."),
+            @ApiResponse(code = 404, message = "Artwork not found."),
+            @ApiResponse(code = 409, message = "Artwork already has document of category.")
+    })
+    ResponseEntity<UploadArtworkDocumentsResponse> uploadArtworkDocuments(@Valid @RequestBody UploadArtworkDocumentsRequest request);
+
+    @PostMapping(
+            value = MNG_ARTWORK_DOCUMENT_UPLOAD,
+            produces = {"application/json"},
+            consumes = {"multipart/form-data"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'upload_artwork_document_management')")
+    @ApiOperation(value = "Uploads artwork documents.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Artwork documents successfully submitted."),
+            @ApiResponse(code = 400, message = "Document(s) are not valid."),
+            @ApiResponse(code = 401, message = "User not authorized to edit desired artwork."),
+            @ApiResponse(code = 404, message = "Artwork not found."),
+            @ApiResponse(code = 409, message = "Artwork already has document of category.")
+    })
+    ResponseEntity<UploadArtworkDocumentsResponse> uploadArtworkDocumentsMng(@Valid @RequestBody UploadArtworkDocumentsRequest request);
+
     @DeleteMapping(
-            value = ARTWORK_DOCUMENTS_REMOVE,
+            value = ARTWORK_DOCUMENT_DELETE,
             produces = {"application/json"})
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'remove_artwork_document')")
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'delete_artwork_document')")
     @ApiOperation(value = "Deletes artwork document.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "User successfully deleted artwork document."),
+            @ApiResponse(code = 200, message = "Artwork document successfully deleted."),
             @ApiResponse(code = 401, message = "User not authorized to delete desired artwork document."),
-            @ApiResponse(code = 403, message = "User has no permission."),
             @ApiResponse(code = 404, message = "Document not found.")
     })
-    ResponseEntity<SaveArtworkResponse> deleteArtworkDocument(@Valid ArtworkDocumentRequest request);
+    ResponseEntity<Void> deleteArtworkDocument(@Valid ArtworkDocumentRequest request);
+
+    @DeleteMapping(
+            value = MNG_ARTWORK_DOCUMENT_DELETE,
+            produces = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'delete_artwork_document_management')")
+    @ApiOperation(value = "Deletes artwork document.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Artwork document successfully deleted."),
+            @ApiResponse(code = 401, message = "User not authorized to delete desired artwork document."),
+            @ApiResponse(code = 404, message = "Document not found.")
+    })
+    ResponseEntity<Void> deleteArtworkDocumentMng(@Valid ArtworkDocumentRequest request);
+
 }

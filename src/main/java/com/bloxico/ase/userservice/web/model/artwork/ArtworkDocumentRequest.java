@@ -1,9 +1,7 @@
 package com.bloxico.ase.userservice.web.model.artwork;
 
 import io.swagger.annotations.ApiParam;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -15,11 +13,11 @@ import static lombok.AccessLevel.PRIVATE;
 public class ArtworkDocumentRequest {
 
     @NotNull
-    @ApiParam(name = "artworkId", required = true)
+    @ApiParam(name = "artwork_id", required = true)
     Long artworkId;
 
     @NotNull
-    @ApiParam(name = "documentId", required = true)
+    @ApiParam(name = "document_id", required = true)
     Long documentId;
 
 }

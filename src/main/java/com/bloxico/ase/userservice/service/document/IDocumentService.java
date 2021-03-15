@@ -11,15 +11,18 @@ public interface IDocumentService {
 
     DocumentDto saveDocument(MultipartFile file, FileCategory type);
 
-    DocumentDto saveDocument(MultipartFile file, FileCategory type, Long principalId);
+    DocumentDto saveDocument(MultipartFile file, FileCategory type, long principalId);
 
-    ByteArrayResource getDocumentById(Long id);
+    ByteArrayResource findDocumentById(long id);
 
-    DocumentDto updateDocumentType(Long id, FileCategory type);
+    DocumentDto updateDocumentType(long id, FileCategory type);
 
-    List<DocumentDto> getDocumentsByIds(List<Long> ids);
+    List<DocumentDto> findDocumentsByIds(List<Long> ids);
 
-    void deleteDocumentById(Long id);
+    List<DocumentDto> findDocumentsByArtworkId(long id);
+
+    void deleteDocumentById(long id);
 
     void deleteDocumentsByIds(List<Long> id);
+
 }

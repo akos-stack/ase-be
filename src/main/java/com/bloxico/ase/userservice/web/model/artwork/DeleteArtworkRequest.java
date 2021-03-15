@@ -1,20 +1,19 @@
 package com.bloxico.ase.userservice.web.model.artwork;
 
-import com.bloxico.ase.userservice.entity.artwork.Artwork.Status;
 import io.swagger.annotations.ApiParam;
 import lombok.*;
+
+import javax.validation.constraints.NotNull;
 
 import static lombok.AccessLevel.PRIVATE;
 
 @Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
-public class SearchArtworkRequest {
+public class DeleteArtworkRequest {
 
-    @ApiParam(name = "status")
-    Status status;
-
-    @ApiParam(name = "title")
-    String title;
+    @NotNull
+    @ApiParam(name = "artwork_id")
+    Long artworkId;
 
 }

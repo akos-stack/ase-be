@@ -1,21 +1,19 @@
 package com.bloxico.ase.userservice.service.address;
 
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
-import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
+import com.bloxico.ase.userservice.dto.entity.address.*;
 
 import java.util.Collection;
 import java.util.List;
 
 public interface ILocationService {
 
-    RegionDto findRegionById(Long id);
+    RegionDto findRegionById(long id);
 
     RegionDto findRegionByName(String region);
 
     List<RegionDto> findAllRegionsWithNames(Collection<String> regionNames);
 
-    CountryDto findCountryById(Long id);
+    CountryDto findCountryById(long id);
 
     CountryDto findCountryByName(String country);
 
@@ -31,9 +29,12 @@ public interface ILocationService {
 
     CountryDto updateCountry(CountryDto countryDto);
 
-    LocationDto saveLocation(LocationDto locationDto, Long principalId);
+    LocationDto saveLocation(LocationDto locationDto);
 
-    LocationDto findLocationById(Long id);
+    LocationDto saveLocation(LocationDto locationDto, long principalId);
 
-    int countCountriesByRegionId(Long regionId);
+    LocationDto findLocationById(long id);
+
+    int countCountriesByRegionId(long regionId);
+
 }
