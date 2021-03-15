@@ -132,15 +132,15 @@ public class S3ApiTest extends AbstractSpringTestWithAWS{
         assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED), errors);
     }
 
-    @Test //TODO-FIX
+    @Test
     public void invalidFiles_all_errors() {
-        var textFile = genUUID() + ".pdf";
-        var textFile2 = genUUID() + ".pdf";
+        var textFile = genUUID() + ".png";
+        var textFile2 = genUUID() + ".png";
         var response = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .formParam("fileCategory", "CV")
-                .multiPart("files",  textFile, genInvalidFileBytes(CV))
-                .multiPart("files",  textFile2, genInvalidFileBytes(CV))
+                .multiPart("files",  textFile, genInvalidFileBytes(IMAGE))
+                .multiPart("files",  textFile2, genInvalidFileBytes(IMAGE))
                 .when()
                 .post(API_URL + S3_INVALID_FILES)
                 .then()
@@ -157,13 +157,13 @@ public class S3ApiTest extends AbstractSpringTestWithAWS{
                 ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY), errors);
     }
 
-    @Test //TODO-FIX
+    @Test
     public void invalidFiles_file_image_size_exceeded() {
-        var textFile = genUUID() + ".png";
+        var imgFile = genUUID() + ".png";
         var response = given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .formParam("fileCategory", "IMAGE")
-                .multiPart("files",  textFile, genInvalidFileBytes(IMAGE))
+                .multiPart("files",  imgFile, genInvalidFileBytes(IMAGE))
                 .when()
                 .post(API_URL + S3_INVALID_FILES)
                 .then()
@@ -174,7 +174,7 @@ public class S3ApiTest extends AbstractSpringTestWithAWS{
                 .as(ValidateFilesResponse.class);
         assertFalse(response.getErrors().isEmpty());
         assertEquals(1, response.getErrors().size());
-        var errors = response.getErrors().get(textFile);
+        var errors = response.getErrors().get(imgFile);
         assertNotNull(errors);
         assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED), errors);
     }
@@ -198,12 +198,10 @@ public class S3ApiTest extends AbstractSpringTestWithAWS{
                 .as(ValidateFilesResponse.class);
         assertFalse(response.getErrors().isEmpty());
         assertEquals(2, response.getErrors().size());
-        var errorsFirstFile = response.getErrors().get(imageFile);
-        var errorsSecondFile = response.getErrors().get(imageFile2);
-        assertNotNull(errorsFirstFile);
-        assertNotNull(errorsSecondFile);
-        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY), errorsFirstFile);
-        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY), errorsSecondFile);
+        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY),
+                response.getErrors().get(imageFile));
+        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY),
+                response.getErrors().get(imageFile2));
     }
 
     @Test

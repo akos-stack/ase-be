@@ -7,7 +7,6 @@ import com.bloxico.ase.userservice.exception.S3Exception;
 import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
@@ -184,12 +183,12 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
         var response = s3Service.validateFiles(FileCategory.CV, files);
         assertFalse(response.isEmpty());
         assertEquals(2, response.size());
-        var errors = response.get(files.get(0).getOriginalFilename());
-        var errors2 = response.get(files.get(1).getOriginalFilename());
-        Assertions.assertNotNull(errors);
-        Assertions.assertNotNull(errors2);
-        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY), errors);
-        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY), errors2);
+        assertNotNull(response.get(files.get(0).getOriginalFilename()));
+        assertNotNull(response.get(files.get(1).getOriginalFilename()));
+        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY),
+                response.get(files.get(0).getOriginalFilename()));
+        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY),
+                response.get(files.get(1).getOriginalFilename()));
     }
 
     @Test
@@ -198,28 +197,28 @@ public class S3ServiceImplTest extends AbstractSpringTestWithAWS {
         var response = s3Service.validateFiles(FileCategory.CV, files);
         assertFalse(response.isEmpty());
         assertEquals(2, response.size());
-        var errors = response.get(files.get(0).getOriginalFilename());
-        var errors2 = response.get(files.get(1).getOriginalFilename());
-        Assertions.assertNotNull(errors);
-        Assertions.assertNotNull(errors2);
-        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED), errors);
-        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED), errors2);
+        assertNotNull(response.get(files.get(0).getOriginalFilename()));
+        assertNotNull(response.get(files.get(1).getOriginalFilename()));
+        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED),
+                response.get(files.get(0).getOriginalFilename()));
+        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED),
+                response.get(files.get(1).getOriginalFilename()));
     }
 
-    @Test //TODO-FIX
+    @Test
     public void validateFiles_allErrors() {
-        var files = utilS3.savedListOfInvalidFiles(FileCategory.CV);
-        var response = s3Service.validateFiles(FileCategory.IMAGE, files);
+        var files = utilS3.savedListOfInvalidFiles(FileCategory.IMAGE);
+        var response = s3Service.validateFiles(FileCategory.CV, files);
         assertFalse(response.isEmpty());
         assertEquals(2, response.size());
-        var errors = response.get(files.get(0).getOriginalFilename());
-        var errors2 = response.get(files.get(1).getOriginalFilename());
-        Assertions.assertNotNull(errors);
-        Assertions.assertNotNull(errors2);
+        assertNotNull(response.get(files.get(0).getOriginalFilename()));
+        assertNotNull(response.get(files.get(1).getOriginalFilename()));
         assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED,
-                ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY), errors);
+                ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY),
+                response.get(files.get(0).getOriginalFilename()));
         assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED,
-                ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY), errors2);
+                ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY),
+                response.get(files.get(1).getOriginalFilename()));
     }
 
 }

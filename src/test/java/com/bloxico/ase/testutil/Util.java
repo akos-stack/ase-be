@@ -119,9 +119,9 @@ public class Util {
         switch (category) {
             case CERTIFICATE:
             case CV:
-                return "/testFiles/testInvalidFilePdf.pdf";
+                return "/testFiles/testInvalidFileCv.pdf";
             case IMAGE:
-                return "/testFiles/testInvalidFilePng.png";
+                return "/testFiles/testInvalidFileImg.png";
             default:
                 throw new IllegalArgumentException(category.toString());
         }

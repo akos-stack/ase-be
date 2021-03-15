@@ -25,11 +25,7 @@ public class UtilS3 {
     }
 
     public ValidateFilesRequest savedValidatedFilesRequest(FileCategory category) {
-        return new ValidateFilesRequest(new ArrayList(){{
-            add(genMultipartFile(randElt(category.getSupportedFileExtensions()),
-                genInvalidFileBytes(category)));
-            {add(genMultipartFile(randElt(category.getSupportedFileExtensions()),
-                    genInvalidFileBytes(category)));}}}, category);
+        return new ValidateFilesRequest(savedListOfInvalidFiles(category), category);
     }
 
     public ValidateFilesRequest savedValidatedFilesRequest(FileCategory category, List<MultipartFile>files) {

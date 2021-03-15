@@ -7,7 +7,6 @@ import com.bloxico.ase.userservice.util.SupportedFileExtension;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -35,11 +34,10 @@ public class S3FacadeImplTest extends AbstractSpringTestWithAWS {
     @Test
     public void invalidFiles_valid_and_invalid_file_sent() {
         var imageFile = genMultipartFile(FileCategory.IMAGE);
-        var cvFile = genMultipartFile(FileCategory.CV);
         var validateFilesRequest = utilS3.savedValidatedFilesRequest(
                 FileCategory.CV,
                 new ArrayList(){{add(imageFile);
-                                 add(cvFile);}});
+                                 add(genMultipartFile(FileCategory.CV));}});
         var response = s3FacadeImpl.invalidFiles(validateFilesRequest);
         assertFalse(response.getErrors().isEmpty());
         assertEquals(1, response.getErrors().size());
@@ -50,10 +48,7 @@ public class S3FacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void invalidFiles_file_size_exceeded() {
-        MockMultipartFile certificateFile = new MockMultipartFile("data",
-                genUUID() + ".pdf",
-                "multipart/form-data",
-                genInvalidFileBytes(CERTIFICATE));
+        var certificateFile = genMultipartFile(SupportedFileExtension.pdf, genInvalidFileBytes(CERTIFICATE));
         var certificateFile2 = genMultipartFile(SupportedFileExtension.pdf);
         var validateFilesRequest = utilS3.savedValidatedFilesRequest(
                 FileCategory.CERTIFICATE,
@@ -68,25 +63,21 @@ public class S3FacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void invalidFiles_typeNotSupportedForCategory() {
-        var file = genMultipartFile(SupportedFileExtension.png,
-                genFileBytes(FileCategory.IMAGE));
-        var file2 = genMultipartFile(SupportedFileExtension.png,
-                genFileBytes(FileCategory.IMAGE));
+        var file = genMultipartFile(FileCategory.IMAGE);
+        var file2 = genMultipartFile(FileCategory.IMAGE);
         var validateFilesRequest = utilS3.savedValidatedFilesRequest(
                 CERTIFICATE,
                 new ArrayList(){{add(file); add(file2);}});
         var response = s3FacadeImpl.invalidFiles(validateFilesRequest);
         assertFalse(response.getErrors().isEmpty());
         assertEquals(2, response.getErrors().size());
-        var errors = response.getErrors().get(file.getOriginalFilename());
-        var errors2 = response.getErrors().get(file2.getOriginalFilename());
-        assertNotNull(errors);
-        assertNotNull(errors2);
-        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY), errors);
-        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY), errors2);
+        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY),
+                response.getErrors().get(file.getOriginalFilename()));
+        assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY),
+                response.getErrors().get(file2.getOriginalFilename()));
     }
 
-    @Test//TODO-FIX
+    @Test
     public void invalidFiles_allErrors() {
         var file = genMultipartFile(SupportedFileExtension.pdf,
                 genInvalidFileBytes(CERTIFICATE));
@@ -98,14 +89,14 @@ public class S3FacadeImplTest extends AbstractSpringTestWithAWS {
         var response = s3FacadeImpl.invalidFiles(validateFilesRequest);
         assertFalse(response.getErrors().isEmpty());
         assertEquals(2, response.getErrors().size());
-        var errors = response.getErrors().get(file.getOriginalFilename());
-        var errors2 = response.getErrors().get(file2.getOriginalFilename());
-        assertNotNull(errors);
-        assertNotNull(errors2);
+        assertNotNull(response.getErrors().get(file.getOriginalFilename()));
+        assertNotNull(response.getErrors().get(file2.getOriginalFilename()));
         assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY,
-                ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED), errors);
+                ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED),
+                response.getErrors().get(file.getOriginalFilename()));
         assertEquals(Set.of(ErrorCodes.AmazonS3.FILE_TYPE_NOT_SUPPORTED_FOR_CATEGORY,
-                ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED), errors2);
+                ErrorCodes.AmazonS3.FILE_SIZE_EXCEEDED),
+                response.getErrors().get(file2.getOriginalFilename()));
     }
 
     @Test
