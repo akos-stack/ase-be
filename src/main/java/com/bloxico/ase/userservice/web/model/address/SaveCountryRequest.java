@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ public class SaveCountryRequest {
     @ApiModelProperty(required = true)
     String country;
 
+    @NotNull
     @JsonProperty("regions")
     @ApiModelProperty(required = true)
     @Size(min = 1)

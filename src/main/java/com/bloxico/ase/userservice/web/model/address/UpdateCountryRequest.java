@@ -29,6 +29,7 @@ public class UpdateCountryRequest {
     @ApiModelProperty(required = true)
     String country;
 
+    @NotNull
     @JsonProperty("regions")
     @ApiModelProperty(required = true)
     @Size(min = 1)
