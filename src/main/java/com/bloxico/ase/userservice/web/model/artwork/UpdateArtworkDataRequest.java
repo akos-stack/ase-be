@@ -5,7 +5,6 @@ import com.bloxico.ase.userservice.validator.NullOrNotBlank;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -23,11 +22,6 @@ public class UpdateArtworkDataRequest {
     @JsonProperty("artwork_id")
     @ApiModelProperty(required = true)
     Long artworkId;
-
-    @NotNull
-    @JsonProperty("principal_image_id")
-    @ApiModelProperty(required = true)
-    Long principalImageId;
 
     @NotNull
     @NotEmpty

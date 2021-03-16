@@ -6,9 +6,7 @@ import com.bloxico.ase.userservice.config.security.AseSecurityContext;
 import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
-import com.bloxico.ase.userservice.web.model.artwork.ArtworkResponse;
-import com.bloxico.ase.userservice.web.model.artwork.DetailedArtworkResponse;
-import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkResponse;
+import com.bloxico.ase.userservice.web.model.artwork.*;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.bloxico.ase.testutil.Util.ERROR_CODE;
 import static com.bloxico.ase.testutil.Util.allPages;
 import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.*;
-import static com.bloxico.ase.userservice.util.FileCategory.PRINCIPAL_IMAGE;
 import static com.bloxico.ase.userservice.web.api.ArtworkApi.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -234,8 +231,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void updateArtwork_400_missingCertificate() {
         var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto(Artwork.Status.DRAFT, securityContext.getLoggedInArtOwner().getId())).getId();
-        var documentId = utilDocument.savedDocumentDto(PRINCIPAL_IMAGE).getId();
-        var request = utilArtwork.genUpdateArtworkDataRequest(artworkId, Artwork.Status.READY_FOR_EVALUATION, false, documentId);
+        var request = utilArtwork.genUpdateArtworkDataRequest(artworkId, Artwork.Status.READY_FOR_EVALUATION, false);
         given()
                 .header("Authorization", securityContext.getToken())
                 .contentType(JSON)
@@ -252,8 +248,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void updateArtwork_400_missingResume() {
         var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto(Artwork.Status.DRAFT, securityContext.getLoggedInArtOwner().getId())).getId();
-        var documentId = utilDocument.savedDocumentDto(PRINCIPAL_IMAGE).getId();
-        var request = utilArtwork.genUpdateArtworkDataRequest(artworkId, Artwork.Status.READY_FOR_EVALUATION, true, documentId);
+        var request = utilArtwork.genUpdateArtworkDataRequest(artworkId, Artwork.Status.READY_FOR_EVALUATION, true);
         given()
                 .header("Authorization", securityContext.getToken())
                 .contentType(JSON)
@@ -324,8 +319,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @WithMockCustomUser(auth = true)
     public void updateArtworkMng_400_missingCertificate() {
         var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto(Artwork.Status.DRAFT)).getId();
-        var documentId = utilDocument.savedDocumentDto(PRINCIPAL_IMAGE).getId();
-        var request = utilArtwork.genUpdateArtworkDataRequest(artworkId, Artwork.Status.READY_FOR_EVALUATION, false, documentId);
+        var request = utilArtwork.genUpdateArtworkDataRequest(artworkId, Artwork.Status.READY_FOR_EVALUATION, false);
         given()
                 .header("Authorization", securityContext.getToken())
                 .contentType(JSON)
@@ -342,8 +336,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @WithMockCustomUser(auth = true)
     public void updateArtworkMng_400_missingResume() {
         var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto(Artwork.Status.DRAFT)).getId();
-        var documentId = utilDocument.savedDocumentDto(PRINCIPAL_IMAGE).getId();
-        var request = utilArtwork.genUpdateArtworkDataRequest(artworkId, Artwork.Status.READY_FOR_EVALUATION, true, documentId);
+        var request = utilArtwork.genUpdateArtworkDataRequest(artworkId, Artwork.Status.READY_FOR_EVALUATION, true);
         given()
                 .header("Authorization", securityContext.getToken())
                 .contentType(JSON)

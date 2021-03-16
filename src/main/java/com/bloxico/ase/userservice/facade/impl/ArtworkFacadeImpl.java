@@ -9,7 +9,6 @@ import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.facade.IArtworkFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.artwork.*;
-import com.bloxico.ase.userservice.service.artwork.IArtworkDocumentService;
 import com.bloxico.ase.userservice.service.artwork.impl.metadata.*;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
@@ -25,7 +24,8 @@ import java.util.List;
 import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.DRAFT;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.PENDING;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static com.bloxico.ase.userservice.util.FileCategory.*;
+import static com.bloxico.ase.userservice.util.FileCategory.CERTIFICATE;
+import static com.bloxico.ase.userservice.util.FileCategory.CV;
 import static com.bloxico.ase.userservice.util.Functions.ifNotNull;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_MISSING_CERTIFICATE;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_MISSING_RESUME;
@@ -134,7 +134,6 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
         if (DRAFT != request.getStatus())
             validateRequiredDocuments(request);
         MAPPER.update(request, artwork);
-        doSetPrincipalImage(request.getPrincipalImageId());
         artwork.setLocationId(doSaveLocation(request).getId());
         artwork.setArtist(doSaveArtist(request));
         artwork.addCategories(doSaveArtworkMetadata(categoryService, request.getCategories()));
@@ -157,10 +156,6 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
             throw ARTWORK_MISSING_RESUME.newException();
         if (!iAmArtOwner && !documentTypes.contains(CERTIFICATE))
             throw ARTWORK_MISSING_CERTIFICATE.newException();
-    }
-
-    private void doSetPrincipalImage(Long documentId) {
-        documentService.updateDocumentType(documentId, PRINCIPAL_IMAGE);
     }
 
     // TODO findOrSave?

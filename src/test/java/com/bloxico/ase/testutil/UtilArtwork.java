@@ -16,15 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Year;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type.*;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
-import static com.bloxico.ase.userservice.util.FileCategory.PRINCIPAL_IMAGE;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
@@ -101,29 +97,24 @@ public class UtilArtwork {
     public UpdateArtworkDataRequest genUpdateArtworkDataRequest(long artworkId,
                                                                 Status status)
     {
-        return genUpdateArtworkDataRequest(
-                artworkId, status, true,
-                utilDocument.savedDocumentDto(PRINCIPAL_IMAGE).getId());
+        return genUpdateArtworkDataRequest(artworkId, status, true);
     }
 
     public UpdateArtworkDataRequest genUpdateArtworkDataRequest(Status status,
                                                                 boolean iAmArtOwner)
     {
         return genUpdateArtworkDataRequest(
-                saved(genArtworkDto()).getId(), status, iAmArtOwner,
-                utilDocument.savedDocumentDto(PRINCIPAL_IMAGE).getId());
+                saved(genArtworkDto()).getId(), status, iAmArtOwner);
     }
 
     public UpdateArtworkDataRequest genUpdateArtworkDataRequest(long artworkId,
                                                                 Status status,
-                                                                boolean iAmArtOwner,
-                                                                long principalImageId)
+                                                                boolean iAmArtOwner)
     {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithRegion(region);
         return new UpdateArtworkDataRequest(
                 artworkId,                        // artworkId
-                principalImageId,                 // principal_image_id
                 genUUID(),                        // title
                 List.of(genUUID(), genUUID()),    // categories
                 genUUID(),                        // artist
