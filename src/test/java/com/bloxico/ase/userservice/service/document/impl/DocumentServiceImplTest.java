@@ -39,32 +39,17 @@ public class DocumentServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void getDocument_nullId() {
-        assertThrows(
-                NullPointerException.class,
-                () -> documentService.getDocumentById(null));
-    }
-
-    @Test
     public void getDocument_notFound() {
         assertThrows(
                 AseRuntimeException.class,
-                () -> documentService.getDocumentById(1000L));
+                () -> documentService.findDocumentById(1000L));
     }
 
     @Test
     @WithMockCustomUser
     public void getDocument() {
         var documentDto = utilDocument.savedDocumentDto(FileCategory.CV);
-        assertNotNull(documentService.getDocumentById(documentDto.getId()));
-    }
-
-    @Test
-    @WithMockCustomUser
-    public void updateDocumentType_nullId() {
-        assertThrows(
-                NullPointerException.class,
-                () -> documentService.updateDocumentType(null, FileCategory.PRINCIPAL_IMAGE));
+        assertNotNull(documentService.findDocumentById(documentDto.getId()));
     }
 
     @Test
@@ -98,7 +83,7 @@ public class DocumentServiceImplTest extends AbstractSpringTestWithAWS {
     public void getDocumentsByIds_nullList() {
         assertThrows(
                 NullPointerException.class,
-                () -> documentService.getDocumentsByIds(null));
+                () -> documentService.findDocumentsByIds(null));
     }
 
     @Test
@@ -109,16 +94,9 @@ public class DocumentServiceImplTest extends AbstractSpringTestWithAWS {
             var documentDto = utilDocument.savedDocumentDto(category);
             ids.add(documentDto.getId());
         }
-        var response = documentService.getDocumentsByIds(ids);
+        var response = documentService.findDocumentsByIds(ids);
         assertNotNull(response);
         assertEquals(response.stream().map(BaseEntityDto::getId).collect(Collectors.toList()), ids);
-    }
-
-    @Test
-    public void deleteDocumentById_nullId() {
-        assertThrows(
-                NullPointerException.class,
-                () -> documentService.deleteDocumentById(null));
     }
 
     @Test
@@ -135,7 +113,7 @@ public class DocumentServiceImplTest extends AbstractSpringTestWithAWS {
         documentService.deleteDocumentById(documentDto.getId());
         assertThrows(
                 DocumentException.class,
-                () -> documentService.getDocumentById(documentDto.getId()));
+                () -> documentService.findDocumentById(documentDto.getId()));
     }
 
     @Test
@@ -154,6 +132,6 @@ public class DocumentServiceImplTest extends AbstractSpringTestWithAWS {
             ids.add(documentDto.getId());
         }
         documentService.deleteDocumentsByIds(ids);
-        assertTrue(documentService.getDocumentsByIds(ids).isEmpty());
+        assertTrue(documentService.findDocumentsByIds(ids).isEmpty());
     }
 }

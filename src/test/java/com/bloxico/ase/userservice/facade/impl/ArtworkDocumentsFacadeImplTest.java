@@ -1,162 +1,257 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.testutil.AbstractSpringTestWithAWS;
-import com.bloxico.ase.testutil.UtilArtwork;
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
-import com.bloxico.ase.userservice.entity.user.Role;
+import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.exception.ArtworkException;
 import com.bloxico.ase.userservice.exception.S3Exception;
-import com.bloxico.ase.userservice.exception.UserException;
-import com.bloxico.ase.userservice.facade.IArtworkDocumentsFacade;
-import com.bloxico.ase.userservice.util.FileCategory;
+import com.bloxico.ase.userservice.service.artwork.impl.ArtworkDocumentServiceImpl;
+import com.bloxico.ase.userservice.web.model.WithOwner;
 import com.bloxico.ase.userservice.web.model.artwork.ArtworkDocumentRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkDocumentsRequest;
+import com.bloxico.ase.userservice.web.model.artwork.UploadArtworkDocumentsRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.bloxico.ase.testutil.Util.genMultipartFile;
-import static com.bloxico.ase.userservice.util.FileCategory.CERTIFICATE;
-import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
+import static com.bloxico.ase.userservice.facade.impl.ArtworkDocumentsFacadeImpl.SINGLETONS;
+import static com.bloxico.ase.userservice.util.FileCategory.*;
+import static java.util.stream.Collectors.toSet;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ArtworkDocumentsFacadeImplTest extends AbstractSpringTestWithAWS {
 
-    @Autowired private IArtworkDocumentsFacade artworkDocumentsFacade;
     @Autowired private UtilArtwork utilArtwork;
+    @Autowired private UtilDocument utilDocument;
+    @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private ArtworkDocumentServiceImpl artworkDocumentService;
+    @Autowired private ArtworkDocumentsFacadeImpl artworkDocumentsFacade;
+
+    // TODO ADD downloadArtworkDocument_artworkNotExists
 
     @Test
-    @WithMockCustomUser(role = Role.ART_OWNER)
-    public void saveArtworkDocuments_notFound() {
-        var request = utilArtwork.genSaveArtworkDocumentsRequest();
-        request.setArtworkId(-1L);
+    @WithMockCustomUser
+    public void downloadArtworkDocument_documentNotExists() {
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
+        var document1 = utilDocument.savedDocumentDto(IMAGE);
+        var document2 = utilDocument.savedDocumentDto(CV);
+        artworkDocumentService.saveArtworkDocuments(
+                artworkId, List.of(document1, document2));
+        var request = new ArtworkDocumentRequest(artworkId, -1L);
         assertThrows(
                 ArtworkException.class,
-                () -> artworkDocumentsFacade.saveArtworkDocuments(request));
+                () -> artworkDocumentsFacade.downloadArtworkDocument(request));
+    }
+
+    // TODO ADD downloadArtworkDocument_documentNotOfGivenArtwork
+
+    @Test
+    @WithMockCustomUser
+    public void downloadArtworkDocument() {
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
+        var document1 = utilDocument.savedDocumentDto(IMAGE);
+        var document2 = utilDocument.savedDocumentDto(CV);
+        artworkDocumentService.saveArtworkDocuments(
+                artworkId, List.of(document1, document2));
+        assertNotNull(artworkDocumentsFacade.downloadArtworkDocument(
+                new ArtworkDocumentRequest(
+                        artworkId, document1.getId())));
     }
 
     @Test
-    @WithMockCustomUser(role = Role.ART_OWNER)
-    public void saveArtworkDocuments_notAllowed() {
-        var artworkDto = utilArtwork.savedArtworkDtoDraftWithOwner();
-        var request = new SaveArtworkDocumentsRequest(artworkDto.getId(), List.of(genMultipartFile(IMAGE)), IMAGE);
+    @WithMockCustomUser
+    public void uploadArtworkDocuments_notFound() {
+        var request = utilDocument.genUploadArtworkDocumentsRequest(-1L);
         assertThrows(
-                UserException.class,
-                () -> artworkDocumentsFacade.saveArtworkDocuments(request));
+                ArtworkException.class,
+                () -> artworkDocumentsFacade.uploadArtworkDocuments(
+                        WithOwner.any(request)));
     }
 
     @Test
-    @WithMockCustomUser(role = Role.ART_OWNER)
-    public void saveArtworkDocuments_documentNotValid() {
-        var artworkDto = utilArtwork.savedArtworkDtoDraft();
-        var request = new SaveArtworkDocumentsRequest(artworkDto.getId(), List.of(genMultipartFile(IMAGE)), CERTIFICATE);
+    @WithMockCustomUser
+    public void uploadArtworkDocuments_notAllowed() {
+        var request = utilDocument.genUploadArtworkDocumentsRequest();
+        var ownerId = utilUserProfile.savedArtOwnerDto().getId();
+        assertThrows(
+                ArtworkException.class,
+                () -> artworkDocumentsFacade.uploadArtworkDocuments(
+                        WithOwner.of(ownerId, request)));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void uploadArtworkDocuments_documentNotValid() {
+        var request = new UploadArtworkDocumentsRequest(
+                utilArtwork.saved(utilArtwork.genArtworkDto()).getId(),
+                List.of(genMultipartFile(IMAGE)),
+                CERTIFICATE);
         assertThrows(
                 S3Exception.class,
-                () -> artworkDocumentsFacade.saveArtworkDocuments(request));
+                () -> artworkDocumentsFacade.uploadArtworkDocuments(
+                        WithOwner.any(request)));
+        var ownerId = utilArtwork.ownerIdOf(request.getArtworkId());
+        assertThrows(
+                S3Exception.class,
+                () -> artworkDocumentsFacade.uploadArtworkDocuments(
+                        WithOwner.of(ownerId, request)));
     }
 
     @Test
-    @WithMockCustomUser(role = Role.ART_OWNER)
-    public void saveArtworkDocuments_documentConflict() {
-        var artworkDto = utilArtwork.savedArtworkDtoDraftWithDocuments();
-        for(var type: FileCategory.values()) {
-            if(type == IMAGE) continue;
-            var request = new SaveArtworkDocumentsRequest(artworkDto.getId(), List.of(genMultipartFile(type)), type);
+    @WithMockCustomUser
+    public void uploadArtworkDocuments_documentConflict() {
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
+        for (var type : SINGLETONS) {
+            var request = WithOwner.any(
+                    new UploadArtworkDocumentsRequest(
+                            artworkId, List.of(genMultipartFile(type)), type));
+            assertNotNull(artworkDocumentsFacade.uploadArtworkDocuments(request));
             assertThrows(
                     ArtworkException.class,
-                    () -> artworkDocumentsFacade.saveArtworkDocuments(request));
+                    () -> artworkDocumentsFacade.uploadArtworkDocuments(request));
         }
     }
 
     @Test
-    @WithMockCustomUser(role = Role.ART_OWNER)
-    public void saveArtworkDocuments_failOnDocumentsSize() {
-        var artworkDto = utilArtwork.savedArtworkDtoDraft();
-        for(var type: FileCategory.values()) {
-            if(type == IMAGE) continue;
-            var request = new SaveArtworkDocumentsRequest(artworkDto.getId(), List.of(genMultipartFile(type), genMultipartFile(type)), type);
+    @WithMockCustomUser
+    public void uploadArtworkDocuments_failOnDocumentsSize() {
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
+        for (var type : SINGLETONS) {
+            var request = WithOwner.any(
+                    new UploadArtworkDocumentsRequest(
+                            artworkId,
+                            List.of(genMultipartFile(type),
+                                    genMultipartFile(type)),
+                            type));
             assertThrows(
                     ArtworkException.class,
-                    () -> artworkDocumentsFacade.saveArtworkDocuments(request));
+                    () -> artworkDocumentsFacade.uploadArtworkDocuments(request));
         }
     }
 
     @Test
-    @WithMockCustomUser(role = Role.ART_OWNER)
-    public void saveArtworkDocuments() {
-        var artworkDto = utilArtwork.savedArtworkDtoDraft();
-        var documentsSize = 0;
-        for(var type: FileCategory.values()) {
-            var response = artworkDocumentsFacade.saveArtworkDocuments(new SaveArtworkDocumentsRequest(artworkDto.getId(), List.of(genMultipartFile(type)), type));
-            documentsSize++;
-            assertNotNull(response);
-            assertNotNull(response.getArtworkDto());
-            assertEquals(documentsSize, response.getArtworkDto().getDocuments().size());
-        }
-
+    @WithMockCustomUser
+    public void uploadArtworkDocuments_anyOwner() {
+        var request = new UploadArtworkDocumentsRequest(
+                utilArtwork.saved(utilArtwork.genArtworkDto()).getId(),
+                List.of(genMultipartFile(IMAGE),
+                        genMultipartFile(IMAGE)),
+                IMAGE);
+        var documents = artworkDocumentsFacade
+                .uploadArtworkDocuments(WithOwner.any(request))
+                .getDocuments();
+        assertEquals(
+                Set.of(IMAGE),
+                documents
+                        .stream()
+                        .map(DocumentDto::getType)
+                        .collect(toSet()));
+        assertEquals(
+                Set.copyOf(artworkDocumentService
+                        .findDocumentIdsByArtworkId(request.getArtworkId())),
+                documents.stream().map(DocumentDto::getId).collect(toSet()));
     }
 
     @Test
-    @WithMockCustomUser(role = Role.ART_OWNER)
-    public void downloadArtworkDocument_notAllowed() {
-        var artworkDto = utilArtwork.savedArtworkDtoDraftWithOwner();
-        var request = new ArtworkDocumentRequest(artworkDto.getId(), 1L);
-        assertThrows(
-                UserException.class,
-                () -> artworkDocumentsFacade.downloadArtworkDocument(request));
+    @WithMockCustomUser
+    public void uploadArtworkDocuments_ofOwner() {
+        var request = new UploadArtworkDocumentsRequest(
+                utilArtwork.saved(utilArtwork.genArtworkDto()).getId(),
+                List.of(genMultipartFile(IMAGE),
+                        genMultipartFile(IMAGE)),
+                IMAGE);
+        var ownerId = utilArtwork.ownerIdOf(request.getArtworkId());
+        var documents = artworkDocumentsFacade
+                .uploadArtworkDocuments(WithOwner.of(ownerId, request))
+                .getDocuments();
+        assertEquals(
+                Set.of(IMAGE),
+                documents
+                        .stream()
+                        .map(DocumentDto::getType)
+                        .collect(toSet()));
+        assertEquals(
+                Set.copyOf(artworkDocumentService
+                        .findDocumentIdsByArtworkId(request.getArtworkId())),
+                documents.stream().map(DocumentDto::getId).collect(toSet()));
     }
 
-    @Test
-    @WithMockCustomUser(role = Role.ART_OWNER)
-    public void downloadArtworkDocument_artworkDocumentNotFound() {
-        var artworkDto = utilArtwork.savedArtworkDtoDraftWithDocuments();
-        var request = new ArtworkDocumentRequest(artworkDto.getId(), -1L);
-        assertThrows(
-                ArtworkException.class,
-                () -> artworkDocumentsFacade.downloadArtworkDocument(request));
-    }
+    // TODO ADD deleteArtworkDocument_artworkNotFound
 
     @Test
-    @WithMockCustomUser(role = Role.ART_OWNER)
-    public void downloadArtworkDocument() {
-        var artworkDto = utilArtwork.savedArtworkDtoDraftWithDocuments();
-        var documentDto = artworkDto.getDocuments().stream().findFirst().get();
-        var response = artworkDocumentsFacade.downloadArtworkDocument(
-                new ArtworkDocumentRequest(artworkDto.getId(), documentDto.getId()));
-        assertNotNull(response);
-    }
-
-    @Test
-    @WithMockCustomUser(role = Role.ART_OWNER)
-    public void removeArtworkDocument_notAllowed() {
-        var artworkDto = utilArtwork.savedArtworkDtoDraftWithOwner();
-        var request = new ArtworkDocumentRequest(artworkDto.getId(), 1L);
-        assertThrows(
-                UserException.class,
-                () -> artworkDocumentsFacade.downloadArtworkDocument(request));
-    }
-
-    @Test
-    @WithMockCustomUser(role = Role.ART_OWNER)
-    public void removeArtworkDocument_notFound() {
-        var artworkDto = utilArtwork.savedArtworkDto();
-        var request = new ArtworkDocumentRequest(artworkDto.getId(), -1L);
+    @WithMockCustomUser
+    public void deleteArtworkDocument_documentNotFound() {
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
+        var request = new ArtworkDocumentRequest(artworkId, -1L);
         assertThrows(
                 ArtworkException.class,
-                () -> artworkDocumentsFacade.downloadArtworkDocument(request));
+                () -> artworkDocumentsFacade.deleteArtworkDocument(WithOwner.any(request)));
     }
 
     @Test
-    @WithMockCustomUser(role = Role.ART_OWNER)
-    public void removeArtworkDocument() {
-        var artworkDto = utilArtwork.savedArtworkDtoDraftWithDocuments();
-        var documentDto = artworkDto.getDocuments().stream().findFirst().get();
-        var request = new ArtworkDocumentRequest(artworkDto.getId(), documentDto.getId());
-        var response = artworkDocumentsFacade.deleteArtworkDocument(request);
-        assertNotNull(response);
-        assertNotNull(response.getArtworkDto());
-        assertNotNull(response.getArtworkDto().getDocuments());
-        assertTrue(response.getArtworkDto().getDocuments().stream().noneMatch(documentDto1 -> documentDto1.getId().equals(documentDto.getId())));
+    @WithMockCustomUser
+    public void deleteArtworkDocument_notAllowed() {
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
+        var document = utilDocument.savedDocumentDto(IMAGE);
+        var ownerId = utilUserProfile.savedArtOwnerDto().getId();
+        var request = new ArtworkDocumentRequest(artworkId, document.getId());
+        assertThrows(
+                ArtworkException.class,
+                () -> artworkDocumentsFacade.deleteArtworkDocument(
+                        WithOwner.of(ownerId, request)));
     }
+
+    @Test
+    @WithMockCustomUser
+    public void deleteArtworkDocument_anyOwner() {
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
+        var document1 = utilDocument.savedDocumentDto(IMAGE);
+        var document2 = utilDocument.savedDocumentDto(CV);
+        artworkDocumentService.saveArtworkDocuments(
+                artworkId, List.of(document1, document2));
+        assertThat(
+                artworkDocumentService.findDocumentIdsByArtworkId(artworkId),
+                hasItems(document1.getId(), document2.getId()));
+        artworkDocumentsFacade.deleteArtworkDocument(WithOwner.any(
+                new ArtworkDocumentRequest(artworkId, document1.getId())));
+        assertThat(
+                artworkDocumentService.findDocumentIdsByArtworkId(artworkId),
+                allOf(hasItems(document2.getId()), not(hasItems(document1.getId()))));
+        artworkDocumentsFacade.deleteArtworkDocument(WithOwner.any(
+                new ArtworkDocumentRequest(artworkId, document2.getId())));
+        assertThat(
+                artworkDocumentService.findDocumentIdsByArtworkId(artworkId),
+                not(hasItems(document1.getId(), document2.getId())));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void deleteArtworkDocument_ofOwner() {
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
+        var document1 = utilDocument.savedDocumentDto(IMAGE);
+        var document2 = utilDocument.savedDocumentDto(CV);
+        var ownerId = utilArtwork.ownerIdOf(artworkId);
+        artworkDocumentService.saveArtworkDocuments(
+                artworkId, List.of(document1, document2));
+        assertThat(
+                artworkDocumentService.findDocumentIdsByArtworkId(artworkId),
+                hasItems(document1.getId(), document2.getId()));
+        artworkDocumentsFacade.deleteArtworkDocument(WithOwner.of(
+                ownerId,
+                new ArtworkDocumentRequest(artworkId, document1.getId())));
+        assertThat(
+                artworkDocumentService.findDocumentIdsByArtworkId(artworkId),
+                allOf(hasItems(document2.getId()), not(hasItems(document1.getId()))));
+        artworkDocumentsFacade.deleteArtworkDocument(WithOwner.of(
+                ownerId,
+                new ArtworkDocumentRequest(artworkId, document2.getId())));
+        assertThat(
+                artworkDocumentService.findDocumentIdsByArtworkId(artworkId),
+                not(hasItems(document1.getId(), document2.getId())));
+    }
+
 }

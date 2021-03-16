@@ -59,7 +59,8 @@ public class UtilEvaluation {
     }
 
     public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProjWithCountryName(
-            String countryName) {
+            String countryName)
+    {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithNameAndRegion(countryName, region);
         var details = savedCountryEvaluationDetails(country.getId());
@@ -85,7 +86,8 @@ public class UtilEvaluation {
     }
 
     public CountryEvaluationDetailsWithEvaluatorsCountProj savedCountryEvaluationDetailsCountedProjNoDetailsWithCountryName(
-            String countryName) {
+            String countryName)
+    {
         var region = utilLocation.savedRegion();
         var country = utilLocation.savedCountryWithNameAndRegion(countryName, region);
         return new CountryEvaluationDetailsWithEvaluatorsCountProj(
@@ -114,7 +116,7 @@ public class UtilEvaluation {
     }
 
     public QuotationPackage genQuotationPackage() {
-        var artworkId = utilArtwork.savedArtworkDto().getId();
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
         var qPackage = new QuotationPackage();
         qPackage.setArtworkId(artworkId);
         return qPackage;
@@ -148,7 +150,7 @@ public class UtilEvaluation {
     }
 
     public SaveQuotationPackageRequest genSaveQuotationPackageRequest() {
-        var artworkId = utilArtwork.savedArtworkDto().getId();
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
         var c1 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));
         var c2 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));
         var c3 = new SaveQuotationPackageRequest.Country(utilLocation.savedCountry().getId(), genPosInt(50));

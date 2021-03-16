@@ -1,15 +1,11 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.AbstractSpringTest;
 import com.bloxico.ase.testutil.UtilLocation;
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
-import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
+import com.bloxico.ase.userservice.dto.entity.address.*;
 import com.bloxico.ase.userservice.exception.LocationException;
-import com.bloxico.ase.userservice.repository.address.CountryRepository;
-import com.bloxico.ase.userservice.repository.address.LocationRepository;
-import com.bloxico.ase.userservice.repository.address.RegionRepository;
+import com.bloxico.ase.userservice.repository.address.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -295,7 +291,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
     public void saveLocation_nullLocation() {
         assertThrows(
                 NullPointerException.class,
-                () -> service.saveLocation(null, null));
+                () -> service.saveLocation(null));
     }
 
     @Test
@@ -311,7 +307,7 @@ public class LocationServiceImplTest extends AbstractSpringTest {
                         .map(MAPPER::toDto)
                         .collect(toList()),
                 not(hasItems(location)));
-        service.saveLocation(location, null);
+        service.saveLocation(location);
         assertThat(
                 locationRepository
                         .findAll()
