@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.userservice.config.security.AseSecurityContextService;
+import com.bloxico.ase.userservice.config.security.AseSecurityContext;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
@@ -45,7 +45,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
     private final MaterialServiceImpl materialService;
     private final MediumServiceImpl mediumService;
     private final StyleServiceImpl styleService;
-    private final AseSecurityContextService security;
+    private final AseSecurityContext security;
     private final IArtworkDocumentService artworkDocumentService;
 
     @Autowired
@@ -57,7 +57,7 @@ public class ArtworkFacadeImpl implements IArtworkFacade {
                              MaterialServiceImpl materialService,
                              MediumServiceImpl mediumService,
                              StyleServiceImpl styleService,
-                             AseSecurityContextService security,
+                             AseSecurityContext security,
                              IArtworkDocumentService artworkDocumentService)
     {
         this.locationService = locationService;

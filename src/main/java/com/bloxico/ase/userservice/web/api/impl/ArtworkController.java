@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.web.api.impl;
 
-import com.bloxico.ase.userservice.config.security.AseSecurityContextService;
+import com.bloxico.ase.userservice.config.security.AseSecurityContext;
 import com.bloxico.ase.userservice.facade.IArtworkFacade;
 import com.bloxico.ase.userservice.web.api.ArtworkApi;
 import com.bloxico.ase.userservice.web.model.PageRequest;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArtworkController implements ArtworkApi {
 
     @Autowired private IArtworkFacade artworkFacade;
-    @Autowired private AseSecurityContextService security;
+    @Autowired private AseSecurityContext security;
 
     @Override
     public ResponseEntity<ArtworkResponse> createArtworkDraft() {

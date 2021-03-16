@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.web.api.impl;
 
-import com.bloxico.ase.userservice.config.security.AseSecurityContextService;
+import com.bloxico.ase.userservice.config.security.AseSecurityContext;
 import com.bloxico.ase.userservice.facade.IArtworkDocumentsFacade;
 import com.bloxico.ase.userservice.web.api.ArtworkDocumentsApi;
 import com.bloxico.ase.userservice.web.model.WithOwner;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArtworkDocumentsController implements ArtworkDocumentsApi {
 
     @Autowired private IArtworkDocumentsFacade artworkDocumentsFacade;
-    @Autowired private AseSecurityContextService security;
+    @Autowired private AseSecurityContext security;
 
     @Override
     public ResponseEntity<Resource> downloadArtworkDocument(ArtworkDocumentRequest request) {

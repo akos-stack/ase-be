@@ -40,6 +40,7 @@ public class ArtworkServiceImpl implements IArtworkService {
     @Override
     public ArtworkDto findArtworkById(WithOwner<Long> withOwner) {
         log.info("ArtworkServiceImpl.getArtworkById - start | withOwner: {}", withOwner);
+        requireNonNull(withOwner);
         var artworkDto = artworkRepository
                 .findByIdForOwner(withOwner.getRequest(), withOwner.getOwner())
                 .map(MAPPER::toDto)
