@@ -2,15 +2,16 @@ package com.bloxico.ase.userservice.web.model;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionEvaluationDetailsResponse;
+import com.bloxico.ase.userservice.web.model.user.SearchUsersResponse;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.bloxico.ase.testutil.Util.genUUID;
-import static com.bloxico.ase.testutil.Util.genWithSubstring;
+import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.web.api.EvaluationApi.EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH;
+import static com.bloxico.ase.userservice.web.api.UserManagementApi.USER_SEARCH_ENDPOINT;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
@@ -23,6 +24,8 @@ public class PageRequestTest extends AbstractSpringTest {
 
     @Autowired private UtilAuth utilAuth;
     @Autowired private UtilEvaluation utilEvaluation;
+    @Autowired private UtilUser utilUser;
+    @Autowired private UtilLocation utilLocation;
 
     @Test
     public void pageRequest_400_nullPage() {
@@ -216,6 +219,182 @@ public class PageRequestTest extends AbstractSpringTest {
         }
     }
 
+
+    // Sort by entity fields (uses Sort.by)
+    @Test
+    public void pageRequest_200_sortedByEmail() {
+        var email = genEmail();
+        var u1 = utilUser.savedUserDtoWithEmail("ac" + email);
+        var u2 = utilUser.savedUserDtoWithEmail("aa" + email);
+        var u3 = utilUser.savedUserDtoWithEmail("ab" + email);
+        utilUser.savedUserDto();
+        {
+            var page = given()
+                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .queryParam("email", email)
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("sort", "email")
+                    .when()
+                    .get(API_URL + USER_SEARCH_ENDPOINT)
+                    .then()
+                    .assertThat()
+                    .statusCode(200)
+                    .extract()
+                    .body()
+                    .as(SearchUsersResponse.class)
+                    .getPage();
+            assertEquals(2, page.getNumberOfPages());
+            assertEquals(2, page.getSize());
+            assertEquals(3, page.getTotalSize());
+            assertEquals(List.of(u2, u3), page.getContent());
+        }
+        {
+            var page = given()
+                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .queryParam("email", email)
+                    .queryParam("page", 1)
+                    .queryParam("size", 2)
+                    .queryParam("sort", "email")
+                    .when()
+                    .get(API_URL + USER_SEARCH_ENDPOINT)
+                    .then()
+                    .assertThat()
+                    .statusCode(200)
+                    .extract()
+                    .body()
+                    .as(SearchUsersResponse.class)
+                    .getPage();
+            assertEquals(2, page.getNumberOfPages());
+            assertEquals(2, page.getSize());
+            assertEquals(3, page.getTotalSize());
+            assertEquals(List.of(u1), page.getContent());
+        }
+    }
+
+    @Test
+    public void pageRequest_200_sortedByNameAndEmail() {
+        var email = genUUID();
+        var u1 = utilUser.savedUserDtoWithEmailAndName("ac" + email, "AUser");
+        var u2 = utilUser.savedUserDtoWithEmailAndName("ad" + email, "AUser");
+        var u3 = utilUser.savedUserDtoWithEmailAndName("ab" + email, "AUser");
+        var u4 = utilUser.savedUserDtoWithEmailAndName("aa" + email, "BUser");
+        utilUser.savedUserDto();
+        {
+            var page = given()
+                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .queryParam("email", email)
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("sort", "name,email")
+                    .when()
+                    .get(API_URL + USER_SEARCH_ENDPOINT)
+                    .then()
+                    .assertThat()
+                    .statusCode(200)
+                    .extract()
+                    .body()
+                    .as(SearchUsersResponse.class)
+                    .getPage();
+            assertEquals(2, page.getNumberOfPages());
+            assertEquals(2, page.getSize());
+            assertEquals(4, page.getTotalSize());
+            assertEquals(List.of(u3, u1), page.getContent());
+        }
+        {
+            var page = given()
+                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .queryParam("email", email)
+                    .queryParam("page", 1)
+                    .queryParam("size", 2)
+                    .queryParam("sort", "name,email")
+                    .when()
+                    .get(API_URL + USER_SEARCH_ENDPOINT)
+                    .then()
+                    .assertThat()
+                    .statusCode(200)
+                    .extract()
+                    .body()
+                    .as(SearchUsersResponse.class)
+                    .getPage();
+            assertEquals(2, page.getNumberOfPages());
+            assertEquals(2, page.getSize());
+            assertEquals(4, page.getTotalSize());
+            assertEquals(List.of(u2, u4), page.getContent());
+        }
+    }
+
+    @Test
+    public void pageRequest_200_sortedByNameAndEmailWithOrderDesc() {
+        var email = genUUID();
+        var u1 = utilUser.savedUserDtoWithEmailAndName("ac" + email, "AUser");
+        var u2 = utilUser.savedUserDtoWithEmailAndName("ad" + email, "AUser");
+        var u3 = utilUser.savedUserDtoWithEmailAndName("ab" + email, "AUser");
+        var u4 = utilUser.savedUserDtoWithEmailAndName("aa" + email, "BUser");
+        utilUser.savedUserDto();
+        {
+            var page = given()
+                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .queryParam("email", email)
+                    .queryParam("page", 0)
+                    .queryParam("size", 2)
+                    .queryParam("sort", "name,email")
+                    .queryParam("order", "DESC")
+                    .when()
+                    .get(API_URL + USER_SEARCH_ENDPOINT)
+                    .then()
+                    .assertThat()
+                    .statusCode(200)
+                    .extract()
+                    .body()
+                    .as(SearchUsersResponse.class)
+                    .getPage();
+            assertEquals(2, page.getNumberOfPages());
+            assertEquals(2, page.getSize());
+            assertEquals(4, page.getTotalSize());
+            assertEquals(List.of(u4, u2), page.getContent());
+        }
+        {
+            var page = given()
+                    .header("Authorization", utilAuth.doAdminAuthentication())
+                    .queryParam("email", email)
+                    .queryParam("page", 1)
+                    .queryParam("size", 2)
+                    .queryParam("sort", "name,email")
+                    .queryParam("order", "DESC")
+                    .when()
+                    .get(API_URL + USER_SEARCH_ENDPOINT)
+                    .then()
+                    .assertThat()
+                    .statusCode(200)
+                    .extract()
+                    .body()
+                    .as(SearchUsersResponse.class)
+                    .getPage();
+            assertEquals(2, page.getNumberOfPages());
+            assertEquals(2, page.getSize());
+            assertEquals(4, page.getTotalSize());
+            assertEquals(List.of(u1, u3), page.getContent());
+        }
+    }
+
+    @Test
+    public void pageRequest_200_sortedByNameAndEmailWithInvalidOrder() {
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .queryParam("email", genEmail())
+                .queryParam("page", 0)
+                .queryParam("size", 2)
+                .queryParam("sort", "name,email")
+                .queryParam("order", "foo")
+                .when()
+                .get(API_URL + USER_SEARCH_ENDPOINT)
+                .then()
+                .assertThat()
+                .statusCode(400);
+    }
+
+    // Sort by JPQL aliases (uses JpaSort.unsafe)
     @Test
     public void pageRequest_200_sortedByName() {
         var region = genUUID();

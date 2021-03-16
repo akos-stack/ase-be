@@ -76,7 +76,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
                         request.getSearch(),
                         request.getRegions(),
                         request.includeCountriesWithoutEvaluationDetails(),
-                        pageDetails.toPageable())
+                        pageDetails.toPageableUnsafe())
                 .map(MAPPER::toCountedProj);
         log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - end | request: {}, pageDetails: {}", request, pageDetails);
         return page;
@@ -129,7 +129,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
         var page = countryEvaluationDetailsRepository
                 .findAllRegionsWithCountriesAndEvaluatorsCount(
                         request.getSearch(),
-                        pageDetails.toPageable());
+                        pageDetails.toPageableUnsafe());
         log.debug("EvaluationServiceImpl.findAllRegions - end | request: {}, pageDetails: {}", request, pageDetails);
         return page;
     }

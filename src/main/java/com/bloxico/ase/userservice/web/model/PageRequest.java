@@ -5,12 +5,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiParam;
 import lombok.*;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.JpaSort;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import static java.util.stream.Stream.of;
 import static lombok.AccessLevel.PRIVATE;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 
@@ -42,7 +44,21 @@ public class PageRequest {
         return sort == null
                 ? org.springframework.data.domain.PageRequest.of(page, size)
                 : org.springframework.data.domain.PageRequest.of(page, size,
-                JpaSort.unsafe(order == null ? ASC : order, "(" + sort + ")"));
+                Sort.by(order == null ? ASC : order, sort.split(",")));
     }
 
+    @JsonIgnore
+    @SuppressWarnings("ConstantConditions")
+    public Pageable toPageableUnsafe() {
+        return sort == null
+                ? org.springframework.data.domain.PageRequest.of(page, size)
+                : org.springframework.data.domain.PageRequest.of(page, size,
+                JpaSort.unsafe(order == null ? ASC : order, toUnsafeSort(sort)));
+    }
+
+    private String[] toUnsafeSort(String sort) {
+        return of(sort.split(","))
+                .map(s -> "(" + s + ")")
+                .toArray(String[]::new);
+    }
 }

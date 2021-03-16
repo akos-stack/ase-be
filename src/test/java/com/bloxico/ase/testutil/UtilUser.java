@@ -78,12 +78,29 @@ public class UtilUser {
         return userRepository.saveAndFlush(user);
     }
 
+    public User savedUserWithEmailAndName(String email, String name) {
+        var user = new User();
+        user.setName(name);
+        user.setPassword(passwordEncoder.encode(genPassword()));
+        user.setEmail(email);
+        user.setLocked(false);
+        user.setEnabled(true);
+        var role = roleRepository.getUserRole();
+        user.addRole(role);
+        user.addAspiration(role);
+        return userRepository.saveAndFlush(user);
+    }
+
     public UserDto savedUserDto() {
         return MAPPER.toDto(savedUser());
     }
 
     public UserDto savedUserDtoWithEmail(String email) {
         return MAPPER.toDto(savedUserWithEmail(email));
+    }
+
+    public UserDto savedUserDtoWithEmailAndName(String email, String name) {
+        return MAPPER.toDto(savedUserWithEmailAndName(email, name));
     }
 
     public UserDto savedAdminDtoWithEmail(String email) {
