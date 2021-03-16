@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "378f466d-d9ee-42cc-8ec4-353cbcdaad8c",
+		"_postman_id": "8643e7cf-1ae7-44d4-b142-777a92e2172b",
 		"name": "Art Stock Exchange",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -628,6 +628,72 @@
 									"key": "email",
 									"value": "icabejzik@gmail.com"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Artowner",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "user.name",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Password123!",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "ivana.basic@mail.com",
+									"type": "text"
+								},
+								{
+									"key": "firstName",
+									"value": "Mike",
+									"type": "text"
+								},
+								{
+									"key": "lastName",
+									"value": "Tyson",
+									"type": "text"
+								},
+								{
+									"key": "birthday",
+									"value": "1993-09-14",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Serbia",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Knez Mihajlova 1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{ase-endpoint}}/api/user/registration/art-owner/submit",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"registration",
+								"art-owner",
+								"submit"
 							]
 						}
 					},
@@ -1321,7 +1387,47 @@
 			"name": "Artwork Documents",
 			"item": [
 				{
-					"name": "Save Artwork Documents",
+					"name": "Artwork Document Download",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork/document/download?artworkId=1&documentId=1",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork",
+								"document",
+								"download"
+							],
+							"query": [
+								{
+									"key": "artworkId",
+									"value": "1"
+								},
+								{
+									"key": "documentId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Artwork Documents Upload",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1356,21 +1462,22 @@
 							]
 						},
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/documents",
+							"raw": "{{ase-endpoint}}/api/artwork/document/upload",
 							"host": [
 								"{{ase-endpoint}}"
 							],
 							"path": [
 								"api",
 								"artwork",
-								"documents"
+								"document",
+								"upload"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Artwork Documents Download",
+					"name": "Artwork Documents Upload Management",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1382,35 +1489,46 @@
 								}
 							]
 						},
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "artworkId",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "documents",
+									"type": "file",
+									"src": "/D:/test/download.jpg"
+								},
+								{
+									"key": "fileCategory",
+									"value": "IMAGE",
+									"type": "text"
+								}
+							]
+						},
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/documents/download?artworkId=1&documentId=1",
+							"raw": "{{ase-endpoint}}/api/management/artwork/document/upload",
 							"host": [
 								"{{ase-endpoint}}"
 							],
 							"path": [
 								"api",
+								"management",
 								"artwork",
-								"documents",
-								"download"
-							],
-							"query": [
-								{
-									"key": "artworkId",
-									"value": "1"
-								},
-								{
-									"key": "documentId",
-									"value": "1"
-								}
+								"document",
+								"upload"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Artwork Documents Remove",
+					"name": "Artwork Documents Delete",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1425,15 +1543,15 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/documents/remove?artworkId=1&documentId=1",
+							"raw": "{{ase-endpoint}}/api/artwork/document/delete?artworkId=1&documentId=1",
 							"host": [
 								"{{ase-endpoint}}"
 							],
 							"path": [
 								"api",
 								"artwork",
-								"documents",
-								"remove"
+								"document",
+								"delete"
 							],
 							"query": [
 								{
@@ -1448,12 +1566,161 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Artwork Documents Delete Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{ase-endpoint}}/api/management/artwork/document/delete?artworkId=1&documentId=1",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"management",
+								"artwork",
+								"document",
+								"delete"
+							],
+							"query": [
+								{
+									"key": "artworkId",
+									"value": "1"
+								},
+								{
+									"key": "documentId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Artwork Principal Image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"artwork_id\": 1,\r\n    \"document_id\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork/document/set-principal-image",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork",
+								"document",
+								"set-principal-image"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Artwork Principal Image Management",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"artwork_id\": 1,\r\n    \"document_id\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ase-endpoint}}/api/management/artwork/document/set-principal-image",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"management",
+								"artwork",
+								"document",
+								"set-principal-image"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
 		{
 			"name": "Artwork",
 			"item": [
+				{
+					"name": "Create Artwork Draft",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{ase-endpoint}}/api/artwork/create-draft",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"artwork",
+								"create-draft"
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "Preview Artwork",
 					"request": {
@@ -1470,13 +1737,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork?id=1",
+							"raw": "{{ase-endpoint}}/api/artwork/preview?id=1",
 							"host": [
 								"{{ase-endpoint}}"
 							],
 							"path": [
 								"api",
-								"artwork"
+								"artwork",
+								"preview"
 							],
 							"query": [
 								{
@@ -1489,7 +1757,7 @@
 					"response": []
 				},
 				{
-					"name": "Save Artwork Draft",
+					"name": "Preview Artwork Management",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1501,24 +1769,31 @@
 								}
 							]
 						},
-						"method": "POST",
+						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/draft",
+							"raw": "{{ase-endpoint}}/api/management/artwork/preview?id=1",
 							"host": [
 								"{{ase-endpoint}}"
 							],
 							"path": [
 								"api",
+								"management",
 								"artwork",
-								"draft"
+								"preview"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Save Artwork Data",
+					"name": "Update Artwork",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -1534,7 +1809,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"artwork_id\": 1,\r\n    \"principal_image_id\": 1,\r\n    \"title\": \"Title\",\r\n    \"categories\": [\r\n        \"cat1\"\r\n    ],\r\n    \"artist\": \"Artist Name\",\r\n    \"i_am_art_owner\": true,\r\n    \"year\": 2010,\r\n    \"materials\": [\r\n        \"mat1\"\r\n    ],\r\n    \"mediums\": [\r\n        \"med1\"\r\n    ],\r\n    \"styles\": [\r\n        \"style1\"\r\n    ],\r\n    \"weight\": 10,\r\n    \"height\": 10,\r\n    \"width\": 10,\r\n    \"depth\": 10,\r\n    \"address\": \"The Avenue Street\",\r\n    \"address2\": \"building no 1\",\r\n    \"city\": \"Belgrade\",\r\n    \"country\": \"Serbia\",\r\n    \"region\": \"Europe\",\r\n    \"zip_code\": \"11000\",\r\n    \"phone\": \"01234567\",\r\n    \"appraisal_history\": \"Appraisal History\",\r\n    \"location_history\": \"Location Hisotry\",\r\n    \"runs_history\": \"Runs History\",\r\n    \"maintenance_history\": \"Maintenance History\",\r\n    \"notes\": \"Notes\",\r\n    \"status\": \"DRAFT\"\r\n}",
+							"raw": "{\r\n    \"artwork_id\": 1,\r\n    \"title\": \"Title\",\r\n    \"categories\": [\r\n        \"cat1\"\r\n    ],\r\n    \"artist\": \"Artist Name\",\r\n    \"i_am_art_owner\": true,\r\n    \"year\": 2010,\r\n    \"materials\": [\r\n        \"mat1\"\r\n    ],\r\n    \"mediums\": [\r\n        \"med1\"\r\n    ],\r\n    \"styles\": [\r\n        \"style1\"\r\n    ],\r\n    \"weight\": 10,\r\n    \"height\": 10,\r\n    \"width\": 10,\r\n    \"depth\": 10,\r\n    \"address\": \"The Avenue Street\",\r\n    \"address2\": \"building no 1\",\r\n    \"city\": \"Belgrade\",\r\n    \"country\": \"Serbia\",\r\n    \"region\": \"Europe\",\r\n    \"zip_code\": \"11000\",\r\n    \"phone\": \"01234567\",\r\n    \"appraisal_history\": \"Appraisal History\",\r\n    \"location_history\": \"Location Hisotry\",\r\n    \"runs_history\": \"Runs History\",\r\n    \"maintenance_history\": \"Maintenance History\",\r\n    \"notes\": \"Notes\",\r\n    \"status\": \"DRAFT\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1542,14 +1817,53 @@
 							}
 						},
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/data",
+							"raw": "{{ase-endpoint}}/api/artwork/update",
 							"host": [
 								"{{ase-endpoint}}"
 							],
 							"path": [
 								"api",
 								"artwork",
-								"data"
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Artwork Management",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"artwork_id\": 1,\r\n    \"title\": \"Title\",\r\n    \"categories\": [\r\n        \"cat1\"\r\n    ],\r\n    \"artist\": \"Artist Name\",\r\n    \"i_am_art_owner\": true,\r\n    \"year\": 2010,\r\n    \"materials\": [\r\n        \"mat1\"\r\n    ],\r\n    \"mediums\": [\r\n        \"med1\"\r\n    ],\r\n    \"styles\": [\r\n        \"style1\"\r\n    ],\r\n    \"weight\": 10,\r\n    \"height\": 10,\r\n    \"width\": 10,\r\n    \"depth\": 10,\r\n    \"address\": \"The Avenue Street\",\r\n    \"address2\": \"building no 1\",\r\n    \"city\": \"Belgrade\",\r\n    \"country\": \"Serbia\",\r\n    \"region\": \"Europe\",\r\n    \"zip_code\": \"11000\",\r\n    \"phone\": \"01234567\",\r\n    \"appraisal_history\": \"Appraisal History\",\r\n    \"location_history\": \"Location Hisotry\",\r\n    \"runs_history\": \"Runs History\",\r\n    \"maintenance_history\": \"Maintenance History\",\r\n    \"notes\": \"Notes\",\r\n    \"status\": \"DRAFT\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ase-endpoint}}/api/management/artwork/update",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"management",
+								"artwork",
+								"update"
 							]
 						}
 					},
@@ -1577,6 +1891,62 @@
 							],
 							"path": [
 								"api",
+								"artwork",
+								"search"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "DRAFT"
+								},
+								{
+									"key": "title",
+									"value": ""
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "createdAt"
+								},
+								{
+									"key": "order",
+									"value": "DESC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Artworks Management",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ase-endpoint}}/api/management/artwork/search?status=DRAFT&title&page=0&size=10&sort=createdAt&order=DESC",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"management",
 								"artwork",
 								"search"
 							],
@@ -1632,6 +2002,42 @@
 							],
 							"path": [
 								"api",
+								"artwork",
+								"delete"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Artwork Management",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{ase-endpoint}}/api/management/artwork/delete?id=1",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"management",
 								"artwork",
 								"delete"
 							],
