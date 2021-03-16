@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "8643e7cf-1ae7-44d4-b142-777a92e2172b",
+		"_postman_id": "1ee8a8fb-daa5-4b08-bac9-a184d6da27cb",
 		"name": "Art Stock Exchange",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -211,7 +211,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"sekuloskimilos@gmail.com\",\n    \"password\": \"Sekula123!\",\n    \"match_password\": \"Sekula123!\",\n    \"regionName\": \"Serbia\",\n    \"aspirations\": [\n        \"evaluator\"\n    ]\n}"
+							"raw": "{\n    \"email\": \"sekuloskimilos@gmail.com\",\n    \"username\": \"sekulaaa\",\n    \"password\": \"Sekula123!\",\n    \"match_password\": \"Sekula123!\",\n    \"regionName\": \"Serbia\",\n    \"aspirations\": [\n        \"evaluator\"\n    ]\n}"
 						},
 						"url": {
 							"raw": "{{endpoint_ase}}/api/user/registration",
@@ -366,6 +366,43 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Refresh registration token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint_ase}}/api/user/registration/token/refresh?token=71dd0baf-3e2b-4275-8fb3-674daad0f238",
+							"host": [
+								"{{endpoint_ase}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"registration",
+								"token",
+								"refresh"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "71dd0baf-3e2b-4275-8fb3-674daad0f238"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -388,7 +425,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/users?email=a&role=USER&page=0&size=100",
+							"raw": "{{ase-endpoint}}/api/users?email=<searchText>&role=user&page=0&size=10&sort=email&order=DESC",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -399,11 +436,11 @@
 							"query": [
 								{
 									"key": "email",
-									"value": "a"
+									"value": "<searchText>"
 								},
 								{
 									"key": "role",
-									"value": "USER"
+									"value": "user"
 								},
 								{
 									"key": "page",
@@ -411,7 +448,15 @@
 								},
 								{
 									"key": "size",
-									"value": "100"
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "email"
+								},
+								{
+									"key": "order",
+									"value": "DESC"
 								}
 							]
 						}
@@ -563,7 +608,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/user/registration/evaluator/search?email=&page=&size=&sort=",
+							"raw": "{{ase-endpoint}}/api/user/registration/evaluator/search?email=<searchText>&page=0&size=10&sort=status&order=DESC",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -577,19 +622,23 @@
 							"query": [
 								{
 									"key": "email",
-									"value": ""
+									"value": "<searchText>"
 								},
 								{
 									"key": "page",
-									"value": ""
+									"value": "0"
 								},
 								{
 									"key": "size",
-									"value": ""
+									"value": "10"
 								},
 								{
 									"key": "sort",
-									"value": ""
+									"value": "status"
+								},
+								{
+									"key": "order",
+									"value": "DESC"
 								}
 							]
 						}
@@ -725,7 +774,7 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": []
+									"src": "/C:/Users/rodje/Desktop/ase/ase-be-services/src/test/resources/testFiles/testCv.txt"
 								},
 								{
 									"key": "",
@@ -736,14 +785,20 @@
 							]
 						},
 						"url": {
-							"raw": "{{ase-endpoint}}/api/s3/upload",
+							"raw": "{{ase-endpoint}}/api/s3/validate?category=CV",
 							"host": [
 								"{{ase-endpoint}}"
 							],
 							"path": [
 								"api",
 								"s3",
-								"upload"
+								"validate"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "CV"
+								}
 							]
 						}
 					},
@@ -765,7 +820,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/s3/delete?fileName=1610570538233-file-sample_100kB.doc",
+							"raw": "{{ase-endpoint}}/api/s3/delete?path=1610570538233-file-sample_100kB.doc",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -776,7 +831,7 @@
 							],
 							"query": [
 								{
-									"key": "fileName",
+									"key": "path",
 									"value": "1610570538233-file-sample_100kB.doc"
 								}
 							]
@@ -800,7 +855,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/s3/download?fileName=1610645577245-file-sample_100kB.doc",
+							"raw": "{{ase-endpoint}}/api/s3/download?path=1610645577245-file-sample_100kB.doc",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -811,7 +866,7 @@
 							],
 							"query": [
 								{
-									"key": "fileName",
+									"key": "path",
 									"value": "1610645577245-file-sample_100kB.doc"
 								}
 							]
@@ -1244,6 +1299,46 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Delete Country Details",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint_ase}}/api/evaluation/management/country-details/delete",
+									"host": [
+										"{{endpoint_ase}}"
+									],
+									"path": [
+										"api",
+										"evaluation",
+										"management",
+										"country-details",
+										"delete"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -1307,83 +1402,6 @@
 			]
 		},
 		{
-			"name": "Config",
-			"item": [
-				{
-					"name": "Save Config",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"type\": \"QUOTATION_PACKAGE_MIN_EVALUATIONS\",\r\n    \"value\": 15\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{endpoint_ase}}/api/config/save",
-							"host": [
-								"{{endpoint_ase}}"
-							],
-							"path": [
-								"api",
-								"config",
-								"save"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search Config",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{endpoint_ase}}/api/config?type=QUOTATION_PACKAGE_MIN_EVALUATIONS",
-							"host": [
-								"{{endpoint_ase}}"
-							],
-							"path": [
-								"api",
-								"config"
-							],
-							"query": [
-								{
-									"key": "type",
-									"value": "QUOTATION_PACKAGE_MIN_EVALUATIONS"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
 			"name": "Artwork Documents",
 			"item": [
 				{
@@ -1434,7 +1452,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{access-token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -1484,7 +1502,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{access-token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -1885,7 +1903,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/search?status=DRAFT&title&page=0&size=10&sort=createdAt&order=DESC",
+							"raw": "{{ase-endpoint}}/api/artwork/search?status=DRAFT&title=&page=0&size=10&sort=createdAt&order=DESC",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -2057,14 +2075,14 @@
 			"name": "Artwork Metadata Management",
 			"item": [
 				{
-					"name": "Create artwork metadata",
+					"name": "Save artwork metadata",
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{access-token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -2081,7 +2099,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/create",
+							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/save",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -2090,7 +2108,7 @@
 								"artwork",
 								"management",
 								"metadata",
-								"create"
+								"save"
 							]
 						}
 					},
@@ -2104,7 +2122,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{access-token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -2112,7 +2130,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/management/metadata?type=CATEGORY",
+							"raw": "{{ase-endpoint}}/api/artwork/management/metadata?status=APPROVED&name=<searchText>&type=CATEGORY&page=0&size=10&sort=status&order DESC",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -2125,22 +2143,31 @@
 							"query": [
 								{
 									"key": "status",
-									"value": "APPROVED",
-									"disabled": true
+									"value": "APPROVED"
 								},
 								{
 									"key": "name",
-									"value": "5",
-									"disabled": true
-								},
-								{
-									"key": "size",
-									"value": "2",
-									"disabled": true
+									"value": "<searchText>"
 								},
 								{
 									"key": "type",
 									"value": "CATEGORY"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "status"
+								},
+								{
+									"key": "order DESC",
+									"value": null
 								}
 							]
 						}
@@ -2155,7 +2182,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{access-token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -2195,7 +2222,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{access-token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -2241,7 +2268,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{access-token}}",
+									"value": "{{access_token}}",
 									"type": "string"
 								}
 							]
@@ -2249,14 +2276,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/metadata?type=CATEGORY",
+							"raw": "{{ase-endpoint}}/api/artwork/approved-metadata?type=CATEGORY",
 							"host": [
 								"{{ase-endpoint}}"
 							],
 							"path": [
 								"api",
 								"artwork",
-								"metadata"
+								"approved-metadata"
 							],
 							"query": [
 								{
@@ -2268,6 +2295,104 @@
 									"value": "<searchText>",
 									"disabled": true
 								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "System",
+			"item": [
+				{
+					"name": "Save Config",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"QUOTATION_PACKAGE_MIN_EVALUATIONS\",\r\n    \"value\": 15\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{endpoint_ase}}/api/system/config/save",
+							"host": [
+								"{{endpoint_ase}}"
+							],
+							"path": [
+								"api",
+								"system",
+								"config",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Config",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint_ase}}/api/system/config?type=QUOTATION_PACKAGE_MIN_EVALUATIONS",
+							"host": [
+								"{{endpoint_ase}}"
+							],
+							"path": [
+								"api",
+								"system",
+								"config"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "QUOTATION_PACKAGE_MIN_EVALUATIONS"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Constants",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{endpoint_ase}}/api/system/constants",
+							"host": [
+								"{{endpoint_ase}}"
+							],
+							"path": [
+								"api",
+								"system",
+								"constants"
 							]
 						}
 					},
