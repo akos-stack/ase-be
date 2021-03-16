@@ -20,8 +20,8 @@ public interface ArtworkDocumentsApi {
     String MNG_ARTWORK_DOCUMENT_UPLOAD     = "/management/artwork/document/upload";
     String ARTWORK_DOCUMENT_DELETE         = "/artwork/document/delete";
     String MNG_ARTWORK_DOCUMENT_DELETE     = "/management/artwork/document/delete";
-    String ARTWORK_SET_PRINCIPAL_IMAGE     = "/artwork/documents/principal";
-    String MNG_ARTWORK_SET_PRINCIPAL_IMAGE = "/management/artwork/documents/principal";
+    String ARTWORK_SET_PRINCIPAL_IMAGE     = "/artwork/document/set-principal-image";
+    String MNG_ARTWORK_SET_PRINCIPAL_IMAGE = "/management/artwork/document/set-principal-image";
     // @formatter:on
 
     @GetMapping(
