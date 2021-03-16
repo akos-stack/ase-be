@@ -14,3 +14,5 @@ id,name
 413,upload_artwork_document_management
 414,delete_artwork_document
 415,delete_artwork_document_management
+416,set_principal_image
+417,set_principal_image_management

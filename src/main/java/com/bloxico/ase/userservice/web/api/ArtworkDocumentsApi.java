@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.userservice.web.model.artwork.*;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.SetArtworkPrincipalImageRequest;
 import io.swagger.annotations.*;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -14,11 +15,13 @@ import javax.validation.Valid;
 public interface ArtworkDocumentsApi {
 
     // @formatter:off
-    String ARTWORK_DOCUMENT_DOWNLOAD   = "/artwork/document/download";
-    String ARTWORK_DOCUMENT_UPLOAD     = "/artwork/document/upload";
-    String MNG_ARTWORK_DOCUMENT_UPLOAD = "/management/artwork/document/upload";
-    String ARTWORK_DOCUMENT_DELETE     = "/artwork/document/delete";
-    String MNG_ARTWORK_DOCUMENT_DELETE = "/management/artwork/document/delete";
+    String ARTWORK_DOCUMENT_DOWNLOAD       = "/artwork/document/download";
+    String ARTWORK_DOCUMENT_UPLOAD         = "/artwork/document/upload";
+    String MNG_ARTWORK_DOCUMENT_UPLOAD     = "/management/artwork/document/upload";
+    String ARTWORK_DOCUMENT_DELETE         = "/artwork/document/delete";
+    String MNG_ARTWORK_DOCUMENT_DELETE     = "/management/artwork/document/delete";
+    String ARTWORK_SET_PRINCIPAL_IMAGE     = "/artwork/documents/principal";
+    String MNG_ARTWORK_SET_PRINCIPAL_IMAGE = "/management/artwork/documents/principal";
     // @formatter:on
 
     @GetMapping(
@@ -41,7 +44,6 @@ public interface ArtworkDocumentsApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Artwork documents successfully submitted."),
             @ApiResponse(code = 400, message = "Document(s) are not valid."),
-            @ApiResponse(code = 401, message = "User not authorized to edit desired artwork."),
             @ApiResponse(code = 404, message = "Artwork not found."),
             @ApiResponse(code = 409, message = "Artwork already has document of category.")
     })
@@ -56,7 +58,6 @@ public interface ArtworkDocumentsApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Artwork documents successfully submitted."),
             @ApiResponse(code = 400, message = "Document(s) are not valid."),
-            @ApiResponse(code = 401, message = "User not authorized to edit desired artwork."),
             @ApiResponse(code = 404, message = "Artwork not found."),
             @ApiResponse(code = 409, message = "Artwork already has document of category.")
     })
@@ -69,7 +70,6 @@ public interface ArtworkDocumentsApi {
     @ApiOperation(value = "Deletes artwork document.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Artwork document successfully deleted."),
-            @ApiResponse(code = 401, message = "User not authorized to delete desired artwork document."),
             @ApiResponse(code = 404, message = "Document not found.")
     })
     ResponseEntity<Void> deleteArtworkDocument(@Valid ArtworkDocumentRequest request);
@@ -81,9 +81,34 @@ public interface ArtworkDocumentsApi {
     @ApiOperation(value = "Deletes artwork document.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Artwork document successfully deleted."),
-            @ApiResponse(code = 401, message = "User not authorized to delete desired artwork document."),
             @ApiResponse(code = 404, message = "Document not found.")
     })
     ResponseEntity<Void> deleteArtworkDocumentMng(@Valid ArtworkDocumentRequest request);
+
+    @PostMapping(
+            value = ARTWORK_SET_PRINCIPAL_IMAGE,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'set_principal_image')")
+    @ApiOperation(value = "User sets principal image.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "User successfully set principal image."),
+            @ApiResponse(code = 400, message = "Document is not an image."),
+            @ApiResponse(code = 404, message = "Artwork not found.")
+    })
+    ResponseEntity<Void> setArtworkPrincipalImage(@Valid @RequestBody SetArtworkPrincipalImageRequest request);
+
+    @PostMapping(
+            value = MNG_ARTWORK_SET_PRINCIPAL_IMAGE,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'set_principal_image_management')")
+    @ApiOperation(value = "User sets principal image.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "User successfully set principal image."),
+            @ApiResponse(code = 400, message = "Document is not an image."),
+            @ApiResponse(code = 404, message = "Artwork not found.")
+    })
+    ResponseEntity<Void> setArtworkPrincipalImageMng(@Valid @RequestBody SetArtworkPrincipalImageRequest request);
 
 }

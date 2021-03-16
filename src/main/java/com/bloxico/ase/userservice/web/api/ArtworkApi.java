@@ -42,7 +42,6 @@ public interface ArtworkApi {
     @ApiOperation(value = "Fetches submitted artwork.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Artwork successfully fetched."),
-            @ApiResponse(code = 401, message = "User not authorized to fetch artwork."),
             @ApiResponse(code = 404, message = "Artwork not found.")
     })
     ResponseEntity<DetailedArtworkResponse> findArtworkById(@Valid FindByArtworkIdRequest request);
@@ -54,7 +53,6 @@ public interface ArtworkApi {
     @ApiOperation(value = "Fetches submitted artwork.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Artwork successfully fetched."),
-            @ApiResponse(code = 401, message = "User not authorized to fetch artwork."),
             @ApiResponse(code = 404, message = "Artwork not found.")
     })
     ResponseEntity<DetailedArtworkResponse> findArtworkByIdMng(@Valid FindByArtworkIdRequest request);
@@ -68,7 +66,6 @@ public interface ArtworkApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Data successfully updated."),
             @ApiResponse(code = 400, message = "User submitted invalid data."),
-            @ApiResponse(code = 401, message = "User not authorized to update artwork."),
             @ApiResponse(code = 404, message = "Artwork not found.")
     })
     ResponseEntity<DetailedArtworkResponse> updateArtworkData(@Valid @RequestBody UpdateArtworkDataRequest request);
@@ -82,7 +79,6 @@ public interface ArtworkApi {
     @ApiResponses({
             @ApiResponse(code = 200, message = "Data successfully updated."),
             @ApiResponse(code = 400, message = "User submitted invalid data."),
-            @ApiResponse(code = 401, message = "User not authorized to update artwork."),
             @ApiResponse(code = 404, message = "Artwork not found.")
     })
     ResponseEntity<DetailedArtworkResponse> updateArtworkDataMng(@Valid @RequestBody UpdateArtworkDataRequest request);
@@ -110,7 +106,6 @@ public interface ArtworkApi {
     @ApiOperation(value = "Deletes artwork document.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "User successfully deleted artwork."),
-            @ApiResponse(code = 401, message = "User not authorized to delete desired artwork."),
             @ApiResponse(code = 404, message = "Artwork not found.")
     })
     ResponseEntity<Void> deleteArtwork(@Valid DeleteArtworkRequest request);
@@ -122,7 +117,6 @@ public interface ArtworkApi {
     @ApiOperation(value = "Deletes artwork document.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "User successfully deleted artwork."),
-            @ApiResponse(code = 401, message = "User not authorized to delete desired artwork."),
             @ApiResponse(code = 404, message = "Artwork not found.")
     })
     ResponseEntity<Void> deleteArtworkMng(@Valid DeleteArtworkRequest request);

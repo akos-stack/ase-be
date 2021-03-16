@@ -9,6 +9,8 @@ import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.artwork.UploadArtworkDocumentsResponse;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.SetArtworkPrincipalImageRequest;
+import io.restassured.http.ContentType;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -499,6 +501,210 @@ public class ArtworkDocumentsApiTest extends AbstractSpringTestWithAWS {
                 .param("documentId", saveDocumentResponse.getDocuments().get(0).getId())
                 .when()
                 .delete(API_URL + MNG_ARTWORK_DOCUMENT_DELETE)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.USER, auth = true)
+    public void setPrincipalImg_403_notAuthorized(){
+        var request = new SetArtworkPrincipalImageRequest(1L, 1L);
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(API_URL + ARTWORK_SET_PRINCIPAL_IMAGE)
+                .then()
+                .assertThat()
+                .statusCode(403);
+    }
+
+    @Test
+    @WithMockCustomUser(auth = true)
+    public void setPrincipalImg_403_admin_notAuthorized(){
+        var request = new SetArtworkPrincipalImageRequest(1L, 1L);
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(API_URL + ARTWORK_SET_PRINCIPAL_IMAGE)
+                .then()
+                .assertThat()
+                .statusCode(403);
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
+    public void setPrincipalImg_404_notFound(){
+        var request = new SetArtworkPrincipalImageRequest(-1L, 1L);
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(API_URL + ARTWORK_SET_PRINCIPAL_IMAGE)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
+    public void setPrincipalImg_404_notAllowed(){
+        var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(Artwork.Status.DRAFT));
+        var request = new SetArtworkPrincipalImageRequest(artwork.getId(), 1L);
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(API_URL + ARTWORK_SET_PRINCIPAL_IMAGE)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
+    public void setPrincipalImg_404_artworkDocumentNotFound(){
+        var artwork = utilArtwork.saved(
+                utilArtwork.genArtworkDto(Artwork.Status.DRAFT, securityContext.getLoggedInArtOwner().getId()));
+        var request = new SetArtworkPrincipalImageRequest(artwork.getId(), 1000L);
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(API_URL + ARTWORK_SET_PRINCIPAL_IMAGE)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_DOCUMENT_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
+    public void setPrincipalImg_404_documentIsNotImage(){
+        var artwork = utilArtwork.saved(
+                utilArtwork.genArtworkDto(Artwork.Status.DRAFT, securityContext.getLoggedInArtOwner().getId()));
+        var document = utilArtwork.saveArtworkDocument(artwork.getId(), CERTIFICATE);
+        var request = new SetArtworkPrincipalImageRequest(artwork.getId(), document.getId());
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(API_URL + ARTWORK_SET_PRINCIPAL_IMAGE)
+                .then()
+                .assertThat()
+                .statusCode(400)
+                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_DOCUMENT_CANNOT_BE_PRINCIPAL_IMAGE.getCode()));
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
+    public void setPrincipalImg(){
+        var artwork = utilArtwork.saved(
+                utilArtwork.genArtworkDto(Artwork.Status.DRAFT, securityContext.getLoggedInArtOwner().getId()));
+        var document = utilArtwork.saveArtworkDocument(artwork.getId(), IMAGE);
+        var request = new SetArtworkPrincipalImageRequest(artwork.getId(), document.getId());
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(API_URL + ARTWORK_SET_PRINCIPAL_IMAGE)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.USER, auth = true)
+    public void setPrincipalImgMng_403_notAuthorized(){
+        var request = new SetArtworkPrincipalImageRequest(-1L, 1L);
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(API_URL + MNG_ARTWORK_SET_PRINCIPAL_IMAGE)
+                .then()
+                .assertThat()
+                .statusCode(403);
+    }
+
+    @Test
+    @WithMockCustomUser(auth = true)
+    public void setPrincipalImgMng_404_notFound(){
+        var request = new SetArtworkPrincipalImageRequest(-1L, 1L);
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(API_URL + MNG_ARTWORK_SET_PRINCIPAL_IMAGE)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    @WithMockCustomUser(auth = true)
+    public void setPrincipalImgMng_404_artworkDocumentNotFound(){
+        var artwork = utilArtwork.saved(
+                utilArtwork.genArtworkDto(Artwork.Status.DRAFT));
+        var request = new SetArtworkPrincipalImageRequest(artwork.getId(), 1000L);
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(API_URL + MNG_ARTWORK_SET_PRINCIPAL_IMAGE)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_DOCUMENT_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    @WithMockCustomUser(auth = true)
+    public void setPrincipalImgMng_404_documentIsNotImage(){
+        var artwork = utilArtwork.saved(
+                utilArtwork.genArtworkDto(Artwork.Status.DRAFT));
+        var document = utilArtwork.saveArtworkDocument(artwork.getId(), CERTIFICATE);
+        var request = new SetArtworkPrincipalImageRequest(artwork.getId(), document.getId());
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(API_URL + MNG_ARTWORK_SET_PRINCIPAL_IMAGE)
+                .then()
+                .assertThat()
+                .statusCode(400)
+                .body(ERROR_CODE, is(ErrorCodes.Artwork.ARTWORK_DOCUMENT_CANNOT_BE_PRINCIPAL_IMAGE.getCode()));
+    }
+
+    @Test
+    @WithMockCustomUser(auth = true)
+    public void setPrincipalImgMng(){
+        var artwork = utilArtwork.saved(
+                utilArtwork.genArtworkDto(Artwork.Status.DRAFT));
+        var document = utilArtwork.saveArtworkDocument(artwork.getId(), IMAGE);
+        var request = new SetArtworkPrincipalImageRequest(artwork.getId(), document.getId());
+        given()
+                .header("Authorization", securityContext.getToken())
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(API_URL + MNG_ARTWORK_SET_PRINCIPAL_IMAGE)
                 .then()
                 .assertThat()
                 .statusCode(200);

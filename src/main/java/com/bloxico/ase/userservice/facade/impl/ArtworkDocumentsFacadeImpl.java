@@ -7,7 +7,10 @@ import com.bloxico.ase.userservice.service.artwork.IArtworkService;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
 import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.model.WithOwner;
-import com.bloxico.ase.userservice.web.model.artwork.*;
+import com.bloxico.ase.userservice.web.model.artwork.ArtworkDocumentRequest;
+import com.bloxico.ase.userservice.web.model.artwork.UploadArtworkDocumentsRequest;
+import com.bloxico.ase.userservice.web.model.artwork.UploadArtworkDocumentsResponse;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.SetArtworkPrincipalImageRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -17,8 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Set;
 
 import static com.bloxico.ase.userservice.util.FileCategory.*;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_DOCUMENT_ALREADY_ATTACHED;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_DOCUMENT_NOT_FOUND;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.*;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
@@ -86,6 +88,23 @@ public class ArtworkDocumentsFacadeImpl implements IArtworkDocumentsFacade {
         log.info("ArtworkFacadeImpl.deleteArtworkDocument - end | withOwner: {}", withOwner);
     }
 
+    @Override
+    public void setPrincipalImage(WithOwner<SetArtworkPrincipalImageRequest> withOwner) {
+        log.info("ArtworkFacadeImpl.setPrincipalImage - start | withOwner: {}", withOwner);
+        var artworkId = artworkService.findArtworkById(withOwner
+                .convert(SetArtworkPrincipalImageRequest::getArtworkId))
+                .getId();
+        var request = withOwner.getRequest();
+        requireArtworkHasDocumentInValidType(request);
+        documentService
+                .findDocumentsByArtworkId(artworkId)
+                .stream().filter(documentDto -> documentDto.getType().equals(PRINCIPAL_IMAGE))
+                .findFirst()
+                .ifPresent(documentDto -> documentService.updateDocumentType(documentDto.getId(), IMAGE));
+        documentService.updateDocumentType(request.getDocumentId(), PRINCIPAL_IMAGE);
+        log.info("ArtworkFacadeImpl.setPrincipalImage - end | withOwner: {}", withOwner);
+    }
+
     private void requireArtworkHasDocument(ArtworkDocumentRequest request) {
         artworkDocumentService
                 .findDocumentIdsByArtworkId(request.getArtworkId())
@@ -105,4 +124,17 @@ public class ArtworkDocumentsFacadeImpl implements IArtworkDocumentsFacade {
             throw ARTWORK_DOCUMENT_ALREADY_ATTACHED.newException();
     }
 
+    private void requireArtworkHasDocumentInValidType(SetArtworkPrincipalImageRequest request) {
+        var document = documentService
+                .findDocumentsByArtworkId(request.getArtworkId())
+                .stream()
+                .filter(documentDto -> documentDto.getId().equals(request.getDocumentId()))
+                .findFirst();
+        if(document.isEmpty()) {
+            throw ARTWORK_DOCUMENT_NOT_FOUND.newException();
+        }
+        if(document.get().getType() != IMAGE && document.get().getType() != PRINCIPAL_IMAGE) {
+            throw ARTWORK_DOCUMENT_CANNOT_BE_PRINCIPAL_IMAGE.newException();
+        }
+    }
 }

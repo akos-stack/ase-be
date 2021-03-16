@@ -253,7 +253,12 @@ public interface ErrorCodes {
         ARTWORK_DOCUMENT_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "Artworks_09",
-                "Artwork document not found.");
+                "Artwork document not found."),
+
+        ARTWORK_DOCUMENT_CANNOT_BE_PRINCIPAL_IMAGE(
+                HttpStatus.BAD_REQUEST,
+                "Artworks_10",
+                "Artwork document cannot be set as principal image.");
 
         private final HttpStatus httpStatus;
         private final String code, description;

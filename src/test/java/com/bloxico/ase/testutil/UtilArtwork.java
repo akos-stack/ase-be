@@ -1,8 +1,8 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
-import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDocumentDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
+import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.entity.artwork.Artist;
 import com.bloxico.ase.userservice.entity.artwork.Artwork.Status;
 import com.bloxico.ase.userservice.facade.impl.ArtworkFacadeImpl;
@@ -16,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Year;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type.*;
@@ -163,12 +166,19 @@ public class UtilArtwork {
         return map;
     }
 
-    public List<ArtworkDocumentDto> saveArtworkDocuments(long artworkId) {
+    public List<DocumentDto> saveArtworkDocuments(long artworkId) {
         var documents = Arrays
                 .stream(FileCategory.values())
                 .map(utilDocument::savedDocumentDto)
                 .collect(toList());
-        return artworkDocumentService.saveArtworkDocuments(artworkId, documents);
+        artworkDocumentService.saveArtworkDocuments(artworkId, documents);
+        return documents;
+    }
+
+    public DocumentDto saveArtworkDocument(long artworkId, FileCategory fileCategory) {
+        var document = utilDocument.savedDocumentDto(fileCategory);
+        artworkDocumentService.saveArtworkDocuments(artworkId, List.of(document));
+        return document;
     }
 
     public long ownerIdOf(long artworkId) {
