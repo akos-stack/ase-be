@@ -45,7 +45,7 @@ public interface ArtworkDocumentsApi {
             @ApiResponse(code = 404, message = "Artwork not found."),
             @ApiResponse(code = 409, message = "Artwork already has document of category.")
     })
-    ResponseEntity<UploadArtworkDocumentsResponse> uploadArtworkDocuments(@Valid @RequestBody UploadArtworkDocumentsRequest request);
+    ResponseEntity<UploadArtworkDocumentsResponse> uploadArtworkDocuments(UploadArtworkDocumentsRequest request);
 
     @PostMapping(
             value = MNG_ARTWORK_DOCUMENT_UPLOAD,
@@ -60,7 +60,7 @@ public interface ArtworkDocumentsApi {
             @ApiResponse(code = 404, message = "Artwork not found."),
             @ApiResponse(code = 409, message = "Artwork already has document of category.")
     })
-    ResponseEntity<UploadArtworkDocumentsResponse> uploadArtworkDocumentsMng(@Valid @RequestBody UploadArtworkDocumentsRequest request);
+    ResponseEntity<UploadArtworkDocumentsResponse> uploadArtworkDocumentsMng(UploadArtworkDocumentsRequest request);
 
     @DeleteMapping(
             value = ARTWORK_DOCUMENT_DELETE,

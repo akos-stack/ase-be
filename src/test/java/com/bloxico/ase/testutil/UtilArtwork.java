@@ -1,6 +1,7 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDocumentDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
 import com.bloxico.ase.userservice.entity.artwork.Artist;
 import com.bloxico.ase.userservice.entity.artwork.Artwork.Status;
@@ -162,12 +163,12 @@ public class UtilArtwork {
         return map;
     }
 
-    public void saveArtworkDocuments(long artworkId) {
+    public List<ArtworkDocumentDto> saveArtworkDocuments(long artworkId) {
         var documents = Arrays
                 .stream(FileCategory.values())
                 .map(utilDocument::savedDocumentDto)
                 .collect(toList());
-        artworkDocumentService.saveArtworkDocuments(artworkId, documents);
+        return artworkDocumentService.saveArtworkDocuments(artworkId, documents);
     }
 
     public long ownerIdOf(long artworkId) {

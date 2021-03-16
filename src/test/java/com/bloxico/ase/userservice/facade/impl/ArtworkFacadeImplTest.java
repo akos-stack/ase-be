@@ -64,7 +64,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser
     public void findArtworkById_notAllowed() {
-        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto(DRAFT)).getId();
         var ownerId = utilUserProfile.savedArtOwnerDto().getId();
         assertThrows(
                 ArtworkException.class,
@@ -111,14 +111,14 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(role = ART_OWNER)
     public void updateArtworkData_notAllowed() {
-        var request = utilArtwork.genUpdateArtworkDataRequest(DRAFT);
-        var ownerId = utilUserProfile.savedArtOwnerDto().getId();
+        var artworkDto = utilArtwork.saved(utilArtwork.genArtworkDto(DRAFT));
+        var request = utilArtwork.genUpdateArtworkDataRequest(artworkDto.getId(), DRAFT);
         assertThrows(
                 ArtworkException.class,
                 () -> artworkFacade.updateArtworkData(
-                        WithOwner.of(ownerId, request)));
+                        WithOwner.of(utilSecurityContext.getLoggedInArtOwner().getId(), request)));
     }
 
     @Test
@@ -245,9 +245,10 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(role = ART_OWNER)
     public void deleteArtwork_notAllowed() {
-        var request = utilArtwork.genUpdateArtworkDataRequest(DRAFT);
+        var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(DRAFT));
+        var request = utilArtwork.genUpdateArtworkDataRequest(artwork.getId(), DRAFT);
         var ownerId = utilUserProfile.savedArtOwnerDto().getId();
         assertThrows(
                 ArtworkException.class,
@@ -267,7 +268,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser(role = ART_OWNER)
     public void deleteArtwork() {
-        var request = utilArtwork.saved(utilArtwork.genArtworkDto());
+        var request = utilArtwork.saved(utilArtwork.genArtworkDto(DRAFT, securityContext.getArtOwnerId()));
         artworkFacade.deleteArtwork(WithOwner.of(securityContext.getArtOwnerId(), new DeleteArtworkRequest(request.getId())));
         assertThrows(
                 ArtworkException.class,

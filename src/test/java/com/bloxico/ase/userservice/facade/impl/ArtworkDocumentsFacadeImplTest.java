@@ -3,6 +3,8 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
+import com.bloxico.ase.userservice.entity.artwork.Artwork;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.exception.ArtworkException;
 import com.bloxico.ase.userservice.exception.S3Exception;
 import com.bloxico.ase.userservice.service.artwork.impl.ArtworkDocumentServiceImpl;
@@ -30,6 +32,7 @@ public class ArtworkDocumentsFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private ArtworkDocumentServiceImpl artworkDocumentService;
     @Autowired private ArtworkDocumentsFacadeImpl artworkDocumentsFacade;
+    @Autowired private UtilSecurityContext utilSecurityContext;
 
     // TODO ADD downloadArtworkDocument_artworkNotExists
 
@@ -73,14 +76,14 @@ public class ArtworkDocumentsFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser
+    @WithMockCustomUser(role = Role.ART_OWNER)
     public void uploadArtworkDocuments_notAllowed() {
-        var request = utilDocument.genUploadArtworkDocumentsRequest();
-        var ownerId = utilUserProfile.savedArtOwnerDto().getId();
+        var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(Artwork.Status.DRAFT));
+        var request = utilDocument.genUploadArtworkDocumentsRequest(artwork.getId());
         assertThrows(
                 ArtworkException.class,
                 () -> artworkDocumentsFacade.uploadArtworkDocuments(
-                        WithOwner.of(ownerId, request)));
+                        WithOwner.of(utilSecurityContext.getLoggedInArtOwner().getId(), request)));
     }
 
     @Test

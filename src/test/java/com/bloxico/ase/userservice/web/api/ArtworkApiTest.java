@@ -33,6 +33,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilSecurityContext securityContext;
     @Autowired private AseSecurityContext aseSecurityContext;
     @Autowired private UtilDocument utilDocument;
+    @Autowired private UtilUserProfile utilUserProfile;
 
     @Test
     @WithMockCustomUser(role = Role.USER, auth = true)
@@ -184,7 +185,8 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void updateArtwork_404_notAllowed() {
-        var request = utilArtwork.genUpdateArtworkDataRequest(Artwork.Status.DRAFT);
+        var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(DRAFT));
+        var request = utilArtwork.genUpdateArtworkDataRequest(artwork.getId(), DRAFT);
         given()
                 .header("Authorization", securityContext.getToken())
                 .contentType(JSON)
@@ -447,7 +449,7 @@ public class ArtworkApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser(role = Role.ART_OWNER, auth = true)
     public void deleteArtwork_404_notAllowed() {
-        var request = utilArtwork.saved(utilArtwork.genArtworkDto());
+        var request = utilArtwork.saved(utilArtwork.genArtworkDto(DRAFT));
         given()
                 .header("Authorization", securityContext.getToken())
                 .contentType(JSON)

@@ -47,7 +47,7 @@ public class DocumentServiceImpl implements IDocumentService {
         document.setType(type);
         if (principalId > 0)
             document.setCreatorId(principalId);
-        var documentDto = MAPPER.toDto(documentRepository.save(document));
+        var documentDto = MAPPER.toDto(documentRepository.saveAndFlush(document));
         log.info("DocumentServiceImpl.saveDocument - end | file: {}, fileCategory: {}", file, type);
         return documentDto;
     }
