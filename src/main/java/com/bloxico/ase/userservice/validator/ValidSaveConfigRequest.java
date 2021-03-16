@@ -15,7 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = SaveConfigRequestValidator.class)
 public @interface ValidSaveConfigRequest {
 
-    String message() default "Invalid config request for the given type.";
+    String message() default "Invalid config value for the given type.";
 
     Class<?>[] groups() default {};
 

@@ -91,8 +91,10 @@ public class Util {
     public static String getTestFilePath(FileCategory category) {
         switch (category) {
             case CV:
+            case CERTIFICATE:
                 return "/testFiles/testCv.txt";
             case IMAGE:
+            case PRINCIPAL_IMAGE:
                 return "/testFiles/testImg.jpg";
             default:
                 throw new IllegalArgumentException(category.toString());

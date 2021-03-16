@@ -48,7 +48,8 @@ public class AWSUtil {
     public byte[] downloadFile(String path) {
         requireNonNull(path);
         try (var ob = s3client.getObject(bucketName, path);
-             var in = ob.getObjectContent()) {
+             var in = ob.getObjectContent())
+        {
             return IOUtils.toByteArray(in);
         } catch (Throwable ex) {
             throw FILE_DOWNLOAD_FAILED.newException(ex);

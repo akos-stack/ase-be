@@ -58,8 +58,12 @@ public interface ErrorCodes {
         RESUME_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "User_06",
-                "When downloading user resume, if resume path is null or empty."
-        );
+                "When downloading user resume, if resume path is null or empty."),
+
+        ACCESS_NOT_ALLOWED(
+                HttpStatus.UNAUTHORIZED,
+                "User_07",
+                "Access not allowed.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
@@ -185,7 +189,12 @@ public interface ErrorCodes {
         COUNTRY_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "Location_05",
-                "Country with specified name was not found.");
+                "Country with specified name was not found."),
+
+        LOCATION_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "Location_06",
+                "Location with id not found.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
@@ -226,10 +235,30 @@ public interface ErrorCodes {
                 "Artworks_04",
                 "Artwork certificate not uploaded."),
 
-        ARTWORK_GROUP_NOT_FOUND(
+        ARTWORK_NOT_FOUND(
                 HttpStatus.NOT_FOUND,
                 "Artworks_05",
-                "Artwork group not found.");
+                "Artwork not found."),
+
+        ARTWORK_DOCUMENT_ALREADY_ATTACHED(
+                HttpStatus.CONFLICT,
+                "Artworks_07",
+                "Artwork certificate already provided."),
+
+        ARTWORK_ONLY_ONE_DOCUMENT_ALLOWED_FOR_CATEGORY(
+                HttpStatus.BAD_REQUEST,
+                "Artworks_08",
+                "Artwork only one document allowed."),
+
+        ARTWORK_DOCUMENT_NOT_FOUND(
+                HttpStatus.NOT_FOUND,
+                "Artworks_09",
+                "Artwork document not found."),
+
+        ARTWORK_DOCUMENT_CANNOT_BE_PRINCIPAL_IMAGE(
+                HttpStatus.BAD_REQUEST,
+                "Artworks_10",
+                "Artwork document cannot be set as principal image.");
 
         private final HttpStatus httpStatus;
         private final String code, description;

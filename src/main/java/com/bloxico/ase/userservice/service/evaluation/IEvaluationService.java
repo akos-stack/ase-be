@@ -1,8 +1,6 @@
 package com.bloxico.ase.userservice.service.evaluation;
 
-import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.*;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.web.model.PageRequest;
@@ -35,6 +33,7 @@ public interface IEvaluationService {
 
     QuotationPackageDto saveQuotationPackage(QuotationPackageDto quotationPackage);
 
-    Set<QuotationPackageCountryDto> saveQuotationPackageCountries(long packageId,
-                                                                  Collection<QuotationPackageCountryDto> countries);
+    Set<QuotationPackageCountryDto> saveQuotationPackageCountries(
+            long packageId, Collection<QuotationPackageCountryDto> countries);
+
 }

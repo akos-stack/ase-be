@@ -23,18 +23,14 @@ import com.bloxico.ase.userservice.entity.user.profile.*;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsCountedTransferProj;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.web.model.address.*;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkRequest;
+import com.bloxico.ase.userservice.web.model.artwork.UpdateArtworkDataRequest;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.IArtworkMetadataRequest;
 import com.bloxico.ase.userservice.web.model.config.SaveConfigRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SaveCountryEvaluationDetailsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SaveQuotationPackageRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.UpdateCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.token.IPendingEvaluatorRequest;
 import com.bloxico.ase.userservice.web.model.user.*;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
@@ -84,15 +80,13 @@ public interface AseMapper {
 
     ArtworkDto toDto(Artwork artwork);
 
-    ArtworkGroupDto toDto(ArtworkGroup artworkGroup);
-
-    ArtworkHistoryDto toDto(ArtworkHistory artworkHistory);
-
-    @Mapping(target = "email", source = "pendingEvaluatorDocument.pendingEvaluatorDocumentId.email")
-    @Mapping(target = "documentId", source = "pendingEvaluatorDocument.pendingEvaluatorDocumentId.documentId")
-    PendingEvaluatorDocumentDto toDto(PendingEvaluatorDocument pendingEvaluatorDocument);
+    @Mapping(target = "email", source = "id.email")
+    @Mapping(target = "documentId", source = "id.documentId")
+    PendingEvaluatorDocumentDto toDto(PendingEvaluatorDocument entity);
 
     ConfigDto toDto(Config entity);
+
+    ArtworkDocumentDto toDto(ArtworkDocument entity);
 
     // DTO -> ENTITY
 
@@ -118,17 +112,19 @@ public interface AseMapper {
     @Mapping(target = "id.countryId", source = "countryId")
     QuotationPackageCountry toEntity(QuotationPackageCountryDto dto);
 
+    @Mapping(target = "id.email", source = "email")
+    @Mapping(target = "id.documentId", source = "documentId")
+    PendingEvaluatorDocument toEntity(PendingEvaluatorDocumentDto dto);
+
     Document toEntity(DocumentDto dto);
 
-    PendingEvaluator toEntity(PendingEvaluatorDto pendingEvaluatorDto);
+    PendingEvaluator toEntity(PendingEvaluatorDto dto);
 
     Artist toEntity(ArtistDto dto);
 
     Artwork toEntity(ArtworkDto dto);
 
-    ArtworkGroup toEntity(ArtworkGroupDto dto);
-
-    ArtworkHistory toEntity(ArtworkHistoryDto dto);
+    ArtworkDocument toEntity(ArtworkDocumentDto dto);
 
     Config toEntity(ConfigDto dto);
 
@@ -151,7 +147,7 @@ public interface AseMapper {
     LocationDto toLocationDto(ISubmitUserProfileRequest request);
 
     @Mapping(ignore = true, target = "country")
-    LocationDto toLocationDto(SaveArtworkRequest request);
+    LocationDto toLocationDto(UpdateArtworkDataRequest request);
 
     UserProfileDto toUserProfileDto(ISubmitUserProfileRequest request);
 
@@ -190,27 +186,19 @@ public interface AseMapper {
 
     PendingEvaluatorDto toPendingEvaluatorDto(IPendingEvaluatorRequest request);
 
-    @Mapping(ignore = true, target = "artist")
-    @Mapping(ignore = true, target = "owner")
-    @Mapping(ignore = true, target = "location")
-    @Mapping(ignore = true, target = "group")
-    @Mapping(ignore = true, target = "history")
-    @Mapping(ignore = true, target = "categories")
-    @Mapping(ignore = true, target = "materials")
-    @Mapping(ignore = true, target = "mediums")
-    @Mapping(ignore = true, target = "styles")
-    ArtworkDto toArtworkDto(SaveArtworkRequest request);
-
-    ArtworkHistoryDto toArtworkHistoryDto(SaveArtworkRequest request);
-
-    @Mapping(source = "groupId", target = "id")
-    ArtworkGroupDto toArtworkGroupDto(SaveArtworkRequest request);
-
     default ConfigDto toDto(SaveConfigRequest request) {
         var dto = new ConfigDto();
         dto.setType(request.getType());
         dto.setValue(request.getValue().toString());
         return dto;
     }
+
+    @Mapping(ignore = true, target = "id")
+    @Mapping(ignore = true, target = "artist")
+    @Mapping(ignore = true, target = "categories")
+    @Mapping(ignore = true, target = "materials")
+    @Mapping(ignore = true, target = "mediums")
+    @Mapping(ignore = true, target = "styles")
+    void update(UpdateArtworkDataRequest request, @MappingTarget ArtworkDto artwork);
 
 }

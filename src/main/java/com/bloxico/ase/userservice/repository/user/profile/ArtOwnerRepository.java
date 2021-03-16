@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface ArtOwnerRepository extends JpaRepository<ArtOwner, Long> {
 
     Optional<ArtOwner> findByUserProfile_UserId(Long id);
+
 }

@@ -1,9 +1,7 @@
 package com.bloxico.ase.userservice.facade.impl;
 
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.UtilSecurityContext;
-import com.bloxico.ase.testutil.UtilUserProfile;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import org.junit.Test;

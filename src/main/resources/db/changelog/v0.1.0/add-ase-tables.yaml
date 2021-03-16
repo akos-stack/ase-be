@@ -88,6 +88,35 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     unique: true
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_role_creator
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_role_updater
+                    references: users(id)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
         - createTable:
             tableName: permissions
             columns:
@@ -188,7 +217,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_category_creator
+                    foreignKeyName: fk_config_creator
                     references: users(id)
               - column:
                   name: created_at
@@ -200,7 +229,7 @@ databaseChangeLog:
                   name: updater_id
                   type: bigint
                   constraints:
-                    foreignKeyName: fk_category_updater
+                    foreignKeyName: fk_config_updater
                     references: users(id)
               - column:
                   name: updated_at
@@ -354,7 +383,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_country_creator
+                    foreignKeyName: fk_country_evaluation_detail_creator
                     references: users(id)
               - column:
                   name: created_at
@@ -366,7 +395,7 @@ databaseChangeLog:
                   name: updater_id
                   type: bigint
                   constraints:
-                    foreignKeyName: fk_country_updater
+                    foreignKeyName: fk_country_evaluation_detail_updater
                     references: users(id)
               - column:
                   name: updated_at
@@ -628,7 +657,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_blacklisted_jwt_creator
+                    foreignKeyName: fk_blacklisted_token_creator
                     references: users(id)
               - column:
                   name: created_at
@@ -640,7 +669,7 @@ databaseChangeLog:
                   name: updater_id
                   type: bigint
                   constraints:
-                    foreignKeyName: fk_blacklisted_jwt_updater
+                    foreignKeyName: fk_blacklisted_token_updater
                     references: users(id)
               - column:
                   name: updated_at
@@ -737,7 +766,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_token_creator
+                    foreignKeyName: fk_pending_evaluator_creator
                     references: users(id)
               - column:
                   name: created_at
@@ -749,7 +778,7 @@ databaseChangeLog:
                   name: updater_id
                   type: bigint
                   constraints:
-                    foreignKeyName: fk_token_updater
+                    foreignKeyName: fk_pending_evaluator_updater
                     references: users(id)
               - column:
                   name: updated_at
@@ -1028,6 +1057,35 @@ databaseChangeLog:
                     primaryKey: true
                     foreignKeyName: fk_document_pending_evaluator
                     references: documents(id)
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_pending_evaluator_document_creator
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_pending_evaluator_document_updater
+                    references: users(id)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
         - createTable:
             tableName: artists
             columns:
@@ -1073,50 +1131,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - createTable:
-            tableName: artwork_groups
-            columns:
-              - column:
-                  name: id
-                  type: bigint
-                  autoIncrement: true
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-              - column:
-                  name: status
-                  type: varchar(256)
-                  constraints:
-                    nullable: false
-              # METADATA
-              - column:
-                  name: creator_id
-                  type: bigint
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_artworks_group_creator
-                    references: users(id)
-              - column:
-                  name: created_at
-                  type: timestamp
-                  defaultValueComputed: "CURRENT_TIMESTAMP"
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updater_id
-                  type: bigint
-                  constraints:
-                    foreignKeyName: fk_artworks_group_updater
-                    references: users(id)
-              - column:
-                  name: updated_at
-                  type: timestamp
-              - column:
-                  name: version
-                  type: bigint
-                  defaultValueNumeric: 0
-                  constraints:
-                    nullable: false
-        - createTable:
             tableName: artworks
             columns:
               - column:
@@ -1129,106 +1143,48 @@ databaseChangeLog:
               - column:
                   name: title
                   type: varchar(256)
-                  constraints:
-                    nullable: false
               - column:
                   name: artist_id
                   type: bigint
                   constraints:
-                    nullable: false
-                    foreignKeyName: fk_artworks_artist
+                    foreignKeyName: fk_artwork_artist
                     references: artists(id)
               - column:
                   name: owner_id
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_artworks_art_owner
+                    foreignKeyName: fk_artwork_art_owner
                     references: art_owners(id)
               - column:
                   name: year
                   type: integer
-                  constraints:
-                    nullable: false
               - column:
                   name: weight
                   type: numeric
-                  constraints:
-                    nullable: false
               - column:
                   name: height
                   type: numeric
-                  constraints:
-                    nullable: false
               - column:
                   name: width
                   type: numeric
-                  constraints:
-                    nullable: false
               - column:
                   name: depth
                   type: numeric
-                  constraints:
-                    nullable: false
               - column:
                   name: phone_number
                   type: varchar(256)
-                  constraints:
-                    nullable: false
               - column:
                   name: location_id
                   type: bigint
                   constraints:
-                    nullable: false
-                    foreignKeyName: fk_artworks_location
+                    foreignKeyName: fk_artwork_location
                     references: locations(id)
               - column:
-                  name: group_id
-                  type: bigint
+                  name: status
+                  type: varchar(256)
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_artworks_artworks_group
-                    references: artwork_groups(id)
-              # METADATA
-              - column:
-                  name: creator_id
-                  type: bigint
-                  constraints:
-                    nullable: false
-                    foreignKeyName: fk_artworks_creator
-                    references: users(id)
-              - column:
-                  name: created_at
-                  type: timestamp
-                  defaultValueComputed: "CURRENT_TIMESTAMP"
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updater_id
-                  type: bigint
-                  constraints:
-                    foreignKeyName: fk_artworks_updater
-                    references: users(id)
-              - column:
-                  name: updated_at
-                  type: timestamp
-              - column:
-                  name: version
-                  type: bigint
-                  defaultValueNumeric: 0
-                  constraints:
-                    nullable: false
-        - createTable:
-            tableName: artworks_history
-            columns:
-              - column:
-                  name: id
-                  type: bigint
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-                    foreignKeyName: fk_artworks_history
-                    references: artworks(id)
               - column:
                   name: appraisal_history
                   type: varchar(256)
@@ -1244,6 +1200,35 @@ databaseChangeLog:
               - column:
                   name: notes
                   type: varchar(256)
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_artwork_creator
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_artwork_updater
+                    references: users(id)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
         - createTable:
             tableName: artworks_categories
             columns:
@@ -1272,7 +1257,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    foreignKeyName: fk_artwork_materials
+                    foreignKeyName: fk_artwork_material
                     references: artworks(id)
               - column:
                   name: material_id
@@ -1280,7 +1265,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    foreignKeyName: fk_material_artworks
+                    foreignKeyName: fk_material_artwork
                     references: materials(id)
         - createTable:
             tableName: artworks_mediums
@@ -1291,7 +1276,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    foreignKeyName: fk_artwork_mediums
+                    foreignKeyName: fk_artwork_medium
                     references: artworks(id)
               - column:
                   name: medium_id
@@ -1299,7 +1284,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    foreignKeyName: fk_medium_artworks
+                    foreignKeyName: fk_medium_artwork
                     references: mediums(id)
         - createTable:
             tableName: artworks_styles
@@ -1310,7 +1295,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    foreignKeyName: fk_artwork_styles
+                    foreignKeyName: fk_artwork_style
                     references: artworks(id)
               - column:
                   name: style_id
@@ -1318,7 +1303,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    foreignKeyName: fk_style_artworks
+                    foreignKeyName: fk_style_artwork
                     references: styles(id)
         - createTable:
             tableName: artworks_documents
@@ -1329,7 +1314,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    foreignKeyName: fk_artworks_document
+                    foreignKeyName: fk_artwork_document
                     references: artworks(id)
               - column:
                   name: document_id
@@ -1337,8 +1322,37 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    foreignKeyName: fk_document_artworks
+                    foreignKeyName: fk_document_artwork
                     references: documents(id)
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_artwork_document_creator
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_artwork_document_updater
+                    references: users(id)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
         - createTable:
             tableName: quotation_packages
             columns:
@@ -1362,7 +1376,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_quotation_packages_creator
+                    foreignKeyName: fk_quotation_package_creator
                     references: users(id)
               - column:
                   name: created_at
@@ -1374,7 +1388,7 @@ databaseChangeLog:
                   name: updater_id
                   type: bigint
                   constraints:
-                    foreignKeyName: fk_quotation_packages_updater
+                    foreignKeyName: fk_quotation_package_updater
                     references: users(id)
               - column:
                   name: updated_at
@@ -1415,7 +1429,7 @@ databaseChangeLog:
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_quotation_packages_countries_creator
+                    foreignKeyName: fk_quotation_package_country_creator
                     references: users(id)
               - column:
                   name: created_at
@@ -1427,7 +1441,7 @@ databaseChangeLog:
                   name: updater_id
                   type: bigint
                   constraints:
-                    foreignKeyName: fk_quotation_packages_countries_updater
+                    foreignKeyName: fk_quotation_package_country_updater
                     references: users(id)
               - column:
                   name: updated_at
@@ -1457,3 +1471,32 @@ databaseChangeLog:
                     primaryKey: true
                     foreignKeyName: fk_document_user_profile
                     references: documents(id)
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_profile_document_creator
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_user_profile_document_updater
+                    references: users(id)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false

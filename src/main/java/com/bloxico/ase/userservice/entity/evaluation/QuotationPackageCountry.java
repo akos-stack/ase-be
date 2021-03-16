@@ -1,16 +1,13 @@
 package com.bloxico.ase.userservice.entity.evaluation;
 
 import com.bloxico.ase.userservice.entity.BaseEntityAudit;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "quotation_packages_countries")
 public class QuotationPackageCountry extends BaseEntityAudit {

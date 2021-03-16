@@ -1,11 +1,7 @@
 package com.bloxico.ase.userservice.service.address.impl;
 
-import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
-import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
-import com.bloxico.ase.userservice.dto.entity.address.RegionDto;
-import com.bloxico.ase.userservice.repository.address.CountryRepository;
-import com.bloxico.ase.userservice.repository.address.LocationRepository;
-import com.bloxico.ase.userservice.repository.address.RegionRepository;
+import com.bloxico.ase.userservice.dto.entity.address.*;
+import com.bloxico.ase.userservice.repository.address.*;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +36,7 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public RegionDto findRegionById(Long id) {
+    public RegionDto findRegionById(long id) {
         log.debug("LocationServiceImpl.findRegionById - start | id: {}", id);
         var regionDto = regionRepository
                 .findById(id)
@@ -75,7 +71,7 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public CountryDto findCountryById(Long id) {
+    public CountryDto findCountryById(long id) {
         log.debug("LocationServiceImpl.findCountryById - start | id: {}", id);
         var countryDto = countryRepository
                 .findById(id)
@@ -180,13 +176,17 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public LocationDto saveLocation(LocationDto dto, Long principalId) {
+    public LocationDto saveLocation(LocationDto locationDto) {
+        return saveLocation(locationDto, -1);
+    }
+
+    @Override
+    public LocationDto saveLocation(LocationDto dto, long principalId) {
         log.debug("LocationServiceImpl.saveLocation - start | dto: {}", dto);
         requireNonNull(dto);
         var location = MAPPER.toEntity(dto);
-        if(principalId != null) {
+        if (principalId > 0)
             location.setCreatorId(principalId);
-        }
         location = locationRepository.saveAndFlush(location);
         var locationDto = MAPPER.toDto(location);
         log.debug("LocationServiceImpl.saveLocation - end | dto: {}", dto);
@@ -194,7 +194,17 @@ public class LocationServiceImpl implements ILocationService {
     }
 
     @Override
-    public int countCountriesByRegionId(Long regionId) {
+    public LocationDto findLocationById(long id) {
+        log.debug("LocationServiceImpl.findLocationById - start | id: {}", id);
+        var location = locationRepository.findById(id)
+                .map(MAPPER::toDto)
+                .orElseThrow(LOCATION_NOT_FOUND::newException);
+        log.debug("LocationServiceImpl.findLocationById - end | id: {}", id);
+        return location;
+    }
+
+    @Override
+    public int countCountriesByRegionId(long regionId) {
         log.debug("LocationServiceImpl.countCountriesByRegionId - start | regionId: {}", regionId);
         var count = countryRepository.countByRegionsIdEquals(regionId);
         log.debug("LocationServiceImpl.countCountriesByRegionId - end | regionId: {}", regionId);

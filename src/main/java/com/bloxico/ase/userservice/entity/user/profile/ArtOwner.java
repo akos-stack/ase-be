@@ -1,19 +1,14 @@
 package com.bloxico.ase.userservice.entity.user.profile;
 
 import com.bloxico.ase.userservice.entity.BaseEntity;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import static javax.persistence.FetchType.LAZY;
 
 @Data
-@EqualsAndHashCode(of = "userProfile", callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 @ToString(exclude = "userProfile")
 @Table(name = "art_owners")
 @Entity

@@ -9,6 +9,8 @@ public interface IUserProfileService {
 
     UserProfileDto findUserProfileByUserId(long id);
 
+    UserProfileDto findUserProfileById(Long id);
+
     UserProfileDto updateUserProfile(long id, UpdateUserProfileRequest request);
 
     UserProfileDto saveUserProfile(UserProfileDto userProfileDto, long principalId);
@@ -19,5 +21,5 @@ public interface IUserProfileService {
 
     ArtOwnerDto findArtOwnerByUserId(long id);
 
-    void saveUserProfileDocument(Long userId, long documentId);
+    void saveUserProfileDocument(long userProfileId, long documentId, long principalId);
 }

@@ -5,15 +5,12 @@ import com.bloxico.ase.userservice.util.FileCategory;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import static javax.persistence.EnumType.STRING;
 
 @Data
-@EqualsAndHashCode(of = {"id"}, callSuper = false)
+@EqualsAndHashCode(of = "path", callSuper = false)
 @Entity
 @Table(name = "documents")
 public class Document extends BaseEntity {
@@ -24,4 +21,5 @@ public class Document extends BaseEntity {
     @Column(name = "type")
     @Enumerated(STRING)
     private FileCategory type;
+
 }

@@ -1,15 +1,13 @@
 package com.bloxico.ase.userservice.dto.entity.evaluation;
 
+import com.bloxico.ase.userservice.dto.entity.BaseEntityDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(of = "countryId")
-public class CountryEvaluationDetailsDto {
-
-    @JsonProperty("id")
-    private Long id;
+@EqualsAndHashCode(of = "countryId", callSuper = false)
+public class CountryEvaluationDetailsDto extends BaseEntityDto {
 
     @JsonProperty("country_id")
     private Long countryId;
