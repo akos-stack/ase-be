@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-import static com.bloxico.ase.testutil.Util.genUUID;
-import static com.bloxico.ase.testutil.Util.randEnumConst;
+import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertTrue;
@@ -63,6 +63,13 @@ public class UtilArtworkMetadata {
         return savedArtworkMetadataDto(type, randEnumConst(Status.class));
     }
 
+    public List<ArtworkMetadataDto> savedArtworkMetadataDtos(Type type) {
+        return Stream
+                .generate(() -> savedArtworkMetadataDto(type))
+                .limit(genPosInt(6))
+                .collect(toList());
+    }
+
     public ArtworkMetadataDto savedArtworkMetadataDto(Type type, Status status) {
         return MAPPER.toDto(savedArtworkMetadata(type, status));
     }
@@ -107,7 +114,7 @@ public class UtilArtworkMetadata {
     }
 
     public static SearchApprovedArtworkMetadataRequest genSearchApprovedMetadataRequest(Type type, String name) {
-        return new SearchApprovedArtworkMetadataRequest(type, "");
+        return new SearchApprovedArtworkMetadataRequest(type, name);
     }
 
 }

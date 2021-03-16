@@ -1,16 +1,11 @@
 package com.bloxico.ase.userservice.entity;
 
 import lombok.Data;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Column;
-import javax.persistence.EntityListeners;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -21,22 +16,23 @@ public abstract class BaseEntityAudit implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Column(name = "creator_id")
     @CreatedBy
+    @Column(name = "creator_id")
     private Long creatorId;
 
-    @Column(name = "updater_id")
     @LastModifiedBy
+    @Column(name = "updater_id")
     private Long updaterId;
 
-    @Column(name = "created_at")
     @CreatedDate
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
     @LastModifiedDate
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Version
     private long version;
+
 }

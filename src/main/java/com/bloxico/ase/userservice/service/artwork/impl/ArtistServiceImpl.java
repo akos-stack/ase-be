@@ -26,7 +26,8 @@ public class ArtistServiceImpl implements IArtistService {
         log.info("ArtistService.saveArtist - start | dto: {}", dto);
         requireNonNull(dto);
         var artist = MAPPER.toEntity(dto);
-        var artistDto = MAPPER.toDto(artistRepository.save(artist));
+        artist = artistRepository.saveAndFlush(artist);
+        var artistDto = MAPPER.toDto(artist);
         log.info("ArtistService.saveArtist - end | dto: {}", dto);
         return artistDto;
     }

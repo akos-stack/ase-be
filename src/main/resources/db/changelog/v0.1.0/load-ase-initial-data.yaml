@@ -5,6 +5,10 @@ databaseChangeLog:
     changes:
     - loadData:
         encoding: UTF-8
+        file: db/changelog/v0.1.0/initial_data/users.csv
+        tableName: users
+    - loadData:
+        encoding: UTF-8
         file: db/changelog/v0.1.0/initial_data/roles.csv
         tableName: roles
     - loadData:
@@ -47,10 +51,6 @@ databaseChangeLog:
         encoding: UTF-8
         file: db/changelog/v0.1.0/initial_data/roles_permissions/04_owner.csv
         tableName: roles_permissions
-    - loadData:
-        encoding: UTF-8
-        file: db/changelog/v0.1.0/initial_data/users.csv
-        tableName: users
     - loadData:
         encoding: UTF-8
         file: db/changelog/v0.1.0/initial_data/users_roles.csv

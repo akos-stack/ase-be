@@ -1,9 +1,19 @@
 package com.bloxico.ase.userservice.facade;
 
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SaveArtworkResponse;
+import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.WithOwner;
+import com.bloxico.ase.userservice.web.model.artwork.*;
 
 public interface IArtworkFacade {
 
-    SaveArtworkResponse submitArtwork(SaveArtworkRequest request);
+    ArtworkResponse createArtworkDraft();
+
+    DetailedArtworkResponse findArtworkById(WithOwner<FindByArtworkIdRequest> withOwner);
+
+    DetailedArtworkResponse updateArtworkData(WithOwner<UpdateArtworkDataRequest> withOwner);
+
+    SearchArtworkResponse searchArtworks(WithOwner<SearchArtworkRequest> withOwner, PageRequest page);
+
+    void deleteArtwork(WithOwner<DeleteArtworkRequest> withOwner);
+
 }

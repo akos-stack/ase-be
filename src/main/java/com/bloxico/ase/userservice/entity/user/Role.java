@@ -1,33 +1,26 @@
 package com.bloxico.ase.userservice.entity.user;
 
+import com.bloxico.ase.userservice.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.FetchType.EAGER;
-import static javax.persistence.GenerationType.IDENTITY;
 
 @Data
-@EqualsAndHashCode(of = "name")
+@EqualsAndHashCode(of = "name", callSuper = false)
 @Table(name = "roles")
 @Entity
-public class Role implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Role extends BaseEntity {
 
     public static final String ADMIN = "admin";
     public static final String USER = "user";
     public static final String EVALUATOR = "evaluator";
     public static final String ART_OWNER = "art_owner";
-
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
 
     @Column(name = "name")
     private String name;

@@ -1,12 +1,11 @@
 package com.bloxico.ase.testutil;
 
-import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.entity.user.profile.Evaluator;
 import com.bloxico.ase.userservice.entity.user.profile.UserProfile;
-import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
 import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
+import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
 import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
 import com.bloxico.ase.userservice.service.user.impl.UserProfileServiceImpl;
 import com.bloxico.ase.userservice.web.model.token.EvaluatorInvitationRequest;
@@ -21,6 +20,7 @@ import java.util.Map;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.user.Role.ART_OWNER;
+import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static java.math.BigDecimal.ONE;
@@ -111,6 +111,16 @@ public class UtilUserProfile {
         artOwnerDto.setUserProfile(userProfileDto);
         var response = userProfileService.saveArtOwner(artOwnerDto, principalId);
         utilUser.addRoleToUserWithId(ART_OWNER, userId);
+        return response;
+    }
+
+    public EvaluatorDto savedEvaluatorDto(long userId) {
+        var userProfileDto = savedUserProfileDto(userId);
+        var principalId = userProfileDto.getUserId();
+        var evaluatorDto = new EvaluatorDto();
+        evaluatorDto.setUserProfile(userProfileDto);
+        var response = userProfileService.saveEvaluator(evaluatorDto, principalId);
+        utilUser.addRoleToUserWithId(EVALUATOR, userId);
         return response;
     }
 

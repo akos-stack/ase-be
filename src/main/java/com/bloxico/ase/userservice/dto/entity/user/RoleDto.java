@@ -1,5 +1,6 @@
 package com.bloxico.ase.userservice.dto.entity.user;
 
+import com.bloxico.ase.userservice.dto.entity.BaseEntityDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -7,11 +8,8 @@ import lombok.EqualsAndHashCode;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(of = "name")
-public class RoleDto {
-
-    @JsonProperty("id")
-    private Long id;
+@EqualsAndHashCode(of = "name", callSuper = false)
+public class RoleDto extends BaseEntityDto {
 
     @JsonProperty("name")
     private String name;

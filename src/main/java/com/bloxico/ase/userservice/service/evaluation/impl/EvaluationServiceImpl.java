@@ -1,13 +1,9 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
-import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.*;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
-import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
-import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageCountryRepository;
-import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageRepository;
+import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.ISearchCountryEvaluationDetailsRequest;
@@ -66,20 +62,20 @@ public class EvaluationServiceImpl implements IEvaluationService {
     @Override
     public Page<CountryEvaluationDetailsWithEvaluatorsCountProj> searchCountryEvaluationDetails(
             ISearchCountryEvaluationDetailsRequest request,
-            PageRequest pageDetails)
+            PageRequest page)
     {
-        log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - start | request: {}, pageDetails: {}", request, pageDetails);
+        log.debug("EvaluationServiceImpl.searchCountryEvaluationDetails - start | request: {}, page: {}", request, page);
         requireNonNull(request);
-        requireNonNull(pageDetails);
-        var page = countryEvaluationDetailsRepository
+        requireNonNull(page);
+        var result = countryEvaluationDetailsRepository
                 .findAllCountryEvaluationDetailsWithEvaluatorsCount(
                         request.getSearch(),
                         request.getRegions(),
                         request.includeCountriesWithoutEvaluationDetails(),
-                        pageDetails.toPageableUnsafe())
+                        page.toPageableUnsafe())
                 .map(MAPPER::toCountedProj);
-        log.debug("EvaluationServiceImpl.findAllCountriesWithEvaluationDetails - end | request: {}, pageDetails: {}", request, pageDetails);
-        return page;
+        log.debug("EvaluationServiceImpl.searchCountryEvaluationDetails - end | request: {}, page: {}", request, page);
+        return result;
     }
 
     @Override
@@ -121,19 +117,20 @@ public class EvaluationServiceImpl implements IEvaluationService {
     @Override
     public Page<RegionWithCountriesAndEvaluatorsCountProj> searchRegionEvaluationDetails(
             SearchRegionEvaluationDetailsRequest request,
-            PageRequest pageDetails)
+            PageRequest page)
     {
-        log.debug("EvaluationServiceImpl.findAllRegions - start | request: {}, pageDetails: {}", request, pageDetails);
+        log.debug("EvaluationServiceImpl.searchRegionEvaluationDetails - start | request: {}, page: {}", request, page);
         requireNonNull(request);
-        requireNonNull(pageDetails);
-        var page = countryEvaluationDetailsRepository
+        requireNonNull(page);
+        var result = countryEvaluationDetailsRepository
                 .findAllRegionsWithCountriesAndEvaluatorsCount(
                         request.getSearch(),
-                        pageDetails.toPageableUnsafe());
-        log.debug("EvaluationServiceImpl.findAllRegions - end | request: {}, pageDetails: {}", request, pageDetails);
-        return page;
+                        page.toPageableUnsafe());
+        log.debug("EvaluationServiceImpl.searchRegionEvaluationDetails - end | request: {}, page: {}", request, page);
+        return result;
     }
 
+    @Override
     public QuotationPackageDto saveQuotationPackage(QuotationPackageDto dto) {
         log.debug("EvaluationServiceImpl.saveQuotationPackageDto - start | dto: {}", dto);
         requireNonNull(dto);
@@ -147,11 +144,10 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public Set<QuotationPackageCountryDto> saveQuotationPackageCountries(long packageId,
-                                                                         Collection<QuotationPackageCountryDto> dtos)
+    public Set<QuotationPackageCountryDto> saveQuotationPackageCountries(
+            long packageId, Collection<QuotationPackageCountryDto> dtos)
     {
-        log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - start | packageId: {}, dtos: {}",
-                packageId, dtos);
+        log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - start | packageId: {}, dtos: {}", packageId, dtos);
         requireNonNull(dtos);
         var quotationPackageCountryDtos = dtos
                 .stream()
@@ -161,8 +157,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
                 .map(quotationPackageCountryRepository::saveAndFlush)
                 .map(MAPPER::toDto)
                 .collect(toSet());
-        log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - end | packageId: {}, dtos: {}",
-                packageId, dtos);
+        log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - end | packageId: {}, dtos: {}", packageId, dtos);
         return quotationPackageCountryDtos;
     }
 

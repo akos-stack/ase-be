@@ -143,7 +143,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
             var principalId = evaluatorDto.getUserProfile().getUserId();
             var documentId = documentService.saveDocument(profileImage, IMAGE, principalId).getId();
             var userProfileId = evaluatorDto.getUserProfile().getId();
-            userProfileService.saveUserProfileDocument(userProfileId, documentId);
+            userProfileService.saveUserProfileDocument(userProfileId, documentId, principalId);
         }
         log.info("UserRegistrationFacadeImpl.submitEvaluator - end | request: {}", request);
         return evaluatorDto;
@@ -160,7 +160,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
             var principalId = artOwnerDto.getUserProfile().getUserId();
             var documentId = documentService.saveDocument(profileImage, IMAGE, principalId).getId();
             var userProfileId = artOwnerDto.getUserProfile().getId();
-            userProfileService.saveUserProfileDocument(userProfileId, documentId);
+            userProfileService.saveUserProfileDocument(userProfileId, documentId, userId);
         }
         mailUtil.sendTokenEmail(VERIFICATION, request.getEmail(), tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.submitArtOwner - end | request: {}", request);
@@ -189,7 +189,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public ByteArrayResource downloadEvaluatorResume(DownloadEvaluatorResumeRequest request) {
         log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - start | request: {}", request);
         var pendingEvaluatorDocumentDto = pendingEvaluatorService.getEvaluatorResume(request.getEmail());
-        var response = documentService.getDocumentById(pendingEvaluatorDocumentDto.getDocumentId());
+        var response = documentService.findDocumentById(pendingEvaluatorDocumentDto.getDocumentId());
         log.info("UserRegistrationFacadeImpl.downloadEvaluatorResume - end | request: {}", request);
         return response;
     }

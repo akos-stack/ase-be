@@ -1,14 +1,9 @@
 package com.bloxico.ase.userservice.service.user.impl;
 
-import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.*;
 import com.bloxico.ase.userservice.entity.user.profile.UserProfileDocument;
-import com.bloxico.ase.userservice.entity.user.profile.UserProfileDocumentId;
-import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
-import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
-import com.bloxico.ase.userservice.repository.user.profile.UserProfileDocumentRepository;
-import com.bloxico.ase.userservice.repository.user.profile.UserProfileRepository;
+import com.bloxico.ase.userservice.entity.user.profile.UserProfileDocument.Id;
+import com.bloxico.ase.userservice.repository.user.profile.*;
 import com.bloxico.ase.userservice.service.user.IUserProfileService;
 import com.bloxico.ase.userservice.web.model.user.UpdateUserProfileRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +43,17 @@ public class UserProfileServiceImpl implements IUserProfileService {
                 .map(MAPPER::toDto)
                 .orElseThrow(USER_NOT_FOUND::newException);
         log.debug("UserProfileServiceImpl.findUserProfileByUserId - end | id: {}", id);
+        return userProfileDto;
+    }
+
+    @Override
+    public UserProfileDto findUserProfileById(Long id) {
+        log.debug("UserProfileServiceImpl.findUserProfileById - start | id: {}", id);
+        var userProfileDto = userProfileRepository
+                .findById(id)
+                .map(MAPPER::toDto)
+                .orElseThrow(USER_NOT_FOUND::newException);
+        log.debug("UserProfileServiceImpl.findUserProfileById - end | id: {}", id);
         return userProfileDto;
     }
 
@@ -102,22 +108,25 @@ public class UserProfileServiceImpl implements IUserProfileService {
 
     @Override
     public ArtOwnerDto findArtOwnerByUserId(long id) {
-        log.debug("UserProfileServiceImpl.getArtOwnerById - start | id: {}",id);
-        var response = artOwnerRepository.findByUserProfile_UserId(id).map(MAPPER::toDto).orElseThrow(USER_NOT_FOUND::newException);
-        log.debug("UserProfileServiceImpl.getArtOwnerById - end | id: {}",id);
+        log.debug("UserProfileServiceImpl.findArtOwnerByUserId - start | id: {}", id);
+        var response = artOwnerRepository
+                .findByUserProfile_UserId(id)
+                .map(MAPPER::toDto)
+                .orElseThrow(USER_NOT_FOUND::newException);
+        log.debug("UserProfileServiceImpl.findArtOwnerByUserId - end | id: {}", id);
         return response;
     }
 
     @Override
-    public void saveUserProfileDocument(Long userId, long documentId) {
-        log.debug("UserServiceImpl.saveUserProfileDocument - start | userId: {}, documentId {}", userId, documentId);
+    public void saveUserProfileDocument(long userProfileId, long documentId, long principalId) {
+        log.debug("UserServiceImpl.saveUserProfileDocument - start | userProfileId: {}, documentId: {}, principalId: {}",
+                userProfileId, documentId, principalId);
         var userProfileDocument = new UserProfileDocument();
-        var userProfileDocumentId = new UserProfileDocumentId();
-        userProfileDocumentId.setDocumentId(documentId);
-        userProfileDocumentId.setUserProfileId(userId);
-        userProfileDocument.setUserProfileDocumentId(userProfileDocumentId);
+        userProfileDocument.setId(new Id(userProfileId, documentId));
+        userProfileDocument.setCreatorId(principalId);
         userProfileDocumentRepository.saveAndFlush(userProfileDocument);
-        log.debug("UserServiceImpl.saveUserProfileDocument - end | userId: {}, documentId {}", userId, documentId);
+        log.debug("UserServiceImpl.saveUserProfileDocument - end | userProfileId: {}, documentId: {}, principalId: {}",
+                userProfileId, documentId, principalId);
     }
 
 }

@@ -50,8 +50,8 @@ import org.junit.runners.Suite;
         EvaluationServiceImplTest.class,
         DocumentServiceImplTest.class,
         ArtistServiceImplTest.class,
-        ArtworkGroupServiceImplTest.class,
         ArtworkServiceImplTest.class,
+        ArtworkDocumentsServiceImplTest.class,
         ConfigServiceImplTest.class,
         ConstantServiceImplTest.class,
 
@@ -65,6 +65,7 @@ import org.junit.runners.Suite;
         ArtworkMetadataFacadeImplTest.class,
         EvaluationFacadeImplTest.class,
         ArtworkFacadeImplTest.class,
+        ArtworkDocumentsFacadeImplTest.class,
         AWSUtilTest.class,
         SystemFacadeImplTest.class,
 
@@ -79,6 +80,7 @@ import org.junit.runners.Suite;
         UserManagementApiTest.class,
         ArtworkMetadataApiTest.class,
         ArtworkApiTest.class,
+        ArtworkDocumentsApiTest.class,
         EvaluationApiTest.class,
         SystemApiTest.class
 })

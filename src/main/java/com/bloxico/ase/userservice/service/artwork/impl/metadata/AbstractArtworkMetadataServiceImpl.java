@@ -16,6 +16,7 @@ import java.util.List;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.Functions.doto;
+import static com.bloxico.ase.userservice.util.Functions.ifNull;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_METADATA_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
@@ -77,9 +78,8 @@ abstract class AbstractArtworkMetadataServiceImpl<T extends ArtworkMetadata> imp
         log.debug("AbstractArtworkMetadataServiceImpl[{}].searchArtworkMetadata - start | request: {}, page: {}", getType(), request, page);
         requireNonNull(request);
         requireNonNull(page);
-        var pageable = page.toPageable();
         var artworkMetadataDtos = repository
-                .search(request.getStatus(), request.getName(), pageable)
+                .search(request.getStatus(), request.getName(), page.toPageable())
                 .map(MAPPER::toDto);
         log.debug("AbstractArtworkMetadataServiceImpl[{}].searchArtworkMetadata - end | request: {}, page: {}", getType(), request, page);
         return artworkMetadataDtos;
@@ -90,7 +90,7 @@ abstract class AbstractArtworkMetadataServiceImpl<T extends ArtworkMetadata> imp
         log.debug("AbstractArtworkMetadataServiceImpl[{}].searchApprovedArtworkMetadata - start | request: {}", getType(), request);
         requireNonNull(request);
         var artworkMetadataDtos = repository
-                .findAllByStatusAndNameContains(APPROVED, request.getName() != null ? request.getName() : "")
+                .findAllByStatusAndNameContains(APPROVED, ifNull(request.getName(), ""))
                 .stream()
                 .map(MAPPER::toDto)
                 .collect(toList());
