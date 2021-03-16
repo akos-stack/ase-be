@@ -6,6 +6,7 @@ import com.bloxico.ase.userservice.entity.artwork.Artist;
 import com.bloxico.ase.userservice.entity.artwork.Artwork.Status;
 import com.bloxico.ase.userservice.facade.impl.ArtworkFacadeImpl;
 import com.bloxico.ase.userservice.repository.artwork.ArtistRepository;
+import com.bloxico.ase.userservice.service.artwork.impl.ArtworkDocumentServiceImpl;
 import com.bloxico.ase.userservice.service.artwork.impl.ArtworkServiceImpl;
 import com.bloxico.ase.userservice.util.FileCategory;
 import com.bloxico.ase.userservice.web.model.WithOwner;
@@ -21,6 +22,7 @@ import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadat
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.FileCategory.PRINCIPAL_IMAGE;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 @Component
 public class UtilArtwork {
@@ -33,6 +35,7 @@ public class UtilArtwork {
     @Autowired private ArtistRepository artistRepository;
     @Autowired private ArtworkServiceImpl artworkService;
     @Autowired private ArtworkFacadeImpl artworkFacade;
+    @Autowired private ArtworkDocumentServiceImpl artworkDocumentService;
 
     public Artist savedArtist() {
         var creatorId = utilUser.savedAdmin().getId();
@@ -157,6 +160,14 @@ public class UtilArtwork {
         map.put("artworkId", String.valueOf(saved(genArtworkDto()).getId()));
         map.put("fileCategory", fileCategory.name());
         return map;
+    }
+
+    public void saveArtworkDocuments(long artworkId) {
+        var documents = Arrays
+                .stream(FileCategory.values())
+                .map(utilDocument::savedDocumentDto)
+                .collect(toList());
+        artworkDocumentService.saveArtworkDocuments(artworkId, documents);
     }
 
     public long ownerIdOf(long artworkId) {

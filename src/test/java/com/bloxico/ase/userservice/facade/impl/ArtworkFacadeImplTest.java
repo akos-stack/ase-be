@@ -8,17 +8,23 @@ import com.bloxico.ase.userservice.exception.ArtworkException;
 import com.bloxico.ase.userservice.service.artwork.impl.ArtworkDocumentServiceImpl;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
 import com.bloxico.ase.userservice.web.model.WithOwner;
+import com.bloxico.ase.userservice.web.model.artwork.DeleteArtworkRequest;
 import com.bloxico.ase.userservice.web.model.artwork.FindByArtworkIdRequest;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static com.bloxico.ase.testutil.Util.allPages;
 import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.*;
+import static com.bloxico.ase.userservice.entity.user.Role.ART_OWNER;
 import static com.bloxico.ase.userservice.util.FileCategory.CERTIFICATE;
 import static com.bloxico.ase.userservice.util.FileCategory.CV;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasItems;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -28,6 +34,7 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilDocument utilDocument;
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private AseSecurityContext securityContext;
+    @Autowired private UtilSecurityContext utilSecurityContext;
     @Autowired private IDocumentService documentService;
     @Autowired private ArtworkFacadeImpl artworkFacade;
     @Autowired private ArtworkDocumentServiceImpl artworkDocumentService;
@@ -163,71 +170,110 @@ public class ArtworkFacadeImplTest extends AbstractSpringTestWithAWS {
         // TODO ADD more assertions
     }
 
-//    @Test
-//    @WithMockCustomUser
-//    public void searchArtworks_ok_owner() {
-//        var m1 = utilArtwork.savedArtworkDto();
-//        var m2 = utilArtwork.savedArtworkDto();
-//        var m3 = utilArtwork.savedArtworkDto();
-//        var m4 = utilArtwork.savedArtworkDto(Artwork.Status.WAITING_FOR_EVALUATION);
-//        var m5 = utilArtwork.savedArtworkDtoWithOwner();
-//        assertThat(
-//                artworkFacade
-//                        .searchArtworks(genSearchArtworksRequest(Artwork.Status.DRAFT), allPages())
-//                        .getPage()
-//                        .getContent(),
-//                Matchers.allOf(
-//                        hasItems(m1, m2, m3),
-//                        not(hasItems(m4, m5))));
-//    }
-//
-//    @Test
-//    @WithMockCustomUser
-//    public void searchArtworks_ok_admin() {
-//        var m1 = utilArtwork.savedArtworkDtoWithOwner();
-//        var m2 = utilArtwork.savedArtworkDtoWithOwner();
-//        var m3 = utilArtwork.savedArtworkDtoWithOwner();
-//        var m4 = utilArtwork.savedArtworkDtoWithOwner(WAITING_FOR_EVALUATION);
-//        var m5 = utilArtwork.savedArtworkDtoWithOwner();
-//        assertThat(
-//                artworkFacade.searchArtworks(genSearchArtworksRequest(Artwork.Status.DRAFT), allPages())
-//                        .getPage()
-//                        .getContent(),
-//                Matchers.allOf(
-//                        hasItems(m1, m2, m3, m5),
-//                        not(hasItems(m4))));
-//    }
-//
-//    @Test
-//    @WithMockCustomUser
-//    public void deleteArtwork_notAllowed() {
-//        var request = utilArtwork.savedArtworkDtoWithOwner();
-//        assertThrows(
-//                UserException.class,
-//                () -> artworkFacade.deleteArtwork(request.getId()));
-//    }
-//
-//    @Test
-//    @WithMockCustomUser
-//    public void deleteArtwork_notFound() {
-//        assertThrows(
-//                ArtworkException.class,
-//                () -> artworkFacade.deleteArtwork(-1L));
-//    }
-//
-//    @Test
-//    @WithMockCustomUser
-//    public void deleteArtwork() {
-//        var request = utilArtwork.savedArtworkDto();
-//        artworkFacade.deleteArtwork(request.getId());
-//        assertThrows(
-//                ArtworkException.class,
-//                () -> artworkFacade.findMyArtworkById(request.getId()));
-//        for (var documentDto : request.getDocuments()) {
-//            assertThrows(
-//                    DocumentException.class,
-//                    () -> documentService.findDocumentById(documentDto.getId()));
-//        }
-//    }
+    @Test
+    @WithMockCustomUser
+    public void searchArtworks_anyOwner() {
+        var artwork1 = utilArtwork.saved(utilArtwork.genArtworkDto(DRAFT));
+        var artwork2 = utilArtwork.saved(utilArtwork.genArtworkDto(READY_FOR_EVALUATION));
+        var artwork3 = utilArtwork.saved(utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION));
+        assertThat(artworkFacade
+                        .searchArtworks(
+                                WithOwner.any(new SearchArtworkRequest(null, null)),
+                                allPages())
+                        .getPage().getContent(),
+                hasItems(artwork1, artwork2, artwork3));
+        assertThat(
+                artworkFacade
+                        .searchArtworks(
+                                WithOwner.any(new SearchArtworkRequest(artwork1.getStatus(), null)),
+                                allPages())
+                        .getPage().getContent(),
+                allOf(hasItems(artwork1), not(hasItems(artwork2, artwork3))));
+        assertThat(
+                artworkFacade
+                        .searchArtworks(
+                                WithOwner.any(new SearchArtworkRequest(artwork3.getStatus(), artwork3.getTitle())),
+                                allPages())
+                        .getPage().getContent(),
+                allOf(hasItems(artwork3), not(hasItems(artwork1, artwork2))));
+        assertThat(
+                artworkFacade
+                        .searchArtworks(
+                                WithOwner.any(new SearchArtworkRequest(null, artwork3.getTitle())),
+                                allPages())
+                        .getPage().getContent(),
+                allOf(hasItems(artwork3), not(hasItems(artwork1, artwork2))));
+    }
+
+    @Test
+    @WithMockCustomUser(role = ART_OWNER)
+    public void searchArtworks_ofOwner() {
+        var ownerId = utilSecurityContext.getLoggedInArtOwner().getId();
+        var artwork1 = utilArtwork.saved(utilArtwork.genArtworkDto(DRAFT));
+        var artwork2 = utilArtwork.saved(utilArtwork.genArtworkDto(READY_FOR_EVALUATION));
+        var artwork3 = utilArtwork.saved(utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION));
+        var artwork4 = utilArtwork.saved(utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION, ownerId));
+        var artwork5 = utilArtwork.saved(utilArtwork.genArtworkDto(READY_FOR_EVALUATION, ownerId));
+        var artwork6 = utilArtwork.saved(utilArtwork.genArtworkDto(DRAFT, ownerId));
+        assertThat(artworkFacade
+                        .searchArtworks(
+                                WithOwner.of(ownerId, new SearchArtworkRequest(null, null)),
+                                allPages())
+                        .getPage().getContent(),
+                allOf(hasItems(artwork3, artwork4, artwork5, artwork6), not(hasItems(artwork1, artwork2))));
+        assertThat(
+                artworkFacade
+                        .searchArtworks(
+                                WithOwner.of(ownerId, new SearchArtworkRequest(artwork1.getStatus(), null)),
+                                allPages())
+                        .getPage().getContent(),
+                allOf(hasItems(artwork6), not(hasItems(artwork1, artwork2, artwork3, artwork4, artwork5))));
+        assertThat(
+                artworkFacade
+                        .searchArtworks(
+                                WithOwner.of(ownerId, new SearchArtworkRequest(artwork3.getStatus(), artwork3.getTitle())),
+                                allPages())
+                        .getPage().getContent(),
+                allOf(hasItems(artwork3), not(hasItems(artwork1, artwork2, artwork4, artwork5, artwork6))));
+        assertThat(
+                artworkFacade
+                        .searchArtworks(
+                                WithOwner.of(ownerId, new SearchArtworkRequest(null, artwork3.getTitle())),
+                                allPages())
+                        .getPage().getContent(),
+                allOf(hasItems(artwork3), not(hasItems(artwork1, artwork2, artwork4, artwork5, artwork6))));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void deleteArtwork_notAllowed() {
+        var request = utilArtwork.genUpdateArtworkDataRequest(DRAFT);
+        var ownerId = utilUserProfile.savedArtOwnerDto().getId();
+        assertThrows(
+                ArtworkException.class,
+                () -> artworkFacade.updateArtworkData(
+                        WithOwner.of(ownerId, request)));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void deleteArtwork_notFound() {
+        assertThrows(
+                ArtworkException.class,
+                () -> artworkFacade.deleteArtwork(WithOwner.any(
+                        new DeleteArtworkRequest(-1L))));
+    }
+
+    @Test
+    @WithMockCustomUser(role = ART_OWNER)
+    public void deleteArtwork() {
+        var request = utilArtwork.saved(utilArtwork.genArtworkDto());
+        artworkFacade.deleteArtwork(WithOwner.of(securityContext.getArtOwnerId(), new DeleteArtworkRequest(request.getId())));
+        assertThrows(
+                ArtworkException.class,
+                () -> artworkFacade.findArtworkById(WithOwner.any(new FindByArtworkIdRequest(request.getId()))));
+        var documents = documentService.findDocumentsByArtworkId(request.getId());
+        assertTrue(documents.isEmpty());
+    }
 
 }
