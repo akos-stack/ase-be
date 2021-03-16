@@ -8,9 +8,11 @@ import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.exception.ArtworkException;
 import com.bloxico.ase.userservice.exception.S3Exception;
 import com.bloxico.ase.userservice.service.artwork.impl.ArtworkDocumentServiceImpl;
+import com.bloxico.ase.userservice.service.document.impl.DocumentServiceImpl;
 import com.bloxico.ase.userservice.web.model.WithOwner;
 import com.bloxico.ase.userservice.web.model.artwork.ArtworkDocumentRequest;
 import com.bloxico.ase.userservice.web.model.artwork.UploadArtworkDocumentsRequest;
+import com.bloxico.ase.userservice.web.model.artwork.metadata.SetArtworkPrincipalImageRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,6 +35,7 @@ public class ArtworkDocumentsFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private ArtworkDocumentServiceImpl artworkDocumentService;
     @Autowired private ArtworkDocumentsFacadeImpl artworkDocumentsFacade;
     @Autowired private UtilSecurityContext utilSecurityContext;
+    @Autowired private DocumentServiceImpl documentService;
 
     // TODO ADD downloadArtworkDocument_artworkNotExists
 
@@ -257,4 +260,82 @@ public class ArtworkDocumentsFacadeImplTest extends AbstractSpringTestWithAWS {
                 not(hasItems(document1.getId(), document2.getId())));
     }
 
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER)
+    public void setPrincipalImg_notAllowed() {
+        var artwork = utilArtwork.saved(
+                utilArtwork.genArtworkDto(Artwork.Status.DRAFT));
+        var document = utilArtwork.saveArtworkDocument(artwork.getId(), IMAGE);
+        assertThrows(
+                ArtworkException.class,
+                () -> artworkDocumentsFacade.setPrincipalImage(WithOwner.of(utilSecurityContext.getLoggedInArtOwner().getId(),
+                        new SetArtworkPrincipalImageRequest(artwork.getId(), document.getId()))));
+
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER)
+    public void setPrincipalImg_notFound() {
+        var artwork = utilArtwork.saved(
+                utilArtwork.genArtworkDto(Artwork.Status.DRAFT));
+        assertThrows(
+                ArtworkException.class,
+                () -> artworkDocumentsFacade.setPrincipalImage(WithOwner.of(utilSecurityContext.getLoggedInArtOwner().getId(),
+                        new SetArtworkPrincipalImageRequest(-1L, 1L))));
+
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER)
+    public void setPrincipalImg_artworkDocumentNotFound() {
+        var artwork = utilArtwork.saved(
+                utilArtwork.genArtworkDto(Artwork.Status.DRAFT, utilSecurityContext.getLoggedInArtOwner().getId()));
+        var document = utilDocument.savedDocumentDto(IMAGE);
+        assertThrows(
+                ArtworkException.class,
+                () -> artworkDocumentsFacade.setPrincipalImage(WithOwner.of(utilSecurityContext.getLoggedInArtOwner().getId(),
+                        new SetArtworkPrincipalImageRequest(artwork.getId(), document.getId()))));
+
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER)
+    public void setPrincipalImg_documentIsNotImage() {
+        var artwork = utilArtwork.saved(
+                utilArtwork.genArtworkDto(Artwork.Status.DRAFT, utilSecurityContext.getLoggedInArtOwner().getId()));
+        var document = utilArtwork.saveArtworkDocument(artwork.getId(), CERTIFICATE);
+        assertThrows(
+                ArtworkException.class,
+                () -> artworkDocumentsFacade.setPrincipalImage(WithOwner.of(utilSecurityContext.getLoggedInArtOwner().getId(),
+                        new SetArtworkPrincipalImageRequest(artwork.getId(), document.getId()))));
+
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER)
+    public void setPrincipalImg_withOwner() {
+        var artwork = utilArtwork.saved(
+                utilArtwork.genArtworkDto(Artwork.Status.DRAFT, utilSecurityContext.getLoggedInArtOwner().getId()));
+        var document = utilArtwork.saveArtworkDocument(artwork.getId(), IMAGE);
+        artworkDocumentsFacade.setPrincipalImage(WithOwner.of(utilSecurityContext.getLoggedInArtOwner().getId(),
+                new SetArtworkPrincipalImageRequest(artwork.getId(), document.getId())));
+        var documents = documentService.findDocumentsByArtworkId(artwork.getId());
+        assertNotNull(documents);
+        assertTrue(documents.stream().findFirst().isPresent());
+        assertSame(documents.stream().findFirst().get().getType(), PRINCIPAL_IMAGE);
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ART_OWNER)
+    public void setPrincipalImg_anyOwner() {
+        var artwork = utilArtwork.saved(
+                utilArtwork.genArtworkDto(Artwork.Status.DRAFT));
+        var document = utilArtwork.saveArtworkDocument(artwork.getId(), IMAGE);
+        artworkDocumentsFacade.setPrincipalImage(WithOwner.any(
+                new SetArtworkPrincipalImageRequest(artwork.getId(), document.getId())));
+        var documents = documentService.findDocumentsByArtworkId(artwork.getId());
+        assertNotNull(documents);
+        assertTrue(documents.stream().findFirst().isPresent());
+        assertSame(documents.stream().findFirst().get().getType(), PRINCIPAL_IMAGE);
+    }
 }
