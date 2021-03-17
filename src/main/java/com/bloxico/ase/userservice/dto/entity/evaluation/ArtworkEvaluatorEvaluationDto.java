@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigDecimal;
+
 @Data
 @EqualsAndHashCode(of = {"artworkId", "evaluatorId"}, callSuper = false)
 public class ArtworkEvaluatorEvaluationDto {
@@ -18,10 +20,10 @@ public class ArtworkEvaluatorEvaluationDto {
     private Long countryId;
 
     @JsonProperty("value")
-    private Integer value;
+    private BigDecimal value;
 
     @JsonProperty("selling_price")
-    private Integer sellingPrice;
+    private BigDecimal sellingPrice;
 
     @JsonProperty("ase_sellable")
     private Boolean aseSellable;
