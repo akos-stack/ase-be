@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
 
 @Data
-@EqualsAndHashCode(of = {"artworkId", "evaluatorId"}, callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 public class ArtworkEvaluatorEvaluationDto {
 
     @JsonProperty("artwork_id")

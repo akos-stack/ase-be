@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import java.math.BigDecimal;
 
 @Data
-@EqualsAndHashCode(of = {"artworkId", "evaluatorId"}, callSuper = false)
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "artwork_evaluator_evaluations")
 public class ArtworkEvaluatorEvaluation extends BaseEntity {

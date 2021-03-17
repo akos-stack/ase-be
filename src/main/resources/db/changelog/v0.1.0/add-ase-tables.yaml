@@ -1465,8 +1465,8 @@ databaseChangeLog:
                   name: creator_id
                   type: bigint
                   constraints:
-                    nullable: true # when user created itself
-                    foreignKeyName: fk_user_creator
+                    nullable: false
+                    foreignKeyName: fk_artwork_evaluator_evaluation_creator
                     references: users(id)
               - column:
                   name: created_at
@@ -1478,7 +1478,7 @@ databaseChangeLog:
                   name: updater_id
                   type: bigint
                   constraints:
-                    foreignKeyName: fk_user_updater
+                    foreignKeyName: fk_artwork_evaluator_evaluation_updater
                     references: users(id)
               - column:
                   name: updated_at
