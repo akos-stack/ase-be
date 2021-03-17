@@ -219,10 +219,8 @@ public class PageRequestTest extends AbstractSpringTest {
         }
     }
 
-
-    // Sort by entity fields (uses Sort.by)
     @Test
-    public void pageRequest_200_sortedByEmail() {
+    public void pageRequest_200_sortedByEmail_safeSort() {
         var email = genEmail();
         var u1 = utilUser.savedUserDtoWithEmail("ac" + email);
         var u2 = utilUser.savedUserDtoWithEmail("aa" + email);
@@ -273,7 +271,7 @@ public class PageRequestTest extends AbstractSpringTest {
     }
 
     @Test
-    public void pageRequest_200_sortedByNameAndEmail() {
+    public void pageRequest_200_sortedByNameAndEmail_safeSort() {
         var email = genUUID();
         var u1 = utilUser.savedUserDtoWithEmailAndName("ac" + email, "AUser");
         var u2 = utilUser.savedUserDtoWithEmailAndName("ad" + email, "AUser");
@@ -325,7 +323,7 @@ public class PageRequestTest extends AbstractSpringTest {
     }
 
     @Test
-    public void pageRequest_200_sortedByNameAndEmailWithOrderDesc() {
+    public void pageRequest_200_sortedByNameAndEmailWithOrderDesc_safeSort() {
         var email = genUUID();
         var u1 = utilUser.savedUserDtoWithEmailAndName("ac" + email, "AUser");
         var u2 = utilUser.savedUserDtoWithEmailAndName("ad" + email, "AUser");
@@ -379,7 +377,7 @@ public class PageRequestTest extends AbstractSpringTest {
     }
 
     @Test
-    public void pageRequest_200_sortedByNameAndEmailWithInvalidOrder() {
+    public void pageRequest_200_sortedByNameAndEmailWithInvalidOrder_safeSort() {
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .queryParam("email", genEmail())
@@ -394,9 +392,8 @@ public class PageRequestTest extends AbstractSpringTest {
                 .statusCode(400);
     }
 
-    // Sort by JPQL aliases (uses JpaSort.unsafe)
     @Test
-    public void pageRequest_200_sortedByName() {
+    public void pageRequest_200_sortedByName_unsafeSort() {
         var region = genUUID();
         var r1 = utilEvaluation.savedRegionCountedProj("ac" + region);
         var r2 = utilEvaluation.savedRegionCountedProj("aa" + region);
@@ -447,7 +444,7 @@ public class PageRequestTest extends AbstractSpringTest {
     }
 
     @Test
-    public void pageRequest_200_sortedByIdAndName() {
+    public void pageRequest_200_sortedByIdAndName_unsafeSort() {
         var region = genUUID();
         var r1 = utilEvaluation.savedRegionCountedProj("ac" + region);
         var r2 = utilEvaluation.savedRegionCountedProj("aa" + region);
@@ -498,7 +495,7 @@ public class PageRequestTest extends AbstractSpringTest {
     }
 
     @Test
-    public void pageRequest_200_sortedByIdAndNameWithOrderDesc() {
+    public void pageRequest_200_sortedByIdAndNameWithOrderDesc_unsafeSort() {
         var region = genUUID();
         var r1 = utilEvaluation.savedRegionCountedProj("ac" + region);
         var r2 = utilEvaluation.savedRegionCountedProj("aa" + region);
@@ -551,7 +548,7 @@ public class PageRequestTest extends AbstractSpringTest {
     }
 
     @Test
-    public void pageRequest_200_sortedByIdAndNameWithInvalidOrder() {
+    public void pageRequest_200_sortedByIdAndNameWithInvalidOrder_unsafeSort() {
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .queryParam("search", genUUID())
@@ -567,7 +564,7 @@ public class PageRequestTest extends AbstractSpringTest {
     }
 
     @Test
-    public void pageRequest_200_withOrderWithoutSort() {
+    public void pageRequest_200_withOrderWithoutSort_unsafeSort() {
         var region = genUUID();
         var r1 = utilEvaluation.savedRegionCountedProj(genWithSubstring(region));
         var r2 = utilEvaluation.savedRegionCountedProj(genWithSubstring(region));
