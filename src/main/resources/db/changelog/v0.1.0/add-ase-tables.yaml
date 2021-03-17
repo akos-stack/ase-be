@@ -1400,6 +1400,96 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - createTable:
+            tableName: artwork_evaluator_evaluations
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: artwork_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_artwork_artwork_evaluator_evaluation
+                    references: artworks(id)
+              - column:
+                  name: evaluator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_evaluator_artwork_evaluator_evaluation
+                    references: evaluators(id)
+              - column:
+                  name: country_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_country_artwork_evaluator_evaluation
+                    references: countries(id)
+              - column:
+                  name: value
+                  type: numeric
+                  constraints:
+                    nullable: false
+              - column:
+                  name: selling_price
+                  type: numeric
+                  constraints:
+                    nullable: false
+              - column:
+                  name: ase_sellable
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: send_offer
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rating
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: varchar(256)
+                  constraints:
+                    nullable: true
+              # METADATA
+              - column:
+                  name: creator_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_artwork_evaluator_evaluation_creator
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: timestamp
+                  defaultValueComputed: "CURRENT_TIMESTAMP"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updater_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_artwork_evaluator_evaluation_updater
+                    references: users(id)
+              - column:
+                  name: updated_at
+                  type: timestamp
+              - column:
+                  name: version
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+        - createTable:
             tableName: quotation_packages_countries
             columns:
               - column:
