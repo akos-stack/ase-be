@@ -26,6 +26,7 @@ import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.FileCategory.CV;
 import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.EVALUATOR_INVITATION;
+import static com.bloxico.ase.userservice.util.MailUtil.Template.HOST_INVITATION;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.VERIFICATION;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
 
@@ -194,6 +195,15 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         return response;
     }
 
+    @Override
+    public void sendHostInvitation(HostInvitationRequest request) {
+        log.info("UserRegistrationFacadeImpl.sendHostInvitation - start | request: {}", request);
+        var userDto = userService.findUserById(request.getUserId());
+        var token = registrationTokenService.createTokenForUser(request.getUserId());
+        mailUtil.sendTokenEmail(HOST_INVITATION, userDto.getEmail(), token.getValue());
+        log.info("UserRegistrationFacadeImpl.sendHostInvitation - end | request: {}", request);
+    }
+
     // HELPER METHODS
 
     private LocationDto doSaveLocation(ISubmitUserProfileRequest request, Long principalId) {
@@ -230,5 +240,4 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         evaluatorDto.setUserProfile(userProfileDto);
         return userProfileService.saveEvaluator(evaluatorDto, userProfileDto.getUserId());
     }
-
 }
