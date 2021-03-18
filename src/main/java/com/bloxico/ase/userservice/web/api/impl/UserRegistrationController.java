@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 public class UserRegistrationController implements UserRegistrationApi {
 
@@ -99,6 +101,12 @@ public class UserRegistrationController implements UserRegistrationApi {
     public ResponseEntity<Resource> downloadEvaluatorResume(DownloadEvaluatorResumeRequest request) {
         var response = userRegistrationFacade.downloadEvaluatorResume(request);
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> sendHostInvitation(HostInvitationRequest request) {
+        userRegistrationFacade.sendHostInvitation(request);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
