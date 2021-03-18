@@ -170,15 +170,20 @@ public class EvaluationServiceImpl implements IEvaluationService {
 
     @Override
     public Page<ArtworkEvaluatedProj> searchEvaluatedArtworks(
-            WithOwner<SearchEvaluatedArtworksRequest> withOwner, PageRequest page)
+            SearchEvaluatedArtworksRequest request, PageRequest page, Long principalId)
     {
-        log.debug("EvaluationServiceImpl.searchEvaluatedArtworks - start | withOwner: {}, page: {}", withOwner, page);
-        requireNonNull(withOwner);
+        log.debug("EvaluationServiceImpl.searchEvaluatedArtworks - start | request: {}, page: {}, principalId: {}",
+                    request, page, principalId);
+        requireNonNull(request);
         requireNonNull(page);
         var result = artworkEvaluatorEvaluationRepository
-                .search(withOwner.getOwner(),
+                .search(
+                        request.getArtName(),
+                        request.getCategories(),
+                        principalId,
                         page.toPageableUnsafe());
-        log.debug("EvaluationServiceImpl.searchEvaluatedArtworks - end | withOwner: {}, page: {}", withOwner, page);
+        log.debug("EvaluationServiceImpl.searchEvaluatedArtworks - end | request: {}, page: {}, principalId: {}",
+                request, page, principalId);
         return result;
     }
 

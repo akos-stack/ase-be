@@ -3,10 +3,8 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.userservice.dto.entity.address.CountryDto;
 import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
-import com.bloxico.ase.userservice.service.config.IConfigService;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
-import com.bloxico.ase.userservice.web.model.WithOwner;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,16 +21,13 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
 
     private final ILocationService locationService;
     private final IEvaluationService evaluationService;
-    private final IConfigService configService;
 
     @Autowired
     public EvaluationFacadeImpl(ILocationService locationService,
-                                IEvaluationService evaluationService,
-                                IConfigService configService)
+                                IEvaluationService evaluationService)
     {
         this.locationService = locationService;
         this.evaluationService = evaluationService;
-        this.configService = configService;
     }
 
     @Override
@@ -111,12 +106,14 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
 
     @Override
     public SearchEvaluatedArtworksResponse searchEvaluatedArtworks(
-            WithOwner<SearchEvaluatedArtworksRequest> withOwner, PageRequest page)
+            SearchEvaluatedArtworksRequest request, PageRequest page, Long principalId)
     {
-        log.debug("EvaluationFacadeImpl.searchEvaluatedArtworks - start | withOwner: {}, page: {}", withOwner, page);
-        var result = evaluationService.searchEvaluatedArtworks(withOwner, page);
+        log.debug("EvaluationFacadeImpl.searchEvaluatedArtworks - start | request: {}, page: {}, principalId: {}",
+                request, page, principalId);
+        var result = evaluationService.searchEvaluatedArtworks(request, page, principalId);
         var response = new SearchEvaluatedArtworksResponse(result);
-        log.debug("EvaluationFacadeImpl.searchEvaluatedArtworks - end | withOwner: {}, page: {}", withOwner, page);
+        log.debug("EvaluationFacadeImpl.searchEvaluatedArtworks - end | request: {}, page: {}, principalId: {}",
+                request, page, principalId);
         return response;
     }
 

@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.facade;
 
 import com.bloxico.ase.userservice.web.model.PageRequest;
-import com.bloxico.ase.userservice.web.model.WithOwner;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 
 public interface IEvaluationFacade {
@@ -26,6 +25,6 @@ public interface IEvaluationFacade {
             SaveQuotationPackageRequest request);
 
     SearchEvaluatedArtworksResponse searchEvaluatedArtworks(
-            WithOwner<SearchEvaluatedArtworksRequest> withOwner, PageRequest page);
+            SearchEvaluatedArtworksRequest request, PageRequest page, Long principalId);
 
 }
