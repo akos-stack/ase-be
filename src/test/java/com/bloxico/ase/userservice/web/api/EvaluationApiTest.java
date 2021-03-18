@@ -4,12 +4,18 @@ import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkResponse;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.*;
+import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.DRAFT;
+import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
+import static com.bloxico.ase.userservice.web.api.ArtworkApi.ARTWORK_SEARCH;
 import static com.bloxico.ase.userservice.web.api.EvaluationApi.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.COUNTRY_NOT_FOUND;
@@ -368,6 +374,30 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         assertNotNull(qPackage.getId());
         assertEquals(request.getArtworkId(), qPackage.getArtworkId());
         assertEquals(request.getCountries().size(), qPackage.getCountries().size());
+    }
+
+    @Test
+    @WithMockCustomUser(role = EVALUATOR, auth = true)
+    public void searchArtworkEvaluations() {
+        var evaluator = utilSecurityContext.getLoggedInEvaluator();
+        var ae1 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator);
+        var ae2 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator);
+        var ae3 = utilEvaluation.savedEvaluatedArtwork();
+        var response = given()
+                .header("Authorization", utilSecurityContext.getToken())
+                .contentType(JSON)
+                .params(allPages("search", ""))
+                .when()
+                .get(API_URL + EVALUATION_ARTWORK_EVALUATIONS_SEARCH)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SearchEvaluatedArtworksResponse.class);
+        assertThat(
+                response.getPage().getContent(),
+                allOf(hasItems(ae1, ae2), not(hasItems(ae3))));
     }
 
 }

@@ -1,8 +1,10 @@
 package com.bloxico.ase.userservice.web.api.impl;
 
+import com.bloxico.ase.userservice.config.security.AseSecurityContext;
 import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.web.api.EvaluationApi;
 import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.WithOwner;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,8 +16,8 @@ import javax.validation.Valid;
 @RestController
 public class EvaluationController implements EvaluationApi {
 
-    @Autowired
-    private IEvaluationFacade evaluationFacade;
+    @Autowired private IEvaluationFacade evaluationFacade;
+    @Autowired private AseSecurityContext security;
 
     @Override
     public ResponseEntity<SearchCountryEvaluationDetailsResponse> searchCountryEvaluationDetails(
@@ -71,6 +73,14 @@ public class EvaluationController implements EvaluationApi {
             SaveQuotationPackageRequest request)
     {
         var response = evaluationFacade.saveQuotationPackage(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<SearchEvaluatedArtworksResponse> searchArtworkEvaluations(
+            @Valid SearchEvaluatedArtworksRequest request, @Valid PageRequest page) {
+        var response = evaluationFacade
+                .searchEvaluatedArtworks(WithOwner.of(security.getEvaluatorId(), request), page);
         return ResponseEntity.ok(response);
     }
 
