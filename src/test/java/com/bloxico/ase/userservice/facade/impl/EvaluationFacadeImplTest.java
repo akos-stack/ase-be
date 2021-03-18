@@ -272,49 +272,50 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser
-    public void searchEvaluatedArtworks_nullWithOwner() {
+    public void searchEvaluatedArtworks_nullRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationFacade.searchEvaluatedArtworks(null, allPages()));
+                () -> evaluationFacade.searchEvaluatedArtworks(null, allPages(), 1l));
     }
 
     @Test
-    @WithMockCustomUser(role = EVALUATOR)
+    @WithMockCustomUser
     public void searchEvaluatedArtworks_nullPageRequest() {
-        var evaluatorId = securityContext.getLoggedInEvaluator().getId();
         var request = utilEvaluation.genSearchEvaluatedArtworksRequest();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationFacade.searchEvaluatedArtworks(WithOwner.of(evaluatorId, request), null));
+                () -> evaluationFacade.searchEvaluatedArtworks(request, null, 1l));
     }
 
     @Test
     @WithMockCustomUser(role = EVALUATOR)
     public void searchEvaluatedArtworks_ofEvaluator() {
-        var evaluator = securityContext.getLoggedInEvaluator();
+        var evaluatorId = securityContext.getLoggedInEvaluator().getId();
         var request = utilEvaluation.genSearchEvaluatedArtworksRequest();
-        var ea1 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator);
-        var ea2 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator);
+        var ea1 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluatorId);
+        var ea2 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluatorId);
         var ea3 = utilEvaluation.savedEvaluatedArtwork();
         assertThat(evaluationFacade
                         .searchEvaluatedArtworks(
-                                WithOwner.of(evaluator.getId(), request),
-                                allPages())
+                                request,
+                                allPages(),
+                                securityContext.getLoggedInUserId())
                         .getPage().getContent(),
                 allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
     }
 
     @Test
     @WithMockCustomUser
-    public void searchEvaluatedArtworks_anyEvaluator() {
+    public void searchEvaluatedArtworks_all() {
         var request = utilEvaluation.genSearchEvaluatedArtworksRequest();
         var ea1 = utilEvaluation.savedEvaluatedArtwork();
         var ea2 = utilEvaluation.savedEvaluatedArtwork();
         var ea3 = utilEvaluation.savedEvaluatedArtwork();
         assertThat(evaluationFacade
                         .searchEvaluatedArtworks(
-                                WithOwner.any(request),
-                                allPages())
+                                request,
+                                allPages(),
+                                null)
                         .getPage().getContent(),
                 hasItems(ea1, ea2, ea3));
     }

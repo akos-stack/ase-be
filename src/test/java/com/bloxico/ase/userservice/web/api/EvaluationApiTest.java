@@ -4,18 +4,13 @@ import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
-import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkResponse;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.bloxico.ase.testutil.Util.*;
-import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.*;
-import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.DRAFT;
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
-import static com.bloxico.ase.userservice.web.api.ArtworkApi.ARTWORK_SEARCH;
 import static com.bloxico.ase.userservice.web.api.EvaluationApi.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.COUNTRY_NOT_FOUND;
@@ -378,17 +373,17 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser(role = EVALUATOR, auth = true)
-    public void searchArtworkEvaluations() {
+    public void searchMyEvaluatedArtworks() {
         var evaluator = utilSecurityContext.getLoggedInEvaluator();
-        var ae1 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator);
-        var ae2 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator);
+        var ae1 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator.getId());
+        var ae2 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator.getId());
         var ae3 = utilEvaluation.savedEvaluatedArtwork();
         var response = given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .params(allPages("search", ""))
+                .params(allPages("art_name", ""))
                 .when()
-                .get(API_URL + EVALUATION_ARTWORK_EVALUATIONS_SEARCH)
+                .get(API_URL + EVALUATION_EVALUATED_ARTWORKS_MY_SEARCH)
                 .then()
                 .assertThat()
                 .statusCode(200)

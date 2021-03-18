@@ -305,11 +305,12 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser
-    public void searchEvaluatedArtworks_nullWithOwner() {
+    @WithMockCustomUser(role = EVALUATOR)
+    public void searchEvaluatedArtworks_nullRequest() {
+        var evaluatorId = securityContext.getLoggedInEvaluator().getId();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationService.searchEvaluatedArtworks(null, allPages()));
+                () -> evaluationService.searchEvaluatedArtworks(null, allPages(), evaluatorId));
     }
 
     @Test
@@ -319,36 +320,38 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
         var request = utilEvaluation.genSearchEvaluatedArtworksRequest();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationService.searchEvaluatedArtworks(WithOwner.of(evaluatorId, request), null));
+                () -> evaluationService.searchEvaluatedArtworks(request, null, evaluatorId));
     }
 
     @Test
     @WithMockCustomUser(role = EVALUATOR)
     public void searchEvaluatedArtworks_ofEvaluator() {
-        var evaluator = securityContext.getLoggedInEvaluator();
+        var evaluatorId = securityContext.getLoggedInEvaluator().getId();
         var request = utilEvaluation.genSearchEvaluatedArtworksRequest();
-        var ea1 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator);
-        var ea2 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator);
+        var ea1 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluatorId);
+        var ea2 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluatorId);
         var ea3 = utilEvaluation.savedEvaluatedArtwork();
         assertThat(evaluationService
                         .searchEvaluatedArtworks(
-                                WithOwner.of(evaluator.getId(), request),
-                                allPages())
+                                request,
+                                allPages(),
+                                securityContext.getLoggedInUserId())
                         .getContent(),
                 allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
     }
 
     @Test
     @WithMockCustomUser
-    public void searchEvaluatedArtworks_anyEvaluator() {
+    public void searchEvaluatedArtworks_all() {
         var request = utilEvaluation.genSearchEvaluatedArtworksRequest();
         var ea1 = utilEvaluation.savedEvaluatedArtwork();
         var ea2 = utilEvaluation.savedEvaluatedArtwork();
         var ea3 = utilEvaluation.savedEvaluatedArtwork();
         assertThat(evaluationService
                         .searchEvaluatedArtworks(
-                                WithOwner.any(request),
-                                allPages())
+                                request,
+                                allPages(),
+                                null)
                         .getContent(),
                 hasItems(ea1, ea2, ea3));
     }

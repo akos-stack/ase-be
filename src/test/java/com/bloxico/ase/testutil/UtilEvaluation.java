@@ -199,19 +199,23 @@ public class UtilEvaluation {
     }
 
     public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest() {
-        return new SearchEvaluatedArtworksRequest("");
+        return new SearchEvaluatedArtworksRequest(null, null);
+    }
+
+    public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest(String artName, List<String> categories) {
+        return new SearchEvaluatedArtworksRequest(artName, categories);
     }
 
     public ArtworkEvaluatedProj savedEvaluatedArtwork() {
-        return savedEvaluatedArtworkWithEvaluator(utilUserProfile.savedEvaluator());
+        return savedEvaluatedArtworkWithEvaluator(utilUserProfile.savedEvaluator().getId());
     }
 
-    public ArtworkEvaluatedProj savedEvaluatedArtworkWithEvaluator(Evaluator evaluator) {
+    public ArtworkEvaluatedProj savedEvaluatedArtworkWithEvaluator(long evaluatorId) {
         var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION));
         var evaluation = new ArtworkEvaluatorEvaluation();
         evaluation.setArtworkId(artwork.getId());
-        evaluation.setEvaluatorId(evaluator.getId());
-        evaluation.setCountryId(evaluator.getUserProfile().getLocation().getCountry().getId());
+        evaluation.setEvaluatorId(evaluatorId);
+        evaluation.setCountryId(utilLocation.savedCountry().getId());
         evaluation.setValue(BigDecimal.valueOf(genPosInt(2000)));
         evaluation.setSellingPrice(BigDecimal.valueOf(genPosInt(2000)));
         evaluation.setAseSellable(genBoolean());
@@ -220,8 +224,7 @@ public class UtilEvaluation {
         evaluation.setComment(genUUID());
         artworkEvaluatorEvaluationRepository.saveAndFlush(evaluation);
         return new ArtworkEvaluatedProj(
-                artwork.getTitle(), artwork.getArtist().getName(),
-                evaluation.getValue(), evaluation.getSellingPrice());
+                artwork.getTitle(), artwork.getArtist().getName(), evaluation.getSellingPrice());
     }
 
 }
