@@ -18,4 +18,5 @@ public interface ITokenService {
 
     List<Long> deleteExpiredTokens();
 
+    TokenDto createTokenForHost(Long userId);
 }

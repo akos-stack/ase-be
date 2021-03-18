@@ -49,6 +49,21 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
     }
 
     @Override
+    public TokenDto createTokenForHost(Long userId) {
+        log.debug("TokenServiceImpl[{}].createTokenForHost - start | userId: {}", userId);
+        var token = new Token();
+        token.setValue(newTokenValue());
+        token.setType(Token.Type.HOST_INVITATION);
+        token.setUserId(userId);
+        token.setCreatorId(userId);
+        token.setExpiryDate(newExpiryDate());
+        token = tokenRepository.saveAndFlush(token);
+        var tokenDto = MAPPER.toDto(token);
+        log.debug("TokenServiceImpl[{}].createTokenForHost - end | userId: {}", userId);
+        return tokenDto;
+    }
+
+    @Override
     public TokenDto refreshToken(String tokenValue) {
         log.debug("TokenServiceImpl.refreshToken - start | tokenValue: {}", tokenValue);
         requireNonNull(tokenValue);
