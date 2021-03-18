@@ -1,8 +1,6 @@
 package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.userservice.web.model.PageRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkRequest;
-import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkResponse;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import io.swagger.annotations.*;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +20,7 @@ public interface EvaluationApi {
     String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE = "/evaluation/management/country-details/delete";
     String EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH  = "/evaluation/management/region-details";
     String EVALUATION_QUOTATION_PACKAGE_SAVE            = "/evaluation/quotation-package/save";
-    String EVALUATION_ARTWORK_EVALUATIONS_SEARCH        = "/evaluation/artwork-evaluations";
+    String EVALUATION_EVALUATED_ARTWORKS_MY_SEARCH      = "/evaluation/evaluated-artworks/my";
     // @formatter:on
 
     @GetMapping(
@@ -114,13 +112,13 @@ public interface EvaluationApi {
     ResponseEntity<SaveQuotationPackageResponse> saveQuotationPackage(
             @Valid @RequestBody SaveQuotationPackageRequest request);
 
-    @GetMapping(value = EVALUATION_ARTWORK_EVALUATIONS_SEARCH)
-    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_artwork_evaluations')")
-    @ApiOperation(value = "Searches artwork evaluations.")
+    @GetMapping(value = EVALUATION_EVALUATED_ARTWORKS_MY_SEARCH)
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_evaluated_artworks')")
+    @ApiOperation(value = "Searches evaluated artworks.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Artwork evaluations successfully searched.")
+            @ApiResponse(code = 200, message = "Evaluated artworks successfully searched.")
     })
-    ResponseEntity<SearchEvaluatedArtworksResponse> searchArtworkEvaluations(
+    ResponseEntity<SearchEvaluatedArtworksResponse> searchMyEvaluatedArtworks(
             @Valid SearchEvaluatedArtworksRequest request, @Valid PageRequest page);
 
 }

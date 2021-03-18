@@ -2,20 +2,20 @@ package com.bloxico.ase.userservice.web.model.evaluation;
 
 import io.swagger.annotations.ApiParam;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.List;
 
-import static lombok.AccessLevel.PRIVATE;
-
-@Value
+@Data
 @AllArgsConstructor
-@NoArgsConstructor(force = true, access = PRIVATE)
 public class SearchEvaluatedArtworksRequest {
 
-    @NotNull
-    @ApiParam(name = "search", required = true)
-    String search;
+    @ApiParam(name = "artName")
+    String artName;
+
+    @Size(min = 1)
+    @ApiParam(name = "categories")
+    private List<String> categories;
 
 }

@@ -17,7 +17,4 @@ public class ArtworkEvaluatedProj {
     @JsonProperty("selling_price")
     BigDecimal sellingPrice;
 
-    @JsonProperty("sold_for")
-    BigDecimal soldFor;
-
 }

@@ -1,10 +1,8 @@
 package com.bloxico.ase.userservice.web.api.impl;
 
-import com.bloxico.ase.userservice.config.security.AseSecurityContext;
 import com.bloxico.ase.userservice.facade.IEvaluationFacade;
 import com.bloxico.ase.userservice.web.api.EvaluationApi;
 import com.bloxico.ase.userservice.web.model.PageRequest;
-import com.bloxico.ase.userservice.web.model.WithOwner;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,11 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import static com.bloxico.ase.userservice.config.security.AseSecurityContext.getPrincipalId;
+
 @RestController
 public class EvaluationController implements EvaluationApi {
 
     @Autowired private IEvaluationFacade evaluationFacade;
-    @Autowired private AseSecurityContext security;
 
     @Override
     public ResponseEntity<SearchCountryEvaluationDetailsResponse> searchCountryEvaluationDetails(
@@ -77,10 +76,9 @@ public class EvaluationController implements EvaluationApi {
     }
 
     @Override
-    public ResponseEntity<SearchEvaluatedArtworksResponse> searchArtworkEvaluations(
+    public ResponseEntity<SearchEvaluatedArtworksResponse> searchMyEvaluatedArtworks(
             @Valid SearchEvaluatedArtworksRequest request, @Valid PageRequest page) {
-        var response = evaluationFacade
-                .searchEvaluatedArtworks(WithOwner.of(security.getEvaluatorId(), request), page);
+        var response = evaluationFacade.searchEvaluatedArtworks(request, page, getPrincipalId());
         return ResponseEntity.ok(response);
     }
 
