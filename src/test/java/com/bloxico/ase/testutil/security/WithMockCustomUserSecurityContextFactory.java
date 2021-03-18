@@ -89,7 +89,7 @@ final class WithMockCustomUserSecurityContextFactory implements WithSecurityCont
             }
 
             if(Role.EVALUATOR.equals(customUser.role())) {
-                // TODO
+                utilUserProfile.savedEvaluatorDto(principal.getId());
             }
         }
         return principal;
