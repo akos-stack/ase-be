@@ -32,7 +32,12 @@ public class MailUtil {
         EVALUATOR_INVITATION(
                 "evaluatorInvitationMailTemplate",
                 "register",
-                "Art Stock Exchange - Evaluator invitation");
+                "Art Stock Exchange - Evaluator invitation"),
+
+        HOST_INVITATION(
+                "hostInvitationMailTemplate",
+                        "register",
+                        "Art Stock Exchange - Host invitation");
 
         private final String name, relUri, subject;
 
