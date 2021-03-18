@@ -9,14 +9,19 @@ import com.mitchellbosecke.pebble.spring.extension.SpringExtension;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.DispatcherType;
+import javax.servlet.MultipartConfigElement;
 import java.util.EnumSet;
+
+import static org.springframework.util.unit.DataUnit.MEGABYTES;
 
 @Slf4j
 @Configuration
@@ -101,6 +106,14 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowCredentials(true)
                 .maxAge(3600); // sec
+    }
+
+    @Bean
+    public MultipartConfigElement multipartConfigElement() {
+        var factory = new MultipartConfigFactory();
+        factory.setMaxFileSize(DataSize.of(20, MEGABYTES));
+        factory.setMaxRequestSize(DataSize.of(20, MEGABYTES));
+        return factory.createMultipartConfig();
     }
 
 }

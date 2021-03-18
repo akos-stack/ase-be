@@ -3,6 +3,7 @@ package com.bloxico.ase.userservice.service.aws.impl;
 import com.bloxico.ase.userservice.service.aws.IS3Service;
 import com.bloxico.ase.userservice.util.AWSUtil;
 import com.bloxico.ase.userservice.util.FileCategory;
+import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -10,7 +11,11 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toMap;
 
 @Slf4j
 @Service
@@ -26,22 +31,38 @@ public class S3ServiceImpl implements IS3Service {
     }
 
     @Override
+    public Map<String, Set<ErrorCodes.AmazonS3>> validateFiles(FileCategory category, List<MultipartFile> files) {
+        log.debug("S3ServiceImpl.validateFile - start | category: {}, files: {}", category, files);
+        requireNonNull(category);
+        requireNonNull(files);
+        var invalidFiles = files
+                .stream()
+                .map(file -> Map.entry(
+                        file.getOriginalFilename() + "",
+                        category.fileErrors(file, environment)))
+                .filter(entry -> !entry.getValue().isEmpty())
+                .collect(toMap(Entry::getKey, Entry::getValue));
+        log.debug("S3ServiceImpl.validateFile - end | category: {}, files: {}", category, files);
+        return invalidFiles;
+    }
+
+    @Override
     public void validateFile(FileCategory category, MultipartFile file) {
-        log.debug("S3ServiceImpl.validateFile - start | category: {}, file: {}", category, file.getName());
+        log.debug("S3ServiceImpl.validateFile - start | category: {}, file: {}", category, file);
         requireNonNull(category);
         requireNonNull(file);
         category.validate(file, environment);
-        log.debug("S3ServiceImpl.validateFile - end | category: {}, file: {}", category, file.getName());
+        log.debug("S3ServiceImpl.validateFile - end | category: {}, file: {}", category, file);
     }
 
     @Override
     public String uploadFile(FileCategory category, MultipartFile file) {
-        log.debug("S3ServiceImpl.uploadFile - start | category: {}, file: {}", category, file.getName());
+        log.debug("S3ServiceImpl.uploadFile - start | category: {}, file: {}", category, file);
         requireNonNull(category);
         requireNonNull(file);
         validateFile(category, file);
         var fileUploadPath = awsUtil.uploadFile(category, file);
-        log.debug("S3ServiceImpl.uploadFile - end | category: {}, file: {}", category, file.getName());
+        log.debug("S3ServiceImpl.uploadFile - end | category: {}, file: {}", category, file);
         return fileUploadPath;
     }
 

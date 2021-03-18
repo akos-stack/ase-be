@@ -22,10 +22,14 @@ public class S3FacadeImpl implements IS3Facade {
     }
 
     @Override
-    public void validateFile(ValidateFileRequest request) {
-        log.info("S3FacadeImpl.validateFile - start | request: {}", request);
-        s3Service.validateFile(request.getCategory(), request.getFile());
-        log.info("S3FacadeImpl.validateFile - end | request: {}", request);
+    public ValidateFilesResponse invalidFiles(ValidateFilesRequest request) {
+        log.info("S3FacadeImpl.invalidFiles - start | request: {} ", request);
+        var invalidFiles = s3Service.validateFiles(
+                request.getCategory(),
+                request.getFiles());
+        var response = new ValidateFilesResponse(invalidFiles);
+        log.info("S3FacadeImpl.invalidFiles - end | request: {} ", request);
+        return response;
     }
 
     @Override
