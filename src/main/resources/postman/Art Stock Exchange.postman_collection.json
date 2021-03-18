@@ -353,7 +353,7 @@
 							"raw": "{\n    \"password\": \"this_is_new_password\"\n}"
 						},
 						"url": {
-							"raw": "{{endpoint_ase}}/api/user/password/set",
+							"raw": "{{endpoint_ase}}/api/management/user/password/set",
 							"host": [
 								"{{endpoint_ase}}"
 							],
@@ -425,7 +425,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/users?email=<searchText>&role=user&page=0&size=10&sort=email&order=DESC",
+							"raw": "{{ase-endpoint}}/api/management/users?email=<searchText>&role=user&page=0&size=10&sort=email&order=DESC",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -489,7 +489,7 @@
 							"raw": "{\n    \"user_id\": 1\n}"
 						},
 						"url": {
-							"raw": "{{endpoint_ase}}/api/users/disable",
+							"raw": "{{endpoint_ase}}/api/management/user/disable",
 							"host": [
 								"{{endpoint_ase}}"
 							],
@@ -528,7 +528,7 @@
 							"raw": "{\n    \"user_id\": 1\n}"
 						},
 						"url": {
-							"raw": "{{endpoint_ase}}/api/users/blacklist-tokens",
+							"raw": "{{endpoint_ase}}/api/management/user/blacklist-tokens",
 							"host": [
 								"{{endpoint_ase}}"
 							],
@@ -907,7 +907,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{endpoint_ase}}/api/region/management/save",
+									"raw": "{{endpoint_ase}}/api/management/region/save",
 									"host": [
 										"{{endpoint_ase}}"
 									],
@@ -946,7 +946,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{endpoint_ase}}/api/region/management/delete",
+									"raw": "{{endpoint_ase}}/api/management/region/delete",
 									"host": [
 										"{{endpoint_ase}}"
 									],
@@ -1018,7 +1018,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{endpoint_ase}}/api/country/management/save",
+									"raw": "{{endpoint_ase}}/api/management/country/save",
 									"host": [
 										"{{endpoint_ase}}"
 									],
@@ -1057,7 +1057,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{ase-endpoint}}/api/country/management/update",
+									"raw": "{{ase-endpoint}}/api/management/country/update",
 									"host": [
 										"{{ase-endpoint}}"
 									],
@@ -1134,7 +1134,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{endpoint_ase}}/api/evaluation/management/country-details/save",
+									"raw": "{{endpoint_ase}}/api/management/evaluation/country-details/save",
 									"host": [
 										"{{endpoint_ase}}"
 									],
@@ -1174,7 +1174,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{endpoint_ase}}/api/evaluation/management/country-details/update",
+									"raw": "{{endpoint_ase}}/api/management/evaluation/country-details/update",
 									"host": [
 										"{{endpoint_ase}}"
 									],
@@ -1205,7 +1205,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{endpoint_ase}}/api/evaluation/country-details?page=0&size=10&sort=price_per_evaluation&order=desc&search=a&regions=Europe,Asia",
+									"raw": "{{endpoint_ase}}/api/evaluation/country-details/search?page=0&size=10&sort=price_per_evaluation&order=desc&search=a&regions=Europe,Asia",
 									"host": [
 										"{{endpoint_ase}}"
 									],
@@ -1260,7 +1260,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{endpoint_ase}}/api/evaluation/management/country-details?page=0&size=10&sort=price_per_evaluation&order=desc&search=a&regions=Europe,Asia",
+									"raw": "{{endpoint_ase}}/api/management/evaluation/country-details/search?page=0&size=10&sort=price_per_evaluation&order=desc&search=a&regions=Europe,Asia",
 									"host": [
 										"{{endpoint_ase}}"
 									],
@@ -1325,7 +1325,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{endpoint_ase}}/api/evaluation/management/country-details/delete",
+									"raw": "{{endpoint_ase}}/api/management/evaluation/country-details/delete",
 									"host": [
 										"{{endpoint_ase}}"
 									],
@@ -1361,7 +1361,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{endpoint_ase}}/api/evaluation/management/region-details?page=0&size=10&sort=name&order=desc&search=a",
+									"raw": "{{endpoint_ase}}/api/management/evaluation/region-details/search?page=0&size=10&sort=name&order=desc&search=a",
 									"host": [
 										"{{endpoint_ase}}"
 									],
@@ -2099,7 +2099,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/save",
+							"raw": "{{ase-endpoint}}/api/management/artwork/metadata/save",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -2130,7 +2130,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/management/metadata?status=APPROVED&name=<searchText>&type=CATEGORY&page=0&size=10&sort=status&order DESC",
+							"raw": "{{ase-endpoint}}/api/management/artwork/metadata/search?status=APPROVED&name=<searchText>&type=CATEGORY&page=0&size=10&sort=status&order DESC",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -2199,7 +2199,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/update",
+							"raw": "{{ase-endpoint}}/api/management/artwork/metadata/update",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -2230,7 +2230,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/management/metadata/delete?name=categoryName&type=CATEGORY",
+							"raw": "{{ase-endpoint}}/api/management/artwork/metadata/delete?name=categoryName&type=CATEGORY",
 							"host": [
 								"{{ase-endpoint}}"
 							],
@@ -2276,7 +2276,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{ase-endpoint}}/api/artwork/approved-metadata?type=CATEGORY",
+							"raw": "{{ase-endpoint}}/api/artwork/metadata/search?type=CATEGORY",
 							"host": [
 								"{{ase-endpoint}}"
 							],
