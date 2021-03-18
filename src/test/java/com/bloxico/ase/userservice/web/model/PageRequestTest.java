@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.bloxico.ase.testutil.Util.*;
-import static com.bloxico.ase.userservice.web.api.EvaluationApi.EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH;
+import static com.bloxico.ase.userservice.web.api.EvaluationApi.MNG_EVALUATION_REGION_DETAILS_SEARCH;
 import static com.bloxico.ase.userservice.web.api.UserManagementApi.USER_SEARCH_ENDPOINT;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -34,7 +34,7 @@ public class PageRequestTest extends AbstractSpringTest {
                 .queryParam("search", "")
                 .queryParam("size", 5)
                 .when()
-                .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                 .then()
                 .assertThat()
                 .statusCode(400);
@@ -48,7 +48,7 @@ public class PageRequestTest extends AbstractSpringTest {
                 .queryParam("page", -1)
                 .queryParam("size", 5)
                 .when()
-                .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                 .then()
                 .assertThat()
                 .statusCode(400);
@@ -61,7 +61,7 @@ public class PageRequestTest extends AbstractSpringTest {
                 .queryParam("search", "")
                 .queryParam("page", 0)
                 .when()
-                .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                 .then()
                 .assertThat()
                 .statusCode(400);
@@ -75,7 +75,7 @@ public class PageRequestTest extends AbstractSpringTest {
                 .queryParam("page", 0)
                 .queryParam("size", 0)
                 .when()
-                .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                 .then()
                 .assertThat()
                 .statusCode(400);
@@ -90,7 +90,7 @@ public class PageRequestTest extends AbstractSpringTest {
                 .queryParam("size", 10)
                 .queryParam("sort", "")
                 .when()
-                .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                 .then()
                 .assertThat()
                 .statusCode(400);
@@ -105,7 +105,7 @@ public class PageRequestTest extends AbstractSpringTest {
                 .queryParam("size", 10)
                 .queryParam("sort", "  ")
                 .when()
-                .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                 .then()
                 .assertThat()
                 .statusCode(400);
@@ -124,7 +124,7 @@ public class PageRequestTest extends AbstractSpringTest {
                 .queryParam("page", 0)
                 .queryParam("size", 10)
                 .when()
-                .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                 .then()
                 .assertThat()
                 .statusCode(200)
@@ -156,7 +156,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .queryParam("page", 0)
                     .queryParam("size", 2)
                     .when()
-                    .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                    .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                     .then()
                     .assertThat()
                     .statusCode(200)
@@ -180,7 +180,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .queryParam("page", 1)
                     .queryParam("size", 2)
                     .when()
-                    .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                    .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                     .then()
                     .assertThat()
                     .statusCode(200)
@@ -204,7 +204,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .queryParam("page", 2)
                     .queryParam("size", 2)
                     .when()
-                    .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                    .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                     .then()
                     .assertThat()
                     .statusCode(200)
@@ -407,7 +407,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .queryParam("size", 2)
                     .queryParam("sort", "name")
                     .when()
-                    .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                    .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                     .then()
                     .assertThat()
                     .statusCode(200)
@@ -428,7 +428,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .queryParam("size", 2)
                     .queryParam("sort", "name")
                     .when()
-                    .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                    .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                     .then()
                     .assertThat()
                     .statusCode(200)
@@ -458,7 +458,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .queryParam("size", 2)
                     .queryParam("sort", "id,name")
                     .when()
-                    .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                    .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                     .then()
                     .assertThat()
                     .statusCode(200)
@@ -479,7 +479,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .queryParam("size", 2)
                     .queryParam("sort", "id,name")
                     .when()
-                    .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                    .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                     .then()
                     .assertThat()
                     .statusCode(200)
@@ -510,7 +510,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .queryParam("sort", "id,name")
                     .queryParam("order", "DESC")
                     .when()
-                    .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                    .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                     .then()
                     .assertThat()
                     .statusCode(200)
@@ -532,7 +532,7 @@ public class PageRequestTest extends AbstractSpringTest {
                     .queryParam("sort", "id,name")
                     .queryParam("order", "DESC")
                     .when()
-                    .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                    .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                     .then()
                     .assertThat()
                     .statusCode(200)
@@ -557,7 +557,7 @@ public class PageRequestTest extends AbstractSpringTest {
                 .queryParam("sort", "id,name")
                 .queryParam("order", "foo")
                 .when()
-                .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                 .then()
                 .assertThat()
                 .statusCode(400);
@@ -577,7 +577,7 @@ public class PageRequestTest extends AbstractSpringTest {
                 .queryParam("size", 10)
                 .queryParam("order", "DESC")
                 .when()
-                .get(API_URL + EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH)
+                .get(API_URL + MNG_EVALUATION_REGION_DETAILS_SEARCH)
                 .then()
                 .assertThat()
                 .statusCode(200)

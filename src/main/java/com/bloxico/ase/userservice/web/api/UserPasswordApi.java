@@ -18,7 +18,7 @@ public interface UserPasswordApi {
     String PASSWORD_TOKEN_RESEND_ENDPOINT     = "/user/password/token/resend";
     String PASSWORD_UPDATE_FORGOTTEN_ENDPOINT = "/user/password/update/forgotten";
     String PASSWORD_UPDATE_ENDPOINT           = "/user/password/update";
-    String PASSWORD_SET_ENDPOINT              = "/user/password/set";
+    String PASSWORD_SET_ENDPOINT              = "/management/user/password/set";
     // @formatter:on
 
     @PostMapping(

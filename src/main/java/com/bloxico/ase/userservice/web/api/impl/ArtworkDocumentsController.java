@@ -4,9 +4,7 @@ import com.bloxico.ase.userservice.config.security.AseSecurityContext;
 import com.bloxico.ase.userservice.facade.IArtworkDocumentsFacade;
 import com.bloxico.ase.userservice.web.api.ArtworkDocumentsApi;
 import com.bloxico.ase.userservice.web.model.WithOwner;
-import com.bloxico.ase.userservice.web.model.artwork.ArtworkDocumentRequest;
-import com.bloxico.ase.userservice.web.model.artwork.UploadArtworkDocumentsRequest;
-import com.bloxico.ase.userservice.web.model.artwork.UploadArtworkDocumentsResponse;
+import com.bloxico.ase.userservice.web.model.artwork.*;
 import com.bloxico.ase.userservice.web.model.artwork.metadata.SetArtworkPrincipalImageRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -14,13 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-
 @RestController
 public class ArtworkDocumentsController implements ArtworkDocumentsApi {
 
-    @Autowired private IArtworkDocumentsFacade artworkDocumentsFacade;
     @Autowired private AseSecurityContext security;
+    @Autowired private IArtworkDocumentsFacade artworkDocumentsFacade;
 
     @Override
     public ResponseEntity<Resource> downloadArtworkDocument(ArtworkDocumentRequest request) {
@@ -53,13 +49,13 @@ public class ArtworkDocumentsController implements ArtworkDocumentsApi {
     }
 
     @Override
-    public ResponseEntity<Void> setArtworkPrincipalImage(@Valid SetArtworkPrincipalImageRequest request) {
+    public ResponseEntity<Void> setArtworkPrincipalImage(SetArtworkPrincipalImageRequest request) {
         artworkDocumentsFacade.setPrincipalImage(WithOwner.of(security.getArtOwnerId(), request));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Void> setArtworkPrincipalImageMng(@Valid SetArtworkPrincipalImageRequest request) {
+    public ResponseEntity<Void> setArtworkPrincipalImageMng(SetArtworkPrincipalImageRequest request) {
         artworkDocumentsFacade.setPrincipalImage(WithOwner.any(request));
         return new ResponseEntity<>(HttpStatus.OK);
     }

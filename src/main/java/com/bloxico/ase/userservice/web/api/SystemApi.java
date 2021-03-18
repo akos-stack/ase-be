@@ -14,7 +14,7 @@ public interface SystemApi {
 
     // @formatter:off
     String SYSTEM_CONSTANTS     = "/system/constants";
-    String SYSTEM_CONFIG_SEARCH = "/system/config";
+    String SYSTEM_CONFIG_SEARCH = "/system/config/search";
     String SYSTEM_CONFIG_SAVE   = "/system/config/save";
     // @formatter:on
 

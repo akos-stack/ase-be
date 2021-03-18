@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-
 @RestController
 public class EvaluationController implements EvaluationApi {
 
@@ -52,7 +50,7 @@ public class EvaluationController implements EvaluationApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteCountryEvaluationDetails(@Valid DeleteCountryEvaluationDetailsRequest request) {
+    public ResponseEntity<Void> deleteCountryEvaluationDetails(DeleteCountryEvaluationDetailsRequest request) {
         evaluationFacade.deleteCountryEvaluationDetails(request.getId());
         return new ResponseEntity<>(HttpStatus.OK);
     }
