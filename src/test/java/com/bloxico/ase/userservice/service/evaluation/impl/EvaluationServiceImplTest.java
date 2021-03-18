@@ -2,8 +2,12 @@ package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.exception.EvaluationException;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
+import com.bloxico.ase.userservice.web.model.WithOwner;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchEvaluatedArtworksRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.bloxico.ase.testutil.Util.allPages;
+import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -22,6 +27,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilEvaluation utilEvaluation;
+    @Autowired private UtilSecurityContext securityContext;
     @Autowired private EvaluationServiceImpl evaluationService;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
@@ -296,6 +302,55 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
             assertEquals(packageId, qpc.getQuotationPackageId());
             assertTrue(qpc.getNumberOfEvaluations() > 0);
         }
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluatedArtworks_nullWithOwner() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.searchEvaluatedArtworks(null, allPages()));
+    }
+
+    @Test
+    @WithMockCustomUser(role = EVALUATOR)
+    public void searchEvaluatedArtworks_nullPageRequest() {
+        var evaluatorId = securityContext.getLoggedInEvaluator().getId();
+        var request = utilEvaluation.genSearchEvaluatedArtworksRequest();
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.searchEvaluatedArtworks(WithOwner.of(evaluatorId, request), null));
+    }
+
+    @Test
+    @WithMockCustomUser(role = EVALUATOR)
+    public void searchEvaluatedArtworks_ofEvaluator() {
+        var evaluator = securityContext.getLoggedInEvaluator();
+        var request = utilEvaluation.genSearchEvaluatedArtworksRequest();
+        var ea1 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator);
+        var ea2 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator);
+        var ea3 = utilEvaluation.savedEvaluatedArtwork();
+        assertThat(evaluationService
+                        .searchEvaluatedArtworks(
+                                WithOwner.of(evaluator.getId(), request),
+                                allPages())
+                        .getContent(),
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluatedArtworks_anyEvaluator() {
+        var request = utilEvaluation.genSearchEvaluatedArtworksRequest();
+        var ea1 = utilEvaluation.savedEvaluatedArtwork();
+        var ea2 = utilEvaluation.savedEvaluatedArtwork();
+        var ea3 = utilEvaluation.savedEvaluatedArtwork();
+        assertThat(evaluationService
+                        .searchEvaluatedArtworks(
+                                WithOwner.any(request),
+                                allPages())
+                        .getContent(),
+                hasItems(ea1, ea2, ea3));
     }
 
 }

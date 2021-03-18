@@ -2,30 +2,37 @@ package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.*;
 import com.bloxico.ase.userservice.entity.address.Region;
+import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.bloxico.ase.userservice.entity.evaluation.*;
+import com.bloxico.ase.userservice.entity.user.profile.Evaluator;
+import com.bloxico.ase.userservice.proj.evaluation.ArtworkEvaluatedProj;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
+import com.bloxico.ase.userservice.repository.evaluation.ArtworkEvaluatorEvaluationRepository;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageRepository;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
-import static com.bloxico.ase.testutil.Util.genPosInt;
-import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.WAITING_FOR_EVALUATION;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 
 @Component
 public class UtilEvaluation {
 
     @Autowired private UtilUser utilUser;
+    @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilArtwork utilArtwork;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
     @Autowired private QuotationPackageRepository quotationPackageRepository;
+    @Autowired private ArtworkEvaluatorEvaluationRepository artworkEvaluatorEvaluationRepository;
 
     public CountryEvaluationDetails genCountryEvaluationDetails(Long countryId) {
         var details = new CountryEvaluationDetails();
@@ -189,6 +196,32 @@ public class UtilEvaluation {
 
     public SearchRegionEvaluationDetailsRequest genDefaultSearchRegionsRequest() {
         return new SearchRegionEvaluationDetailsRequest("");
+    }
+
+    public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest() {
+        return new SearchEvaluatedArtworksRequest("");
+    }
+
+    public ArtworkEvaluatedProj savedEvaluatedArtwork() {
+        return savedEvaluatedArtworkWithEvaluator(utilUserProfile.savedEvaluator());
+    }
+
+    public ArtworkEvaluatedProj savedEvaluatedArtworkWithEvaluator(Evaluator evaluator) {
+        var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION));
+        var evaluation = new ArtworkEvaluatorEvaluation();
+        evaluation.setArtworkId(artwork.getId());
+        evaluation.setEvaluatorId(evaluator.getId());
+        evaluation.setCountryId(evaluator.getUserProfile().getLocation().getCountry().getId());
+        evaluation.setValue(BigDecimal.valueOf(genPosInt(2000)));
+        evaluation.setSellingPrice(BigDecimal.valueOf(genPosInt(2000)));
+        evaluation.setAseSellable(genBoolean());
+        evaluation.setSendOffer(genBoolean());
+        evaluation.setRating(genPosInt(6));
+        evaluation.setComment(genUUID());
+        artworkEvaluatorEvaluationRepository.saveAndFlush(evaluation);
+        return new ArtworkEvaluatedProj(
+                artwork.getTitle(), artwork.getArtist().getName(),
+                evaluation.getValue(), evaluation.getSellingPrice());
     }
 
 }
