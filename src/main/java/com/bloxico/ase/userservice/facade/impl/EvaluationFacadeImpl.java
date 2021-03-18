@@ -6,6 +6,7 @@ import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.config.IConfigService;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.WithOwner;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,6 +106,17 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
         quotationPackage.setCountries(countries);
         var response = new SaveQuotationPackageResponse(quotationPackage);
         log.debug("EvaluationFacadeImpl.saveQuotationPackage - start | request: {}", request);
+        return response;
+    }
+
+    @Override
+    public SearchEvaluatedArtworksResponse searchEvaluatedArtworks(
+            WithOwner<SearchEvaluatedArtworksRequest> withOwner, PageRequest page)
+    {
+        log.debug("EvaluationFacadeImpl.searchEvaluatedArtworks - start | withOwner: {}, page: {}", withOwner, page);
+        var result = evaluationService.searchEvaluatedArtworks(withOwner, page);
+        var response = new SearchEvaluatedArtworksResponse(result);
+        log.debug("EvaluationFacadeImpl.searchEvaluatedArtworks - end | withOwner: {}, page: {}", withOwner, page);
         return response;
     }
 
