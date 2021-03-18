@@ -1,12 +1,16 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.*;
+import com.bloxico.ase.userservice.proj.evaluation.ArtworkEvaluatedProj;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
+import com.bloxico.ase.userservice.web.model.WithOwner;
+import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.ISearchCountryEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchEvaluatedArtworksRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionEvaluationDetailsRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +33,18 @@ public class EvaluationServiceImpl implements IEvaluationService {
     private final CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
     private final QuotationPackageRepository quotationPackageRepository;
     private final QuotationPackageCountryRepository quotationPackageCountryRepository;
+    private final ArtworkEvaluatorEvaluationRepository artworkEvaluatorEvaluationRepository;
 
     @Autowired
     public EvaluationServiceImpl(CountryEvaluationDetailsRepository countryEvaluationDetailsRepository,
                                  QuotationPackageRepository quotationPackageRepository,
-                                 QuotationPackageCountryRepository quotationPackageCountryRepository)
+                                 QuotationPackageCountryRepository quotationPackageCountryRepository,
+                                 ArtworkEvaluatorEvaluationRepository artworkEvaluatorEvaluationRepository)
     {
         this.countryEvaluationDetailsRepository = countryEvaluationDetailsRepository;
         this.quotationPackageRepository = quotationPackageRepository;
         this.quotationPackageCountryRepository = quotationPackageCountryRepository;
+        this.artworkEvaluatorEvaluationRepository = artworkEvaluatorEvaluationRepository;
     }
 
     @Override
@@ -159,6 +166,20 @@ public class EvaluationServiceImpl implements IEvaluationService {
                 .collect(toSet());
         log.debug("EvaluationServiceImpl.saveQuotationPackageCountries - end | packageId: {}, dtos: {}", packageId, dtos);
         return quotationPackageCountryDtos;
+    }
+
+    @Override
+    public Page<ArtworkEvaluatedProj> searchEvaluatedArtworks(
+            WithOwner<SearchEvaluatedArtworksRequest> withOwner, PageRequest page)
+    {
+        log.debug("EvaluationServiceImpl.searchEvaluatedArtworks - start | withOwner: {}, page: {}", withOwner, page);
+        requireNonNull(withOwner);
+        requireNonNull(page);
+        var result = artworkEvaluatorEvaluationRepository
+                .search(withOwner.getOwner(),
+                        page.toPageableUnsafe());
+        log.debug("EvaluationServiceImpl.searchEvaluatedArtworks - end | withOwner: {}, page: {}", withOwner, page);
+        return result;
     }
 
     private void requireNotExists(CountryEvaluationDetailsDto dto) {
