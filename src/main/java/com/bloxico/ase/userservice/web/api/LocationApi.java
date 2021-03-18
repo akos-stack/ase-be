@@ -41,7 +41,7 @@ public interface LocationApi {
     })
     ResponseEntity<SaveRegionResponse> saveRegion(@Valid @RequestBody SaveRegionRequest request);
 
-    @PostMapping(
+    @DeleteMapping(
             value = REGION_MANAGEMENT_DELETE,
             produces = {"application/json"},
             consumes = {"application/json"})
@@ -52,7 +52,7 @@ public interface LocationApi {
             @ApiResponse(code = 404, message = "Specified region doesn't exist."),
             @ApiResponse(code = 409, message = "Region has one or more countries tied down to it.")
     })
-    ResponseEntity<Void> deleteRegion(@Valid @RequestBody DeleteRegionRequest request);
+    ResponseEntity<Void> deleteRegion(@Valid DeleteRegionRequest request);
 
     @GetMapping(
             value = COUNTRIES,

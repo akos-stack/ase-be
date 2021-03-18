@@ -1,9 +1,7 @@
 package com.bloxico.ase.userservice.web.api;
 
+import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
-import com.bloxico.ase.testutil.AbstractSpringTest;
-import com.bloxico.ase.testutil.UtilLocation;
-import com.bloxico.ase.testutil.UtilSecurityContext;
 import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.repository.address.RegionRepository;
 import com.bloxico.ase.userservice.web.model.address.*;
@@ -113,9 +111,9 @@ public class LocationApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .body(new DeleteRegionRequest(region.getId()))
+                .param("id", region.getId())
                 .when()
-                .post(API_URL + REGION_MANAGEMENT_DELETE)
+                .delete(API_URL + REGION_MANAGEMENT_DELETE)
                 .then()
                 .assertThat()
                 .statusCode(409)
@@ -128,9 +126,9 @@ public class LocationApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .body(new DeleteRegionRequest(-1L))
+                .param("id", -1L)
                 .when()
-                .post(API_URL + REGION_MANAGEMENT_DELETE)
+                .delete(API_URL + REGION_MANAGEMENT_DELETE)
                 .then()
                 .assertThat()
                 .statusCode(404)
@@ -144,9 +142,9 @@ public class LocationApiTest extends AbstractSpringTest {
         given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .body(new DeleteRegionRequest(region.getId()))
+                .param("id", region.getId())
                 .when()
-                .post(API_URL + REGION_MANAGEMENT_DELETE)
+                .delete(API_URL + REGION_MANAGEMENT_DELETE)
                 .then()
                 .assertThat()
                 .statusCode(200);

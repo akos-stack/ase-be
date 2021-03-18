@@ -246,13 +246,12 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     @Test
     @WithMockCustomUser(auth = true)
     public void deleteCountryEvaluationDetails_404_detailsNotFound() {
-        var request = new DeleteCountryEvaluationDetailsRequest(-1L);
         given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .body(request)
+                .param("id", -1L)
                 .when()
-                .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE)
+                .delete(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE)
                 .then()
                 .assertThat()
                 .statusCode(404)
@@ -265,13 +264,12 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         var evaluator = utilUserProfile.savedEvaluator();
         var countryId = evaluator.getUserProfile().getLocation().getCountry().getId();
         var evaluationDetailsId = utilEvaluation.savedCountryEvaluationDetails(countryId).getId();
-        var request = new DeleteCountryEvaluationDetailsRequest(evaluationDetailsId);
         given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .body(request)
+                .param("id", evaluationDetailsId)
                 .when()
-                .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE)
+                .delete(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE)
                 .then()
                 .assertThat()
                 .statusCode(409)
@@ -282,13 +280,12 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     @WithMockCustomUser(auth = true)
     public void deleteCountryEvaluationDetails_200_ok() {
         var evaluationDetailsId = utilEvaluation.savedCountryEvaluationDetails().getId();
-        var request = new DeleteCountryEvaluationDetailsRequest(evaluationDetailsId);
         given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .body(request)
+                .param("id", evaluationDetailsId)
                 .when()
-                .post(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE)
+                .delete(API_URL + EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE)
                 .then()
                 .assertThat()
                 .statusCode(200);

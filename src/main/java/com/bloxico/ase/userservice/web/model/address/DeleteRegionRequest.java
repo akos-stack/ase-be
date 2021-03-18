@@ -1,10 +1,7 @@
 package com.bloxico.ase.userservice.web.model.address;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import io.swagger.annotations.ApiParam;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
@@ -16,8 +13,7 @@ import static lombok.AccessLevel.PRIVATE;
 public class DeleteRegionRequest {
 
     @NotNull
-    @JsonProperty("id")
-    @ApiModelProperty(required = true)
+    @ApiParam(name = "id", required = true)
     Long id;
 
 }

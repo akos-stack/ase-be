@@ -57,13 +57,12 @@ public interface UserRegistrationApi {
     })
     ResponseEntity<Void> confirmRegistration(@Valid @RequestBody TokenValidationRequest request);
 
-    @ApiOperation(
-            value = "Refreshes expired registration token.")
+    @GetMapping(value = REGISTRATION_TOKEN_REFRESH_ENDPOINT)
+    @ApiOperation(value = "Refreshes expired registration token.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Token is refreshed and email has been sent with updated token value."),
             @ApiResponse(code = 404, message = "Provided token is not found.")
     })
-    @GetMapping(value = REGISTRATION_TOKEN_REFRESH_ENDPOINT)
     ResponseEntity<Void> refreshRegistrationToken(@Valid RefreshRegistrationTokenRequest request);
 
     @PostMapping(

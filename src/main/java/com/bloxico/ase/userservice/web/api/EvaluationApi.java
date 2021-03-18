@@ -73,7 +73,7 @@ public interface EvaluationApi {
     ResponseEntity<UpdateCountryEvaluationDetailsResponse> updateCountryEvaluationDetails(
             @Valid @RequestBody UpdateCountryEvaluationDetailsRequest request);
 
-    @PostMapping(
+    @DeleteMapping(
             value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE,
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'delete_country_evaluation_details')")
@@ -83,7 +83,7 @@ public interface EvaluationApi {
             @ApiResponse(code = 404, message = "Specified evaluation details don't exist."),
             @ApiResponse(code = 409, message = "There are evaluators from country to which evaluation details belong.")
     })
-    ResponseEntity<Void> deleteCountryEvaluationDetails(@Valid @RequestBody DeleteCountryEvaluationDetailsRequest request);
+    ResponseEntity<Void> deleteCountryEvaluationDetails(@Valid DeleteCountryEvaluationDetailsRequest request);
 
     @GetMapping(
             value = EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH,
