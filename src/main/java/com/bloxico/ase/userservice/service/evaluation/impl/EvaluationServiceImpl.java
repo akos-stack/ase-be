@@ -3,7 +3,7 @@ package com.bloxico.ase.userservice.service.evaluation.impl;
 import com.bloxico.ase.userservice.dto.entity.evaluation.*;
 import com.bloxico.ase.userservice.entity.evaluation.QuotationPackageCountry;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
-import com.bloxico.ase.userservice.proj.evaluation.OngoingEvaluationsProj;
+import com.bloxico.ase.userservice.proj.evaluation.EvaluableArtworkProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
@@ -165,12 +165,12 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public Page<OngoingEvaluationsProj> searchOngoingEvaluations(SearchEvaluableArtworksRequest request, PageRequest pageRequest) {
-        log.debug("EvaluationServiceImpl.findAllOngoingEvaluationsByCountryId - start | request: {}, pageRequest: {}", request, pageRequest);
+    public Page<EvaluableArtworkProj> searchEvaluableArtworks(SearchEvaluableArtworksRequest request, PageRequest pageRequest) {
+        log.debug("EvaluationServiceImpl.searchEvaluableArtworks - start | request: {}, pageRequest: {}", request, pageRequest);
         requireNonNull(request);
         requireNonNull(pageRequest);
-        var result = quotationPackageRepository.searchOngoingEvaluations(request.getCountryId(), request.getTitle(), request.getCategories(), pageRequest.toPageable());
-        log.debug("EvaluationServiceImpl.findAllOngoingEvaluationsByCountryId - end | request: {}, pageRequest: {}", request, pageRequest);
+        var result = quotationPackageRepository.searchEvaluableArtworks(request.getCountryId(), request.getTitle(), request.getCategories(), pageRequest.toPageableUnsafe());
+        log.debug("EvaluationServiceImpl.searchEvaluableArtworks - end | request: {}, pageRequest: {}", request, pageRequest);
         return result;
     }
 

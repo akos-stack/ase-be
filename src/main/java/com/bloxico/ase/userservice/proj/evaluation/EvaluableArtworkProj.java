@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
 @Value
-public class OngoingEvaluationsProj {
+public class EvaluableArtworkProj {
 
     @JsonProperty("artwork_id")
     Long artworkId;
@@ -12,10 +12,10 @@ public class OngoingEvaluationsProj {
     @JsonProperty("artwork_title")
     String artworkTitle;
 
-    @JsonProperty("max_evaluations")
-    int maxEvaluations;
+    @JsonProperty("evaluations_limit")
+    int evaluationsLimit;
 
-    @JsonProperty("finished_evaluations")
-    long finishedEvaluations;
+    @JsonProperty("evaluations_taken")
+    long evaluationsTaken;
 
 }

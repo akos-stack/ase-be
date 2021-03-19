@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
-    @Autowired private UtilUser utilUser;
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilEvaluation utilEvaluation;
@@ -307,7 +306,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     public void searchEvaluable_nullSearchRequest() {
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationService.searchOngoingEvaluations(null, allPages()));
+                () -> evaluationService.searchEvaluableArtworks(null, allPages()));
     }
 
     @Test
@@ -315,7 +314,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
         var request = utilEvaluation.genSearchEvaluableArtworksRequest();
         assertThrows(
                 NullPointerException.class,
-                () -> evaluationService.searchOngoingEvaluations(request, null));
+                () -> evaluationService.searchEvaluableArtworks(request, null));
     }
 
     @Test
@@ -327,7 +326,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
         var evaluable3 = utilEvaluation.savedOngoingEvaluationProj();
         var request = utilEvaluation.genSearchEvaluableArtworksRequest(countryId);
         assertThat(
-                evaluationService.searchOngoingEvaluations(request, allPages()),
+                evaluationService.searchEvaluableArtworks(request, allPages()),
                 allOf(hasItems(evaluable1, evaluable2), not(hasItems(evaluable3))));
     }
 
@@ -340,7 +339,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
         var evaluable3 = utilEvaluation.savedOngoingEvaluationProj();
         var request = utilEvaluation.genSearchEvaluableArtworksRequest(countryId, evaluable1.getArtworkTitle());
         assertThat(
-                evaluationService.searchOngoingEvaluations(request, allPages()),
+                evaluationService.searchEvaluableArtworks(request, allPages()),
                 allOf(hasItems(evaluable1), not(hasItems(evaluable2, evaluable3))));
     }
 
@@ -355,7 +354,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
         var evaluable3 = utilEvaluation.savedOngoingEvaluationProj();
         var request = new SearchEvaluableArtworksRequest(countryId, evaluable1.getArtworkTitle(), categories);
         assertThat(
-                evaluationService.searchOngoingEvaluations(request, allPages()),
+                evaluationService.searchEvaluableArtworks(request, allPages()),
                 allOf(hasItems(evaluable1), not(hasItems(evaluable2, evaluable3))));
     }
 

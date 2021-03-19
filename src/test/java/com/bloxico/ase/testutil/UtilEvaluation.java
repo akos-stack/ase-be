@@ -10,7 +10,7 @@ import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
 import com.bloxico.ase.userservice.entity.evaluation.QuotationPackage;
 import com.bloxico.ase.userservice.entity.evaluation.QuotationPackageCountry;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
-import com.bloxico.ase.userservice.proj.evaluation.OngoingEvaluationsProj;
+import com.bloxico.ase.userservice.proj.evaluation.EvaluableArtworkProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageRepository;
@@ -177,18 +177,18 @@ public class UtilEvaluation {
         return MAPPER.toDto(genQuotationPackageCountry(packageId, countryId));
     }
 
-    public OngoingEvaluationsProj savedOngoingEvaluationProj(Long countryId) {
+    public EvaluableArtworkProj savedOngoingEvaluationProj(Long countryId) {
         var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(Artwork.Status.READY_FOR_EVALUATION));
         return savedOngoingEvaluationProj(artwork, countryId);
     }
 
-    public OngoingEvaluationsProj savedOngoingEvaluationProj(ArtworkDto artwork, Long countryId) {
+    public EvaluableArtworkProj savedOngoingEvaluationProj(ArtworkDto artwork, Long countryId) {
         var qPackage = savedQuotationPackage(artwork.getId());
         var qpc = genQuotationPackageCountryDto(qPackage.getId(), countryId);
         evaluationService
                 .saveQuotationPackageCountries(
                         qPackage.getId(), List.of(qpc));
-        return new OngoingEvaluationsProj(
+        return new EvaluableArtworkProj(
                 qPackage.getArtworkId(),
                 artwork.getTitle(),
                 qpc.getNumberOfEvaluations(),
@@ -196,7 +196,7 @@ public class UtilEvaluation {
         );
     }
 
-    public OngoingEvaluationsProj savedOngoingEvaluationProj() {
+    public EvaluableArtworkProj savedOngoingEvaluationProj() {
         long countryId = utilLocation.savedCountry().getId();
         return savedOngoingEvaluationProj(countryId);
     }
