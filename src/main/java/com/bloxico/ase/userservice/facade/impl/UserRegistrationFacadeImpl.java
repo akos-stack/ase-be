@@ -204,7 +204,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public void sendHostInvitation(HostInvitationRequest request) {
         log.info("UserRegistrationFacadeImpl.sendHostInvitation - start | request: {}", request);
         var userDto = userService.findUserById(request.getUserId());
-        hostInvitationTokenService.checkIfTokenWithGivenTypeExist(request.getUserId());
+        hostInvitationTokenService.requireTokenNotExistsForUser(request.getUserId());
         var token = hostInvitationTokenService.createTokenForUser(request.getUserId());
         mailUtil.sendTokenEmail(HOST_INVITATION, userDto.getEmail(), token.getValue());
         log.info("UserRegistrationFacadeImpl.sendHostInvitation - end | request: {}", request);

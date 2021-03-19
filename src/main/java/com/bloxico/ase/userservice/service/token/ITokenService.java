@@ -19,6 +19,6 @@ public interface ITokenService {
 
     List<Long> deleteExpiredTokens();
 
-    void checkIfTokenWithGivenTypeExist(long userId);
+    void requireTokenNotExistsForUser(long userId);
 
 }

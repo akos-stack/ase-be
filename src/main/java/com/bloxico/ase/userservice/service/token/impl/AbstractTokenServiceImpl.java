@@ -121,15 +121,12 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
     }
 
     @Override
-    public void checkIfTokenWithGivenTypeExist(long userId) {
+    public void requireTokenNotExistsForUser(long userId) {
         var type = getType();
-        log.debug("TokenServiceImpl.checkIfTokenWithGivenTypeExist - start | userId: {}", userId);
-        var tokenDto = tokenRepository
-                .findByTypeAndUserId(type, userId)
-                .map(MAPPER::toDto);
-        if(!tokenDto.isEmpty())
+        log.debug("TokenServiceImpl[{}].requireTokenNotExistsForUser - start | userId: {}", type, userId);
+        if (tokenRepository.findByTypeAndUserId(type, userId).isPresent())
             throw TOKEN_EXISTS.newException();
-        log.debug("TokenServiceImpl.checkIfTokenWithGivenTypeExist - end | userId: {}", userId);
+        log.debug("TokenServiceImpl[{}].requireTokenNotExistsForUser - end | userId: {}", type, userId);
     }
 
     private static String newTokenValue() {
