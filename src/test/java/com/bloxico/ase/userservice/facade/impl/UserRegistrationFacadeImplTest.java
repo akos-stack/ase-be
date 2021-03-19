@@ -2,7 +2,9 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
-import com.bloxico.ase.userservice.exception.*;
+import com.bloxico.ase.userservice.exception.LocationException;
+import com.bloxico.ase.userservice.exception.TokenException;
+import com.bloxico.ase.userservice.exception.UserException;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
@@ -588,4 +590,37 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertTrue(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isPresent());
     }
 
+    @Test
+    public void withdrawHostInvitation_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userRegistrationFacade.withdrawHostInvitation(null));
+    }
+
+    @Test
+    public void withdrawHostInvitation_tokenNotFoundForInvalidUserId() {
+        var request = new HostInvitationWithdrawalRequest(-1L);
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.withdrawHostInvitation(request));
+    }
+
+    @Test
+    public void withdrawHostInvitation_tokenNotFoundForUninvitedUser() {
+        var userId = utilUser.savedUser().getId();
+        var request = new HostInvitationWithdrawalRequest(userId);
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.withdrawHostInvitation(request));
+    }
+
+    @Test
+    public void withdrawHostInvitation() {
+        var userId = utilUser.savedUser().getId();
+        userRegistrationFacade.sendHostInvitation(new HostInvitationRequest(userId));
+        assertTrue(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isPresent());
+
+        userRegistrationFacade.withdrawHostInvitation(new HostInvitationWithdrawalRequest(userId));
+        assertFalse(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isPresent());
+    }
 }
