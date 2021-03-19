@@ -694,4 +694,88 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .statusCode(200);
     }
 
+    @Test
+    public void withdrawHostInvitation_404_tokenNotFoundForInvalidUserId() {
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(new HostInvitationWithdrawalRequest(-1L))
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION_WITHDRAW)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void withdrawHostInvitation_404_tokenNotFoundForUninvitedUser() {
+        var userId = utilUser.savedUser().getId();
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(new HostInvitationWithdrawalRequest(userId))
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION_WITHDRAW)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void withdrawHostInvitation_200_ok() {
+        var userId = utilUser.savedUser().getId();
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(new HostInvitationRequest(userId))
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(new HostInvitationWithdrawalRequest(userId))
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION_WITHDRAW)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    public void withdrawHostInvitation_404_tokenNotFoundOnAnotherWithdrawalRequest() {
+        var userId = utilUser.savedUser().getId();
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(new HostInvitationRequest(userId))
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(new HostInvitationWithdrawalRequest(userId))
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION_WITHDRAW)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(new HostInvitationWithdrawalRequest(userId))
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION_WITHDRAW)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
+    }
 }
