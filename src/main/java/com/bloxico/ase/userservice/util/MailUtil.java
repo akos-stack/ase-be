@@ -36,7 +36,7 @@ public class MailUtil {
 
         HOST_INVITATION(
                 "hostInvitationMailTemplate",
-                        "register",
+                        "register/host",
                         "Art Stock Exchange - Host invitation");
 
         private final String name, relUri, subject;
