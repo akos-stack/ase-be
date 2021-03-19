@@ -3,11 +3,13 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.*;
+import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
 import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
 import com.bloxico.ase.userservice.service.token.ITokenService;
+import com.bloxico.ase.userservice.service.token.impl.HostInvitationTokenServiceImpl;
 import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImpl;
 import com.bloxico.ase.userservice.service.user.*;
 import com.bloxico.ase.userservice.util.MailUtil;
@@ -43,6 +45,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     private final IRolePermissionService rolePermissionService;
     private final MailUtil mailUtil;
     private final IDocumentService documentService;
+    private final ITokenService hostInvitationTokenService;
 
     @Autowired
     public UserRegistrationFacadeImpl(IUserService userService,
@@ -51,7 +54,8 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
                                       RegistrationTokenServiceImpl registrationTokenService,
                                       IPendingEvaluatorService pendingEvaluatorService,
                                       IRolePermissionService rolePermissionService,
-                                      MailUtil mailUtil, IDocumentService documentService)
+                                      MailUtil mailUtil, IDocumentService documentService,
+                                      HostInvitationTokenServiceImpl hostInvitationTokenService)
     {
         this.userService = userService;
         this.userProfileService = userProfileService;
@@ -61,6 +65,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         this.rolePermissionService = rolePermissionService;
         this.mailUtil = mailUtil;
         this.documentService = documentService;
+        this.hostInvitationTokenService = hostInvitationTokenService;
     }
 
     @Override
@@ -199,7 +204,8 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public void sendHostInvitation(HostInvitationRequest request) {
         log.info("UserRegistrationFacadeImpl.sendHostInvitation - start | request: {}", request);
         var userDto = userService.findUserById(request.getUserId());
-        var token = registrationTokenService.createTokenForHost(request.getUserId());
+        hostInvitationTokenService.checkIfTokenWithGivenTypeExist(request.getUserId());
+        var token = hostInvitationTokenService.createTokenForUser(request.getUserId());
         mailUtil.sendTokenEmail(HOST_INVITATION, userDto.getEmail(), token.getValue());
         log.info("UserRegistrationFacadeImpl.sendHostInvitation - end | request: {}", request);
     }
