@@ -186,7 +186,7 @@ public interface UserRegistrationApi {
             produces = {"application/json"},
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'invite_host')")
-    @ApiOperation(value = "Send an invitation to a registered user to email to be the host.")
+    @ApiOperation(value = "Send an invitation to a registered user's email to become a host.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Invitation is sent successfully."),
             @ApiResponse(code = 404, message = "User with given id not found."),
