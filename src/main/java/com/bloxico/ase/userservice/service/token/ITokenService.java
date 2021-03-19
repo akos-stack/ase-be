@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.service.token;
 
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 public interface ITokenService {
@@ -18,5 +19,6 @@ public interface ITokenService {
 
     List<Long> deleteExpiredTokens();
 
-    TokenDto createTokenForHost(Long userId);
+    void checkIfTokenWithGivenTypeExist(long userId);
+
 }

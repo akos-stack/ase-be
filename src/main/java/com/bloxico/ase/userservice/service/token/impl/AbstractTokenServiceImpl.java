@@ -4,15 +4,18 @@ import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.service.token.ITokenService;
+import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.Functions.doto;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_EXISTS;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
@@ -45,21 +48,6 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
         token = tokenRepository.saveAndFlush(token);
         var tokenDto = MAPPER.toDto(token);
         log.debug("TokenServiceImpl[{}].createTokenForUser - end | userId: {}", type, userId);
-        return tokenDto;
-    }
-
-    @Override
-    public TokenDto createTokenForHost(Long userId) {
-        log.debug("TokenServiceImpl[{}].createTokenForHost - start | userId: {}", userId);
-        var token = new Token();
-        token.setValue(newTokenValue());
-        token.setType(Token.Type.HOST_INVITATION);
-        token.setUserId(userId);
-        token.setCreatorId(userId);
-        token.setExpiryDate(newExpiryDate());
-        token = tokenRepository.saveAndFlush(token);
-        var tokenDto = MAPPER.toDto(token);
-        log.debug("TokenServiceImpl[{}].createTokenForHost - end | userId: {}", userId);
         return tokenDto;
     }
 
@@ -130,6 +118,18 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
                 .collect(toUnmodifiableList());
         log.debug("TokenServiceImpl[{}].deleteExpiredTokens - end", type);
         return userIds;
+    }
+
+    @Override
+    public void checkIfTokenWithGivenTypeExist(long userId) {
+        var type = getType();
+        log.debug("TokenServiceImpl.checkIfTokenWithGivenTypeExist - start | userId: {}", userId);
+        var tokenDto = tokenRepository
+                .findByTypeAndUserId(type, userId)
+                .map(MAPPER::toDto);
+        if(!tokenDto.isEmpty())
+            throw TOKEN_EXISTS.newException();
+        log.debug("TokenServiceImpl.checkIfTokenWithGivenTypeExist - end | userId: {}", userId);
     }
 
     private static String newTokenValue() {
