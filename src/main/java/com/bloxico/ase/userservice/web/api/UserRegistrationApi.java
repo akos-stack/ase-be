@@ -186,10 +186,11 @@ public interface UserRegistrationApi {
             produces = {"application/json"},
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'invite_host')")
-    @ApiOperation(value = "Sends a host invitation to the provided email.")
+    @ApiOperation(value = "Send an invitation to a registered user to email to be the host.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Invitation is sent successfully."),
-            @ApiResponse(code = 409, message = "Host with given email is already invited.")
+            @ApiResponse(code = 404, message = "User with given id not found."),
+            @ApiResponse(code = 409, message = "User with given id is already invited to be a host.")
     })
     ResponseEntity<Void> sendHostInvitation(@Valid @RequestBody HostInvitationRequest request);
 }
