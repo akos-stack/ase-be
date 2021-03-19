@@ -3,7 +3,6 @@ package com.bloxico.ase.userservice.facade.impl;
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.*;
-import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
@@ -27,9 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.FileCategory.CV;
 import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
-import static com.bloxico.ase.userservice.util.MailUtil.Template.EVALUATOR_INVITATION;
-import static com.bloxico.ase.userservice.util.MailUtil.Template.HOST_INVITATION;
-import static com.bloxico.ase.userservice.util.MailUtil.Template.VERIFICATION;
+import static com.bloxico.ase.userservice.util.MailUtil.Template.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
 
 @Slf4j

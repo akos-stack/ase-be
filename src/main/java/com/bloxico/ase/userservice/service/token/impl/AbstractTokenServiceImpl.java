@@ -4,11 +4,9 @@ import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.service.token.ITokenService;
-import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
