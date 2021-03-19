@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.Functions.doto;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_EXISTS;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
@@ -115,6 +116,15 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
                 .collect(toUnmodifiableList());
         log.debug("TokenServiceImpl[{}].deleteExpiredTokens - end", type);
         return userIds;
+    }
+
+    @Override
+    public void requireTokenNotExistsForUser(long userId) {
+        var type = getType();
+        log.debug("TokenServiceImpl[{}].requireTokenNotExistsForUser - start | userId: {}", type, userId);
+        if (tokenRepository.findByTypeAndUserId(type, userId).isPresent())
+            throw TOKEN_EXISTS.newException();
+        log.debug("TokenServiceImpl[{}].requireTokenNotExistsForUser - end | userId: {}", type, userId);
     }
 
     private static String newTokenValue() {

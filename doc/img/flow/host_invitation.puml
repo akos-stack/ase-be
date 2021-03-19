@@ -1,0 +1,9 @@
+@startuml
+Admin -> UserRegistrationApi: /user/registration/host/invitation
+UserRegistrationApi --> IUserRegistrationFacade: sendHostInvitation(HostInvitationRequest)
+IUserRegistrationFacade -> IUserService : findUserByIdAndRole(userId, Role.EVALUATOR)
+IUserService --> IUserRegistrationFacade : UserDto
+IUserRegistrationFacade -> ITokenService : createTokenForUser(userId)
+ITokenService --> IUserRegistrationFacade : TokenDto
+IUserRegistrationFacade -> MailUtils : sendTokenEmail(HOST_INVITATION, email, value)
+@enduml

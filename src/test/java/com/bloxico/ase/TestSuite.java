@@ -40,6 +40,7 @@ import org.junit.runners.Suite;
         OAuthClientDetailsServiceImplTest.class,
         RegistrationTokenServiceImplTest.class,
         PasswordResetTokenServiceImplTest.class,
+        HostInvitationTokenServiceImplTest.class,
         LocationServiceImplTest.class,
         PendingEvaluatorServiceImplTest.class,
         S3ServiceImplTest.class,
