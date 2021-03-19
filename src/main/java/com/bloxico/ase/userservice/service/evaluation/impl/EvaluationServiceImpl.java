@@ -1,12 +1,15 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.*;
+import com.bloxico.ase.userservice.entity.evaluation.QuotationPackageCountry;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
+import com.bloxico.ase.userservice.proj.evaluation.OngoingEvaluationsProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.ISearchCountryEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchEvaluableArtworksRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionEvaluationDetailsRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -161,6 +164,16 @@ public class EvaluationServiceImpl implements IEvaluationService {
         return quotationPackageCountryDtos;
     }
 
+    @Override
+    public Page<OngoingEvaluationsProj> searchOngoingEvaluations(SearchEvaluableArtworksRequest request, PageRequest pageRequest) {
+        log.debug("EvaluationServiceImpl.findAllOngoingEvaluationsByCountryId - start | request: {}, pageRequest: {}", request, pageRequest);
+        requireNonNull(request);
+        requireNonNull(pageRequest);
+        var result = quotationPackageRepository.searchOngoingEvaluations(request.getCountryId(), request.getTitle(), request.getCategories(), pageRequest.toPageable());
+        log.debug("EvaluationServiceImpl.findAllOngoingEvaluationsByCountryId - end | request: {}, pageRequest: {}", request, pageRequest);
+        return result;
+    }
+
     private void requireNotExists(CountryEvaluationDetailsDto dto) {
         if (countryEvaluationDetailsRepository.findByCountryId(dto.getCountryId()).isPresent())
             throw COUNTRY_EVALUATION_DETAILS_EXISTS.newException();
@@ -172,7 +185,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     private void requireNotExists(QuotationPackageCountryDto dto) {
-        if (quotationPackageCountryRepository.findByIdCountryId(dto.getCountryId()).isPresent())
+        if (quotationPackageCountryRepository.findById(new QuotationPackageCountry.Id(dto.getQuotationPackageId(), dto.getCountryId())).isPresent())
             throw QUOTATION_PACKAGE_COUNTRY_EXISTS.newException();
     }
 

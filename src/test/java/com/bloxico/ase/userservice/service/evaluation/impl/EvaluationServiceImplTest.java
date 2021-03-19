@@ -1,14 +1,18 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
+import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
+import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.bloxico.ase.userservice.exception.EvaluationException;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchEvaluableArtworksRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.bloxico.ase.testutil.Util.allPages;
 import static org.hamcrest.Matchers.*;
@@ -24,6 +28,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private EvaluationServiceImpl evaluationService;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
+    @Autowired private UtilArtwork utilArtwork;
 
     @Test
     public void findCountryEvaluationDetailsById_detailsNotFound() {
@@ -296,6 +301,62 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
             assertEquals(packageId, qpc.getQuotationPackageId());
             assertTrue(qpc.getNumberOfEvaluations() > 0);
         }
+    }
+
+    @Test
+    public void searchEvaluable_nullSearchRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.searchOngoingEvaluations(null, allPages()));
+    }
+
+    @Test
+    public void searchEvaluable_nullPageRequest() {
+        var request = utilEvaluation.genSearchEvaluableArtworksRequest();
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationService.searchOngoingEvaluations(request, null));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluableByCountry() {
+        long countryId = utilLocation.savedCountry().getId();
+        var evaluable1 = utilEvaluation.savedOngoingEvaluationProj(countryId);
+        var evaluable2 = utilEvaluation.savedOngoingEvaluationProj(countryId);
+        var evaluable3 = utilEvaluation.savedOngoingEvaluationProj();
+        var request = utilEvaluation.genSearchEvaluableArtworksRequest(countryId);
+        assertThat(
+                evaluationService.searchOngoingEvaluations(request, allPages()),
+                allOf(hasItems(evaluable1, evaluable2), not(hasItems(evaluable3))));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluableByCountryAndTitle() {
+        long countryId = utilLocation.savedCountry().getId();
+        var evaluable1 = utilEvaluation.savedOngoingEvaluationProj(countryId);
+        var evaluable2 = utilEvaluation.savedOngoingEvaluationProj(countryId);
+        var evaluable3 = utilEvaluation.savedOngoingEvaluationProj();
+        var request = utilEvaluation.genSearchEvaluableArtworksRequest(countryId, evaluable1.getArtworkTitle());
+        assertThat(
+                evaluationService.searchOngoingEvaluations(request, allPages()),
+                allOf(hasItems(evaluable1), not(hasItems(evaluable2, evaluable3))));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluable() {
+        var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(Artwork.Status.READY_FOR_EVALUATION));
+        var categories = artwork.getCategories().stream().map(ArtworkMetadataDto::getName).collect(Collectors.toList());
+        long countryId = utilLocation.savedCountry().getId();
+        var evaluable1 = utilEvaluation.savedOngoingEvaluationProj(artwork, countryId);
+        var evaluable2 = utilEvaluation.savedOngoingEvaluationProj(countryId);
+        var evaluable3 = utilEvaluation.savedOngoingEvaluationProj();
+        var request = new SearchEvaluableArtworksRequest(countryId, evaluable1.getArtworkTitle(), categories);
+        assertThat(
+                evaluationService.searchOngoingEvaluations(request, allPages()),
+                allOf(hasItems(evaluable1), not(hasItems(evaluable2, evaluable3))));
     }
 
 }

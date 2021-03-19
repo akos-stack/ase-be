@@ -1,12 +1,20 @@
 package com.bloxico.ase.testutil;
 
-import com.bloxico.ase.userservice.dto.entity.evaluation.*;
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
 import com.bloxico.ase.userservice.entity.address.Region;
-import com.bloxico.ase.userservice.entity.evaluation.*;
+import com.bloxico.ase.userservice.entity.artwork.Artwork;
+import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
+import com.bloxico.ase.userservice.entity.evaluation.QuotationPackage;
+import com.bloxico.ase.userservice.entity.evaluation.QuotationPackageCountry;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
+import com.bloxico.ase.userservice.proj.evaluation.OngoingEvaluationsProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageRepository;
+import com.bloxico.ase.userservice.service.evaluation.impl.EvaluationServiceImpl;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,6 +34,7 @@ public class UtilEvaluation {
     @Autowired private UtilArtwork utilArtwork;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
     @Autowired private QuotationPackageRepository quotationPackageRepository;
+    @Autowired private EvaluationServiceImpl evaluationService;
 
     public CountryEvaluationDetails genCountryEvaluationDetails(Long countryId) {
         var details = new CountryEvaluationDetails();
@@ -116,7 +125,11 @@ public class UtilEvaluation {
     }
 
     public QuotationPackage genQuotationPackage() {
-        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto(Artwork.Status.READY_FOR_EVALUATION)).getId();
+        return genQuotationPackage(artworkId);
+    }
+
+    public QuotationPackage genQuotationPackage(Long artworkId) {
         var qPackage = new QuotationPackage();
         qPackage.setArtworkId(artworkId);
         return qPackage;
@@ -133,12 +146,23 @@ public class UtilEvaluation {
         return quotationPackageRepository.saveAndFlush(qPackage);
     }
 
+    public QuotationPackage savedQuotationPackage(Long artworkId) {
+        var principalId = utilUser.savedAdmin().getId();
+        var qPackage = genQuotationPackage(artworkId);
+        qPackage.setCreatorId(principalId);
+        return quotationPackageRepository.saveAndFlush(qPackage);
+    }
+
     public QuotationPackageDto savedQuotationPackageDto() {
         return MAPPER.toDto(savedQuotationPackage());
     }
 
     public QuotationPackageCountry genQuotationPackageCountry(long packageId) {
         var countryId = utilLocation.savedCountry().getId();
+        return genQuotationPackageCountry(packageId, countryId);
+    }
+
+    public QuotationPackageCountry genQuotationPackageCountry(long packageId, long countryId) {
         var qpCountry = new QuotationPackageCountry();
         qpCountry.setNumberOfEvaluations(genPosInt(50));
         qpCountry.setId(new QuotationPackageCountry.Id(packageId, countryId));
@@ -147,6 +171,34 @@ public class UtilEvaluation {
 
     public QuotationPackageCountryDto genQuotationPackageCountryDto(long packageId) {
         return MAPPER.toDto(genQuotationPackageCountry(packageId));
+    }
+
+    public QuotationPackageCountryDto genQuotationPackageCountryDto(long packageId, long countryId) {
+        return MAPPER.toDto(genQuotationPackageCountry(packageId, countryId));
+    }
+
+    public OngoingEvaluationsProj savedOngoingEvaluationProj(Long countryId) {
+        var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(Artwork.Status.READY_FOR_EVALUATION));
+        return savedOngoingEvaluationProj(artwork, countryId);
+    }
+
+    public OngoingEvaluationsProj savedOngoingEvaluationProj(ArtworkDto artwork, Long countryId) {
+        var qPackage = savedQuotationPackage(artwork.getId());
+        var qpc = genQuotationPackageCountryDto(qPackage.getId(), countryId);
+        evaluationService
+                .saveQuotationPackageCountries(
+                        qPackage.getId(), List.of(qpc));
+        return new OngoingEvaluationsProj(
+                qPackage.getArtworkId(),
+                artwork.getTitle(),
+                qpc.getNumberOfEvaluations(),
+                0
+        );
+    }
+
+    public OngoingEvaluationsProj savedOngoingEvaluationProj() {
+        long countryId = utilLocation.savedCountry().getId();
+        return savedOngoingEvaluationProj(countryId);
     }
 
     public SaveQuotationPackageRequest genSaveQuotationPackageRequest() {
@@ -189,6 +241,18 @@ public class UtilEvaluation {
 
     public SearchRegionEvaluationDetailsRequest genDefaultSearchRegionsRequest() {
         return new SearchRegionEvaluationDetailsRequest("");
+    }
+
+    public SearchEvaluableArtworksRequest genSearchEvaluableArtworksRequest() {
+        var countryId = utilLocation.savedCountry().getId();
+        return genSearchEvaluableArtworksRequest(countryId);
+    }
+    public SearchEvaluableArtworksRequest genSearchEvaluableArtworksRequest(Long countryId) {
+        return new SearchEvaluableArtworksRequest(countryId, "", null);
+    }
+
+    public SearchEvaluableArtworksRequest genSearchEvaluableArtworksRequest(Long countryId, String title) {
+        return new SearchEvaluableArtworksRequest(countryId, title, null);
     }
 
 }
