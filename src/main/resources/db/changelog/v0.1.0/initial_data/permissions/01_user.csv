@@ -8,3 +8,4 @@ id,name
 107,register_as_evaluator
 108,download_user_resume
 109,set_password
+110,invite_host

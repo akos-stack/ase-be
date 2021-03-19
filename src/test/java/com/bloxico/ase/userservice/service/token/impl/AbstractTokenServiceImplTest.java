@@ -154,4 +154,18 @@ public abstract class AbstractTokenServiceImplTest extends AbstractSpringTest {
                 allOf(hasItems(valid), not(hasItems(expired))));
     }
 
+    @Test
+    public void requireTokenNotExistsForUser_tokenNotExists() {
+        var userId = utilUser.savedUser().getId();
+        tokenService().requireTokenNotExistsForUser(userId);
+    }
+
+    @Test
+    public void requireTokenNotExistsForUser_tokenExists() {
+        var userId = utilToken.savedToken(tokenType()).getUserId();
+        assertThrows(
+                TokenException.class,
+                () -> tokenService().requireTokenNotExistsForUser(userId));
+    }
+
 }

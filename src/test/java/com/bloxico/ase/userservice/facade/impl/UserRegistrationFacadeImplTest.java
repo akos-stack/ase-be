@@ -19,6 +19,7 @@ import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.testutil.UtilToken.genSearchPendingEvaluatorsRequest;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
+import static com.bloxico.ase.userservice.entity.token.Token.Type.HOST_INVITATION;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.entity.user.Role.USER;
@@ -552,6 +553,39 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         var response = userRegistrationFacade.downloadEvaluatorResume(
                 new DownloadEvaluatorResumeRequest(user.getEmail()));
         assertNotNull(response);
+    }
+
+    @Test
+    public void sendHostInvitation_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userRegistrationFacade.sendHostInvitation(null));
+    }
+
+    @Test
+    public void sendHostInvitation_userNotFound() {
+        var request = new HostInvitationRequest(-1L);
+        assertThrows(
+                UserException.class,
+                () -> userRegistrationFacade.sendHostInvitation(request));
+    }
+
+    @Test
+    public void sendHostInvitation_hostAlreadyInvited() {
+        var userId = utilUser.savedUser().getId();
+        var request = new HostInvitationRequest(userId);
+        userRegistrationFacade.sendHostInvitation(request);
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.sendHostInvitation(request));
+    }
+
+    @Test
+    public void sendHostInvitation() {
+        var userId = utilUser.savedUser().getId();
+        var request = new HostInvitationRequest(userId);
+        userRegistrationFacade.sendHostInvitation(request);
+        assertTrue(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isPresent());
     }
 
 }

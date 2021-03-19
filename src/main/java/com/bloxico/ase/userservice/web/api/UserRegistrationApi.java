@@ -32,6 +32,7 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_REQUEST             = "/user/registration/evaluator/request";
     String REGISTRATION_EVALUATOR_SEARCH              = "/user/registration/evaluator/search";
     String REGISTRATION_EVALUATOR_RESUME_DOWNLOAD     = "/user/registration/evaluator/resume";
+    String REGISTRATION_HOST_INVITATION               = "/user/registration/host/invitation";
     // @formatter:on
 
     @PostMapping(
@@ -178,5 +179,18 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 400, message = "Download resume failed for some reason.")
     })
     ResponseEntity<Resource> downloadEvaluatorResume(@Valid DownloadEvaluatorResumeRequest request);
+
+    @PostMapping(
+            value = REGISTRATION_HOST_INVITATION,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'invite_host')")
+    @ApiOperation(value = "Send an invitation to a registered user's email to become a host.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Invitation is sent successfully."),
+            @ApiResponse(code = 404, message = "User with given id not found."),
+            @ApiResponse(code = 409, message = "User with given id is already invited to be a host.")
+    })
+    ResponseEntity<Void> sendHostInvitation(@Valid @RequestBody HostInvitationRequest request);
 
 }
