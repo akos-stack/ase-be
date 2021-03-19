@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
+import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.exception.*;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
@@ -19,6 +20,7 @@ import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.testutil.UtilToken.genSearchPendingEvaluatorsRequest;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.INVITED;
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
+import static com.bloxico.ase.userservice.entity.token.Token.Type.HOST_INVITATION;
 import static com.bloxico.ase.userservice.entity.token.Token.Type.REGISTRATION;
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.entity.user.Role.USER;
@@ -554,4 +556,45 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertNotNull(response);
     }
 
+    @Test
+    public void sendHostInvitation_requestIsNull() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userRegistrationFacade.sendHostInvitation(null));
+    }
+
+    @Test
+    public void sendHostInvitation_hostAlreadyInvited() {
+        var user = utilUser.savedUser();
+
+        var request = new HostInvitationRequest(user.getId());
+        userRegistrationFacade.sendHostInvitation(request);
+        assertNotNull(utilToken.getSavedTokens(user.getId(), Token.Type.HOST_INVITATION));
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.sendHostInvitation(request));
+    }
+
+    @Test
+    public void sendHostInvitation() {
+        var user = utilUser.savedUser();
+
+        var request = new HostInvitationRequest(user.getId());
+        userRegistrationFacade.sendHostInvitation(request);
+
+        var savedToken = utilToken.getSavedTokens(user.getId(), Token.Type.HOST_INVITATION);
+
+        assertNotNull(savedToken);
+        assertNotNull(utilToken.getSavedTokens(user.getId()).contains(savedToken));
+        assertEquals(savedToken.get().getType(), HOST_INVITATION);
+        assertEquals(savedToken.get().getUserId(), user.getId());
+    }
+
+    @Test
+    public void sendHostInvitation_userNotRegistered() {
+        var request = new HostInvitationRequest(-12345678910L);
+        assertThrows(
+                UserException.class,
+                () -> userRegistrationFacade.sendHostInvitation(request));
+    }
 }
