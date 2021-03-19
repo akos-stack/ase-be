@@ -2,7 +2,9 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.userservice.dto.entity.address.LocationDto;
 import com.bloxico.ase.userservice.dto.entity.user.UserDto;
-import com.bloxico.ase.userservice.dto.entity.user.profile.*;
+import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
+import com.bloxico.ase.userservice.dto.entity.user.profile.UserProfileDto;
 import com.bloxico.ase.userservice.facade.IUserRegistrationFacade;
 import com.bloxico.ase.userservice.service.address.ILocationService;
 import com.bloxico.ase.userservice.service.document.IDocumentService;
@@ -10,7 +12,9 @@ import com.bloxico.ase.userservice.service.token.IPendingEvaluatorService;
 import com.bloxico.ase.userservice.service.token.ITokenService;
 import com.bloxico.ase.userservice.service.token.impl.HostInvitationTokenServiceImpl;
 import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImpl;
-import com.bloxico.ase.userservice.service.user.*;
+import com.bloxico.ase.userservice.service.user.IRolePermissionService;
+import com.bloxico.ase.userservice.service.user.IUserProfileService;
+import com.bloxico.ase.userservice.service.user.IUserService;
 import com.bloxico.ase.userservice.util.MailUtil;
 import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
@@ -205,6 +209,14 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var token = hostInvitationTokenService.createTokenForUser(request.getUserId());
         mailUtil.sendTokenEmail(HOST_INVITATION, userDto.getEmail(), token.getValue());
         log.info("UserRegistrationFacadeImpl.sendHostInvitation - end | request: {}", request);
+    }
+
+    @Override
+    public void withdrawHostInvitation(HostInvitationWithdrawalRequest request) {
+        log.info("UserRegistrationFacadeImpl.withdrawHostInvitation - start | request: {}", request);
+        var tokenDto = hostInvitationTokenService.getTokenByUserId(request.getUserId());
+        hostInvitationTokenService.consumeToken(tokenDto.getValue());
+        log.info("UserRegistrationFacadeImpl.withdrawHostInvitation - end | request: {}", request);
     }
 
     // HELPER METHODS
