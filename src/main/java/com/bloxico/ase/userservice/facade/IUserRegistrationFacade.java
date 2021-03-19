@@ -37,4 +37,6 @@ public interface IUserRegistrationFacade {
 
     ByteArrayResource downloadEvaluatorResume(DownloadEvaluatorResumeRequest request);
 
+    void sendHostInvitation(HostInvitationRequest request);
+
 }

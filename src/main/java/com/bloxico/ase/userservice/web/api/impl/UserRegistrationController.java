@@ -101,4 +101,10 @@ public class UserRegistrationController implements UserRegistrationApi {
         return ResponseEntity.ok(response);
     }
 
+    @Override
+    public ResponseEntity<Void> sendHostInvitation(HostInvitationRequest request) {
+        userRegistrationFacade.sendHostInvitation(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
