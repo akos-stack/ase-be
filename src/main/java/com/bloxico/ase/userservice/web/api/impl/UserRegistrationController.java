@@ -8,7 +8,10 @@ import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
-import com.bloxico.ase.userservice.web.model.user.*;
+import com.bloxico.ase.userservice.web.model.user.DownloadEvaluatorResumeRequest;
+import com.bloxico.ase.userservice.web.model.user.RefreshRegistrationTokenRequest;
+import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
+import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -104,6 +107,12 @@ public class UserRegistrationController implements UserRegistrationApi {
     @Override
     public ResponseEntity<Void> sendHostInvitation(HostInvitationRequest request) {
         userRegistrationFacade.sendHostInvitation(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Void> withdrawHostInvitation(HostInvitationWithdrawalRequest request) {
+        userRegistrationFacade.withdrawHostInvitation(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

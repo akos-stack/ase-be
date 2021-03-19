@@ -6,12 +6,21 @@ import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
-import com.bloxico.ase.userservice.web.model.user.*;
-import io.swagger.annotations.*;
+import com.bloxico.ase.userservice.web.model.user.DownloadEvaluatorResumeRequest;
+import com.bloxico.ase.userservice.web.model.user.RefreshRegistrationTokenRequest;
+import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
+import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
 
@@ -33,6 +42,7 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_SEARCH              = "/user/registration/evaluator/search";
     String REGISTRATION_EVALUATOR_RESUME_DOWNLOAD     = "/user/registration/evaluator/resume";
     String REGISTRATION_HOST_INVITATION               = "/user/registration/host/invitation";
+    String REGISTRATION_HOST_INVITATION_WITHDRAW      = "/user/registration/host/invitation/withdraw";
     // @formatter:on
 
     @PostMapping(
@@ -192,5 +202,17 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 409, message = "User with given id is already invited to be a host.")
     })
     ResponseEntity<Void> sendHostInvitation(@Valid @RequestBody HostInvitationRequest request);
+
+    @PostMapping(
+            value = REGISTRATION_HOST_INVITATION_WITHDRAW,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'invite_host')")
+    @ApiOperation(value = "Withdraws an existing host invitation.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Host invitation is withdrawn successfully."),
+            @ApiResponse(code = 404, message = "User with given id is not invited to be a host.")
+    })
+    ResponseEntity<Void> withdrawHostInvitation(@Valid @RequestBody HostInvitationWithdrawalRequest request);
 
 }
