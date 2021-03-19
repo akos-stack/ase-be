@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -29,9 +28,9 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
             "   AND (:status IS NULL OR a.status = :status)    " +
             "   AND " + OWNERSHIP_CHECK)
     // @formatter:on
-    Page<Artwork> search(@Param("status") Status status,
-                         @Param("title") String title,
-                         @Param("owner") Long owner,
+    Page<Artwork> search(Status status,
+                         String title,
+                         Long owner,
                          Pageable pageable);
 
     // @formatter:off
@@ -41,7 +40,6 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
             " WHERE a.id = :id " +
             "   AND " + OWNERSHIP_CHECK)
     // @formatter:on
-    Optional<Artwork> findByIdForOwner(@Param("id") Long id,
-                                       @Param("owner") Long owner);
+    Optional<Artwork> findByIdForOwner(Long id, Long owner);
 
 }
