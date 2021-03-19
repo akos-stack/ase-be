@@ -627,4 +627,74 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .body(notNullValue());
     }
 
+    @Test
+    public void sendHostInvitation_409_hostAlreadyInvited() {
+        var registration = utilAuth.doConfirmedRegistration();
+        var request = new HostInvitationRequest(registration.getId());
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(200);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(409)
+                .body(ERROR_CODE, is(ErrorCodes.Token.TOKEN_EXISTS.getCode()));
+    }
+
+    @Test
+    public void sendHostInvitation_404_userNotFound() {
+        var request = new HostInvitationRequest(-12345678910L);
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.User.USER_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void sendHostInvitation_200_ok() {
+        var registration = utilAuth.doConfirmedRegistration();
+        var request = new HostInvitationRequest(registration.getId());
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    public void sendHostInvitation_200_ok_specific_role() {
+        var registration = utilUserProfile.savedEvaluator();
+        var request = new HostInvitationRequest(registration.getId());
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(request)
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
 }
