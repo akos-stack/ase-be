@@ -628,9 +628,23 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    public void sendHostInvitation_404_userNotFound() {
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .contentType(JSON)
+                .body(new HostInvitationRequest(-1L))
+                .when()
+                .post(API_URL + REGISTRATION_HOST_INVITATION)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(ErrorCodes.User.USER_NOT_FOUND.getCode()));
+    }
+
+    @Test
     public void sendHostInvitation_409_hostAlreadyInvited() {
-        var registration = utilAuth.doConfirmedRegistration();
-        var request = new HostInvitationRequest(registration.getId());
+        var userId = utilUser.savedUser().getId();
+        var request = new HostInvitationRequest(userId);
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
@@ -653,28 +667,12 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void sendHostInvitation_404_userNotFound() {
-        var request = new HostInvitationRequest(-12345678910L);
-        given()
-                .header("Authorization", utilAuth.doAdminAuthentication())
-                .contentType(JSON)
-                .body(request)
-                .when()
-                .post(API_URL + REGISTRATION_HOST_INVITATION)
-                .then()
-                .assertThat()
-                .statusCode(404)
-                .body(ERROR_CODE, is(ErrorCodes.User.USER_NOT_FOUND.getCode()));
-    }
-
-    @Test
     public void sendHostInvitation_200_ok() {
-        var registration = utilAuth.doConfirmedRegistration();
-        var request = new HostInvitationRequest(registration.getId());
+        var userId = utilUser.savedUser().getId();
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .body(request)
+                .body(new HostInvitationRequest(userId))
                 .when()
                 .post(API_URL + REGISTRATION_HOST_INVITATION)
                 .then()
@@ -684,12 +682,11 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     public void sendHostInvitation_200_ok_specific_role() {
-        var registration = utilUserProfile.savedEvaluator();
-        var request = new HostInvitationRequest(registration.getId());
+        var userId = utilUserProfile.savedEvaluator().getUserProfile().getUserId();
         given()
                 .header("Authorization", utilAuth.doAdminAuthentication())
                 .contentType(JSON)
-                .body(request)
+                .body(new HostInvitationRequest(userId))
                 .when()
                 .post(API_URL + REGISTRATION_HOST_INVITATION)
                 .then()

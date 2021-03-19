@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
@@ -53,16 +51,6 @@ public class UtilToken {
         token.setType(type);
         token.setExpiryDate(genNonExpiredLDT());
         token.setCreatorId(adminId);
-        return tokenRepository.saveAndFlush(token);
-    }
-
-    public Token savedToken(Token.Type type, String value, long userId) {
-        var token = new Token();
-        token.setUserId(userId);
-        token.setValue(value);
-        token.setType(type);
-        token.setExpiryDate(genNonExpiredLDT());
-        token.setCreatorId(userId);
         return tokenRepository.saveAndFlush(token);
     }
 
@@ -116,14 +104,6 @@ public class UtilToken {
                 .filter(t -> t.getValue().equals(value))
                 .findAny()
                 .orElseThrow();
-    }
-
-    public Optional<Token> getSavedTokens(long userId, Token.Type type) {
-        return tokenRepository.findByTypeAndUserId(type, userId);
-    }
-
-    public List<Token> getSavedTokens(long userId) {
-        return tokenRepository.findAll();
     }
 
     public BlacklistedToken savedBlacklistedToken() {
