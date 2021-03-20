@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.service.token.impl;
 
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
+import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.service.token.ITokenService;
@@ -125,6 +126,17 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
         if (tokenRepository.findByTypeAndUserId(type, userId).isPresent())
             throw TOKEN_EXISTS.newException();
         log.debug("TokenServiceImpl[{}].requireTokenNotExistsForUser - end | userId: {}", type, userId);
+    }
+
+    @Override
+    public void checkIfTokenExists(String tokenValue) {
+        log.debug("TokenServiceImpl.checkIfTokenExists - start | tokenValue: {}", tokenValue);
+        requireNonNull(tokenValue);
+        tokenRepository
+                .findByValue(tokenValue)
+                .filter(not(Token::isExpired))
+                .orElseThrow(TOKEN_NOT_FOUND::newException);
+        log.debug("TokenServiceImpl.checkIfTokenExists - end | tokenValue: {}", tokenValue);
     }
 
     private static String newTokenValue() {
