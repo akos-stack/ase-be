@@ -9,15 +9,15 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@Api(value = "artworksMetadataManagement")
+@Api(value = "artworkMetadata")
 public interface ArtworkMetadataApi {
 
     // @formatter:off
-    String ARTWORK_METADATA_SAVE     = "/artwork/management/metadata/save";
-    String ARTWORK_METADATA_UPDATE   = "/artwork/management/metadata/update";
-    String ARTWORK_METADATA_DELETE   = "/artwork/management/metadata/delete";
-    String ARTWORK_METADATA_SEARCH   = "/artwork/management/metadata";
-    String ARTWORK_METADATA_APPROVED = "/artwork/approved-metadata";
+    String ARTWORK_METADATA_SAVE            = "/management/artwork/metadata/save";
+    String ARTWORK_METADATA_UPDATE          = "/management/artwork/metadata/update";
+    String ARTWORK_METADATA_DELETE          = "/management/artwork/metadata/delete";
+    String ARTWORK_METADATA_SEARCH          = "/management/artwork/metadata/search";
+    String ARTWORK_METADATA_SEARCH_APPROVED = "/artwork/metadata/search";
     // @formatter:on
 
     @PostMapping(
@@ -66,7 +66,7 @@ public interface ArtworkMetadataApi {
             @Valid SearchArtworkMetadataRequest request,
             @Valid PageRequest page);
 
-    @GetMapping(value = ARTWORK_METADATA_APPROVED)
+    @GetMapping(value = ARTWORK_METADATA_SEARCH_APPROVED)
     @ApiOperation(value = "Searches approved artwork metadata.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Approved artwork metadata successfully searched.")

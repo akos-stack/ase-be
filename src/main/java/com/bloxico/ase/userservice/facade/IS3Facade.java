@@ -5,7 +5,7 @@ import org.springframework.core.io.ByteArrayResource;
 
 public interface IS3Facade {
 
-    void validateFile(ValidateFileRequest request);
+    ValidateFilesResponse invalidFiles(ValidateFilesRequest request);
 
     ByteArrayResource downloadFile(DownloadFileRequest request);
 

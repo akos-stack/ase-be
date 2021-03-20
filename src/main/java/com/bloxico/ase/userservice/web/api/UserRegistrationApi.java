@@ -32,6 +32,8 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_REQUEST             = "/user/registration/evaluator/request";
     String REGISTRATION_EVALUATOR_SEARCH              = "/user/registration/evaluator/search";
     String REGISTRATION_EVALUATOR_RESUME_DOWNLOAD     = "/user/registration/evaluator/resume";
+    String REGISTRATION_HOST_INVITATION               = "/user/registration/host/invitation";
+    String REGISTRATION_HOST_INVITATION_WITHDRAW      = "/user/registration/host/invitation/withdraw";
     // @formatter:on
 
     @PostMapping(
@@ -57,13 +59,12 @@ public interface UserRegistrationApi {
     })
     ResponseEntity<Void> confirmRegistration(@Valid @RequestBody TokenValidationRequest request);
 
-    @ApiOperation(
-            value = "Refreshes expired registration token.")
+    @GetMapping(value = REGISTRATION_TOKEN_REFRESH_ENDPOINT)
+    @ApiOperation(value = "Refreshes expired registration token.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Token is refreshed and email has been sent with updated token value."),
             @ApiResponse(code = 404, message = "Provided token is not found.")
     })
-    @GetMapping(value = REGISTRATION_TOKEN_REFRESH_ENDPOINT)
     ResponseEntity<Void> refreshRegistrationToken(@Valid RefreshRegistrationTokenRequest request);
 
     @PostMapping(
@@ -179,5 +180,30 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 400, message = "Download resume failed for some reason.")
     })
     ResponseEntity<Resource> downloadEvaluatorResume(@Valid DownloadEvaluatorResumeRequest request);
+
+    @PostMapping(
+            value = REGISTRATION_HOST_INVITATION,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'invite_host')")
+    @ApiOperation(value = "Send an invitation to a registered user's email to become a host.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Invitation is sent successfully."),
+            @ApiResponse(code = 404, message = "User with given id not found."),
+            @ApiResponse(code = 409, message = "User with given id is already invited to be a host.")
+    })
+    ResponseEntity<Void> sendHostInvitation(@Valid @RequestBody HostInvitationRequest request);
+
+    @PostMapping(
+            value = REGISTRATION_HOST_INVITATION_WITHDRAW,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'invite_host')")
+    @ApiOperation(value = "Withdraws an existing host invitation.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Host invitation is withdrawn successfully."),
+            @ApiResponse(code = 404, message = "User with given id is not invited to be a host.")
+    })
+    ResponseEntity<Void> withdrawHostInvitation(@Valid @RequestBody HostInvitationWithdrawalRequest request);
 
 }

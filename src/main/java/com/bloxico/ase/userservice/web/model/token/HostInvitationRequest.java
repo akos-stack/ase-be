@@ -1,6 +1,6 @@
-package com.bloxico.ase.userservice.web.model.address;
+package com.bloxico.ase.userservice.web.model.token;
 
-import io.swagger.annotations.ApiParam;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
@@ -10,10 +10,10 @@ import static lombok.AccessLevel.PRIVATE;
 @Value
 @AllArgsConstructor
 @NoArgsConstructor(force = true, access = PRIVATE)
-public class DeleteRegionRequest {
+public class HostInvitationRequest {
 
     @NotNull
-    @ApiParam(name = "id", required = true)
-    Long id;
+    @JsonProperty("user_id")
+    Long userId;
 
 }

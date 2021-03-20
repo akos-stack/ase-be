@@ -11,8 +11,8 @@ import org.springframework.data.jpa.domain.JpaSort;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.stream.Stream;
 
-import static java.util.stream.Stream.of;
 import static lombok.AccessLevel.PRIVATE;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 
@@ -57,8 +57,10 @@ public class PageRequest {
     }
 
     private String[] toUnsafeSort(String sort) {
-        return of(sort.split(","))
+        return Stream
+                .of(sort.split(","))
                 .map(s -> "(" + s + ")")
                 .toArray(String[]::new);
     }
+
 }

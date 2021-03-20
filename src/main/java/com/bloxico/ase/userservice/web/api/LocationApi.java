@@ -12,12 +12,12 @@ import javax.validation.Valid;
 public interface LocationApi {
 
     // @formatter:off
-    String REGIONS                   = "/regions";
-    String REGION_MANAGEMENT_SAVE    = "/region/management/save";
-    String REGION_MANAGEMENT_DELETE  = "/region/management/delete";
-    String COUNTRIES                 = "/countries";
-    String COUNTRY_MANAGEMENT_SAVE   = "/country/management/save";
-    String COUNTRY_MANAGEMENT_UPDATE = "/country/management/update";
+    String REGIONS            = "/regions";
+    String MNG_REGION_SAVE    = "/management/region/save";
+    String MNG_REGION_DELETE  = "/management/region/delete";
+    String COUNTRIES          = "/countries";
+    String MGN_COUNTRY_SAVE   = "/management/country/save";
+    String MNG_COUNTRY_UPDATE = "/management/country/update";
     // @formatter:on
 
     @GetMapping(
@@ -30,7 +30,7 @@ public interface LocationApi {
     ResponseEntity<SearchRegionsResponse> findAllRegions();
 
     @PostMapping(
-            value = REGION_MANAGEMENT_SAVE,
+            value = MNG_REGION_SAVE,
             produces = {"application/json"},
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'save_region')")
@@ -41,8 +41,8 @@ public interface LocationApi {
     })
     ResponseEntity<SaveRegionResponse> saveRegion(@Valid @RequestBody SaveRegionRequest request);
 
-    @PostMapping(
-            value = REGION_MANAGEMENT_DELETE,
+    @DeleteMapping(
+            value = MNG_REGION_DELETE,
             produces = {"application/json"},
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'delete_region')")
@@ -52,7 +52,7 @@ public interface LocationApi {
             @ApiResponse(code = 404, message = "Specified region doesn't exist."),
             @ApiResponse(code = 409, message = "Region has one or more countries tied down to it.")
     })
-    ResponseEntity<Void> deleteRegion(@Valid @RequestBody DeleteRegionRequest request);
+    ResponseEntity<Void> deleteRegion(@Valid DeleteRegionRequest request);
 
     @GetMapping(
             value = COUNTRIES,
@@ -64,7 +64,7 @@ public interface LocationApi {
     ResponseEntity<SearchCountriesResponse> findAllCountries();
 
     @PostMapping(
-            value = COUNTRY_MANAGEMENT_SAVE,
+            value = MGN_COUNTRY_SAVE,
             produces = {"application/json"},
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'save_country')")
@@ -77,7 +77,7 @@ public interface LocationApi {
     ResponseEntity<SaveCountryResponse> saveCountry(@Valid @RequestBody SaveCountryRequest request);
 
     @PostMapping(
-            value = COUNTRY_MANAGEMENT_UPDATE,
+            value = MNG_COUNTRY_UPDATE,
             produces = {"application/json"},
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'update_country')")

@@ -13,9 +13,9 @@ import javax.validation.Valid;
 public interface UserManagementApi {
 
     // @formatter:off
-    String USER_SEARCH_ENDPOINT  = "/users";
-    String USER_DISABLE          = "/users/disable";
-    String USER_BLACKLIST_TOKENS = "/users/blacklist-tokens";
+    String USER_SEARCH_ENDPOINT  = "/management/users";
+    String USER_DISABLE          = "/management/user/disable";
+    String USER_BLACKLIST_TOKENS = "/management/user/blacklist-tokens";
     // @formatter:on
 
     @GetMapping(value = USER_SEARCH_ENDPOINT)

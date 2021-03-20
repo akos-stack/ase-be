@@ -14,21 +14,21 @@ import javax.validation.Valid;
 public interface S3Api {
 
     // @formatter:off
-    String S3_VALIDATE = "/s3/validate";
-    String S3_DOWNLOAD = "/s3/download";
-    String S3_DELETE   = "/s3/delete";
+    String S3_INVALID_FILES = "/s3/invalid-files";
+    String S3_DOWNLOAD      = "/s3/download";
+    String S3_DELETE        = "/s3/delete";
     // @formatter:on
 
     @PostMapping(
-            value = S3_VALIDATE,
+            value = S3_INVALID_FILES,
             produces = {"application/json"},
             consumes = {"multipart/form-data"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'validate_file')")
-    @ApiOperation(value = "Validates file for S3 bucket upload.")
+    @ApiOperation(value = "Validate multiple files before uploading to S3 bucket.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "File is valid.")
+            @ApiResponse(code = 200, message = "List of incorrect files and error codes or empty list.")
     })
-    ResponseEntity<Void> validateFile(@Valid ValidateFileRequest request);
+    ResponseEntity<ValidateFilesResponse> invalidFiles(@Valid ValidateFilesRequest request);
 
     @GetMapping(
             value = S3_DOWNLOAD,

@@ -36,7 +36,7 @@ public interface CountryEvaluationDetailsRepository extends JpaRepository<Countr
             "  FROM CountryEvaluationDetails ced                                                                          " +
             "  RIGHT JOIN Country c1 ON ced.countryId = c1.id                                                             " +
             "  JOIN c1.regions r                                                                                          " +
-            "  WHERE (r.name IN :regions OR :regions IS NULL)                                                             " +
+            "  WHERE (coalesce(:regions, null) is null or r.name in (:regions))                                           " +
             "  AND (LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%'))                                                   " +
             "  OR LOWER(c1.name) LIKE LOWER(CONCAT('%', :search, '%')))                                                   " +
             "  AND (ced IS NOT NULL OR :includeCountriesWithoutEvaluationDetails = TRUE)                                  " ,
@@ -45,7 +45,7 @@ public interface CountryEvaluationDetailsRepository extends JpaRepository<Countr
             "  FROM CountryEvaluationDetails ced                                         " +
             "  RIGHT JOIN Country c ON ced.countryId = c.id                              " +
             "  JOIN c.regions r                                                          " +
-            "  WHERE (r.name IN :regions OR :regions IS NULL)                            " +
+            "  WHERE (coalesce(:regions, null) is null or r.name in (:regions))          " +
             "  AND (LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%'))                  " +
             "  OR LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')))                   " +
             "  AND (ced IS NOT NULL OR :includeCountriesWithoutEvaluationDetails = TRUE) " )

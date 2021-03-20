@@ -13,14 +13,14 @@ import javax.validation.Valid;
 public interface EvaluationApi {
 
     // @formatter:off
-    String EVALUATION_COUNTRY_DETAILS_SEARCH            = "/evaluation/country-details";
-    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH = "/evaluation/management/country-details";
-    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE   = "/evaluation/management/country-details/save";
-    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE = "/evaluation/management/country-details/update";
-    String EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE = "/evaluation/management/country-details/delete";
-    String EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH  = "/evaluation/management/region-details";
-    String EVALUATION_QUOTATION_PACKAGE_SAVE            = "/evaluation/quotation-package/save";
-    String EVALUATION_EVALUATED_SEARCH                  = "/evaluation/evaluated/search";
+    String EVALUATION_COUNTRY_DETAILS_SEARCH     = "/evaluation/country-details/search";
+    String MNG_EVALUATION_COUNTRY_DETAILS_SEARCH = "/management/evaluation/country-details/search";
+    String MNG_EVALUATION_COUNTRY_DETAILS_SAVE   = "/management/evaluation/country-details/save";
+    String MNG_EVALUATION_COUNTRY_DETAILS_UPDATE = "/management/evaluation/country-details/update";
+    String MNG_EVALUATION_COUNTRY_DETAILS_DELETE = "/management/evaluation/country-details/delete";
+    String MNG_EVALUATION_REGION_DETAILS_SEARCH  = "/management/evaluation/region-details/search";
+    String EVALUATION_QUOTATION_PACKAGE_SAVE     = "/evaluation/quotation-package/save";
+    String EVALUATION_EVALUATED_SEARCH           = "/evaluation/evaluated/search";
     // @formatter:on
 
     @GetMapping(
@@ -36,7 +36,7 @@ public interface EvaluationApi {
             @Valid PageRequest page);
 
     @GetMapping(
-            value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SEARCH,
+            value = MNG_EVALUATION_COUNTRY_DETAILS_SEARCH,
             produces = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_management_country_evaluation_details')")
     @ApiOperation(value = "Search countries with evaluation details and those without also.")
@@ -48,7 +48,7 @@ public interface EvaluationApi {
             @Valid PageRequest page);
 
     @PostMapping(
-            value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_SAVE,
+            value = MNG_EVALUATION_COUNTRY_DETAILS_SAVE,
             produces = {"application/json"},
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'save_country_evaluation_details')")
@@ -62,7 +62,7 @@ public interface EvaluationApi {
             @Valid @RequestBody SaveCountryEvaluationDetailsRequest request);
 
     @PostMapping(
-            value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_UPDATE,
+            value = MNG_EVALUATION_COUNTRY_DETAILS_UPDATE,
             produces = {"application/json"},
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'update_country_evaluation_details')")
@@ -74,8 +74,8 @@ public interface EvaluationApi {
     ResponseEntity<UpdateCountryEvaluationDetailsResponse> updateCountryEvaluationDetails(
             @Valid @RequestBody UpdateCountryEvaluationDetailsRequest request);
 
-    @PostMapping(
-            value = EVALUATION_MANAGEMENT_COUNTRY_DETAILS_DELETE,
+    @DeleteMapping(
+            value = MNG_EVALUATION_COUNTRY_DETAILS_DELETE,
             consumes = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'delete_country_evaluation_details')")
     @ApiOperation(value = "Deletes evaluation details in the database.")
@@ -84,10 +84,10 @@ public interface EvaluationApi {
             @ApiResponse(code = 404, message = "Specified evaluation details don't exist."),
             @ApiResponse(code = 409, message = "There are evaluators from country to which evaluation details belong.")
     })
-    ResponseEntity<Void> deleteCountryEvaluationDetails(@Valid @RequestBody DeleteCountryEvaluationDetailsRequest request);
+    ResponseEntity<Void> deleteCountryEvaluationDetails(@Valid DeleteCountryEvaluationDetailsRequest request);
 
     @GetMapping(
-            value = EVALUATION_MANAGEMENT_REGION_DETAILS_SEARCH,
+            value = MNG_EVALUATION_REGION_DETAILS_SEARCH,
             produces = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_management_region_evaluation_details')")
     @ApiOperation(value = "Search regions with evaluation details.")

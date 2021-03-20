@@ -1,6 +1,10 @@
 package com.bloxico.ase.userservice.util;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.function.*;
+
+import static java.util.stream.Collectors.toList;
 
 public class Functions {
 
@@ -27,6 +31,10 @@ public class Functions {
 
     public static <T, U> U ifNotNull(T value, Function<T, U> fn) {
         return value == null ? null : fn.apply(value);
+    }
+
+    public static <T, U> List<U> map(Function<? super T, ? extends U> mapper, Collection<? extends T> coll) {
+        return coll.stream().map(mapper).collect(toList());
     }
 
 }

@@ -17,7 +17,8 @@ public class Token extends BaseEntity {
 
     public enum Type {
         REGISTRATION,
-        PASSWORD_RESET
+        PASSWORD_RESET,
+        HOST_INVITATION
     }
 
     @Column(name = "value")

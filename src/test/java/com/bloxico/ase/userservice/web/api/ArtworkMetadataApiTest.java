@@ -176,7 +176,7 @@ public class ArtworkMetadataApiTest extends AbstractSpringTest {
                     .contentType(JSON)
                     .params(allPages("type", type.name()))
                     .when()
-                    .get(API_URL + ARTWORK_METADATA_APPROVED)
+                    .get(API_URL + ARTWORK_METADATA_SEARCH_APPROVED)
                     .then()
                     .assertThat()
                     .statusCode(200)

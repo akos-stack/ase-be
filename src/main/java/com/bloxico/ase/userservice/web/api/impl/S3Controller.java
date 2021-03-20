@@ -16,9 +16,9 @@ public class S3Controller implements S3Api {
     private IS3Facade s3Facade;
 
     @Override
-    public ResponseEntity<Void> validateFile(ValidateFileRequest request) {
-        s3Facade.validateFile(request);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<ValidateFilesResponse> invalidFiles(ValidateFilesRequest request) {
+        var response = s3Facade.invalidFiles(request);
+        return ResponseEntity.ok(response);
     }
 
     @Override

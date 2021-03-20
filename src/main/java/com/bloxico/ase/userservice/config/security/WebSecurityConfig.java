@@ -126,8 +126,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 UserRegistrationApi.REGISTRATION_EVALUATOR_INVITATION_CHECK,
 
                 UserPasswordApi.PASSWORD_FORGOT_ENDPOINT,
-                UserPasswordApi.PASSWORD_UPDATE_FORGOTTEN_ENDPOINT,
-                UserPasswordApi.PASSWORD_TOKEN_RESEND_ENDPOINT
+                UserPasswordApi.PASSWORD_TOKEN_RESEND_ENDPOINT,
+                UserPasswordApi.PASSWORD_UPDATE_FORGOTTEN_ENDPOINT
         );
     }
 

@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ArtworkController implements ArtworkApi {
 
-    @Autowired private IArtworkFacade artworkFacade;
     @Autowired private AseSecurityContext security;
+    @Autowired private IArtworkFacade artworkFacade;
 
     @Override
     public ResponseEntity<ArtworkResponse> createArtworkDraft() {
