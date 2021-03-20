@@ -28,6 +28,7 @@ import static com.bloxico.ase.userservice.util.FileCategory.CV;
 import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
+import static com.bloxico.ase.userservice.config.security.AseSecurityContext.getPrincipalId;
 
 @Slf4j
 @Service
@@ -218,7 +219,9 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public void checkHostInvitation(String token) {
         log.info("UserRegistrationFacadeImpl.checkHostInvitation - start | token: {}", token);
-        hostInvitationTokenService.checkIfTokenExists(token);
+        var principalId = userService.findUserById(getPrincipalId()).getId();
+        var tokenUserId = hostInvitationTokenService.checkIfTokenExists(token).getUserId();
+        hostInvitationTokenService.equalityWithPrincipalId(principalId, tokenUserId);
         log.info("UserRegistrationFacadeImpl.checkHostInvitation - end | token: {}", token);
     }
 
