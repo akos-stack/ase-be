@@ -11,25 +11,19 @@ import java.util.Collection;
 
 public interface ArtworkEvaluatorEvaluationRepository extends JpaRepository<ArtworkEvaluatorEvaluation, Long> {
 
-    String EVALUATOR_ID =
-            // @formatter:off
-            "(SELECT e.id                     " +
-            " FROM Evaluator e                " +
-            " INNER JOIN e.userProfile up     " +
-            " WHERE up.userId = :principalId) ";
-            // @formatter:on;
-
+    // @formatter:off
     @Query(value =
             "SELECT new com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj( " +
-            "         a.title as artwork_title,                                           " +
-            "         a.artist.name as artist,                                            " +
-            "         ae.sellingPrice as selling_price)                                   " +
+            "         a.title AS artwork_title,                                           " +
+            "         a.artist.name AS artist,                                            " +
+            "         aee.sellingPrice AS selling_price)                                  " +
             "  FROM Artwork a                                                             " +
-            "  INNER JOIN ArtworkEvaluatorEvaluation ae ON ae.artworkId = a.id            " +
-            "  INNER JOIN a.categories c                                                  " +
-            "  WHERE (:artworkTitle IS NULL OR a.title LIKE %:artworkTitle%)              " +
-            "  AND (:categories IS NULL OR c.name IN :categories)                         " +
-            "  AND  (:principalId IS NULL OR ae.evaluatorId = " + EVALUATOR_ID + ")       ")
+            "  JOIN a.categories c                                                        " +
+            "  JOIN ArtworkEvaluatorEvaluation aee ON aee.artworkId = a.id                " +
+            "  JOIN Evaluator e ON e.id = aee.evaluatorId                                 " +
+            "  WHERE (:principalId IS NULL OR e.userProfile.userId = :principalId)        " +
+            "  AND (a.title LIKE %:artworkTitle%)                                         " +
+            "  AND (COALESCE(:categories, NULL) IS NULL OR c.name IN (:categories))       ")
     // @formatter:on
     Page<EvaluatedArtworkProj> search(
             String artworkTitle,
