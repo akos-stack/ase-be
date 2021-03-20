@@ -113,4 +113,10 @@ public class UserRegistrationController implements UserRegistrationApi {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<Void> checkHostInvitation(String token) {
+        userRegistrationFacade.checkHostInvitation(token);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
