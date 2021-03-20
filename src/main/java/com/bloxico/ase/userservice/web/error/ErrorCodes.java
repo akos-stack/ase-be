@@ -96,7 +96,12 @@ public interface ErrorCodes {
         TOKEN_EXISTS(
                 HttpStatus.CONFLICT,
                 "Token_03",
-                "Token already exists for given parameters.");
+                "Token already exists for given parameters."),
+
+        EQUALITY_WITH_PRINCIPAL_ID_ERROR(
+                HttpStatus.BAD_REQUEST,
+                "Token_04",
+                "Token's userId is not equal with principalId");
 
         private final HttpStatus httpStatus;
         private final String code, description;
