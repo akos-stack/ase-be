@@ -176,7 +176,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
         requireNonNull(page);
         var result = artworkEvaluatorEvaluationRepository
                 .search(
-                        request.getArtName(),
+                        request.getArtworkTitle(),
                         request.getCategories(),
                         principalId,
                         page.toPageableUnsafe());

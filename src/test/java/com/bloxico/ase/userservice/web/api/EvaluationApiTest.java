@@ -373,7 +373,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser(role = EVALUATOR, auth = true)
-    public void searchMyEvaluatedArtworks() {
+    public void searchEvaluatedArtworks() {
         var evaluator = utilSecurityContext.getLoggedInEvaluator();
         var ae1 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator.getId());
         var ae2 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator.getId());
@@ -383,7 +383,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .contentType(JSON)
                 .params(allPages("art_name", ""))
                 .when()
-                .get(API_URL + EVALUATION_EVALUATED_ARTWORKS_MY_SEARCH)
+                .get(API_URL + EVALUATION_EVALUATED_SEARCH)
                 .then()
                 .assertThat()
                 .statusCode(200)

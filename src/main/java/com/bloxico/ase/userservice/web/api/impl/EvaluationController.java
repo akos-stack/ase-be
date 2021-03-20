@@ -76,8 +76,8 @@ public class EvaluationController implements EvaluationApi {
     }
 
     @Override
-    public ResponseEntity<SearchEvaluatedArtworksResponse> searchMyEvaluatedArtworks(
-            @Valid SearchEvaluatedArtworksRequest request, @Valid PageRequest page) {
+    public ResponseEntity<SearchEvaluatedArtworksResponse> searchEvaluatedArtworks(
+            SearchEvaluatedArtworksRequest request, PageRequest page) {
         var response = evaluationFacade.searchEvaluatedArtworks(request, page, getPrincipalId());
         return ResponseEntity.ok(response);
     }
