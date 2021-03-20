@@ -43,4 +43,6 @@ public interface IUserRegistrationFacade {
     void sendHostInvitation(HostInvitationRequest request);
 
     void withdrawHostInvitation(HostInvitationWithdrawalRequest request);
+
+    void checkHostInvitation(String token);
 }

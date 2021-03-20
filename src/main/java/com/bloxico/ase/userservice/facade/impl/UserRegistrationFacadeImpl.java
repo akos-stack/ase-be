@@ -215,6 +215,13 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         log.info("UserRegistrationFacadeImpl.withdrawHostInvitation - end | request: {}", request);
     }
 
+    @Override
+    public void checkHostInvitation(String token) {
+        log.info("UserRegistrationFacadeImpl.checkHostInvitation - start | token: {}", token);
+        hostInvitationTokenService.checkIfTokenExists(token);
+        log.info("UserRegistrationFacadeImpl.checkHostInvitation - end | token: {}", token);
+    }
+
     // HELPER METHODS
 
     private LocationDto doSaveLocation(ISubmitUserProfileRequest request, Long principalId) {
