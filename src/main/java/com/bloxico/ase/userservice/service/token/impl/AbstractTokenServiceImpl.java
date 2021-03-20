@@ -1,7 +1,6 @@
 package com.bloxico.ase.userservice.service.token.impl;
 
 import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
-import com.bloxico.ase.userservice.entity.token.PendingEvaluator;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.service.token.ITokenService;
