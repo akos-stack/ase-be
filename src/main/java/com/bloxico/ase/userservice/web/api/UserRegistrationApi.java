@@ -6,21 +6,12 @@ import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
 import com.bloxico.ase.userservice.web.model.token.*;
-import com.bloxico.ase.userservice.web.model.user.DownloadEvaluatorResumeRequest;
-import com.bloxico.ase.userservice.web.model.user.RefreshRegistrationTokenRequest;
-import com.bloxico.ase.userservice.web.model.user.SubmitArtOwnerRequest;
-import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import com.bloxico.ase.userservice.web.model.user.*;
+import io.swagger.annotations.*;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 

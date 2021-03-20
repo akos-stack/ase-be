@@ -2,9 +2,7 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
-import com.bloxico.ase.userservice.exception.LocationException;
-import com.bloxico.ase.userservice.exception.TokenException;
-import com.bloxico.ase.userservice.exception.UserException;
+import com.bloxico.ase.userservice.exception.*;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
@@ -598,7 +596,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void withdrawHostInvitation_tokenNotFoundForInvalidUserId() {
+    public void withdrawHostInvitation_tokenNotFound_userNotExists() {
         var request = new HostInvitationWithdrawalRequest(-1L);
         assertThrows(
                 TokenException.class,
@@ -606,7 +604,7 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void withdrawHostInvitation_tokenNotFoundForUninvitedUser() {
+    public void withdrawHostInvitation_tokenNotFound_uninvitedUser() {
         var userId = utilUser.savedUser().getId();
         var request = new HostInvitationWithdrawalRequest(userId);
         assertThrows(
@@ -619,8 +617,8 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         var userId = utilUser.savedUser().getId();
         userRegistrationFacade.sendHostInvitation(new HostInvitationRequest(userId));
         assertTrue(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isPresent());
-
         userRegistrationFacade.withdrawHostInvitation(new HostInvitationWithdrawalRequest(userId));
-        assertFalse(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isPresent());
+        assertTrue(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isEmpty());
     }
+
 }
