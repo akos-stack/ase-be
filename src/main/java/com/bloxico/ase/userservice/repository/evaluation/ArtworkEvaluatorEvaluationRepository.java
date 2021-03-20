@@ -1,12 +1,11 @@
 package com.bloxico.ase.userservice.repository.evaluation;
 
 import com.bloxico.ase.userservice.entity.evaluation.ArtworkEvaluatorEvaluation;
-import com.bloxico.ase.userservice.proj.evaluation.ArtworkEvaluatedProj;
+import com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 
@@ -21,21 +20,21 @@ public interface ArtworkEvaluatorEvaluationRepository extends JpaRepository<Artw
             // @formatter:on;
 
     @Query(value =
-            "SELECT new com.bloxico.ase.userservice.proj.evaluation.ArtworkEvaluatedProj( " +
-            "         a.title as art_name,                                                " +
+            "SELECT new com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj( " +
+            "         a.title as artwork_title,                                           " +
             "         a.artist.name as artist,                                            " +
             "         ae.sellingPrice as selling_price)                                   " +
             "  FROM Artwork a                                                             " +
             "  INNER JOIN ArtworkEvaluatorEvaluation ae ON ae.artworkId = a.id            " +
             "  INNER JOIN a.categories c                                                  " +
-            "  WHERE (:artName IS NULL OR a.title LIKE %:artName%)                        " +
+            "  WHERE (:artworkTitle IS NULL OR a.title LIKE %:artworkTitle%)              " +
             "  AND (:categories IS NULL OR c.name IN :categories)                         " +
             "  AND  (:principalId IS NULL OR ae.evaluatorId = " + EVALUATOR_ID + ")       ")
     // @formatter:on
-    Page<ArtworkEvaluatedProj> search(
-            @Param("artName") String artName,
-            @Param("categories") Collection<String> categories,
-            @Param("principalId") Long principalId,
+    Page<EvaluatedArtworkProj> search(
+            String artworkTitle,
+            Collection<String> categories,
+            Long principalId,
             Pageable pageable);
 
 }

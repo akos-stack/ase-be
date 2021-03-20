@@ -1,14 +1,12 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.*;
-import com.bloxico.ase.userservice.proj.evaluation.ArtworkEvaluatedProj;
+import com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
-import com.bloxico.ase.userservice.web.model.WithOwner;
-import com.bloxico.ase.userservice.web.model.artwork.SearchArtworkRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.ISearchCountryEvaluationDetailsRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchEvaluatedArtworksRequest;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionEvaluationDetailsRequest;
@@ -169,7 +167,7 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public Page<ArtworkEvaluatedProj> searchEvaluatedArtworks(
+    public Page<EvaluatedArtworkProj> searchEvaluatedArtworks(
             SearchEvaluatedArtworksRequest request, PageRequest page, Long principalId)
     {
         log.debug("EvaluationServiceImpl.searchEvaluatedArtworks - start | request: {}, page: {}, principalId: {}",

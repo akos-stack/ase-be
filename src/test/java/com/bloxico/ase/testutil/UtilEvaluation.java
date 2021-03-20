@@ -2,10 +2,8 @@ package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.*;
 import com.bloxico.ase.userservice.entity.address.Region;
-import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.bloxico.ase.userservice.entity.evaluation.*;
-import com.bloxico.ase.userservice.entity.user.profile.Evaluator;
-import com.bloxico.ase.userservice.proj.evaluation.ArtworkEvaluatedProj;
+import com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.repository.evaluation.ArtworkEvaluatorEvaluationRepository;
@@ -206,11 +204,11 @@ public class UtilEvaluation {
         return new SearchEvaluatedArtworksRequest(artName, categories);
     }
 
-    public ArtworkEvaluatedProj savedEvaluatedArtwork() {
+    public EvaluatedArtworkProj savedEvaluatedArtwork() {
         return savedEvaluatedArtworkWithEvaluator(utilUserProfile.savedEvaluator().getId());
     }
 
-    public ArtworkEvaluatedProj savedEvaluatedArtworkWithEvaluator(long evaluatorId) {
+    public EvaluatedArtworkProj savedEvaluatedArtworkWithEvaluator(long evaluatorId) {
         var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION));
         var evaluation = new ArtworkEvaluatorEvaluation();
         evaluation.setArtworkId(artwork.getId());
@@ -223,7 +221,7 @@ public class UtilEvaluation {
         evaluation.setRating(genPosInt(6));
         evaluation.setComment(genUUID());
         artworkEvaluatorEvaluationRepository.saveAndFlush(evaluation);
-        return new ArtworkEvaluatedProj(
+        return new EvaluatedArtworkProj(
                 artwork.getTitle(), artwork.getArtist().getName(), evaluation.getSellingPrice());
     }
 

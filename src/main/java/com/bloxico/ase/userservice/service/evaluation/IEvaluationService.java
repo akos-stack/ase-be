@@ -3,7 +3,7 @@ package com.bloxico.ase.userservice.service.evaluation;
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
 import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
 import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
-import com.bloxico.ase.userservice.proj.evaluation.ArtworkEvaluatedProj;
+import com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj;
 import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
 import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
 import com.bloxico.ase.userservice.web.model.PageRequest;
@@ -40,7 +40,7 @@ public interface IEvaluationService {
     Set<QuotationPackageCountryDto> saveQuotationPackageCountries(
             long packageId, Collection<QuotationPackageCountryDto> countries);
 
-    Page<ArtworkEvaluatedProj> searchEvaluatedArtworks(
+    Page<EvaluatedArtworkProj> searchEvaluatedArtworks(
             SearchEvaluatedArtworksRequest request, PageRequest page, Long principalId);
 
 }

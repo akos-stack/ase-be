@@ -6,10 +6,10 @@ import lombok.Value;
 import java.math.BigDecimal;
 
 @Value
-public class ArtworkEvaluatedProj {
+public class EvaluatedArtworkProj {
 
-    @JsonProperty("art_name")
-    String artName;
+    @JsonProperty("artwork_title")
+    String artworkTitle;
 
     @JsonProperty("artist")
     String artist;

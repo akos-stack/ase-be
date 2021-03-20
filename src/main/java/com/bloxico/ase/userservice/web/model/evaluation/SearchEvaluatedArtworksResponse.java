@@ -1,6 +1,6 @@
 package com.bloxico.ase.userservice.web.model.evaluation;
 
-import com.bloxico.ase.userservice.proj.evaluation.ArtworkEvaluatedProj;
+import com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj;
 import com.bloxico.ase.userservice.web.model.ResponsePage;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -16,9 +16,9 @@ import static lombok.AccessLevel.PRIVATE;
 public class SearchEvaluatedArtworksResponse {
 
     @JsonProperty("page")
-    ResponsePage<ArtworkEvaluatedProj> page;
+    ResponsePage<EvaluatedArtworkProj> page;
 
-    public SearchEvaluatedArtworksResponse(Page<ArtworkEvaluatedProj> page) {
+    public SearchEvaluatedArtworksResponse(Page<EvaluatedArtworkProj> page) {
         this.page = new ResponsePage<>(page);
     }
 
