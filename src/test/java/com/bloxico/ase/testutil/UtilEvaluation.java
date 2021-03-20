@@ -197,7 +197,7 @@ public class UtilEvaluation {
     }
 
     public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest() {
-        return new SearchEvaluatedArtworksRequest(null, null);
+        return new SearchEvaluatedArtworksRequest("", null);
     }
 
     public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest(String artName, List<String> categories) {
