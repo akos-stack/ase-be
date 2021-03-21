@@ -7,17 +7,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 
-@Data
+import static lombok.AccessLevel.PRIVATE;
+
+@Value
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true, access = PRIVATE)
 public class ValidateFileRequest {
 
     @NotNull
     @ApiParam(name = "category", required = true)
-    private FileCategory category;
+    FileCategory category;
 
     @NotNull
     @ApiParam(name = "file", required = true)
-    private MultipartFile file;
+    MultipartFile file;
 
 }

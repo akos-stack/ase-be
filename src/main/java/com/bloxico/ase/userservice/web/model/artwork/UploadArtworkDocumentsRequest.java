@@ -13,29 +13,31 @@ import java.util.List;
 
 import static com.bloxico.ase.userservice.facade.impl.ArtworkDocumentsFacadeImpl.SINGLETONS;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Artwork.ARTWORK_ONLY_ONE_DOCUMENT_ALLOWED_FOR_CATEGORY;
+import static lombok.AccessLevel.PRIVATE;
 
-@Data
+@Value
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true, access = PRIVATE)
 public class UploadArtworkDocumentsRequest {
 
     @NotNull
     @JsonProperty("artwork_id")
     @ApiModelProperty(required = true)
-    private Long artworkId;
+    Long artworkId;
 
     @NotNull
     @NotEmpty
     @JsonProperty("documents")
     @ApiModelProperty(required = true)
-    private List<MultipartFile> documents;
+    List<MultipartFile> documents;
 
     @JsonProperty("file_category")
     @ApiModelProperty(required = true)
-    private FileCategory fileCategory;
+    FileCategory fileCategory;
 
     @JsonIgnore
     public void validateSingletonDocuments() {
+        //noinspection ConstantConditions
         if (SINGLETONS.contains(fileCategory) && documents.size() > 1)
             throw ARTWORK_ONLY_ONE_DOCUMENT_ALLOWED_FOR_CATEGORY.newException();
     }

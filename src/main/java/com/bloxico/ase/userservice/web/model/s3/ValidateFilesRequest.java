@@ -9,18 +9,20 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Data
+import static lombok.AccessLevel.PRIVATE;
+
+@Value
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true, access = PRIVATE)
 public class ValidateFilesRequest {
 
     @NotNull
     @ApiParam(name = "category", required = true)
-    private FileCategory category;
+    FileCategory category;
 
     @NotNull
     @NotEmpty
     @ApiParam(name = "category", required = true)
-    private List<MultipartFile> files;
+    List<MultipartFile> files;
 
 }

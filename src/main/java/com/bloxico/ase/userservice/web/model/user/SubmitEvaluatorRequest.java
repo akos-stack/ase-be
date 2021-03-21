@@ -20,10 +20,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
+import static lombok.AccessLevel.PRIVATE;
 
-@Data
+@Value
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true, access = PRIVATE)
 @ToString(exclude = "password")
 public class SubmitEvaluatorRequest implements ISubmitUserProfileRequest {
 

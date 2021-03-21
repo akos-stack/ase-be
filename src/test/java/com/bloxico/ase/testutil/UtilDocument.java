@@ -32,13 +32,11 @@ public class UtilDocument {
     }
 
     public UploadArtworkDocumentsRequest genUploadArtworkDocumentsRequest(long artworkId) {
-        var request = new UploadArtworkDocumentsRequest();
-        request.setArtworkId(artworkId);
-        request.setDocuments(List.of(
-                genMultipartFile(IMAGE),
-                genMultipartFile(IMAGE)));
-        request.setFileCategory(IMAGE);
-        return request;
+        return new UploadArtworkDocumentsRequest(
+                artworkId,
+                List.of(genMultipartFile(IMAGE),
+                        genMultipartFile(IMAGE)),
+                IMAGE);
     }
 
 }

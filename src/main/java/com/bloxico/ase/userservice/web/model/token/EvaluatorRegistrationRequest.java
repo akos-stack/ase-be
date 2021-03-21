@@ -12,10 +12,11 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import static com.bloxico.ase.userservice.entity.token.PendingEvaluator.Status.REQUESTED;
+import static lombok.AccessLevel.PRIVATE;
 
-@Data
+@Value
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(force = true, access = PRIVATE)
 public class EvaluatorRegistrationRequest implements IPendingEvaluatorRequest {
 
     @NotNull
