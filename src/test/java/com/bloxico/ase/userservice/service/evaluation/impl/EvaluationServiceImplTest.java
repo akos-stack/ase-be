@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.exception.EvaluationException;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import org.junit.Test;
@@ -70,9 +70,11 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     @Test
     public void searchCountryEvaluationDetails_emptyRegions() {
         var request = utilEvaluation.genSearchCountryEvaluationDetailsRequest(Collections.emptyList());
-        assertThrows(
-                NullPointerException.class,
-                () -> evaluationService.searchCountryEvaluationDetails(request, allPages()));
+        assertEquals(
+                List.of(),
+                evaluationService
+                        .searchCountryEvaluationDetails(request, allPages())
+                        .getContent());
     }
 
     @Test

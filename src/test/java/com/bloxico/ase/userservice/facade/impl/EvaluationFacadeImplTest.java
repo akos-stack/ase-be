@@ -47,9 +47,11 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     public void searchCountryEvaluationDetails_emptyRegions() {
         var request = utilEvaluation
                 .genSearchCountryEvaluationDetailsRequest(Collections.emptyList());
-        assertThrows(
-                NullPointerException.class,
-                () -> evaluationFacade.searchCountryEvaluationDetails(request, allPages()));
+        assertEquals(
+                List.of(),
+                evaluationFacade
+                        .searchCountryEvaluationDetails(request, allPages())
+                        .getPage().getContent());
     }
 
     @Test
