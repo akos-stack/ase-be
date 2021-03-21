@@ -32,6 +32,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private UtilSystem utilSystem;
+    @Autowired private UtilArtwork utilArtwork;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test
@@ -372,9 +373,9 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     @WithMockCustomUser(role = EVALUATOR, auth = true)
     public void searchEvaluatedArtworks() {
         var evaluator = utilSecurityContext.getLoggedInEvaluator();
-        var ae1 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator.getId());
-        var ae2 = utilEvaluation.savedEvaluatedArtworkWithEvaluator(evaluator.getId());
-        var ae3 = utilEvaluation.savedEvaluatedArtwork();
+        var ea1 = utilEvaluation.savedEvaluatedArtwork(evaluator.getId());
+        var ea2 = utilEvaluation.savedEvaluatedArtwork(evaluator.getId());
+        var ea3 = utilEvaluation.savedEvaluatedArtwork();
         var response = given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
@@ -389,7 +390,35 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .as(SearchEvaluatedArtworksResponse.class);
         assertThat(
                 response.getPage().getContent(),
-                allOf(hasItems(ae1, ae2), not(hasItems(ae3))));
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
+    }
+
+    @Test
+    @WithMockCustomUser(role = EVALUATOR, auth = true)
+    public void searchEvaluatedArtworks_withArtworkTitle() {
+        var title = genUUID();
+        var evaluatorId = utilSecurityContext.getLoggedInEvaluator().getId();
+        var ea1 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)), evaluatorId);
+        var ea2 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)), evaluatorId);
+        var ea3 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)));
+        var response = given()
+                .header("Authorization", utilSecurityContext.getToken())
+                .contentType(JSON)
+                .params(allPages("artworkTitle", title))
+                .when()
+                .get(API_URL + EVALUATION_EVALUATED_SEARCH)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SearchEvaluatedArtworksResponse.class);
+        assertThat(
+                response.getPage().getContent(),
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
     }
 
 }

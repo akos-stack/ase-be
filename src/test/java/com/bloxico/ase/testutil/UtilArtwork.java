@@ -19,6 +19,7 @@ import java.time.Year;
 import java.util.*;
 
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.WAITING_FOR_EVALUATION;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type.*;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static java.util.Objects.requireNonNull;
@@ -89,6 +90,13 @@ public class UtilArtwork {
     public ArtworkDto saved(ArtworkDto artworkDto) {
         return artworkService.saveArtwork(artworkDto);
     }
+
+    public ArtworkDto savedEvaluableArtworkDto(String title) {
+        var artworkDto = genArtworkDto(WAITING_FOR_EVALUATION, utilUserProfile.savedArtOwnerDto().getId());
+        artworkDto.setTitle(title);
+        return saved(artworkDto);
+    }
+
 
     public UpdateArtworkDataRequest genUpdateArtworkDataRequest(Status status) {
         return genUpdateArtworkDataRequest(saved(genArtworkDto()).getId(), status);

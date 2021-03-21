@@ -1,5 +1,6 @@
 package com.bloxico.ase.testutil;
 
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
 import com.bloxico.ase.userservice.dto.entity.evaluation.*;
 import com.bloxico.ase.userservice.entity.address.Region;
 import com.bloxico.ase.userservice.entity.evaluation.*;
@@ -200,16 +201,23 @@ public class UtilEvaluation {
         return new SearchEvaluatedArtworksRequest("", null);
     }
 
-    public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest(String artName, List<String> categories) {
-        return new SearchEvaluatedArtworksRequest(artName, categories);
+    public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest(String artworkTitle, List<String> categories) {
+        return new SearchEvaluatedArtworksRequest(artworkTitle, categories);
     }
 
     public EvaluatedArtworkProj savedEvaluatedArtwork() {
-        return savedEvaluatedArtworkWithEvaluator(utilUserProfile.savedEvaluator().getId());
+        return savedEvaluatedArtwork(utilUserProfile.savedEvaluator().getId());
     }
 
-    public EvaluatedArtworkProj savedEvaluatedArtworkWithEvaluator(long evaluatorId) {
-        var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION));
+    public EvaluatedArtworkProj savedEvaluatedArtwork(long evaluatorId) {
+        return savedEvaluatedArtwork(utilArtwork.saved(utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION)), evaluatorId);
+    }
+
+    public EvaluatedArtworkProj savedEvaluatedArtwork(ArtworkDto artwork) {
+        return savedEvaluatedArtwork(artwork, utilUserProfile.savedEvaluator().getId());
+    }
+
+    public EvaluatedArtworkProj savedEvaluatedArtwork(ArtworkDto artwork, long evaluatorId) {
         var evaluation = new ArtworkEvaluatorEvaluation();
         evaluation.setArtworkId(artwork.getId());
         evaluation.setEvaluatorId(evaluatorId);
