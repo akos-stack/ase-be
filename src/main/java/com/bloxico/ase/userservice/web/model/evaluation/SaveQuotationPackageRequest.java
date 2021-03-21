@@ -1,8 +1,8 @@
 package com.bloxico.ase.userservice.web.model.evaluation;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;

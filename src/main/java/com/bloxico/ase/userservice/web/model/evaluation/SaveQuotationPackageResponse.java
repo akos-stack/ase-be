@@ -1,8 +1,8 @@
 package com.bloxico.ase.userservice.web.model.evaluation;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 import static lombok.AccessLevel.PRIVATE;
 

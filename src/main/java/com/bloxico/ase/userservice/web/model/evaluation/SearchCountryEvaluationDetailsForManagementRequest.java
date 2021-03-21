@@ -1,8 +1,8 @@
 package com.bloxico.ase.userservice.web.model.evaluation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiParam;
 import lombok.*;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
