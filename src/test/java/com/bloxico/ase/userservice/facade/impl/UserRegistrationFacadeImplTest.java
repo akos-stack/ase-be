@@ -2,6 +2,7 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
+import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.exception.*;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
@@ -619,6 +620,30 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertTrue(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isPresent());
         userRegistrationFacade.withdrawHostInvitation(new HostInvitationWithdrawalRequest(userId));
         assertTrue(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isEmpty());
+    }
+
+    @Test
+    public void checkHostInvitation_nullToken() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userRegistrationFacade.checkHostInvitation(null));
+    }
+
+    @Test
+    public void checkHostInvitation_tokenNotFound() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userRegistrationFacade.checkHostInvitation(genUUID()));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void checkHostInvitation() {
+        var loggedInUser = utilSecurityContext.getLoggedInUserId();
+        var request = new HostInvitationRequest(loggedInUser);
+        userRegistrationFacade.sendHostInvitation(request);
+        var token = tokenRepository.findByTypeAndUserId(Token.Type.HOST_INVITATION, loggedInUser);
+        userRegistrationFacade.checkHostInvitation(token.get().getValue());
     }
 
 }
