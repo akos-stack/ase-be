@@ -221,7 +221,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public void checkHostInvitation(String token) {
         log.info("UserRegistrationFacadeImpl.checkHostInvitation - start | token: {}", token);
         var tokenDto = hostInvitationTokenService.getTokenByUserId(getPrincipalId());
-        if(tokenDto.getValue() != token)
+        if(!tokenDto.getValue().equals(token))
             throw ErrorCodes.Token.TOKEN_NOT_FOUND.newException();
         log.info("UserRegistrationFacadeImpl.checkHostInvitation - end | token: {}", token);
     }
