@@ -621,4 +621,55 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertTrue(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isEmpty());
     }
 
+    @Test
+    @WithMockCustomUser
+    public void checkHostInvitation_nullToken_principalNotInvited() {
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.checkHostInvitation(null));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void checkHostInvitation_nullToken_principalInvited() {
+        utilToken.doHostInvitation(utilSecurityContext.getLoggedInUserId());
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.checkHostInvitation(null));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void checkHostInvitation_tokenNotExists_principalNotInvited() {
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.checkHostInvitation(genUUID()));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void checkHostInvitation_tokenNotExists_principalInvited() {
+        utilToken.doHostInvitation(utilSecurityContext.getLoggedInUserId());
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.checkHostInvitation(genUUID()));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void checkHostInvitation_userIdNotEqualsPrincipalId() {
+        var token = utilToken.doHostInvitation().getValue();
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.checkHostInvitation(token));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void checkHostInvitation() {
+        var userId = utilSecurityContext.getLoggedInUserId();
+        var token = utilToken.doHostInvitation(userId).getValue();
+        userRegistrationFacade.checkHostInvitation(token);
+    }
+
 }

@@ -31,7 +31,7 @@ public class AseSecurityContext {
                     ? (Long) details
                     : Long.valueOf((Integer) details);
         }
-        throw new NullPointerException("Principal not found");
+        throw new AssertionError("Principal not found");
     }
 
     public long getArtOwnerId() {

@@ -47,6 +47,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Autowired private PendingEvaluatorRepository pendingEvaluatorRepository;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UserRegistrationFacadeImpl userRegistrationFacade;
+    @Autowired private UtilSecurityContext securityContext;
 
     @Test
     public void registration_400_passwordMismatch() {
@@ -774,6 +775,47 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .body(new HostInvitationWithdrawalRequest(userId))
                 .when()
                 .post(API_URL + REGISTRATION_HOST_INVITATION_WITHDRAW)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
+    @Test
+    public void checkHostInvitation_404_tokenNotExists() {
+        given()
+                .header("Authorization", utilAuth.doAuthentication())
+                .pathParam("token", genUUID())
+                .when()
+                .get(API_URL + REGISTRATION_HOST_INVITATION_CHECK)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void checkHostInvitation_404_userIdNotEqualsPrincipalId() {
+        var token = utilToken.doHostInvitation().getValue();
+        given()
+                .header("Authorization", utilAuth.doAuthentication())
+                .pathParam("token", token)
+                .when()
+                .get(API_URL + REGISTRATION_HOST_INVITATION_CHECK)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void checkHostInvitation_200_ok() {
+        var registration = utilAuth.doConfirmedRegistration();
+        var token = utilToken.doHostInvitation(registration.getId()).getValue();
+        given()
+                .header("Authorization", utilAuth.doAuthentication(registration))
+                .pathParam("token", token)
+                .when()
+                .get(API_URL + REGISTRATION_HOST_INVITATION_CHECK)
                 .then()
                 .assertThat()
                 .statusCode(200);
