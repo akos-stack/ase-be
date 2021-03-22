@@ -22,7 +22,7 @@ public interface ArtworkEvaluatorEvaluationRepository extends JpaRepository<Artw
             "  JOIN ArtworkEvaluatorEvaluation aee ON aee.artworkId = a.id                " +
             "  JOIN Evaluator e ON e.id = aee.evaluatorId                                 " +
             "  WHERE (:principalId IS NULL OR e.userProfile.userId = :principalId)        " +
-            "  AND (a.title LIKE %:artworkTitle%)                                         " +
+            "  AND (:artworkTitle IS NULL OR a.title LIKE %:artworkTitle%)                " +
             "  AND (COALESCE(:categories, NULL) IS NULL OR c.name IN (:categories))       ")
     // @formatter:on
     Page<EvaluatedArtworkProj> search(

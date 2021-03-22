@@ -339,7 +339,7 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
         var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
         var categoriesFilter = List.of(c1.getName(), c2.getName());
         var evaluatorId = securityContext.getLoggedInEvaluator().getId();
-        var request = utilEvaluation.genSearchEvaluatedArtworksRequest("", categoriesFilter);
+        var request = utilEvaluation.genSearchEvaluatedArtworksRequest(null, categoriesFilter);
         var ea1 = utilEvaluation.savedEvaluatedArtwork(
                 utilArtwork.savedEvaluableArtworkDto(Set.of(c1, c2)),
                 evaluatorId);
@@ -404,7 +404,7 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
         var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
         var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
         var categoriesFilter = List.of(c1.getName(), c2.getName());
-        var request = utilEvaluation.genSearchEvaluatedArtworksRequest("", categoriesFilter);
+        var request = utilEvaluation.genSearchEvaluatedArtworksRequest(null, categoriesFilter);
         var ea1 = utilEvaluation.savedEvaluatedArtwork(
                 utilArtwork.savedEvaluableArtworkDto(Set.of(c1, c2)));
         var ea2 = utilEvaluation.savedEvaluatedArtwork(

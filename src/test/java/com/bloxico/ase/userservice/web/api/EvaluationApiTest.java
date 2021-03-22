@@ -446,7 +446,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         var response = given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .params(allPages(Map.of("artworkTitle", "", "categories", categoriesFilter)))
+                .params(allPages("categories", categoriesFilter))
                 .when()
                 .get(API_URL + EVALUATION_EVALUATED_SEARCH)
                 .then()
