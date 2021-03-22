@@ -23,10 +23,12 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.bloxico.ase.userservice.config.security.AseSecurityContext.getPrincipalId;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.FileCategory.CV;
 import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.*;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
 
 @Slf4j
@@ -213,6 +215,15 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         var tokenDto = hostInvitationTokenService.getTokenByUserId(request.getUserId());
         hostInvitationTokenService.consumeToken(tokenDto.getValue());
         log.info("UserRegistrationFacadeImpl.withdrawHostInvitation - end | request: {}", request);
+    }
+
+    @Override
+    public void checkHostInvitation(String token) {
+        log.info("UserRegistrationFacadeImpl.checkHostInvitation - start | token: {}", token);
+        var tokenDto = hostInvitationTokenService.getTokenByUserId(getPrincipalId());
+        if (!tokenDto.getValue().equals(token))
+            throw TOKEN_NOT_FOUND.newException();
+        log.info("UserRegistrationFacadeImpl.checkHostInvitation - end | token: {}", token);
     }
 
     // HELPER METHODS

@@ -34,6 +34,7 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_RESUME_DOWNLOAD     = "/user/registration/evaluator/resume";
     String REGISTRATION_HOST_INVITATION               = "/user/registration/host/invitation";
     String REGISTRATION_HOST_INVITATION_WITHDRAW      = "/user/registration/host/invitation/withdraw";
+    String REGISTRATION_HOST_INVITATION_CHECK         = "/user/registration/host/invitation/check/{token}";
     // @formatter:on
 
     @PostMapping(
@@ -205,5 +206,13 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "User with given id is not invited to be a host.")
     })
     ResponseEntity<Void> withdrawHostInvitation(@Valid @RequestBody HostInvitationWithdrawalRequest request);
+
+    @GetMapping(value = REGISTRATION_HOST_INVITATION_CHECK)
+    @ApiOperation(value = "Checks if user is invited to be a host with given token.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Host Invitation exists."),
+            @ApiResponse(code = 404, message = "Host Invitation is not found.")
+    })
+    ResponseEntity<Void> checkHostInvitation(@Valid @PathVariable("token") String token);
 
 }
