@@ -12,6 +12,7 @@ import com.bloxico.ase.userservice.service.token.impl.HostInvitationTokenService
 import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImpl;
 import com.bloxico.ase.userservice.service.user.*;
 import com.bloxico.ase.userservice.util.MailUtil;
+import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
@@ -219,9 +220,9 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public void checkHostInvitation(String token) {
         log.info("UserRegistrationFacadeImpl.checkHostInvitation - start | token: {}", token);
-        var principalId = userService.findUserById(getPrincipalId()).getId();
-        var tokenUserId = hostInvitationTokenService.checkIfTokenExists(token).getUserId();
-        hostInvitationTokenService.equalityWithPrincipalId(principalId, tokenUserId);
+        var tokenDto = hostInvitationTokenService.getTokenByUserId(getPrincipalId());
+        if(tokenDto.getValue() != token)
+            throw ErrorCodes.Token.TOKEN_NOT_FOUND.newException();
         log.info("UserRegistrationFacadeImpl.checkHostInvitation - end | token: {}", token);
     }
 
