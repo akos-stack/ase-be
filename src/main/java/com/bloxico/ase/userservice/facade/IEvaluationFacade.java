@@ -24,4 +24,9 @@ public interface IEvaluationFacade {
     SaveQuotationPackageResponse saveQuotationPackage(
             SaveQuotationPackageRequest request);
 
+    SearchEvaluatedArtworksResponse searchEvaluatedArtworks(
+            SearchEvaluatedArtworksRequest request,
+            PageRequest page,
+            Long principalId);
+
 }

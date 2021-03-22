@@ -48,6 +48,10 @@ public class Util {
         return current().nextInt(1, bound);
     }
 
+    public static boolean genBoolean() {
+        return current().nextBoolean();
+    }
+
     public static BigDecimal genPosBigDecimal(double bound) {
         return BigDecimal.valueOf(current().nextDouble(1, bound));
     }
