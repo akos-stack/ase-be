@@ -20,7 +20,7 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
     @Test
     public void returnMyProfileData_userNotFound() {
         assertThrows(
-                NullPointerException.class,
+                AssertionError.class,
                 () -> userProfileFacade.returnMyProfileData());
     }
 
@@ -44,14 +44,14 @@ public class UserProfileFacadeImplTest extends AbstractSpringTest {
     public void updateMyProfile_notFound() {
         var request = new UpdateUserProfileRequest(genUUID(), genUUID(), genUUID());
         assertThrows(
-                NullPointerException.class,
+                AssertionError.class,
                 () -> userProfileFacade.updateMyProfile(request));
     }
 
     @Test
     @WithMockCustomUser(role = Role.USER)
     public void updateMyProfile() {
-        var userProfileDto = utilUserProfile.savedUserProfileDto(securityContext.getLoggedInUserId());
+        utilUserProfile.savedUserProfileDto(securityContext.getLoggedInUserId());
         var request = new UpdateUserProfileRequest(genUUID(), genUUID(), genUUID());
         var response = userProfileFacade.updateMyProfile(request);
         assertEquals(request.getFirstName(), response.getUserProfile().getFirstName());
