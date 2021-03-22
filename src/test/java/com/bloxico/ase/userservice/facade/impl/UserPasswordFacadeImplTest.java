@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.facade.impl;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.exception.TokenException;
 import com.bloxico.ase.userservice.exception.UserException;
@@ -140,7 +140,7 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
     public void updateKnownPassword_userNotFound() {
         var request = new KnownPasswordUpdateRequest(genPassword(), genPassword());
         assertThrows(
-                NullPointerException.class,
+                AssertionError.class,
                 () -> userPasswordFacade.updateKnownPassword(request));
     }
 
@@ -173,11 +173,11 @@ public class UserPasswordFacadeImplTest extends AbstractSpringTest {
                 () -> userPasswordFacade.setNewPassword(null));
     }
 
-    @Test
+    @Test // TODO ASE-236
     public void setNewPassword_userNotFound() {
         var request = new SetPasswordRequest(genPassword());
         assertThrows(
-                NullPointerException.class,
+                AssertionError.class,
                 () -> userPasswordFacade.setNewPassword(request));
     }
 
