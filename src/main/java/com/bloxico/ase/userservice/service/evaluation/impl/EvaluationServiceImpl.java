@@ -169,7 +169,11 @@ public class EvaluationServiceImpl implements IEvaluationService {
         log.debug("EvaluationServiceImpl.searchEvaluableArtworks - start | request: {}, pageRequest: {}", request, pageRequest);
         requireNonNull(request);
         requireNonNull(pageRequest);
-        var result = quotationPackageRepository.searchEvaluableArtworks(request.getCountryId(), request.getTitle(), request.getCategories(), pageRequest.toPageableUnsafe());
+        var result = quotationPackageRepository
+                .searchEvaluableArtworks(
+                        request.getCountryId(),
+                        request.getTitle(), request.getCategories(),
+                        pageRequest.toPageableUnsafe());
         log.debug("EvaluationServiceImpl.searchEvaluableArtworks - end | request: {}, pageRequest: {}", request, pageRequest);
         return result;
     }

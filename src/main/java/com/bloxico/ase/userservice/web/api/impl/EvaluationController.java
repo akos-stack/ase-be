@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 public class EvaluationController implements EvaluationApi {
 
@@ -69,6 +71,12 @@ public class EvaluationController implements EvaluationApi {
             SaveQuotationPackageRequest request)
     {
         var response = evaluationFacade.saveQuotationPackage(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<SearchEvaluableArtworksResponse> searchEvaluableArtworks(@Valid SearchEvaluableArtworksRequest request, @Valid PageRequest page) {
+        var response = evaluationFacade.searchEvaluableArtworks(request, page);
         return ResponseEntity.ok(response);
     }
 

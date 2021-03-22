@@ -108,6 +108,15 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
         return response;
     }
 
+    @Override
+    public SearchEvaluableArtworksResponse searchEvaluableArtworks(SearchEvaluableArtworksRequest request, PageRequest page) {
+        log.debug("EvaluationFacadeImpl.searchEvaluableArtworks - start | request: {}, page: {}", request, page);
+        var result = evaluationService.searchEvaluableArtworks(request, page);
+        var response = new SearchEvaluableArtworksResponse(result);
+        log.debug("EvaluationFacadeImpl.searchEvaluableArtworks - end | request: {}, page: {}", request, page);
+        return response;
+    }
+
     private void requireCountryHasNoEvaluators(CountryDto countryDto) {
         var evaluatorsInCountry = evaluationService.countEvaluatorsByCountryId(countryDto.getId());
         if (evaluatorsInCountry > 0)
