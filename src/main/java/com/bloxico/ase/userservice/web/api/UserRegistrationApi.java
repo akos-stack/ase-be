@@ -211,8 +211,7 @@ public interface UserRegistrationApi {
     @ApiOperation(value = "Checks if user is invited to be a host with given token.")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Host Invitation exists."),
-            @ApiResponse(code = 400, message = "Token's userId does not match with principalId"),
-            @ApiResponse(code = 404, message = "Host Invitation is not found or principal not found")
+            @ApiResponse(code = 404, message = "Host Invitation is not found.")
     })
     ResponseEntity<Void> checkHostInvitation(@Valid @PathVariable("token") String token);
 
