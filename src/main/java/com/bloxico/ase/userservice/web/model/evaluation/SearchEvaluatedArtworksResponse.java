@@ -3,9 +3,7 @@ package com.bloxico.ase.userservice.web.model.evaluation;
 import com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj;
 import com.bloxico.ase.userservice.web.model.ResponsePage;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 import org.springframework.data.domain.Page;
 
 import static lombok.AccessLevel.PRIVATE;

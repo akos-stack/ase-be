@@ -14,21 +14,22 @@ public interface ArtworkEvaluatorEvaluationRepository extends JpaRepository<Artw
     // @formatter:off
     @Query(value =
             "SELECT new com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj( " +
-            "         a.title AS artwork_title,                                           " +
-            "         a.artist.name AS artist,                                            " +
-            "         aee.sellingPrice AS selling_price)                                  " +
+            "        a.title          AS artwork_title,                                   " +
+            "        a.artist.name    AS artist,                                          " +
+            "        aee.sellingPrice AS selling_price)                                   " +
             "  FROM Artwork a                                                             " +
             "  JOIN a.categories c                                                        " +
-            "  JOIN ArtworkEvaluatorEvaluation aee ON aee.artworkId = a.id                " +
-            "  JOIN Evaluator e ON e.id = aee.evaluatorId                                 " +
-            "  WHERE (:principalId IS NULL OR e.userProfile.userId = :principalId)        " +
-            "  AND (:artworkTitle IS NULL OR a.title LIKE %:artworkTitle%)                " +
-            "  AND (COALESCE(:categories, NULL) IS NULL OR c.name IN (:categories))       ")
+            "  JOIN ArtworkEvaluatorEvaluation aee                                        " +
+            "    ON aee.artworkId = a.id                                                  " +
+            "  JOIN Evaluator e                                                           " +
+            "    ON e.id = aee.evaluatorId                                                " +
+            " WHERE (:principalId  IS NULL OR e.userProfile.userId = :principalId)        " +
+            "   AND (:artworkTitle IS NULL OR a.title LIKE %:artworkTitle%)               " +
+            "   AND (COALESCE(:categories, NULL) IS NULL OR c.name IN (:categories))      ")
     // @formatter:on
-    Page<EvaluatedArtworkProj> search(
-            String artworkTitle,
-            Collection<String> categories,
-            Long principalId,
-            Pageable pageable);
+    Page<EvaluatedArtworkProj> search(String artworkTitle,
+                                      Collection<String> categories,
+                                      Long principalId,
+                                      Pageable pageable);
 
 }

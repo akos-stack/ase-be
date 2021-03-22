@@ -14,7 +14,8 @@ import static com.bloxico.ase.userservice.config.security.AseSecurityContext.get
 @RestController
 public class EvaluationController implements EvaluationApi {
 
-    @Autowired private IEvaluationFacade evaluationFacade;
+    @Autowired
+    private IEvaluationFacade evaluationFacade;
 
     @Override
     public ResponseEntity<SearchCountryEvaluationDetailsResponse> searchCountryEvaluationDetails(
@@ -75,7 +76,8 @@ public class EvaluationController implements EvaluationApi {
 
     @Override
     public ResponseEntity<SearchEvaluatedArtworksResponse> searchEvaluatedArtworks(
-            SearchEvaluatedArtworksRequest request, PageRequest page) {
+            SearchEvaluatedArtworksRequest request, PageRequest page)
+    {
         var response = evaluationFacade.searchEvaluatedArtworks(request, page, getPrincipalId());
         return ResponseEntity.ok(response);
     }

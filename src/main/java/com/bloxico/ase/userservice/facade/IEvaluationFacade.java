@@ -25,6 +25,8 @@ public interface IEvaluationFacade {
             SaveQuotationPackageRequest request);
 
     SearchEvaluatedArtworksResponse searchEvaluatedArtworks(
-            SearchEvaluatedArtworksRequest request, PageRequest page, Long principalId);
+            SearchEvaluatedArtworksRequest request,
+            PageRequest page,
+            Long principalId);
 
 }

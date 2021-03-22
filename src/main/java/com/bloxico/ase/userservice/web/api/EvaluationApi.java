@@ -119,6 +119,7 @@ public interface EvaluationApi {
             @ApiResponse(code = 200, message = "Evaluated artworks successfully searched.")
     })
     ResponseEntity<SearchEvaluatedArtworksResponse> searchEvaluatedArtworks(
-            @Valid SearchEvaluatedArtworksRequest request, @Valid PageRequest page);
+            @Valid SearchEvaluatedArtworksRequest request,
+            @Valid PageRequest page);
 
 }

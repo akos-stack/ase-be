@@ -9,8 +9,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static com.bloxico.ase.testutil.Util.*;
@@ -380,9 +378,9 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     @WithMockCustomUser(role = EVALUATOR, auth = true)
     public void searchEvaluatedArtworks() {
         var evaluator = utilSecurityContext.getLoggedInEvaluator();
-        var ea1 = utilEvaluation.savedEvaluatedArtwork(evaluator.getId());
-        var ea2 = utilEvaluation.savedEvaluatedArtwork(evaluator.getId());
-        var ea3 = utilEvaluation.savedEvaluatedArtwork();
+        var ea1 = utilEvaluation.savedEvaluatedArtworkProj(evaluator.getId());
+        var ea2 = utilEvaluation.savedEvaluatedArtworkProj(evaluator.getId());
+        var ea3 = utilEvaluation.savedEvaluatedArtworkProj();
         var response = given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
@@ -405,11 +403,11 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     public void searchEvaluatedArtworks_withArtworkTitle() {
         var title = genUUID();
         var evaluatorId = utilSecurityContext.getLoggedInEvaluator().getId();
-        var ea1 = utilEvaluation.savedEvaluatedArtwork(
+        var ea1 = utilEvaluation.savedEvaluatedArtworkProj(
                 utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)), evaluatorId);
-        var ea2 = utilEvaluation.savedEvaluatedArtwork(
+        var ea2 = utilEvaluation.savedEvaluatedArtworkProj(
                 utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)), evaluatorId);
-        var ea3 = utilEvaluation.savedEvaluatedArtwork(
+        var ea3 = utilEvaluation.savedEvaluatedArtworkProj(
                 utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)));
         var response = given()
                 .header("Authorization", utilSecurityContext.getToken())
@@ -433,20 +431,19 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     public void searchEvaluatedArtworks_withCategories() {
         var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
         var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
-        var categoriesFilter = String.format("%s,%s",c1.getName(), c2.getName());
         var evaluatorId = utilSecurityContext.getLoggedInEvaluator().getId();
-        var ea1 = utilEvaluation.savedEvaluatedArtwork(
+        var ea1 = utilEvaluation.savedEvaluatedArtworkProj(
                 utilArtwork.savedEvaluableArtworkDto(Set.of(c1, c2)), evaluatorId);
-        var ea2 = utilEvaluation.savedEvaluatedArtwork(
+        var ea2 = utilEvaluation.savedEvaluatedArtworkProj(
                 utilArtwork.savedEvaluableArtworkDto(Set.of(c1)), evaluatorId);
-        var ea3 = utilEvaluation.savedEvaluatedArtwork(
+        var ea3 = utilEvaluation.savedEvaluatedArtworkProj(
                 utilArtwork.savedEvaluableArtworkDto(genUUID()), evaluatorId);
-        var ea4 = utilEvaluation.savedEvaluatedArtwork(
+        var ea4 = utilEvaluation.savedEvaluatedArtworkProj(
                 utilArtwork.savedEvaluableArtworkDto(Set.of(c2)));
         var response = given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .params(allPages("categories", categoriesFilter))
+                .params(allPages("categories", String.format("%s,%s", c1.getName(), c2.getName())))
                 .when()
                 .get(API_URL + EVALUATION_EVALUATED_SEARCH)
                 .then()

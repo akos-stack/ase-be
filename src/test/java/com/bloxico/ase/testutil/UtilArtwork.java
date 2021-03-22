@@ -93,13 +93,15 @@ public class UtilArtwork {
     }
 
     public ArtworkDto savedEvaluableArtworkDto(String title) {
-        var artworkDto = genArtworkDto(WAITING_FOR_EVALUATION, utilUserProfile.savedArtOwnerDto().getId());
+        var ownerId = utilUserProfile.savedArtOwnerDto().getId();
+        var artworkDto = genArtworkDto(WAITING_FOR_EVALUATION, ownerId);
         artworkDto.setTitle(title);
         return saved(artworkDto);
     }
 
     public ArtworkDto savedEvaluableArtworkDto(Set<ArtworkMetadataDto> categories) {
-        var artworkDto = genArtworkDto(WAITING_FOR_EVALUATION, utilUserProfile.savedArtOwnerDto().getId());
+        var ownerId = utilUserProfile.savedArtOwnerDto().getId();
+        var artworkDto = genArtworkDto(WAITING_FOR_EVALUATION, ownerId);
         artworkDto.setCategories(categories);
         return saved(artworkDto);
     }

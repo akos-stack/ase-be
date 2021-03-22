@@ -1,15 +1,11 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.*;
-import com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj;
-import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
-import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
+import com.bloxico.ase.userservice.proj.evaluation.*;
 import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.ISearchCountryEvaluationDetailsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchEvaluatedArtworksRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -171,12 +167,11 @@ public class EvaluationServiceImpl implements IEvaluationService {
             SearchEvaluatedArtworksRequest request, PageRequest page, Long principalId)
     {
         log.debug("EvaluationServiceImpl.searchEvaluatedArtworks - start | request: {}, page: {}, principalId: {}",
-                    request, page, principalId);
+                request, page, principalId);
         requireNonNull(request);
         requireNonNull(page);
         var result = artworkEvaluatorEvaluationRepository
-                .search(
-                        request.getArtworkTitle(),
+                .search(request.getArtworkTitle(),
                         request.getCategories(),
                         principalId,
                         page.toPageableUnsafe());

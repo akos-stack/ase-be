@@ -4,17 +4,12 @@ import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
 import com.bloxico.ase.userservice.dto.entity.evaluation.*;
 import com.bloxico.ase.userservice.entity.address.Region;
 import com.bloxico.ase.userservice.entity.evaluation.*;
-import com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj;
-import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
-import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
-import com.bloxico.ase.userservice.repository.evaluation.ArtworkEvaluatorEvaluationRepository;
-import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
-import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageRepository;
+import com.bloxico.ase.userservice.proj.evaluation.*;
+import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 
@@ -201,36 +196,47 @@ public class UtilEvaluation {
         return new SearchEvaluatedArtworksRequest(null, null);
     }
 
+    public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest(List<String> categories) {
+        return new SearchEvaluatedArtworksRequest(null, categories);
+    }
+
+    public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest(String artworkTitle) {
+        return new SearchEvaluatedArtworksRequest(artworkTitle, null);
+    }
+
     public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest(String artworkTitle, List<String> categories) {
         return new SearchEvaluatedArtworksRequest(artworkTitle, categories);
     }
 
-    public EvaluatedArtworkProj savedEvaluatedArtwork() {
-        return savedEvaluatedArtwork(utilUserProfile.savedEvaluator().getId());
+    public EvaluatedArtworkProj savedEvaluatedArtworkProj() {
+        return savedEvaluatedArtworkProj(utilUserProfile.savedEvaluator().getId());
     }
 
-    public EvaluatedArtworkProj savedEvaluatedArtwork(long evaluatorId) {
-        return savedEvaluatedArtwork(utilArtwork.saved(utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION)), evaluatorId);
+    public EvaluatedArtworkProj savedEvaluatedArtworkProj(long evaluatorId) {
+        return savedEvaluatedArtworkProj(utilArtwork.saved(
+                utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION)), evaluatorId);
     }
 
-    public EvaluatedArtworkProj savedEvaluatedArtwork(ArtworkDto artwork) {
-        return savedEvaluatedArtwork(artwork, utilUserProfile.savedEvaluator().getId());
+    public EvaluatedArtworkProj savedEvaluatedArtworkProj(ArtworkDto artwork) {
+        return savedEvaluatedArtworkProj(artwork, utilUserProfile.savedEvaluator().getId());
     }
 
-    public EvaluatedArtworkProj savedEvaluatedArtwork(ArtworkDto artwork, long evaluatorId) {
+    public EvaluatedArtworkProj savedEvaluatedArtworkProj(ArtworkDto artwork, long evaluatorId) {
         var evaluation = new ArtworkEvaluatorEvaluation();
         evaluation.setArtworkId(artwork.getId());
         evaluation.setEvaluatorId(evaluatorId);
         evaluation.setCountryId(utilLocation.savedCountry().getId());
-        evaluation.setValue(BigDecimal.valueOf(genPosInt(2000)));
-        evaluation.setSellingPrice(BigDecimal.valueOf(genPosInt(2000)));
+        evaluation.setValue(genPosBigDecimal(2000));
+        evaluation.setSellingPrice(genPosBigDecimal(2000));
         evaluation.setAseSellable(genBoolean());
         evaluation.setSendOffer(genBoolean());
         evaluation.setRating(genPosInt(6));
         evaluation.setComment(genUUID());
         artworkEvaluatorEvaluationRepository.saveAndFlush(evaluation);
         return new EvaluatedArtworkProj(
-                artwork.getTitle(), artwork.getArtist().getName(), evaluation.getSellingPrice());
+                artwork.getTitle(),
+                artwork.getArtist().getName(),
+                evaluation.getSellingPrice());
     }
 
 }
