@@ -33,6 +33,7 @@ public interface UserRegistrationApi {
     String REGISTRATION_EVALUATOR_SEARCH              = "/user/registration/evaluator/search";
     String REGISTRATION_EVALUATOR_RESUME_DOWNLOAD     = "/user/registration/evaluator/resume";
     String REGISTRATION_HOST_INVITATION               = "/user/registration/host/invitation";
+    String REGISTRATION_HOST_INVITATION_WITHDRAW      = "/user/registration/host/invitation/withdraw";
     // @formatter:on
 
     @PostMapping(
@@ -192,5 +193,17 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 409, message = "User with given id is already invited to be a host.")
     })
     ResponseEntity<Void> sendHostInvitation(@Valid @RequestBody HostInvitationRequest request);
+
+    @PostMapping(
+            value = REGISTRATION_HOST_INVITATION_WITHDRAW,
+            produces = {"application/json"},
+            consumes = {"application/json"})
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'invite_host')")
+    @ApiOperation(value = "Withdraws an existing host invitation.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Host invitation is withdrawn successfully."),
+            @ApiResponse(code = 404, message = "User with given id is not invited to be a host.")
+    })
+    ResponseEntity<Void> withdrawHostInvitation(@Valid @RequestBody HostInvitationWithdrawalRequest request);
 
 }

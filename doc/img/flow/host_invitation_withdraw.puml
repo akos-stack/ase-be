@@ -1,0 +1,8 @@
+@startuml
+Admin -> UserRegistrationApi: /user/registration/host/invitation/withdraw
+UserRegistrationApi --> IUserRegistrationFacade: withdrawHostInvitation(HostInvitationWithdrawalRequest)
+IUserRegistrationFacade -> ITokenService : getTokenByUserId(long)
+ITokenService --> IUserRegistrationFacade : TokenDto
+IUserRegistrationFacade -> ITokenService : consumeToken(String)
+ITokenService --> IUserRegistrationFacade : TokenDto
+@enduml

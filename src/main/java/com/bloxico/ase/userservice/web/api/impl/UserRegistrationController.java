@@ -107,4 +107,10 @@ public class UserRegistrationController implements UserRegistrationApi {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<Void> withdrawHostInvitation(HostInvitationWithdrawalRequest request) {
+        userRegistrationFacade.withdrawHostInvitation(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Data
@@ -16,6 +17,7 @@ public class SearchCountryEvaluationDetailsForManagementRequest implements ISear
     @ApiParam(name = "search", required = true)
     private String search;
 
+    @Size(min = 1)
     @ApiParam(name = "regions")
     private List<String> regions;
 

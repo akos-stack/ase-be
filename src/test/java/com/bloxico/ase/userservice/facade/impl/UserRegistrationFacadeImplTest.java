@@ -588,4 +588,37 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         assertTrue(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isPresent());
     }
 
+    @Test
+    public void withdrawHostInvitation_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userRegistrationFacade.withdrawHostInvitation(null));
+    }
+
+    @Test
+    public void withdrawHostInvitation_tokenNotFound_userNotExists() {
+        var request = new HostInvitationWithdrawalRequest(-1L);
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.withdrawHostInvitation(request));
+    }
+
+    @Test
+    public void withdrawHostInvitation_tokenNotFound_uninvitedUser() {
+        var userId = utilUser.savedUser().getId();
+        var request = new HostInvitationWithdrawalRequest(userId);
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.withdrawHostInvitation(request));
+    }
+
+    @Test
+    public void withdrawHostInvitation() {
+        var userId = utilUser.savedUser().getId();
+        userRegistrationFacade.sendHostInvitation(new HostInvitationRequest(userId));
+        assertTrue(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isPresent());
+        userRegistrationFacade.withdrawHostInvitation(new HostInvitationWithdrawalRequest(userId));
+        assertTrue(tokenRepository.findByTypeAndUserId(HOST_INVITATION, userId).isEmpty());
+    }
+
 }
