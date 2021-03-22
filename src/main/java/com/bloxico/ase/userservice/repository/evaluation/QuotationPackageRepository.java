@@ -28,7 +28,7 @@ public interface QuotationPackageRepository extends JpaRepository<QuotationPacka
                     "  JOIN QuotationPackageCountry qpc on qp.id = qpc.id.quotationPackageId            " +
                     "  JOIN Artwork a on a.id = qp.artworkId                                            " +
                     "  JOIN a.categories ac                                                             " +
-                    "  WHERE a.status = 'READY_FOR_EVALUATION'                                          " +
+                    "  WHERE a.status = 'WAITING_FOR_EVALUATION'                                        " +
                     "   and (:title is NULL or a.title like %:title%)                                   " +
                     "   and qpc.id.countryId = :countryId                                               " +
                     "   and (COALESCE(:categories, NULL) is NULL or ac.name in (:categories))           ",
@@ -37,7 +37,7 @@ public interface QuotationPackageRepository extends JpaRepository<QuotationPacka
                     " JOIN QuotationPackageCountry qpc on qp.id = qpc.id.quotationPackageId             " +
                     " JOIN Artwork a on a.id = qp.artworkId                                             " +
                     " JOIN a.categories ac                                                              " +
-                    " WHERE a.status = 'READY_FOR_EVALUATION'                                           " +
+                    " WHERE a.status = 'WAITING_FOR_EVALUATION'                                         " +
                     "   and (:title is NULL or a.title like %:title%)                                   " +
                     "   and qpc.id.countryId = :countryId                                               " +
                     "   and (COALESCE(:categories, NULL) is NULL or ac.name in (:categories))")

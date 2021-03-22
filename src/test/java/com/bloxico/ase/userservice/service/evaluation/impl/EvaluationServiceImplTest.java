@@ -2,8 +2,6 @@ package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
-import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
-import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.bloxico.ase.userservice.exception.EvaluationException;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.web.model.evaluation.SearchEvaluableArtworksRequest;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
@@ -447,14 +444,14 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void searchEvaluable_nullSearchRequest() {
+    public void searchEvaluableArtworks_nullSearchRequest() {
         assertThrows(
                 NullPointerException.class,
                 () -> evaluationService.searchEvaluableArtworks(null, allPages()));
     }
 
     @Test
-    public void searchEvaluable_nullPageRequest() {
+    public void searchEvaluableArtworks_nullPageRequest() {
         var request = utilEvaluation.genSearchEvaluableArtworksRequest();
         assertThrows(
                 NullPointerException.class,
@@ -463,11 +460,11 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser
-    public void searchEvaluableByCountry() {
+    public void searchEvaluableArtworks() {
         long countryId = utilLocation.savedCountry().getId();
-        var evaluable1 = utilEvaluation.savedOngoingEvaluationProj(countryId);
-        var evaluable2 = utilEvaluation.savedOngoingEvaluationProj(countryId);
-        var evaluable3 = utilEvaluation.savedOngoingEvaluationProj();
+        var evaluable1 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var evaluable2 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var evaluable3 = utilEvaluation.savedEvaluableArtworkProj();
         var request = utilEvaluation.genSearchEvaluableArtworksRequest(countryId);
         assertThat(
                 evaluationService.searchEvaluableArtworks(request, allPages()),
@@ -476,11 +473,11 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser
-    public void searchEvaluableByCountryAndTitle() {
+    public void searchEvaluableArtworks_WithTitle() {
         long countryId = utilLocation.savedCountry().getId();
-        var evaluable1 = utilEvaluation.savedOngoingEvaluationProj(countryId);
-        var evaluable2 = utilEvaluation.savedOngoingEvaluationProj(countryId);
-        var evaluable3 = utilEvaluation.savedOngoingEvaluationProj();
+        var evaluable1 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var evaluable2 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var evaluable3 = utilEvaluation.savedEvaluableArtworkProj();
         var request = utilEvaluation.genSearchEvaluableArtworksRequest(countryId, evaluable1.getArtworkTitle());
         assertThat(
                 evaluationService.searchEvaluableArtworks(request, allPages()),
@@ -489,17 +486,24 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser
-    public void searchEvaluable() {
-        var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(Artwork.Status.READY_FOR_EVALUATION));
-        var categories = artwork.getCategories().stream().map(ArtworkMetadataDto::getName).collect(Collectors.toList());
+    public void searchEvaluableArtworks_WithTitleAndCategories() {
         long countryId = utilLocation.savedCountry().getId();
-        var evaluable1 = utilEvaluation.savedOngoingEvaluationProj(artwork, countryId);
-        var evaluable2 = utilEvaluation.savedOngoingEvaluationProj(countryId);
-        var evaluable3 = utilEvaluation.savedOngoingEvaluationProj();
-        var request = new SearchEvaluableArtworksRequest(countryId, evaluable1.getArtworkTitle(), categories);
-        assertThat(
-                evaluationService.searchEvaluableArtworks(request, allPages()),
-                allOf(hasItems(evaluable1), not(hasItems(evaluable2, evaluable3))));
+        var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var cs = List.of(c1.getName(), c2.getName());
+        var ea1 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1, c2)), countryId);
+        var ea2 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1)), countryId);
+        var ea3 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c2)), countryId);
+        var ea4 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genUUID()), countryId);
+        var request = new SearchEvaluableArtworksRequest(countryId, "", cs);
+        assertThat(evaluationService
+                        .searchEvaluableArtworks(request, allPages())
+                        .getContent(),
+                allOf(hasItems(ea1, ea2, ea3), not(hasItems(ea4))));
     }
 
 }
