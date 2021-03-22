@@ -795,14 +795,14 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
     }
 
-    @Test //TODO-FIX
-    @WithMockCustomUser
+    @Test
     public void checkHostInvitation_200_ok() {
-        var loggedInUser = utilSecurityContext.getLoggedInUserId();
-        var request = new HostInvitationRequest(loggedInUser);
+        var registration = utilAuth.doConfirmedRegistration();
+        var request = new HostInvitationRequest(registration.getId());
         userRegistrationFacade.sendHostInvitation(request);
-        var token = tokenRepository.findByTypeAndUserId(Token.Type.HOST_INVITATION, loggedInUser);
+        var token = tokenRepository.findByTypeAndUserId(Token.Type.HOST_INVITATION, registration.getId());
         given()
+                .header("Authorization", utilAuth.doAuthentication(registration))
                 .pathParam("token", token.get().getValue())
                 .when()
                 .get(API_URL + REGISTRATION_HOST_INVITATION_CHECK)
