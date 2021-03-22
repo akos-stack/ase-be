@@ -795,7 +795,7 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
     }
 
-    @Test
+    @Test //TODO-FIX
     @WithMockCustomUser
     public void checkHostInvitation_200_ok() {
         var loggedInUser = utilSecurityContext.getLoggedInUserId();
