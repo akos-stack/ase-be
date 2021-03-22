@@ -1,7 +1,9 @@
 package com.bloxico.ase.userservice.config.security;
 
 import com.bloxico.ase.userservice.entity.user.profile.ArtOwner;
+import com.bloxico.ase.userservice.entity.user.profile.Evaluator;
 import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
+import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +16,7 @@ import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_NOT_FOU
 public class AseSecurityContext {
 
     @Autowired private ArtOwnerRepository artOwnerRepository;
+    @Autowired private EvaluatorRepository evaluatorRepository;
 
     public static Authentication auth() {
         return SecurityContextHolder.getContext().getAuthentication();
@@ -35,6 +38,13 @@ public class AseSecurityContext {
         return artOwnerRepository
                 .findByUserProfile_UserId(getPrincipalId())
                 .map(ArtOwner::getId)
+                .orElseThrow(USER_NOT_FOUND::newException);
+    }
+
+    public long getEvaluatorId() {
+        return evaluatorRepository
+                .findByUserProfile_UserId(getPrincipalId())
+                .map(Evaluator::getId)
                 .orElseThrow(USER_NOT_FOUND::newException);
     }
 

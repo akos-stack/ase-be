@@ -20,6 +20,7 @@ public interface EvaluationApi {
     String MNG_EVALUATION_COUNTRY_DETAILS_DELETE = "/management/evaluation/country-details/delete";
     String MNG_EVALUATION_REGION_DETAILS_SEARCH  = "/management/evaluation/region-details/search";
     String EVALUATION_QUOTATION_PACKAGE_SAVE     = "/evaluation/quotation-package/save";
+    String EVALUATION_EVALUATED_SEARCH           = "/evaluation/evaluated/search";
     String SEARCH_EVALUABLE_ARTWORKS             = "/evaluation/search/evaluable";
     // @formatter:on
 
@@ -111,6 +112,16 @@ public interface EvaluationApi {
     })
     ResponseEntity<SaveQuotationPackageResponse> saveQuotationPackage(
             @Valid @RequestBody SaveQuotationPackageRequest request);
+
+    @GetMapping(value = EVALUATION_EVALUATED_SEARCH)
+    @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_evaluated_artworks')")
+    @ApiOperation(value = "Searches evaluated artworks.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Evaluated artworks successfully searched.")
+    })
+    ResponseEntity<SearchEvaluatedArtworksResponse> searchEvaluatedArtworks(
+            @Valid SearchEvaluatedArtworksRequest request,
+            @Valid PageRequest page);
 
     @GetMapping(
             value = SEARCH_EVALUABLE_ARTWORKS,

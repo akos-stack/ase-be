@@ -8,11 +8,12 @@ import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetail
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-import static com.bloxico.ase.testutil.Util.allPages;
-import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
+import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type.CATEGORY;
+import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -24,7 +25,10 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private UtilUserProfile utilUserProfile;
+    @Autowired private UtilSecurityContext securityContext;
     @Autowired private UtilSystem utilSystem;
+    @Autowired private UtilArtwork utilArtwork;
+    @Autowired private UtilArtworkMetadata utilArtworkMetadata;
     @Autowired private EvaluationFacadeImpl evaluationFacade;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
@@ -266,4 +270,143 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
         var request = utilEvaluation.genSaveQuotationPackageRequest();
         evaluationFacade.saveQuotationPackage(request);
     }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluatedArtworks_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.searchEvaluatedArtworks(null, allPages(), 1L));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluatedArtworks_nullPageRequest() {
+        var request = utilEvaluation.genSearchEvaluatedArtworksRequest();
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.searchEvaluatedArtworks(request, null, 1L));
+    }
+
+    @Test
+    @WithMockCustomUser(role = EVALUATOR)
+    public void searchEvaluatedArtworks_ofEvaluator() {
+        var evaluatorId = securityContext.getLoggedInEvaluator().getId();
+        var ea1 = utilEvaluation.savedEvaluatedArtworkProj(evaluatorId);
+        var ea2 = utilEvaluation.savedEvaluatedArtworkProj(evaluatorId);
+        var ea3 = utilEvaluation.savedEvaluatedArtworkProj();
+        assertThat(evaluationFacade
+                        .searchEvaluatedArtworks(
+                                utilEvaluation.genSearchEvaluatedArtworksRequest(),
+                                allPages(),
+                                securityContext.getLoggedInUserId())
+                        .getPage().getContent(),
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
+    }
+
+    @Test
+    @WithMockCustomUser(role = EVALUATOR)
+    public void searchEvaluatedArtworks_ofEvaluator_withArtworkTitle() {
+        var title = genUUID();
+        var evaluatorId = securityContext.getLoggedInEvaluator().getId();
+        var ea1 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)),
+                evaluatorId);
+        var ea2 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genUUID()),
+                evaluatorId);
+        var ea3 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)));
+        assertThat(evaluationFacade
+                        .searchEvaluatedArtworks(
+                                utilEvaluation.genSearchEvaluatedArtworksRequest(title),
+                                allPages(),
+                                securityContext.getLoggedInUserId())
+                        .getPage()
+                        .getContent(),
+                allOf(hasItems(ea1), not(hasItems(ea2, ea3))));
+    }
+
+    @Test
+    @WithMockCustomUser(role = EVALUATOR)
+    public void searchEvaluatedArtworks_ofEvaluator_withCategories() {
+        var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var cs = List.of(c1.getName(), c2.getName());
+        var evaluatorId = securityContext.getLoggedInEvaluator().getId();
+        var ea1 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1, c2)),
+                evaluatorId);
+        var ea2 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1)),
+                evaluatorId);
+        var ea3 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genUUID()),
+                evaluatorId);
+        var ea4 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c2)));
+        assertThat(evaluationFacade
+                        .searchEvaluatedArtworks(
+                                utilEvaluation.genSearchEvaluatedArtworksRequest(cs),
+                                allPages(),
+                                securityContext.getLoggedInUserId())
+                        .getPage()
+                        .getContent(),
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3, ea4))));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluatedArtworks_all() {
+        var ea1 = utilEvaluation.savedEvaluatedArtworkProj();
+        var ea2 = utilEvaluation.savedEvaluatedArtworkProj();
+        var ea3 = utilEvaluation.savedEvaluatedArtworkProj();
+        var request = utilEvaluation.genSearchEvaluatedArtworksRequest();
+        assertThat(evaluationFacade
+                        .searchEvaluatedArtworks(request, allPages(), null)
+                        .getPage()
+                        .getContent(),
+                hasItems(ea1, ea2, ea3));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluatedArtworks_all_withArtworkTitle() {
+        var title = genUUID();
+        var ea1 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)));
+        var ea2 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)));
+        var ea3 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genUUID()));
+        var request = utilEvaluation.genSearchEvaluatedArtworksRequest(title);
+        assertThat(evaluationFacade
+                        .searchEvaluatedArtworks(request, allPages(), null)
+                        .getPage()
+                        .getContent(),
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluatedArtworks_all_withCategories() {
+        var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var cs = List.of(c1.getName(), c2.getName());
+        var ea1 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1, c2)));
+        var ea2 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1)));
+        var ea3 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c2)));
+        var ea4 = utilEvaluation.savedEvaluatedArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genUUID()));
+        var request = utilEvaluation.genSearchEvaluatedArtworksRequest(cs);
+        assertThat(evaluationFacade
+                        .searchEvaluatedArtworks(request, allPages(), null)
+                        .getPage()
+                        .getContent(),
+                allOf(hasItems(ea1, ea2, ea3), not(hasItems(ea4))));
+    }
+
 }

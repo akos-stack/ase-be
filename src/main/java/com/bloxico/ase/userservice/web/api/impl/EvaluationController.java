@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.bloxico.ase.userservice.config.security.AseSecurityContext.getPrincipalId;
+
 import javax.validation.Valid;
 
 @RestController
@@ -71,6 +73,14 @@ public class EvaluationController implements EvaluationApi {
             SaveQuotationPackageRequest request)
     {
         var response = evaluationFacade.saveQuotationPackage(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<SearchEvaluatedArtworksResponse> searchEvaluatedArtworks(
+            SearchEvaluatedArtworksRequest request, PageRequest page)
+    {
+        var response = evaluationFacade.searchEvaluatedArtworks(request, page, getPrincipalId());
         return ResponseEntity.ok(response);
     }
 

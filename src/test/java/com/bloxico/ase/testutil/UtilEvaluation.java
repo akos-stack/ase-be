@@ -1,10 +1,15 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.*;
+import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
 import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
 import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
 import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
 import com.bloxico.ase.userservice.entity.address.Region;
+import com.bloxico.ase.userservice.entity.evaluation.*;
+import com.bloxico.ase.userservice.proj.evaluation.*;
+import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.entity.artwork.Artwork;
 import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
 import com.bloxico.ase.userservice.entity.evaluation.QuotationPackage;
@@ -22,19 +27,21 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Set;
 
-import static com.bloxico.ase.testutil.Util.genPosInt;
-import static com.bloxico.ase.testutil.Util.genUUID;
+import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.entity.artwork.Artwork.Status.WAITING_FOR_EVALUATION;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 
 @Component
 public class UtilEvaluation {
 
     @Autowired private UtilUser utilUser;
+    @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private UtilLocation utilLocation;
     @Autowired private UtilArtwork utilArtwork;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
     @Autowired private QuotationPackageRepository quotationPackageRepository;
     @Autowired private EvaluationServiceImpl evaluationService;
+    @Autowired private ArtworkEvaluatorEvaluationRepository artworkEvaluatorEvaluationRepository;
 
     public CountryEvaluationDetails genCountryEvaluationDetails(Long countryId) {
         var details = new CountryEvaluationDetails();
@@ -241,6 +248,53 @@ public class UtilEvaluation {
 
     public SearchRegionEvaluationDetailsRequest genDefaultSearchRegionsRequest() {
         return new SearchRegionEvaluationDetailsRequest("");
+    }
+
+    public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest() {
+        return new SearchEvaluatedArtworksRequest(null, null);
+    }
+
+    public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest(List<String> categories) {
+        return new SearchEvaluatedArtworksRequest(null, categories);
+    }
+
+    public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest(String artworkTitle) {
+        return new SearchEvaluatedArtworksRequest(artworkTitle, null);
+    }
+
+    public SearchEvaluatedArtworksRequest genSearchEvaluatedArtworksRequest(String artworkTitle, List<String> categories) {
+        return new SearchEvaluatedArtworksRequest(artworkTitle, categories);
+    }
+
+    public EvaluatedArtworkProj savedEvaluatedArtworkProj() {
+        return savedEvaluatedArtworkProj(utilUserProfile.savedEvaluator().getId());
+    }
+
+    public EvaluatedArtworkProj savedEvaluatedArtworkProj(long evaluatorId) {
+        return savedEvaluatedArtworkProj(utilArtwork.saved(
+                utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION)), evaluatorId);
+    }
+
+    public EvaluatedArtworkProj savedEvaluatedArtworkProj(ArtworkDto artwork) {
+        return savedEvaluatedArtworkProj(artwork, utilUserProfile.savedEvaluator().getId());
+    }
+
+    public EvaluatedArtworkProj savedEvaluatedArtworkProj(ArtworkDto artwork, long evaluatorId) {
+        var evaluation = new ArtworkEvaluatorEvaluation();
+        evaluation.setArtworkId(artwork.getId());
+        evaluation.setEvaluatorId(evaluatorId);
+        evaluation.setCountryId(utilLocation.savedCountry().getId());
+        evaluation.setValue(genPosBigDecimal(2000));
+        evaluation.setSellingPrice(genPosBigDecimal(2000));
+        evaluation.setAseSellable(genBoolean());
+        evaluation.setSendOffer(genBoolean());
+        evaluation.setRating(genPosInt(6));
+        evaluation.setComment(genUUID());
+        artworkEvaluatorEvaluationRepository.saveAndFlush(evaluation);
+        return new EvaluatedArtworkProj(
+                artwork.getTitle(),
+                artwork.getArtist().getName(),
+                evaluation.getSellingPrice());
     }
 
     public SearchEvaluableArtworksRequest genSearchEvaluableArtworksRequest() {

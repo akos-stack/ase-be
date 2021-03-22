@@ -3,7 +3,9 @@ package com.bloxico.ase.testutil;
 import com.bloxico.ase.userservice.config.security.AsePrincipal;
 import com.bloxico.ase.userservice.entity.user.User;
 import com.bloxico.ase.userservice.entity.user.profile.ArtOwner;
+import com.bloxico.ase.userservice.entity.user.profile.Evaluator;
 import com.bloxico.ase.userservice.repository.user.profile.ArtOwnerRepository;
+import com.bloxico.ase.userservice.repository.user.profile.EvaluatorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,8 +15,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class UtilSecurityContext {
 
-    @Autowired
-    private ArtOwnerRepository artOwnerRepository;
+    @Autowired private ArtOwnerRepository artOwnerRepository;
+    @Autowired private EvaluatorRepository evaluatorRepository;
 
     public String getToken() {
         if (SecurityContextHolder.getContext().getAuthentication() != null) {
@@ -48,6 +50,12 @@ public class UtilSecurityContext {
 
     public ArtOwner getLoggedInArtOwner() {
         return artOwnerRepository
+                .findByUserProfile_UserId(getLoggedInUserId())
+                .orElse(null);
+    }
+
+    public Evaluator getLoggedInEvaluator() {
+        return evaluatorRepository
                 .findByUserProfile_UserId(getLoggedInUserId())
                 .orElse(null);
     }
