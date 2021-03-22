@@ -1,7 +1,7 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
-import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.testutil.*;
+import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.exception.EvaluationException;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import org.junit.Test;
@@ -9,8 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
+import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type.CATEGORY;
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
@@ -25,6 +28,7 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilEvaluation utilEvaluation;
     @Autowired private UtilSecurityContext securityContext;
     @Autowired private UtilArtwork utilArtwork;
+    @Autowired private UtilArtworkMetadata utilArtworkMetadata;
     @Autowired private EvaluationServiceImpl evaluationService;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
@@ -361,6 +365,34 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
+    @WithMockCustomUser(role = EVALUATOR)
+    public void searchEvaluatedArtworks_ofEvaluator_withCategories() {
+        var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var categoriesFilter = List.of(c1.getName(), c2.getName());
+        var evaluatorId = securityContext.getLoggedInEvaluator().getId();
+        var request = utilEvaluation.genSearchEvaluatedArtworksRequest("", categoriesFilter);
+        var ea1 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1, c2)),
+                evaluatorId);
+        var ea2 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1)),
+                evaluatorId);
+        var ea3 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(genUUID()),
+                evaluatorId);
+        var ea4 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c2)));
+        assertThat(evaluationService
+                        .searchEvaluatedArtworks(
+                                request,
+                                allPages(),
+                                securityContext.getLoggedInUserId())
+                        .getContent(),
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3, ea4))));
+    }
+
+    @Test
     @WithMockCustomUser
     public void searchEvaluatedArtworks_all() {
         var request = utilEvaluation.genSearchEvaluatedArtworksRequest();
@@ -394,6 +426,30 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
                                 null)
                         .getContent(),
                 allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluatedArtworks_all_withCategories() {
+        var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var categoriesFilter = List.of(c1.getName(), c2.getName());
+        var request = utilEvaluation.genSearchEvaluatedArtworksRequest("", categoriesFilter);
+        var ea1 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1, c2)));
+        var ea2 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1)));
+        var ea3 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c2)));
+        var ea4 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(genUUID()));
+        assertThat(evaluationService
+                        .searchEvaluatedArtworks(
+                                request,
+                                allPages(),
+                                null)
+                        .getContent(),
+                allOf(hasItems(ea1, ea2, ea3), not(hasItems(ea4))));
     }
 
 }

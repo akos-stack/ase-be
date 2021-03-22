@@ -9,7 +9,13 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
+import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type.CATEGORY;
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
 import static com.bloxico.ase.userservice.web.api.EvaluationApi.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.*;
@@ -33,6 +39,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     @Autowired private UtilUserProfile utilUserProfile;
     @Autowired private UtilSystem utilSystem;
     @Autowired private UtilArtwork utilArtwork;
+    @Autowired private UtilArtworkMetadata utilArtworkMetadata;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
 
     @Test
@@ -419,6 +426,38 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         assertThat(
                 response.getPage().getContent(),
                 allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
+    }
+
+    @Test
+    @WithMockCustomUser(role = EVALUATOR, auth = true)
+    public void searchEvaluatedArtworks_withCategories() {
+        var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var categoriesFilter = String.format("%s,%s",c1.getName(), c2.getName());
+        var evaluatorId = utilSecurityContext.getLoggedInEvaluator().getId();
+        var ea1 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1, c2)), evaluatorId);
+        var ea2 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1)), evaluatorId);
+        var ea3 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(genUUID()), evaluatorId);
+        var ea4 = utilEvaluation.savedEvaluatedArtwork(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c2)));
+        var response = given()
+                .header("Authorization", utilSecurityContext.getToken())
+                .contentType(JSON)
+                .params(allPages(Map.of("artworkTitle", "", "categories", categoriesFilter)))
+                .when()
+                .get(API_URL + EVALUATION_EVALUATED_SEARCH)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SearchEvaluatedArtworksResponse.class);
+        assertThat(
+                response.getPage().getContent(),
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3, ea4))));
     }
 
 }

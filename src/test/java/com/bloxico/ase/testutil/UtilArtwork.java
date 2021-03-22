@@ -2,6 +2,7 @@ package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtistDto;
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
+import com.bloxico.ase.userservice.dto.entity.artwork.metadata.ArtworkMetadataDto;
 import com.bloxico.ase.userservice.dto.entity.document.DocumentDto;
 import com.bloxico.ase.userservice.entity.artwork.Artist;
 import com.bloxico.ase.userservice.entity.artwork.Artwork.Status;
@@ -97,6 +98,11 @@ public class UtilArtwork {
         return saved(artworkDto);
     }
 
+    public ArtworkDto savedEvaluableArtworkDto(Set<ArtworkMetadataDto> categories) {
+        var artworkDto = genArtworkDto(WAITING_FOR_EVALUATION, utilUserProfile.savedArtOwnerDto().getId());
+        artworkDto.setCategories(categories);
+        return saved(artworkDto);
+    }
 
     public UpdateArtworkDataRequest genUpdateArtworkDataRequest(Status status) {
         return genUpdateArtworkDataRequest(saved(genArtworkDto()).getId(), status);
