@@ -16,9 +16,11 @@ import com.bloxico.ase.userservice.web.model.token.*;
 import com.bloxico.ase.userservice.web.model.user.SubmitEvaluatorRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import java.time.LocalDate;
 
 import static com.bloxico.ase.testutil.Util.*;
+import static com.bloxico.ase.userservice.entity.token.Token.Type.HOST_INVITATION;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.util.SupportedFileExtension.pdf;
@@ -183,6 +185,19 @@ public class UtilToken {
 
     public static SearchPendingEvaluatorsRequest genSearchPendingEvaluatorsRequest(String email) {
         return new SearchPendingEvaluatorsRequest(email);
+    }
+
+    public TokenDto doHostInvitation() {
+        return doHostInvitation(utilUser.savedUser().getId());
+    }
+
+    public TokenDto doHostInvitation(long userId) {
+        var request = new HostInvitationRequest(userId);
+        userRegistrationFacade.sendHostInvitation(request);
+        return tokenRepository
+                .findByTypeAndUserId(HOST_INVITATION, userId)
+                .map(MAPPER::toDto)
+                .orElseThrow();
     }
 
 }

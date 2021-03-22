@@ -4,7 +4,6 @@ import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.dto.entity.user.profile.ArtOwnerDto;
 import com.bloxico.ase.userservice.dto.entity.user.profile.EvaluatorDto;
-import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.facade.impl.UserRegistrationFacadeImpl;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
@@ -782,11 +781,24 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void checkHostInvitation_404_invitationNotFound() {
-        var registration = utilAuth.doConfirmedRegistration();
+    public void checkHostInvitation_404_tokenNotExists() {
         given()
-                .header("Authorization", utilAuth.doAuthentication(registration))
+                .header("Authorization", utilAuth.doAuthentication())
                 .pathParam("token", genUUID())
+                .when()
+                .get(API_URL + REGISTRATION_HOST_INVITATION_CHECK)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void checkHostInvitation_404_userIdNotEqualsPrincipalId() {
+        var token = utilToken.doHostInvitation().getValue();
+        given()
+                .header("Authorization", utilAuth.doAuthentication())
+                .pathParam("token", token)
                 .when()
                 .get(API_URL + REGISTRATION_HOST_INVITATION_CHECK)
                 .then()
@@ -798,12 +810,10 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
     @Test
     public void checkHostInvitation_200_ok() {
         var registration = utilAuth.doConfirmedRegistration();
-        var request = new HostInvitationRequest(registration.getId());
-        userRegistrationFacade.sendHostInvitation(request);
-        var token = tokenRepository.findByTypeAndUserId(Token.Type.HOST_INVITATION, registration.getId());
+        var token = utilToken.doHostInvitation(registration.getId()).getValue();
         given()
                 .header("Authorization", utilAuth.doAuthentication(registration))
-                .pathParam("token", token.get().getValue())
+                .pathParam("token", token)
                 .when()
                 .get(API_URL + REGISTRATION_HOST_INVITATION_CHECK)
                 .then()

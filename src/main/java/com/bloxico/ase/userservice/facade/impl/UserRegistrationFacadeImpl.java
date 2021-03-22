@@ -12,7 +12,6 @@ import com.bloxico.ase.userservice.service.token.impl.HostInvitationTokenService
 import com.bloxico.ase.userservice.service.token.impl.RegistrationTokenServiceImpl;
 import com.bloxico.ase.userservice.service.user.*;
 import com.bloxico.ase.userservice.util.MailUtil;
-import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import com.bloxico.ase.userservice.web.model.PageRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationRequest;
 import com.bloxico.ase.userservice.web.model.registration.RegistrationResponse;
@@ -24,12 +23,13 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.bloxico.ase.userservice.config.security.AseSecurityContext.getPrincipalId;
 import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.FileCategory.CV;
 import static com.bloxico.ase.userservice.util.FileCategory.IMAGE;
 import static com.bloxico.ase.userservice.util.MailUtil.Template.*;
+import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.MATCH_REGISTRATION_PASSWORD_ERROR;
-import static com.bloxico.ase.userservice.config.security.AseSecurityContext.getPrincipalId;
 
 @Slf4j
 @Service
@@ -221,8 +221,8 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     public void checkHostInvitation(String token) {
         log.info("UserRegistrationFacadeImpl.checkHostInvitation - start | token: {}", token);
         var tokenDto = hostInvitationTokenService.getTokenByUserId(getPrincipalId());
-        if(!tokenDto.getValue().equals(token))
-            throw ErrorCodes.Token.TOKEN_NOT_FOUND.newException();
+        if (!tokenDto.getValue().equals(token))
+            throw TOKEN_NOT_FOUND.newException();
         log.info("UserRegistrationFacadeImpl.checkHostInvitation - end | token: {}", token);
     }
 

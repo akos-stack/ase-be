@@ -2,7 +2,6 @@ package com.bloxico.ase.userservice.facade.impl;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
-import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.exception.*;
 import com.bloxico.ase.userservice.repository.token.PendingEvaluatorRepository;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
@@ -623,27 +622,54 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    public void checkHostInvitation_nullToken() {
+    @WithMockCustomUser
+    public void checkHostInvitation_nullToken_principalNotInvited() {
         assertThrows(
-                NullPointerException.class,
+                TokenException.class,
                 () -> userRegistrationFacade.checkHostInvitation(null));
     }
 
     @Test
-    public void checkHostInvitation_tokenNotFound() {
+    @WithMockCustomUser
+    public void checkHostInvitation_nullToken_principalInvited() {
+        utilToken.doHostInvitation(utilSecurityContext.getLoggedInUserId());
         assertThrows(
-                NullPointerException.class,
+                TokenException.class,
+                () -> userRegistrationFacade.checkHostInvitation(null));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void checkHostInvitation_tokenNotExists_principalNotInvited() {
+        assertThrows(
+                TokenException.class,
                 () -> userRegistrationFacade.checkHostInvitation(genUUID()));
     }
 
     @Test
     @WithMockCustomUser
+    public void checkHostInvitation_tokenNotExists_principalInvited() {
+        utilToken.doHostInvitation(utilSecurityContext.getLoggedInUserId());
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.checkHostInvitation(genUUID()));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void checkHostInvitation_userIdNotEqualsPrincipalId() {
+        var token = utilToken.doHostInvitation().getValue();
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.checkHostInvitation(token));
+    }
+
+    @Test
+    @WithMockCustomUser
     public void checkHostInvitation() {
-        var loggedInUser = utilSecurityContext.getLoggedInUserId();
-        var request = new HostInvitationRequest(loggedInUser);
-        userRegistrationFacade.sendHostInvitation(request);
-        var token = tokenRepository.findByTypeAndUserId(Token.Type.HOST_INVITATION, loggedInUser);
-        userRegistrationFacade.checkHostInvitation(token.get().getValue());
+        var userId = utilSecurityContext.getLoggedInUserId();
+        var token = utilToken.doHostInvitation(userId).getValue();
+        userRegistrationFacade.checkHostInvitation(token);
     }
 
 }
