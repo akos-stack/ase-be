@@ -31,16 +31,16 @@ public interface QuotationPackageRepository extends JpaRepository<QuotationPacka
                     "  WHERE a.status = 'READY_FOR_EVALUATION'                                          " +
                     "   and (:title is NULL or a.title like %:title%)                                   " +
                     "   and qpc.id.countryId = :countryId                                               " +
-                    "   and ((:categories) is NULL or ac.name in (:categories))                         ",
+                    "   and (COALESCE(:categories, NULL) is NULL or ac.name in (:categories))           ",
             countQuery =
-            "SELECT DISTINCT COUNT(a.id) FROM QuotationPackage qp                                       " +
+            "SELECT COUNT(DISTINCT a.id) FROM QuotationPackage qp                                       " +
                     " JOIN QuotationPackageCountry qpc on qp.id = qpc.id.quotationPackageId             " +
                     " JOIN Artwork a on a.id = qp.artworkId                                             " +
                     " JOIN a.categories ac                                                              " +
                     " WHERE a.status = 'READY_FOR_EVALUATION'                                           " +
                     "   and (:title is NULL or a.title like %:title%)                                   " +
                     "   and qpc.id.countryId = :countryId                                               " +
-                    "   and ((:categories) is NULL or ac.name in (:categories))")
+                    "   and (COALESCE(:categories, NULL) is NULL or ac.name in (:categories))")
     // @formatter:on
     Page<EvaluableArtworkProj> searchEvaluableArtworks(Long countryId, String title, List<String> categories, Pageable pageable);
 }

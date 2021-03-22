@@ -20,7 +20,6 @@ public class SearchEvaluableArtworksRequest {
     @ApiParam(name = "countryId", required = true)
     Long countryId;
 
-    @NotNull
     @ApiParam(name = "title")
     String title;
 
