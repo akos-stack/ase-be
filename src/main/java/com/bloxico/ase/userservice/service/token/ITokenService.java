@@ -20,7 +20,4 @@ public interface ITokenService {
 
     void requireTokenNotExistsForUser(long userId);
 
-    TokenDto checkIfTokenExists(String tokenValue);
-
-    void equalityWithPrincipalId(long principalId, Long tokenUserId);
 }

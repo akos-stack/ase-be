@@ -4,7 +4,6 @@ import com.bloxico.ase.userservice.dto.entity.token.TokenDto;
 import com.bloxico.ase.userservice.entity.token.Token;
 import com.bloxico.ase.userservice.repository.token.TokenRepository;
 import com.bloxico.ase.userservice.service.token.ITokenService;
-import com.bloxico.ase.userservice.web.error.ErrorCodes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -16,7 +15,6 @@ import static com.bloxico.ase.userservice.util.AseMapper.MAPPER;
 import static com.bloxico.ase.userservice.util.Functions.doto;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_EXISTS;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Token.TOKEN_NOT_FOUND;
-import static com.bloxico.ase.userservice.web.error.ErrorCodes.User.USER_NOT_FOUND;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toUnmodifiableList;
@@ -127,29 +125,6 @@ abstract class AbstractTokenServiceImpl implements ITokenService {
         if (tokenRepository.findByTypeAndUserId(type, userId).isPresent())
             throw TOKEN_EXISTS.newException();
         log.debug("TokenServiceImpl[{}].requireTokenNotExistsForUser - end | userId: {}", type, userId);
-    }
-
-    @Override
-    public TokenDto checkIfTokenExists(String tokenValue) {
-        log.debug("TokenServiceImpl.checkIfTokenExists - start | tokenValue: {}", tokenValue);
-        requireNonNull(tokenValue);
-        var tokenDto = tokenRepository
-                .findByValue(tokenValue)
-                .filter(not(Token::isExpired))
-                .map(MAPPER::toDto)
-                .orElseThrow(TOKEN_NOT_FOUND::newException);
-        log.debug("TokenServiceImpl.checkIfTokenExists - end | tokenValue: {}", tokenValue);
-        return tokenDto;
-    }
-
-    @Override
-    public void equalityWithPrincipalId(long principalId, Long tokenUserId){
-        log.debug("TokenServiceImpl.equalityWithPrincipalId - start | principalId: {}, tokenUserId: {}", principalId, tokenUserId);
-        requireNonNull(principalId);
-        requireNonNull(tokenUserId);
-        if (principalId != tokenUserId)
-            throw ErrorCodes.Token.EQUALITY_WITH_PRINCIPAL_ID_ERROR.newException();
-        log.debug("TokenServiceImpl.equalityWithPrincipalId - end | principalId: {}, tokenUserId: {}", principalId, tokenUserId);
     }
 
     private static String newTokenValue() {
