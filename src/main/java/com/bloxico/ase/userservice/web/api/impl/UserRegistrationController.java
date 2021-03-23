@@ -119,4 +119,10 @@ public class UserRegistrationController implements UserRegistrationApi {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<Void> refreshHostInvitation(HostInvitationRefreshTokenRequest request) {
+        userRegistrationFacade.refreshHostInvitationToken(request);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

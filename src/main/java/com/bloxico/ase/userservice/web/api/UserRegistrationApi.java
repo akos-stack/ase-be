@@ -35,6 +35,7 @@ public interface UserRegistrationApi {
     String REGISTRATION_HOST_INVITATION               = "/user/registration/host/invitation";
     String REGISTRATION_HOST_INVITATION_WITHDRAW      = "/user/registration/host/invitation/withdraw";
     String REGISTRATION_HOST_INVITATION_CHECK         = "/user/registration/host/invitation/check/{token}";
+    String REGISTRATION_HOST_INVITATION_REFRESH       = "/user/registration/host/invitation/refresh";
     // @formatter:on
 
     @PostMapping(
@@ -214,5 +215,13 @@ public interface UserRegistrationApi {
             @ApiResponse(code = 404, message = "Host Invitation is not found.")
     })
     ResponseEntity<Void> checkHostInvitation(@Valid @PathVariable("token") String token);
+
+    @GetMapping(value = REGISTRATION_HOST_INVITATION_REFRESH)
+    @ApiOperation(value = "Refreshes expired host invitation token.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Token is refreshed and email has been sent with updated token value."),
+            @ApiResponse(code = 404, message = "Provided token for host invitation is not found.")
+    })
+    ResponseEntity<Void> refreshHostInvitation(@Valid HostInvitationRefreshTokenRequest request);
 
 }
