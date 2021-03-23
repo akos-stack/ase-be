@@ -1,21 +1,11 @@
 package com.bloxico.ase.testutil;
 
 import com.bloxico.ase.userservice.dto.entity.artwork.ArtworkDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
+import com.bloxico.ase.userservice.dto.entity.evaluation.*;
 import com.bloxico.ase.userservice.entity.address.Region;
-import com.bloxico.ase.userservice.entity.evaluation.ArtworkEvaluatorEvaluation;
-import com.bloxico.ase.userservice.entity.evaluation.CountryEvaluationDetails;
-import com.bloxico.ase.userservice.entity.evaluation.QuotationPackage;
-import com.bloxico.ase.userservice.entity.evaluation.QuotationPackageCountry;
-import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
-import com.bloxico.ase.userservice.proj.evaluation.EvaluableArtworkProj;
-import com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj;
-import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
-import com.bloxico.ase.userservice.repository.evaluation.ArtworkEvaluatorEvaluationRepository;
-import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
-import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageRepository;
+import com.bloxico.ase.userservice.entity.evaluation.*;
+import com.bloxico.ase.userservice.proj.evaluation.*;
+import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.service.evaluation.impl.EvaluationServiceImpl;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -189,15 +179,12 @@ public class UtilEvaluation {
     public EvaluableArtworkProj savedEvaluableArtworkProj(ArtworkDto artwork, Long countryId) {
         var qPackage = savedQuotationPackage(artwork.getId());
         var qpc = genQuotationPackageCountryDto(qPackage.getId(), countryId);
-        evaluationService
-                .saveQuotationPackageCountries(
-                        qPackage.getId(), List.of(qpc));
+        evaluationService.saveQuotationPackageCountries(qPackage.getId(), List.of(qpc));
         return new EvaluableArtworkProj(
                 qPackage.getArtworkId(),
                 artwork.getTitle(),
                 qpc.getNumberOfEvaluations(),
-                0
-        );
+                0);
     }
 
     public EvaluableArtworkProj savedEvaluableArtworkProj() {
@@ -298,6 +285,7 @@ public class UtilEvaluation {
         var countryId = utilLocation.savedCountry().getId();
         return genSearchEvaluableArtworksRequest(countryId);
     }
+
     public SearchEvaluableArtworksRequest genSearchEvaluableArtworksRequest(Long countryId) {
         return new SearchEvaluableArtworksRequest(countryId, "", null);
     }

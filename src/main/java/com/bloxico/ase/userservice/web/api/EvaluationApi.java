@@ -21,7 +21,7 @@ public interface EvaluationApi {
     String MNG_EVALUATION_REGION_DETAILS_SEARCH  = "/management/evaluation/region-details/search";
     String EVALUATION_QUOTATION_PACKAGE_SAVE     = "/evaluation/quotation-package/save";
     String EVALUATION_EVALUATED_SEARCH           = "/evaluation/evaluated/search";
-    String SEARCH_EVALUABLE_ARTWORKS             = "/evaluation/search/evaluable";
+    String SEARCH_EVALUABLE_ARTWORKS             = "/evaluation/evaluable/search";
     // @formatter:on
 
     @GetMapping(
@@ -127,11 +127,12 @@ public interface EvaluationApi {
             value = SEARCH_EVALUABLE_ARTWORKS,
             produces = {"application/json"})
     @PreAuthorize("@permissionSecurity.isAuthorized(authentication, 'search_evaluable_artworks')")
-    @ApiOperation(value = "Search artworks available for evaluation in country.")
+    @ApiOperation(value = "Search artworks available for evaluation in the given country.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Paginated list of artworks in country available for evaluation.")
+            @ApiResponse(code = 200, message = "Artworks in a country with ongoing evaluation details.")
     })
     ResponseEntity<SearchEvaluableArtworksResponse> searchEvaluableArtworks(
             @Valid SearchEvaluableArtworksRequest request,
             @Valid PageRequest page);
+
 }

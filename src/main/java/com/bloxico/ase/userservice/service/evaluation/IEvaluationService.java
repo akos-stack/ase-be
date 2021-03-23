@@ -39,6 +39,8 @@ public interface IEvaluationService {
             PageRequest page,
             Long principalId);
 
-    Page<EvaluableArtworkProj> searchEvaluableArtworks(SearchEvaluableArtworksRequest request, PageRequest pageRequest);
+    Page<EvaluableArtworkProj> searchEvaluableArtworks(
+            SearchEvaluableArtworksRequest request,
+            PageRequest page);
 
 }

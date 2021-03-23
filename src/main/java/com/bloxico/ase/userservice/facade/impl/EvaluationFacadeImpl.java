@@ -118,7 +118,9 @@ public class EvaluationFacadeImpl implements IEvaluationFacade {
     }
 
     @Override
-    public SearchEvaluableArtworksResponse searchEvaluableArtworks(SearchEvaluableArtworksRequest request, PageRequest page) {
+    public SearchEvaluableArtworksResponse searchEvaluableArtworks(
+            SearchEvaluableArtworksRequest request, PageRequest page)
+    {
         log.debug("EvaluationFacadeImpl.searchEvaluableArtworks - start | request: {}, page: {}", request, page);
         var result = evaluationService.searchEvaluableArtworks(request, page);
         var response = new SearchEvaluableArtworksResponse(result);

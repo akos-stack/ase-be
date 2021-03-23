@@ -3,9 +3,7 @@ package com.bloxico.ase.userservice.web.model.evaluation;
 import com.bloxico.ase.userservice.proj.evaluation.EvaluableArtworkProj;
 import com.bloxico.ase.userservice.web.model.ResponsePage;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 import org.springframework.data.domain.Page;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -21,4 +19,5 @@ public class SearchEvaluableArtworksResponse {
     public SearchEvaluableArtworksResponse(Page<EvaluableArtworkProj> page) {
         this.page = new ResponsePage<>(page);
     }
+
 }

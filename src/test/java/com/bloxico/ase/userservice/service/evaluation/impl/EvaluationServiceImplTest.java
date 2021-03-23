@@ -8,9 +8,7 @@ import com.bloxico.ase.userservice.web.model.evaluation.SearchEvaluableArtworksR
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
@@ -460,33 +458,34 @@ public class EvaluationServiceImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser
-    public void searchEvaluableArtworks() {
+    public void searchEvaluableArtworks_byCountry() {
         long countryId = utilLocation.savedCountry().getId();
-        var evaluable1 = utilEvaluation.savedEvaluableArtworkProj(countryId);
-        var evaluable2 = utilEvaluation.savedEvaluableArtworkProj(countryId);
-        var evaluable3 = utilEvaluation.savedEvaluableArtworkProj();
+        var ea1 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var ea2 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var ea3 = utilEvaluation.savedEvaluableArtworkProj();
         var request = utilEvaluation.genSearchEvaluableArtworksRequest(countryId);
         assertThat(
                 evaluationService.searchEvaluableArtworks(request, allPages()),
-                allOf(hasItems(evaluable1, evaluable2), not(hasItems(evaluable3))));
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
     }
 
     @Test
     @WithMockCustomUser
-    public void searchEvaluableArtworks_WithTitle() {
+    public void searchEvaluableArtworks_byCountryAndTitle() {
         long countryId = utilLocation.savedCountry().getId();
-        var evaluable1 = utilEvaluation.savedEvaluableArtworkProj(countryId);
-        var evaluable2 = utilEvaluation.savedEvaluableArtworkProj(countryId);
-        var evaluable3 = utilEvaluation.savedEvaluableArtworkProj();
-        var request = utilEvaluation.genSearchEvaluableArtworksRequest(countryId, evaluable1.getArtworkTitle());
+        var ea1 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var ea2 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var ea3 = utilEvaluation.savedEvaluableArtworkProj();
+        var title = ea1.getArtworkTitle();
+        var request = utilEvaluation.genSearchEvaluableArtworksRequest(countryId, title);
         assertThat(
                 evaluationService.searchEvaluableArtworks(request, allPages()),
-                allOf(hasItems(evaluable1), not(hasItems(evaluable2, evaluable3))));
+                allOf(hasItems(ea1), not(hasItems(ea2, ea3))));
     }
 
     @Test
     @WithMockCustomUser
-    public void searchEvaluableArtworks_WithTitleAndCategories() {
+    public void searchEvaluableArtworks_byCountryAndCategories() {
         long countryId = utilLocation.savedCountry().getId();
         var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
         var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);

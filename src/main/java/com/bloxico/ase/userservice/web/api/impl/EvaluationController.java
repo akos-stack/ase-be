@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.bloxico.ase.userservice.config.security.AseSecurityContext.getPrincipalId;
 
-import javax.validation.Valid;
-
 @RestController
 public class EvaluationController implements EvaluationApi {
 
@@ -85,7 +83,9 @@ public class EvaluationController implements EvaluationApi {
     }
 
     @Override
-    public ResponseEntity<SearchEvaluableArtworksResponse> searchEvaluableArtworks(@Valid SearchEvaluableArtworksRequest request, @Valid PageRequest page) {
+    public ResponseEntity<SearchEvaluableArtworksResponse> searchEvaluableArtworks(
+            SearchEvaluableArtworksRequest request, PageRequest page)
+    {
         var response = evaluationFacade.searchEvaluableArtworks(request, page);
         return ResponseEntity.ok(response);
     }

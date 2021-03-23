@@ -1,23 +1,12 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
-import com.bloxico.ase.userservice.dto.entity.evaluation.CountryEvaluationDetailsDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageCountryDto;
-import com.bloxico.ase.userservice.dto.entity.evaluation.QuotationPackageDto;
-import com.bloxico.ase.userservice.entity.evaluation.QuotationPackageCountry;
-import com.bloxico.ase.userservice.proj.evaluation.CountryEvaluationDetailsWithEvaluatorsCountProj;
-import com.bloxico.ase.userservice.proj.evaluation.EvaluableArtworkProj;
-import com.bloxico.ase.userservice.proj.evaluation.EvaluatedArtworkProj;
-import com.bloxico.ase.userservice.proj.evaluation.RegionWithCountriesAndEvaluatorsCountProj;
-import com.bloxico.ase.userservice.repository.evaluation.ArtworkEvaluatorEvaluationRepository;
-import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
-import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageCountryRepository;
-import com.bloxico.ase.userservice.repository.evaluation.QuotationPackageRepository;
+import com.bloxico.ase.userservice.dto.entity.evaluation.*;
+import com.bloxico.ase.userservice.entity.evaluation.QuotationPackageCountry.Id;
+import com.bloxico.ase.userservice.proj.evaluation.*;
+import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
 import com.bloxico.ase.userservice.web.model.PageRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.ISearchCountryEvaluationDetailsRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchEvaluableArtworksRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchEvaluatedArtworksRequest;
-import com.bloxico.ase.userservice.web.model.evaluation.SearchRegionEvaluationDetailsRequest;
+import com.bloxico.ase.userservice.web.model.evaluation.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -193,16 +182,17 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     @Override
-    public Page<EvaluableArtworkProj> searchEvaluableArtworks(SearchEvaluableArtworksRequest request, PageRequest pageRequest) {
-        log.debug("EvaluationServiceImpl.searchEvaluableArtworks - start | request: {}, pageRequest: {}", request, pageRequest);
+    public Page<EvaluableArtworkProj> searchEvaluableArtworks(SearchEvaluableArtworksRequest request, PageRequest page) {
+        log.debug("EvaluationServiceImpl.searchEvaluableArtworks - start | request: {}, page: {}", request, page);
         requireNonNull(request);
-        requireNonNull(pageRequest);
+        requireNonNull(page);
         var result = quotationPackageRepository
                 .searchEvaluableArtworks(
                         request.getCountryId(),
-                        request.getTitle(), request.getCategories(),
-                        pageRequest.toPageableUnsafe());
-        log.debug("EvaluationServiceImpl.searchEvaluableArtworks - end | request: {}, pageRequest: {}", request, pageRequest);
+                        request.getTitle(),
+                        request.getCategories(),
+                        page.toPageableUnsafe());
+        log.debug("EvaluationServiceImpl.searchEvaluableArtworks - end | request: {}, page: {}", request, page);
         return result;
     }
 
@@ -217,7 +207,9 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     private void requireNotExists(QuotationPackageCountryDto dto) {
-        if (quotationPackageCountryRepository.findById(new QuotationPackageCountry.Id(dto.getQuotationPackageId(), dto.getCountryId())).isPresent())
+        if (quotationPackageCountryRepository
+                .findById(new Id(dto.getQuotationPackageId(), dto.getCountryId()))
+                .isPresent())
             throw QUOTATION_PACKAGE_COUNTRY_EXISTS.newException();
     }
 

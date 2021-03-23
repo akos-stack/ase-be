@@ -474,7 +474,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser(role = EVALUATOR, auth = true)
-    public void searchEvaluableArtworks() {
+    public void searchEvaluableArtworks_byCountry() {
         var countryId = utilLocation.savedCountry().getId();
         var ea1 = utilEvaluation.savedEvaluableArtworkProj(countryId);
         var ea2 = utilEvaluation.savedEvaluableArtworkProj(countryId);
@@ -498,7 +498,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser(role = EVALUATOR, auth = true)
-    public void searchEvaluableArtworks_withArtworkTitle() {
+    public void searchEvaluableArtworks_byCountryAndTitle() {
         var title = genUUID();
         var countryId = utilLocation.savedCountry().getId();
         var ea1 = utilEvaluation.savedEvaluableArtworkProj(
@@ -529,7 +529,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser(role = EVALUATOR, auth = true)
-    public void searchEvaluableArtworks_withCategories() {
+    public void searchEvaluableArtworks_byCountryAndCategories() {
         long countryId = utilLocation.savedCountry().getId();
         var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
         var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
@@ -544,7 +544,9 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
         var response = given()
                 .header("Authorization", utilSecurityContext.getToken())
                 .contentType(JSON)
-                .params(allPages(Map.of("countryId", countryId,"categories", String.format("%s", c1.getName()))))
+                .params(allPages(Map.of(
+                        "countryId", countryId,
+                        "categories", String.format("%s", c1.getName()))))
                 .when()
                 .get(API_URL + SEARCH_EVALUABLE_ARTWORKS)
                 .then()

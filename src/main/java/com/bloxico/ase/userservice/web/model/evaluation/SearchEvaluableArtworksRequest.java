@@ -1,12 +1,10 @@
 package com.bloxico.ase.userservice.web.model.evaluation;
 
 import io.swagger.annotations.ApiParam;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
-
+import javax.validation.constraints.Size;
 import java.util.List;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -17,12 +15,13 @@ import static lombok.AccessLevel.PRIVATE;
 public class SearchEvaluableArtworksRequest {
 
     @NotNull
-    @ApiParam(name = "countryId", required = true)
+    @ApiParam(name = "country_id", required = true)
     Long countryId;
 
     @ApiParam(name = "title")
     String title;
 
+    @Size(min = 1)
     @ApiParam(name = "categories")
     List<String> categories;
 

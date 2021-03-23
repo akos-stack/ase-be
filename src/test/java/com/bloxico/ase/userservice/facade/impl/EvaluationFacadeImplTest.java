@@ -411,7 +411,6 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser
     public void searchEvaluableArtworks_nullRequest() {
         assertThrows(
                 NullPointerException.class,
@@ -419,7 +418,6 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser
     public void searchEvaluableArtworks_nullPageRequest() {
         var request = utilEvaluation.genSearchEvaluableArtworksRequest();
         assertThrows(
@@ -429,22 +427,22 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser
-    public void searchEvaluableArtworks() {
+    public void searchEvaluableArtworks_byCountry() {
         long countryId = utilLocation.savedCountry().getId();
-        var evaluable1 = utilEvaluation.savedEvaluableArtworkProj(countryId);
-        var evaluable2 = utilEvaluation.savedEvaluableArtworkProj(countryId);
-        var evaluable3 = utilEvaluation.savedEvaluableArtworkProj();
+        var ea1 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var ea2 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var ea3 = utilEvaluation.savedEvaluableArtworkProj();
         var request = utilEvaluation.genSearchEvaluableArtworksRequest(countryId);
         assertThat(evaluationFacade
                         .searchEvaluableArtworks(request, allPages())
                         .getPage()
                         .getContent(),
-                allOf(hasItems(evaluable1, evaluable2), not(hasItems(evaluable3))));
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
     }
 
     @Test
     @WithMockCustomUser
-    public void searchEvaluableArtworks_withArtworkTitle() {
+    public void searchEvaluableArtworks_byCountryAndTitle() {
         var title = genUUID();
         var countryId = utilLocation.savedCountry().getId();
         var ea1 = utilEvaluation.savedEvaluableArtworkProj(
@@ -466,7 +464,7 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
 
     @Test
     @WithMockCustomUser
-    public void searchEvaluableArtworks_withCategories() {
+    public void searchEvaluableArtworks_byCountryAndCategories() {
         long countryId = utilLocation.savedCountry().getId();
         var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
         var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
