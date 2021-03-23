@@ -821,4 +821,30 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .statusCode(200);
     }
 
+    @Test
+    public void refreshHostInvitation_404_tokenNotFound() {
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .param("token", genUUID())
+                .when()
+                .get(API_URL + REGISTRATION_HOST_INVITATION_REFRESH)
+                .then()
+                .assertThat()
+                .statusCode(404)
+                .body(ERROR_CODE, is(TOKEN_NOT_FOUND.getCode()));
+    }
+
+    @Test
+    public void refreshHostInvitation_200_ok() {
+        var tokenValue = utilToken.doHostInvitation().getValue();
+        given()
+                .header("Authorization", utilAuth.doAdminAuthentication())
+                .param("token", tokenValue)
+                .when()
+                .get(API_URL + REGISTRATION_HOST_INVITATION_REFRESH)
+                .then()
+                .assertThat()
+                .statusCode(200);
+    }
+
 }
