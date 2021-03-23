@@ -1,6 +1,7 @@
 package com.bloxico.ase.userservice.service.evaluation.impl;
 
 import com.bloxico.ase.userservice.dto.entity.evaluation.*;
+import com.bloxico.ase.userservice.entity.evaluation.QuotationPackageCountry.Id;
 import com.bloxico.ase.userservice.proj.evaluation.*;
 import com.bloxico.ase.userservice.repository.evaluation.*;
 import com.bloxico.ase.userservice.service.evaluation.IEvaluationService;
@@ -180,6 +181,21 @@ public class EvaluationServiceImpl implements IEvaluationService {
         return result;
     }
 
+    @Override
+    public Page<EvaluableArtworkProj> searchEvaluableArtworks(SearchEvaluableArtworksRequest request, PageRequest page) {
+        log.debug("EvaluationServiceImpl.searchEvaluableArtworks - start | request: {}, page: {}", request, page);
+        requireNonNull(request);
+        requireNonNull(page);
+        var result = quotationPackageRepository
+                .searchEvaluableArtworks(
+                        request.getCountryId(),
+                        request.getTitle(),
+                        request.getCategories(),
+                        page.toPageableUnsafe());
+        log.debug("EvaluationServiceImpl.searchEvaluableArtworks - end | request: {}, page: {}", request, page);
+        return result;
+    }
+
     private void requireNotExists(CountryEvaluationDetailsDto dto) {
         if (countryEvaluationDetailsRepository.findByCountryId(dto.getCountryId()).isPresent())
             throw COUNTRY_EVALUATION_DETAILS_EXISTS.newException();
@@ -191,7 +207,9 @@ public class EvaluationServiceImpl implements IEvaluationService {
     }
 
     private void requireNotExists(QuotationPackageCountryDto dto) {
-        if (quotationPackageCountryRepository.findByIdCountryId(dto.getCountryId()).isPresent())
+        if (quotationPackageCountryRepository
+                .findById(new Id(dto.getQuotationPackageId(), dto.getCountryId()))
+                .isPresent())
             throw QUOTATION_PACKAGE_COUNTRY_EXISTS.newException();
     }
 

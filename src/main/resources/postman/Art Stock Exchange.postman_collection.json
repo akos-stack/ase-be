@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1ee8a8fb-daa5-4b08-bac9-a184d6da27cb",
+		"_postman_id": "568c6cb9-f8d6-4e57-9a13-7c6d7e0560fc",
 		"name": "Art Stock Exchange",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -1398,6 +1398,68 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "Search Evaluable Artworks",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ase-endpoint}}/api/evaluation/search/evaluable?page=0&size=10&sort=artwork_id&order=ASC&countryId=1",
+							"host": [
+								"{{ase-endpoint}}"
+							],
+							"path": [
+								"api",
+								"evaluation",
+								"search",
+								"evaluable"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "artwork_id"
+								},
+								{
+									"key": "order",
+									"value": "ASC"
+								},
+								{
+									"key": "countryId",
+									"value": "1"
+								},
+								{
+									"key": "title",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "categories",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},

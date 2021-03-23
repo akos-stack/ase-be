@@ -6,6 +6,7 @@ import com.bloxico.ase.userservice.entity.address.Region;
 import com.bloxico.ase.userservice.entity.evaluation.*;
 import com.bloxico.ase.userservice.proj.evaluation.*;
 import com.bloxico.ase.userservice.repository.evaluation.*;
+import com.bloxico.ase.userservice.service.evaluation.impl.EvaluationServiceImpl;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,7 @@ public class UtilEvaluation {
     @Autowired private UtilArtwork utilArtwork;
     @Autowired private CountryEvaluationDetailsRepository countryEvaluationDetailsRepository;
     @Autowired private QuotationPackageRepository quotationPackageRepository;
+    @Autowired private EvaluationServiceImpl evaluationService;
     @Autowired private ArtworkEvaluatorEvaluationRepository artworkEvaluatorEvaluationRepository;
 
     public CountryEvaluationDetails genCountryEvaluationDetails(Long countryId) {
@@ -117,7 +119,11 @@ public class UtilEvaluation {
     }
 
     public QuotationPackage genQuotationPackage() {
-        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto()).getId();
+        var artworkId = utilArtwork.saved(utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION)).getId();
+        return genQuotationPackage(artworkId);
+    }
+
+    public QuotationPackage genQuotationPackage(Long artworkId) {
         var qPackage = new QuotationPackage();
         qPackage.setArtworkId(artworkId);
         return qPackage;
@@ -134,12 +140,23 @@ public class UtilEvaluation {
         return quotationPackageRepository.saveAndFlush(qPackage);
     }
 
+    public QuotationPackage savedQuotationPackage(Long artworkId) {
+        var principalId = utilUser.savedAdmin().getId();
+        var qPackage = genQuotationPackage(artworkId);
+        qPackage.setCreatorId(principalId);
+        return quotationPackageRepository.saveAndFlush(qPackage);
+    }
+
     public QuotationPackageDto savedQuotationPackageDto() {
         return MAPPER.toDto(savedQuotationPackage());
     }
 
     public QuotationPackageCountry genQuotationPackageCountry(long packageId) {
         var countryId = utilLocation.savedCountry().getId();
+        return genQuotationPackageCountry(packageId, countryId);
+    }
+
+    public QuotationPackageCountry genQuotationPackageCountry(long packageId, long countryId) {
         var qpCountry = new QuotationPackageCountry();
         qpCountry.setNumberOfEvaluations(genPosInt(50));
         qpCountry.setId(new QuotationPackageCountry.Id(packageId, countryId));
@@ -148,6 +165,31 @@ public class UtilEvaluation {
 
     public QuotationPackageCountryDto genQuotationPackageCountryDto(long packageId) {
         return MAPPER.toDto(genQuotationPackageCountry(packageId));
+    }
+
+    public QuotationPackageCountryDto genQuotationPackageCountryDto(long packageId, long countryId) {
+        return MAPPER.toDto(genQuotationPackageCountry(packageId, countryId));
+    }
+
+    public EvaluableArtworkProj savedEvaluableArtworkProj(Long countryId) {
+        var artwork = utilArtwork.saved(utilArtwork.genArtworkDto(WAITING_FOR_EVALUATION));
+        return savedEvaluableArtworkProj(artwork, countryId);
+    }
+
+    public EvaluableArtworkProj savedEvaluableArtworkProj(ArtworkDto artwork, Long countryId) {
+        var qPackage = savedQuotationPackage(artwork.getId());
+        var qpc = genQuotationPackageCountryDto(qPackage.getId(), countryId);
+        evaluationService.saveQuotationPackageCountries(qPackage.getId(), List.of(qpc));
+        return new EvaluableArtworkProj(
+                qPackage.getArtworkId(),
+                artwork.getTitle(),
+                qpc.getNumberOfEvaluations(),
+                0);
+    }
+
+    public EvaluableArtworkProj savedEvaluableArtworkProj() {
+        long countryId = utilLocation.savedCountry().getId();
+        return savedEvaluableArtworkProj(countryId);
     }
 
     public SaveQuotationPackageRequest genSaveQuotationPackageRequest() {
@@ -237,6 +279,19 @@ public class UtilEvaluation {
                 artwork.getTitle(),
                 artwork.getArtist().getName(),
                 evaluation.getSellingPrice());
+    }
+
+    public SearchEvaluableArtworksRequest genSearchEvaluableArtworksRequest() {
+        var countryId = utilLocation.savedCountry().getId();
+        return genSearchEvaluableArtworksRequest(countryId);
+    }
+
+    public SearchEvaluableArtworksRequest genSearchEvaluableArtworksRequest(Long countryId) {
+        return new SearchEvaluableArtworksRequest(countryId, "", null);
+    }
+
+    public SearchEvaluableArtworksRequest genSearchEvaluableArtworksRequest(Long countryId, String title) {
+        return new SearchEvaluableArtworksRequest(countryId, title, null);
     }
 
 }

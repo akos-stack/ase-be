@@ -5,6 +5,7 @@ import com.bloxico.ase.testutil.security.WithMockCustomUser;
 import com.bloxico.ase.userservice.exception.EvaluationException;
 import com.bloxico.ase.userservice.exception.LocationException;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
+import com.bloxico.ase.userservice.web.model.evaluation.SearchEvaluableArtworksRequest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -404,6 +405,81 @@ public class EvaluationFacadeImplTest extends AbstractSpringTestWithAWS {
         var request = utilEvaluation.genSearchEvaluatedArtworksRequest(cs);
         assertThat(evaluationFacade
                         .searchEvaluatedArtworks(request, allPages(), null)
+                        .getPage()
+                        .getContent(),
+                allOf(hasItems(ea1, ea2, ea3), not(hasItems(ea4))));
+    }
+
+    @Test
+    public void searchEvaluableArtworks_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.searchEvaluableArtworks(null, allPages()));
+    }
+
+    @Test
+    public void searchEvaluableArtworks_nullPageRequest() {
+        var request = utilEvaluation.genSearchEvaluableArtworksRequest();
+        assertThrows(
+                NullPointerException.class,
+                () -> evaluationFacade.searchEvaluableArtworks(request, null));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluableArtworks_byCountry() {
+        long countryId = utilLocation.savedCountry().getId();
+        var ea1 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var ea2 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var ea3 = utilEvaluation.savedEvaluableArtworkProj();
+        var request = utilEvaluation.genSearchEvaluableArtworksRequest(countryId);
+        assertThat(evaluationFacade
+                        .searchEvaluableArtworks(request, allPages())
+                        .getPage()
+                        .getContent(),
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluableArtworks_byCountryAndTitle() {
+        var title = genUUID();
+        var countryId = utilLocation.savedCountry().getId();
+        var ea1 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)),
+                countryId);
+        var ea2 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)),
+                countryId);
+        var ea3 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genUUID()),
+                countryId);
+        var request = utilEvaluation.genSearchEvaluableArtworksRequest(countryId, title);
+        assertThat(evaluationFacade
+                        .searchEvaluableArtworks(request, allPages())
+                        .getPage()
+                        .getContent(),
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
+    }
+
+    @Test
+    @WithMockCustomUser
+    public void searchEvaluableArtworks_byCountryAndCategories() {
+        long countryId = utilLocation.savedCountry().getId();
+        var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var cs = List.of(c1.getName(), c2.getName());
+        var ea1 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1, c2)), countryId);
+        var ea2 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1)), countryId);
+        var ea3 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c2)), countryId);
+        var ea4 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genUUID()), countryId);
+        var request = new SearchEvaluableArtworksRequest(countryId, "", cs);
+        assertThat(evaluationFacade
+                        .searchEvaluableArtworks(request, allPages())
                         .getPage()
                         .getContent(),
                 allOf(hasItems(ea1, ea2, ea3), not(hasItems(ea4))));

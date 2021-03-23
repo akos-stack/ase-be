@@ -2,19 +2,20 @@ package com.bloxico.ase.userservice.web.api;
 
 import com.bloxico.ase.testutil.*;
 import com.bloxico.ase.testutil.security.WithMockCustomUser;
-import com.bloxico.ase.userservice.entity.user.Role;
 import com.bloxico.ase.userservice.repository.evaluation.CountryEvaluationDetailsRepository;
 import com.bloxico.ase.userservice.web.model.evaluation.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Set;
 
 import static com.bloxico.ase.testutil.Util.*;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Status.APPROVED;
 import static com.bloxico.ase.userservice.entity.artwork.metadata.ArtworkMetadata.Type.CATEGORY;
 import static com.bloxico.ase.userservice.entity.user.Role.EVALUATOR;
+import static com.bloxico.ase.userservice.entity.user.Role.USER;
 import static com.bloxico.ase.userservice.web.api.EvaluationApi.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Evaluation.*;
 import static com.bloxico.ase.userservice.web.error.ErrorCodes.Location.COUNTRY_NOT_FOUND;
@@ -67,7 +68,7 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
     }
 
     @Test
-    @WithMockCustomUser(role = Role.USER, auth = true)
+    @WithMockCustomUser(role = USER, auth = true)
     public void searchCountryEvaluationDetails_withRegions_200_ok() {
         var region1 = utilLocation.savedRegion();
         var region2 = utilLocation.savedRegion();
@@ -452,6 +453,108 @@ public class EvaluationApiTest extends AbstractSpringTestWithAWS {
                 .extract()
                 .body()
                 .as(SearchEvaluatedArtworksResponse.class);
+        assertThat(
+                response.getPage().getContent(),
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3, ea4))));
+    }
+
+    @Test
+    @WithMockCustomUser(role = USER, auth = true)
+    public void searchEvaluableArtworks_notAuthorized() {
+        given()
+                .header("Authorization", utilSecurityContext.getToken())
+                .contentType(JSON)
+                .params(allPages("countryId", 1L))
+                .when()
+                .get(API_URL + SEARCH_EVALUABLE_ARTWORKS)
+                .then()
+                .assertThat()
+                .statusCode(403);
+    }
+
+    @Test
+    @WithMockCustomUser(role = EVALUATOR, auth = true)
+    public void searchEvaluableArtworks_byCountry() {
+        var countryId = utilLocation.savedCountry().getId();
+        var ea1 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var ea2 = utilEvaluation.savedEvaluableArtworkProj(countryId);
+        var ea3 = utilEvaluation.savedEvaluableArtworkProj();
+        var response = given()
+                .header("Authorization", utilSecurityContext.getToken())
+                .contentType(JSON)
+                .params(allPages("countryId", countryId))
+                .when()
+                .get(API_URL + SEARCH_EVALUABLE_ARTWORKS)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SearchEvaluableArtworksResponse.class);
+        assertThat(
+                response.getPage().getContent(),
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
+    }
+
+    @Test
+    @WithMockCustomUser(role = EVALUATOR, auth = true)
+    public void searchEvaluableArtworks_byCountryAndTitle() {
+        var title = genUUID();
+        var countryId = utilLocation.savedCountry().getId();
+        var ea1 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)),
+                countryId);
+        var ea2 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genWithSubstring(title)),
+                countryId);
+        var ea3 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genUUID()),
+                countryId);
+        var response = given()
+                .header("Authorization", utilSecurityContext.getToken())
+                .contentType(JSON)
+                .params(allPages(Map.of("countryId", countryId, "title", title)))
+                .when()
+                .get(API_URL + SEARCH_EVALUABLE_ARTWORKS)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SearchEvaluableArtworksResponse.class);
+        assertThat(
+                response.getPage().getContent(),
+                allOf(hasItems(ea1, ea2), not(hasItems(ea3))));
+    }
+
+    @Test
+    @WithMockCustomUser(role = EVALUATOR, auth = true)
+    public void searchEvaluableArtworks_byCountryAndCategories() {
+        long countryId = utilLocation.savedCountry().getId();
+        var c1 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var c2 = utilArtworkMetadata.savedArtworkMetadataDto(CATEGORY, APPROVED);
+        var ea1 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1, c2)), countryId);
+        var ea2 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c1)), countryId);
+        var ea3 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(Set.of(c2)), countryId);
+        var ea4 = utilEvaluation.savedEvaluableArtworkProj(
+                utilArtwork.savedEvaluableArtworkDto(genUUID()), countryId);
+        var response = given()
+                .header("Authorization", utilSecurityContext.getToken())
+                .contentType(JSON)
+                .params(allPages(Map.of(
+                        "countryId", countryId,
+                        "categories", String.format("%s", c1.getName()))))
+                .when()
+                .get(API_URL + SEARCH_EVALUABLE_ARTWORKS)
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(SearchEvaluableArtworksResponse.class);
         assertThat(
                 response.getPage().getContent(),
                 allOf(hasItems(ea1, ea2), not(hasItems(ea3, ea4))));

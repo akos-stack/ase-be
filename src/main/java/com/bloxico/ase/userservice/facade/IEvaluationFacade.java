@@ -29,4 +29,8 @@ public interface IEvaluationFacade {
             PageRequest page,
             Long principalId);
 
+    SearchEvaluableArtworksResponse searchEvaluableArtworks(
+            SearchEvaluableArtworksRequest request,
+            PageRequest page);
+
 }

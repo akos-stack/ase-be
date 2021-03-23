@@ -82,4 +82,12 @@ public class EvaluationController implements EvaluationApi {
         return ResponseEntity.ok(response);
     }
 
+    @Override
+    public ResponseEntity<SearchEvaluableArtworksResponse> searchEvaluableArtworks(
+            SearchEvaluableArtworksRequest request, PageRequest page)
+    {
+        var response = evaluationFacade.searchEvaluableArtworks(request, page);
+        return ResponseEntity.ok(response);
+    }
+
 }
