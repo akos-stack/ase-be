@@ -226,6 +226,15 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
         log.info("UserRegistrationFacadeImpl.checkHostInvitation - end | token: {}", token);
     }
 
+    @Override
+    public void refreshHostInvitationToken(HostInvitationRefreshTokenRequest request) {
+        log.info("UserRegistrationFacadeImpl.refreshHostInvitationToken - start | request: {}", request);
+        var tokenDto = hostInvitationTokenService.refreshToken(request.getToken());
+        var userDto = userService.findUserById(tokenDto.getUserId());
+        mailUtil.sendTokenEmail(HOST_INVITATION, userDto.getEmail(), tokenDto.getValue());
+        log.info("UserRegistrationFacadeImpl.refreshHostInvitationToken - end | request: {}", request);
+    }
+
     // HELPER METHODS
 
     private LocationDto doSaveLocation(ISubmitUserProfileRequest request, Long principalId) {

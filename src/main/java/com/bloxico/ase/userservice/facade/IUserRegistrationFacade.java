@@ -43,4 +43,5 @@ public interface IUserRegistrationFacade {
 
     void checkHostInvitation(String token);
 
+    void refreshHostInvitationToken(HostInvitationRefreshTokenRequest request);
 }
