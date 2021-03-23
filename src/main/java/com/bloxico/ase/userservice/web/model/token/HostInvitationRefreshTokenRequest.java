@@ -1,9 +1,7 @@
 package com.bloxico.ase.userservice.web.model.token;
 
 import io.swagger.annotations.ApiParam;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 

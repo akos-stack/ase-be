@@ -229,6 +229,7 @@ public class UserRegistrationFacadeImpl implements IUserRegistrationFacade {
     @Override
     public void refreshHostInvitationToken(HostInvitationRefreshTokenRequest request) {
         log.info("UserRegistrationFacadeImpl.refreshHostInvitationToken - start | request: {}", request);
+        checkHostInvitation(request.getToken());
         var tokenDto = hostInvitationTokenService.refreshToken(request.getToken());
         var userDto = userService.findUserById(tokenDto.getUserId());
         mailUtil.sendTokenEmail(HOST_INVITATION, userDto.getEmail(), tokenDto.getValue());

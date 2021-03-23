@@ -672,6 +672,11 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         userRegistrationFacade.checkHostInvitation(token);
     }
 
+    // TODO revisit tests bellow (see tests for checkHostInvitation)
+    // _principalNotInvited
+    // _principalInvited
+    // _userIdNotEqualsPrincipalId
+
     @Test
     public void refreshHostInvitationToken_nullRequest() {
         assertThrows(
@@ -690,21 +695,16 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
     @Test
     public void refreshHostInvitationToken() {
         var userId = utilUser.savedUser().getId();
-        var tokenValue = utilToken.doHostInvitation(userId).getValue();
-        var invitationTokenDto = tokenRepository
-                .findByValue(tokenValue)
-                .map(MAPPER::toDto)
-                .orElseThrow();
+        var token = utilToken.doHostInvitation(userId);
         userRegistrationFacade.refreshHostInvitationToken(
-                new HostInvitationRefreshTokenRequest(tokenValue));
-        var refreshedTokenDto = tokenRepository
-                .findByTypeAndUserId(HOST_INVITATION, invitationTokenDto.getUserId())
-                .map(MAPPER::toDto)
+                new HostInvitationRefreshTokenRequest(token.getValue()));
+        var refreshedToken = tokenRepository
+                .findByTypeAndUserId(HOST_INVITATION, token.getUserId())
                 .orElseThrow();
-        assertEquals(invitationTokenDto.getId(), refreshedTokenDto.getId());
-        assertEquals(invitationTokenDto.getUserId(), refreshedTokenDto.getUserId());
-        assertNotEquals(invitationTokenDto.getValue(), refreshedTokenDto.getValue());
-        assertTrue(invitationTokenDto.getExpiryDate().isBefore(refreshedTokenDto.getExpiryDate()));
+        assertEquals(token.getId(), refreshedToken.getId());
+        assertEquals(token.getUserId(), refreshedToken.getUserId());
+        assertNotEquals(token.getValue(), refreshedToken.getValue());
+        assertTrue(token.getExpiryDate().isBefore(refreshedToken.getExpiryDate()));
     }
 
 }

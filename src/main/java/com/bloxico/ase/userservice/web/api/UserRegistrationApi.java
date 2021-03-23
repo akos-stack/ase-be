@@ -219,7 +219,7 @@ public interface UserRegistrationApi {
     @GetMapping(value = REGISTRATION_HOST_INVITATION_REFRESH)
     @ApiOperation(value = "Refreshes expired host invitation token.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Token is refreshed and email has been sent with updated token value."),
+            @ApiResponse(code = 200, message = "Token is refreshed and email is sent with updated token value."),
             @ApiResponse(code = 404, message = "Provided token for host invitation is not found.")
     })
     ResponseEntity<Void> refreshHostInvitation(@Valid HostInvitationRefreshTokenRequest request);

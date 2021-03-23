@@ -821,6 +821,11 @@ public class UserRegistrationApiTest extends AbstractSpringTestWithAWS {
                 .statusCode(200);
     }
 
+    // TODO revisit tests bellow (see tests for checkHostInvitation)
+    // _principalNotInvited
+    // _principalInvited
+    // _userIdNotEqualsPrincipalId
+
     @Test
     public void refreshHostInvitation_404_tokenNotFound() {
         given()
