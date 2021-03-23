@@ -302,7 +302,12 @@ public interface ErrorCodes {
         QUOTATION_PACKAGE_COUNTRY_EXISTS(
                 HttpStatus.CONFLICT,
                 "Evaluation_05",
-                "Quotation package country already exists for specified country.");
+                "Quotation package country already exists for specified country."),
+
+        QUOTATION_PACKAGE_MIN_EVALUATIONS_REQUIRED(
+                HttpStatus.BAD_REQUEST,
+                "Evaluation_06",
+                "Quotation package has less than required minimum of evaluations.");
 
         private final HttpStatus httpStatus;
         private final String code, description;
