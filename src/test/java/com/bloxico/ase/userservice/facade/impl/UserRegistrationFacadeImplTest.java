@@ -672,4 +672,39 @@ public class UserRegistrationFacadeImplTest extends AbstractSpringTestWithAWS {
         userRegistrationFacade.checkHostInvitation(token);
     }
 
+    @Test
+    public void refreshHostInvitationToken_nullRequest() {
+        assertThrows(
+                NullPointerException.class,
+                () -> userRegistrationFacade.refreshHostInvitationToken(null));
+    }
+
+    @Test
+    public void refreshHostInvitationToken_tokenNotFound() {
+        assertThrows(
+                TokenException.class,
+                () -> userRegistrationFacade.refreshHostInvitationToken(
+                        new HostInvitationRefreshTokenRequest(genUUID())));
+    }
+
+    @Test
+    public void refreshHostInvitationToken() {
+        var userId = utilUser.savedUser().getId();
+        var tokenValue = utilToken.doHostInvitation(userId).getValue();
+        var invitationTokenDto = tokenRepository
+                .findByValue(tokenValue)
+                .map(MAPPER::toDto)
+                .orElseThrow();
+        userRegistrationFacade.refreshHostInvitationToken(
+                new HostInvitationRefreshTokenRequest(tokenValue));
+        var refreshedTokenDto = tokenRepository
+                .findByTypeAndUserId(HOST_INVITATION, invitationTokenDto.getUserId())
+                .map(MAPPER::toDto)
+                .orElseThrow();
+        assertEquals(invitationTokenDto.getId(), refreshedTokenDto.getId());
+        assertEquals(invitationTokenDto.getUserId(), refreshedTokenDto.getUserId());
+        assertNotEquals(invitationTokenDto.getValue(), refreshedTokenDto.getValue());
+        assertTrue(invitationTokenDto.getExpiryDate().isBefore(refreshedTokenDto.getExpiryDate()));
+    }
+
 }
